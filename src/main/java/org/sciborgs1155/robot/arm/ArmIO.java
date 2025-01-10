@@ -1,7 +1,7 @@
-package org.sciborgs1155.robot.groundIntake;
+package org.sciborgs1155.robot.arm;
 
-/** Hardware interface for {@link GroundIntake} subsystem */
-public interface GroundIntakeIO {
+/** Hardware interface for {@link Arm} subsystem */
+public interface ArmIO {
 
     /**
      * @return The position in radians.
@@ -18,8 +18,5 @@ public interface GroundIntakeIO {
      */
     public void setArmVoltage(double voltage);
 
-    /**
-     * Sets the power (from -1 to 1) of the roller motors.
-     */
-    public void setRoller(double power);
+    public void close();
 }

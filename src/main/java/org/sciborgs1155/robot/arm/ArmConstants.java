@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.groundIntake;
+package org.sciborgs1155.robot.arm;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Radians;
@@ -8,7 +8,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
-public class GroundIntakeConstants {
+public class ArmConstants {
     // TODO not tuned (at all)
     public static final double kP = 1;
     public static final double kI = 0;
@@ -22,10 +22,6 @@ public class GroundIntakeConstants {
     public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(0); //TODO figure this out
     public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(0); //TODO figure this one out too
     public static final Rotation2d STARTING_ANGLE = Rotation2d.fromRadians(0); //TODO ??????
-
-    // The amount of power going into the roller (from 0-1)
-    public static final double INTAKE_POWER = 0.5; //TODO arbitrary value
-    public static final double OUTTAKE_POWER = -0.2; //TODO also arbitrary
 
     public static final DCMotor GEARBOX = DCMotor.getNEO(1);
     public static final double GEARING = 8.21;

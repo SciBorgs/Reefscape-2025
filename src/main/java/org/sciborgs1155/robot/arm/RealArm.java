@@ -1,4 +1,4 @@
-package org.sciborgs1155.robot.groundIntake;
+package org.sciborgs1155.robot.arm;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -7,8 +7,8 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 
-/** {@link GroundIntakeIO} class with {@link TalonFX} motor controllers */
-public class RealGroundIntake implements GroundIntakeIO {
+/** {@link ArmIO} class with {@link TalonFX} motor controllers */
+public class RealArm implements ArmIO {
     /** Controls arm orientation */
     private final TalonFX pivotMotor;
 
@@ -30,12 +30,7 @@ public class RealGroundIntake implements GroundIntakeIO {
         pivotMotor.setVoltage(voltage);
     }
 
-    @Override
-    public void setRoller(double power) {
-        rollerMotor.set(power);
-    }
-
-    public RealGroundIntake() {
+    public RealArm() {
         pivotMotor = new TalonFX(ARM_MOTOR);
         rollerMotor = new TalonFX(ROLLER_MOTOR);
 
