@@ -63,4 +63,10 @@ public class RealScoral implements ScoralIO {
   public boolean beambreak() {
     return beambreak.get();
   }
+
+  @Override
+  public void close() throws Exception {
+    topMotor.close();
+    bottomMotor.close();
+  }
 }

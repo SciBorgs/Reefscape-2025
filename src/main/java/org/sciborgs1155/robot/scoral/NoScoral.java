@@ -9,4 +9,7 @@ public class NoScoral implements ScoralIO {
   public boolean beambreak() {
     return false;
   }
+
+  @Override
+  public void close() throws Exception {}
 }

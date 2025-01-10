@@ -9,4 +9,7 @@ public class SimScoral implements ScoralIO {
   public boolean beambreak() {
     return false;
   }
+
+  @Override
+  public void close() throws Exception {}
 }
