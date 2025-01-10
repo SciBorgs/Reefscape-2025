@@ -2,7 +2,7 @@ package org.sciborgs1155.robot.scoral;
 
 public interface ScoralIO {
 
-  void outtake();
+  void setPower(double power);
 
   boolean beambreak();
 }

@@ -20,7 +20,7 @@ public class RealScoral implements ScoralIO {
   }
 
   @Override
-  public void outtake() {
+  public void setPower(double power) {
     // TODO : SCORAL OUTTAKE
   }
 
