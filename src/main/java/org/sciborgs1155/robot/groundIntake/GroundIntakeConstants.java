@@ -19,5 +19,9 @@ public class GroundIntakeConstants {
     public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(0); //TODO figure this out
     public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(0); //TODO figure this one out too
     public static final Rotation2d STARTING_ANGLE = Rotation2d.fromRadians(0); //TODO ??????
+
+    // The amount of power going into the roller (from 0-1)
+    public static final double INTAKE_POWER = 0.5; //TODO arbitrary value
+    public static final double OUTTAKE_POWER = -0.2; //TODO also arbitrary
     
 }
