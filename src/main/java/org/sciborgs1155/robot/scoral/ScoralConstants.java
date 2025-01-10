@@ -1,5 +1,3 @@
 package org.sciborgs1155.robot.scoral;
 
-public class ScoralConstants {
-    
-}
+public class ScoralConstants {}
