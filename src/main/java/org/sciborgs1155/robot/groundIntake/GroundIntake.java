@@ -12,7 +12,7 @@ public class GroundIntake {
     private final GroundIntakeIO hardware;
 
     private final PIDController fb = new PIDController(kP, kI, kD);
-    private final ArmFeedforward ff;
+    private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
     public static GroundIntake create() {
         return Robot.isReal() ? new GroundIntake(new RealGroundIntake()) : new GroundIntake(new SimGroundIntake());
