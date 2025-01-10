@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.FaultLogger.check;
 import static org.sciborgs1155.robot.Ports.Scoral.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMI;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.RAMP_TIME;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -33,7 +35,7 @@ public class RealScoral implements ScoralIO {
             topConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
 
     topConfig.apply(
-        topConfig.idleMode(IdleMode.kBrake).smartCurrentLimit((int) CURRENT_LIMI.in(Amps)));
+        topConfig.idleMode(IdleMode.kBrake).smartCurrentLimit((int) CURRENT_LIMI.in(Amps)).openLoopRampRate(RAMP_TIME.in(Seconds)));
 
     check(
         topMotor,
