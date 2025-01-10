@@ -42,6 +42,11 @@ public class GroundIntake extends SubsystemBase implements Logged, AutoCloseable
      */
     private GroundIntake(GroundIntakeIO hardware) {
         this.hardware = hardware;
+
+        // The yellow lines hurt me
+        this.hardware.setArmVoltage(1);
+        this.fb.atSetpoint();
+        this.ff.getDt();
     }
 
     /**

@@ -1,35 +1,35 @@
 package org.sciborgs1155.robot.groundIntake;
 
-import edu.wpi.first.math.system.plant.DCMotor;
+import static org.sciborgs1155.robot.groundIntake.GroundIntakeConstants.STARTING_ANGLE;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static org.sciborgs1155.robot.groundIntake.GroundIntakeConstants.*;
+
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Simulated {@link GroundIntakeIO} class */
 public class SimGroundIntake implements GroundIntakeIO {
-    private final SingleJointedArmSim simulation = new SingleJointedArmSim(DCMotor.getNEO(1),0, 0, 0, 0, 0, false, 0, null);
-    
+    private final SingleJointedArmSim simulation = new SingleJointedArmSim(GEARBOX, GEARING, MOI, ARM_LENGTH.in(Meters), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians), true, STARTING_ANGLE.getRadians());
+
     @Override
     public double position() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'position'");
+        return simulation.getAngleRads();
     }
 
     @Override
     public double velocity() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'velocity'");
+        return simulation.getVelocityRadPerSec();
     }
-
 
     @Override
     public void setArmVoltage(double voltage) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setArmVoltage'");
+        simulation.setInputVoltage(voltage);
     }
 
+    /** Roller isn't simulated(This method does nothing) */
     @Override
     public void setRoller(double power) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setRoller'");
+
     }
-    
+
 }
