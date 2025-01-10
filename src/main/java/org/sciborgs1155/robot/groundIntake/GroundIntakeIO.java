@@ -16,5 +16,10 @@ public interface GroundIntakeIO {
     /**
      * Sets the voltage of the arm motor.
      */
-    public void set();
+    public void setArmVoltage(double voltage);
+
+    /**
+     * Sets the power (from -1 to 1) of the roller motors.
+     */
+    public void setRoller(double power);
 }
