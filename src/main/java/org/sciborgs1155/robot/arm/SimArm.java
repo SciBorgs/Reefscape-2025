@@ -8,21 +8,29 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Simulated {@link ArmIO} class */
 public class SimArm implements ArmIO {
-    private final SingleJointedArmSim simulation = new SingleJointedArmSim(GEARBOX, GEARING, MOI, ARM_LENGTH.in(Meters), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians), true, STARTING_ANGLE.getRadians());
+  private final SingleJointedArmSim simulation =
+      new SingleJointedArmSim(
+          GEARBOX,
+          GEARING,
+          MOI,
+          ARM_LENGTH.in(Meters),
+          MIN_ANGLE.in(Radians),
+          MAX_ANGLE.in(Radians),
+          true,
+          STARTING_ANGLE.getRadians());
 
-    @Override
-    public double position() {
-        return simulation.getAngleRads();
-    }
+  @Override
+  public double position() {
+    return simulation.getAngleRads();
+  }
 
-    @Override
-    public double velocity() {
-        return simulation.getVelocityRadPerSec();
-    }
+  @Override
+  public double velocity() {
+    return simulation.getVelocityRadPerSec();
+  }
 
-    @Override
-    public void setArmVoltage(double voltage) {
-        simulation.setInputVoltage(voltage);
-    }
-
+  @Override
+  public void setArmVoltage(double voltage) {
+    simulation.setInputVoltage(voltage);
+  }
 }
