@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.groundIntake;
 
+/** Hardware interface for {@link GroundIntake} subsystem */
 public interface GroundIntakeIO {
 
     /**
