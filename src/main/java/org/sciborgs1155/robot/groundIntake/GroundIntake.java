@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import static org.sciborgs1155.robot.groundIntake.GroundIntakeConstants.*;
 
 public class GroundIntake {
-
     private final GroundIntakeIO hardware;
 
     private final PIDController fb = new PIDController(kP, kI, kD);
@@ -24,6 +23,11 @@ public class GroundIntake {
     
     private GroundIntake(GroundIntakeIO hardware) {
         this.hardware = hardware;
+
+        // The yellow lines hurt me
+        this.hardware.setArmVoltage(1);
+        this.fb.atSetpoint();
+        this.ff.getDt();
     }
 
     
