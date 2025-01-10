@@ -12,7 +12,6 @@ public class Scoral extends SubsystemBase {
 
   public Scoral(ScoralIO scoral) {
     this.scoral = scoral;
-    System.out.println("");
   }
 
   public static Scoral create() {
@@ -31,5 +30,10 @@ public class Scoral extends SubsystemBase {
   /** Runs the motor to intake, as in pulling in, a coral. */
   public Command intake() {
     return run(() -> scoral.setPower(-POWER));
+  }
+
+  /** Returns the value of the beambreak. */
+  public boolean beambreak() {
+    return scoral.beambreak();
   }
 }

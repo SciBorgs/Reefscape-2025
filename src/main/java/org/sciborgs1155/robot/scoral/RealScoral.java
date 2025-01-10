@@ -1,9 +1,10 @@
 package org.sciborgs1155.robot.scoral;
 
+import static org.sciborgs1155.robot.Ports.Scoral.*;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
-import org.sciborgs1155.robot.Ports;
 
 public class RealScoral implements ScoralIO {
 
@@ -13,16 +14,14 @@ public class RealScoral implements ScoralIO {
   private final DigitalInput beambreak;
 
   public RealScoral() {
-    topMotor = new SparkMax(Ports.Scoral.TOP_ROLLER, MotorType.kBrushed);
-    bottomMotor = new SparkMax(Ports.Scoral.BOTTOM_ROLLER, MotorType.kBrushed);
+    topMotor = new SparkMax(TOP_ROLLER, MotorType.kBrushed);
+    bottomMotor = new SparkMax(BOTTOM_ROLLER, MotorType.kBrushed);
 
-    beambreak = new DigitalInput(Ports.Scoral.BEAMBREAK);
+    beambreak = new DigitalInput(BEAMBREAK);
   }
 
   @Override
-  public void setPower(double power) {
-    // TODO : SCORAL OUTTAKE
-  }
+  public void setPower(double power) {}
 
   @Override
   public boolean beambreak() {
