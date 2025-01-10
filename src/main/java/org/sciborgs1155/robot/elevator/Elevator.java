@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static org.sciborgs1155.robot.Constants.*;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,7 +13,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -40,8 +40,11 @@ public class Elevator extends SubsystemBase implements Logged {
 
   @Log private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Log.NT private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
-  @Log.NT private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+  @Log.NT
+  private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+
+  @Log.NT
+  private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
@@ -54,6 +57,10 @@ public class Elevator extends SubsystemBase implements Logged {
 
   public Command retract() {
     return run(() -> update(MIN_HEIGHT.in(Meters)));
+  }
+
+  public Command scoreLevel(Level level) {
+    return run(() -> update(level.getHeight()));
   }
 
   @Log.NT
@@ -88,7 +95,7 @@ public class Elevator extends SubsystemBase implements Logged {
 
   @Override
   public void periodic() {
-      setpoint.setLength(positionSetpoint());
-      measurement.setLength(position());
+    setpoint.setLength(positionSetpoint());
+    measurement.setLength(position());
   }
 }

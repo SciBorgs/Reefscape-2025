@@ -60,5 +60,22 @@ public class Constants {
           && pose.getY() > 0
           && pose.getY() < Field.WIDTH.in(Meters));
     }
+
+    public enum Level {
+      L1(.3),
+      L2(.7),
+      L3(1),
+      L4(1.5);
+
+      private final double height;
+
+      Level(double height) {
+        this.height = height;
+      }
+
+      public double getHeight() {
+        return this.height;
+      }
+    }
   }
 }

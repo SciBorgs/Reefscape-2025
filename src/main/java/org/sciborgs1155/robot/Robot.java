@@ -5,8 +5,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.Constants.*;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -96,7 +96,10 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    teleop().onTrue(elevator.extend());
+    operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    operator.y().onTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
