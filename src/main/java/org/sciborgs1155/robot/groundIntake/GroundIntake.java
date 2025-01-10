@@ -19,7 +19,7 @@ public class GroundIntake {
     }
 
     public static GroundIntake none() {
-        return new NoGroundIntake();
+    return new GroundIntake(new NoGroundIntake());
     }
     
     private GroundIntake(GroundIntakeIO hardware) {

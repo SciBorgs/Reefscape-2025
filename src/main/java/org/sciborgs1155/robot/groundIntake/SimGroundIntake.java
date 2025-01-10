@@ -19,10 +19,17 @@ public class SimGroundIntake implements GroundIntakeIO {
         throw new UnsupportedOperationException("Unimplemented method 'velocity'");
     }
 
+
     @Override
-    public void set() {
+    public void setArmVoltage(double voltage) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'set'");
+        throw new UnsupportedOperationException("Unimplemented method 'setArmVoltage'");
+    }
+
+    @Override
+    public void setRoller(double power) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setRoller'");
     }
     
 }

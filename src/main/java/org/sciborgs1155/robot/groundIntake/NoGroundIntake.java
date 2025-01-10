@@ -13,6 +13,15 @@ public class NoGroundIntake implements GroundIntakeIO {
     }
 
     @Override
-    public void set() {}
+    public void setArmVoltage(double voltage) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setArmVoltage'");
+    }
+
+    @Override
+    public void setRoller(double power) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setRoller'");
+    }
     
 }
