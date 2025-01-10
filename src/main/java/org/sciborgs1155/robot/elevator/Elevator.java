@@ -45,14 +45,15 @@ public class Elevator extends SubsystemBase implements Logged {
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
+    setDefaultCommand(retract());
   }
 
   public Command extend() {
-    return Commands.run(() -> update(MAX_HEIGHT.in(Meters)));
+    return run(() -> update(MAX_HEIGHT.in(Meters)));
   }
 
   public Command retract() {
-    return Commands.run(() -> update(MIN_HEIGHT.in(Meters)));
+    return run(() -> update(MIN_HEIGHT.in(Meters)));
   }
 
   @Log.NT

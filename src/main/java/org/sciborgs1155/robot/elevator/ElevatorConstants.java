@@ -19,8 +19,8 @@ public class ElevatorConstants {
   public static final double kV = 1;
   public static final double kA = 0;
 
-  public static final Distance MIN_HEIGHT = Meters.of(0);
-  public static final Distance MAX_HEIGHT = Meters.of(1);
+  public static final Distance MIN_HEIGHT = Meters.of(.2);
+  public static final Distance MAX_HEIGHT = Meters.of(2);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(1);

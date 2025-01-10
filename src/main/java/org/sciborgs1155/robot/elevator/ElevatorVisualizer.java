@@ -17,10 +17,10 @@ public class ElevatorVisualizer implements Logged {
   public ElevatorVisualizer(Color8Bit color) {
     mech = new Mechanism2d(50, 50);
     MechanismRoot2d chassis = mech.getRoot("chassis", 25, 10);
-    elevator = chassis.append(new MechanismLigament2d("elevator", MIN_HEIGHT.in(Meters) * 5, 0, 3, color));
+    elevator = chassis.append(new MechanismLigament2d("elevator", MIN_HEIGHT.in(Meters) * 10, 90, 3, color));
   }
 
   public void setLength(double length) {
-    elevator.setLength(length * 5);
+    elevator.setLength(length * 10);
   }
 }
