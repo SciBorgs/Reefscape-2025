@@ -17,7 +17,7 @@ public class SimElevator implements ElevatorIO {
     elevator =
         new ElevatorSim(
             LinearSystemId.createElevatorSystem(
-                DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), DRUM_RADIUS.in(Meters), gearing),
+                DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), DRUM_RADIUS.in(Meters), GEARING),
             DCMotor.getKrakenX60(2),
             MIN_HEIGHT.in(Meters),
             MAX_HEIGHT.in(Meters),
