@@ -40,4 +40,8 @@ public class SimElevator implements ElevatorIO {
   public double getVelocity() {
     return elevator.getVelocityMetersPerSecond();
   }
+
+  @Override
+  public void close() throws Exception {
+  }
 }

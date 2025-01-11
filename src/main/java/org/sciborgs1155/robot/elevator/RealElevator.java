@@ -32,4 +32,10 @@ public class RealElevator implements ElevatorIO {
   public double getVelocity() {
     return lead.getVelocity().getValueAsDouble();
   }
+
+  @Override
+  public void close() throws Exception {
+    lead.close();
+    follower.close();
+  }
 }

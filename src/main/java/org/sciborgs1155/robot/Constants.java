@@ -67,7 +67,7 @@ public class Constants {
       L3(1),
       L4(1.5);
 
-      private final double height;
+      public final double height;
 
       Level(double height) {
         this.height = height;

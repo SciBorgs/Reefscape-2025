@@ -18,7 +18,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.robot.Robot;
 
-public class Elevator extends SubsystemBase implements Logged {
+public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public static Elevator create() {
     return Robot.isReal() ? new Elevator(new RealElevator()) : new Elevator(new SimElevator());
   }
@@ -97,5 +97,10 @@ public class Elevator extends SubsystemBase implements Logged {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+  }
+
+  @Override
+  public void close() throws Exception {
+    hardware.close();
   }
 }

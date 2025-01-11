@@ -14,4 +14,8 @@ public class NoElevator implements ElevatorIO {
   public double getVelocity() {
     return 0;
   }
+
+  @Override
+  public void close() throws Exception {
+  }
 }
