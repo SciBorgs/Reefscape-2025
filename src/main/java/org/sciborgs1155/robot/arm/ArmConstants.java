@@ -45,7 +45,7 @@ public class ArmConstants {
   /** Fully retracted. */
   public static final Angle MAX_ANGLE = Radians.of(Math.PI * 3 / 4 + 0.1);
 
-  public static final Angle GOTO_TOLERANCE = Degrees.of(2);
+  public static final Angle POSITION_TOLERANCE = Degrees.of(2);
 
   public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(4);
   public static final AngularAcceleration MAX_ACCEL = RadiansPerSecondPerSecond.of(10);

@@ -19,8 +19,12 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple Arm subsystem used for climbing and intaking coral from the ground. */
@@ -74,6 +78,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
+    fb.setTolerance(POSITION_TOLERANCE.in(Radians));
   }
 
   /**
@@ -103,7 +108,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
 
   @Log.NT
   /** Moves the arm towards a specified goal angle. */
-  public Command goTowards(Angle goal) {
+  public Command goTo(Angle goal) {
     return run(() -> {
           double feedForward = ff.calculate(goal.in(Radians), 0);
           double feedBack = fb.calculate(hardware.position(), goal.in(Radians));
@@ -113,14 +118,17 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .andThen(Commands.print("Yippee"));
   }
 
-  public Command goTo(Angle goal) {
-    return goTowards(goal)
-        .until(() -> (Math.abs(goal.in(Radians) - position()) < GOTO_TOLERANCE.in(Radians)));
-  }
-
   @Override
   public void close() throws Exception {
     hardware.close();
+  }
+
+  public Test goToTest(Angle goal) {
+    Command testCommand = goTo(goal).until(fb::atGoal);
+    EqualityAssertion atGoal =
+        Assertion.eAssert(
+            "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
+    return new Test(testCommand, Set.of(atGoal));
   }
 
   @Override
