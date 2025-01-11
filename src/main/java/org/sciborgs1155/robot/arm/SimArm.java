@@ -35,5 +35,10 @@ public class SimArm implements ArmIO {
   }
 
   @Override
+  public double voltage() {
+    return simulation.getInput().elementSum();
+  }
+
+  @Override
   public void close() {}
 }

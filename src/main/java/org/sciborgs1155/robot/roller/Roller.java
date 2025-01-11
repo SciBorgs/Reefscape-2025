@@ -13,8 +13,8 @@ public class Roller extends SubsystemBase implements Logged, AutoCloseable {
   private final RollerIO hardware;
 
   /**
-   * Returns a new {@link Roller} subsystem, which will have real hardware if the
-   * robot is real, and no hardware connection if it isn't.
+   * Returns a new {@link Roller} subsystem, which will have real hardware if the robot is real, and
+   * no hardware connection if it isn't.
    */
   public Roller create() {
     return Robot.isReal() ? new Roller(new RealRoller()) : new Roller(new NoRoller());
@@ -27,12 +27,12 @@ public class Roller extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Makes the roller spin inwards(towards robot). */
   public Command intake() {
-    return run(() -> hardware.setPower(INTAKE_POWER));
+    return run(() -> hardware.setPower(INTAKE_POWER)).withName("Intaking");
   }
 
   /** Makes the roller spin outwards(away from robot). */
   public Command outtake() {
-    return run(() -> hardware.setPower(OUTTAKE_POWER));
+    return run(() -> hardware.setPower(OUTTAKE_POWER)).withName("Outtaking");
   }
 
   private Roller(RollerIO hardwareInterface) {

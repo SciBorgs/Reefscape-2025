@@ -12,6 +12,11 @@ public interface ArmIO extends AutoCloseable {
    */
   public double velocity();
 
+  /**
+   * @return Returns the voltage of the arm motor.
+   */
+  public double voltage();
+
   /** Sets the voltage of the arm motor. */
   public void setVoltage(double voltage);
 }

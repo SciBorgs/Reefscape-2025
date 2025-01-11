@@ -7,6 +7,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -30,14 +32,18 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class Robot extends CommandRobot implements Logged {
@@ -50,11 +56,14 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
+  private final Arm arm = Arm.create();
 
   // COMMANDS
-  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  @Log.NT
+  private final SendableChooser<Command> autos = Autos.configureAutos(drive);
 
-  @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
+  @Log.NT
+  private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -65,7 +74,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem interaction
+    // TODO: Add configs for all additional libraries, components, intersubsystem
+    // interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
@@ -98,16 +108,16 @@ public class Robot extends CommandRobot implements Logged {
     InputStream x = InputStream.of(driver::getLeftY).negate();
     InputStream y = InputStream.of(driver::getLeftX).negate();
 
-    // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
-    InputStream r =
-        InputStream.hypot(x, y)
-            .log("Robot/raw joystick")
-            .scale(() -> speedMultiplier)
-            .clamp(1.0)
-            .deadband(Constants.DEADBAND, 1.0)
-            .signedPow(2.0)
-            .log("Robot/processed joystick")
-            .scale(MAX_SPEED.in(MetersPerSecond));
+    // Apply speed multiplier, deadband, square inputs, and scale translation to max
+    // speed
+    InputStream r = InputStream.hypot(x, y)
+        .log("Robot/raw joystick")
+        .scale(() -> speedMultiplier)
+        .clamp(1.0)
+        .deadband(Constants.DEADBAND, 1.0)
+        .signedPow(2.0)
+        .log("Robot/processed joystick")
+        .scale(MAX_SPEED.in(MetersPerSecond));
 
     InputStream theta = InputStream.atan(x, y);
 
@@ -115,16 +125,16 @@ public class Robot extends CommandRobot implements Logged {
     x = r.scale(theta.map(Math::cos)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
     y = r.scale(theta.map(Math::sin)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
 
-    // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
-    InputStream omega =
-        InputStream.of(driver::getRightX)
-            .negate()
-            .scale(() -> speedMultiplier)
-            .clamp(1.0)
-            .deadband(DEADBAND, 1.0)
-            .signedPow(2.0)
-            .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
-            .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
+    // Apply speed multiplier, deadband, square inputs, and scale rotation to max
+    // teleop speed
+    InputStream omega = InputStream.of(driver::getRightX)
+        .negate()
+        .scale(() -> speedMultiplier)
+        .clamp(1.0)
+        .deadband(DEADBAND, 1.0)
+        .signedPow(2.0)
+        .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
+        .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
@@ -139,6 +149,8 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
+    operator.a().onTrue(arm.moveArmTo(MAX_ANGLE));
+    operator.b().onTrue(arm.moveArmTo(MIN_ANGLE));
     // TODO: Add any additional bindings.
   }
 
@@ -146,15 +158,15 @@ public class Robot extends CommandRobot implements Logged {
    * Command factory to make both controllers rumble.
    *
    * @param rumbleType The area of the controller to rumble.
-   * @param strength The intensity of the rumble.
+   * @param strength   The intensity of the rumble.
    * @return The command to rumble both controllers.
    */
   public Command rumble(RumbleType rumbleType, double strength) {
     return Commands.runOnce(
-            () -> {
-              driver.getHID().setRumble(rumbleType, strength);
-              operator.getHID().setRumble(rumbleType, strength);
-            })
+        () -> {
+          driver.getHID().setRumble(rumbleType, strength);
+          operator.getHID().setRumble(rumbleType, strength);
+        })
         .andThen(Commands.waitSeconds(0.3))
         .finallyDo(
             () -> {

@@ -42,6 +42,11 @@ public class RealArm implements ArmIO {
   }
 
   @Override
+  public double voltage() {
+    return motor.getBusVoltage();
+  }
+
+  @Override
   public void setVoltage(double voltage) {
     motor.setVoltage(voltage);
   }

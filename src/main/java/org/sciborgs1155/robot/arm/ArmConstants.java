@@ -31,6 +31,10 @@ public class ArmConstants {
   public static final double MOI = 1;
 
   public static final Distance ARM_LENGTH = Centimeters.of(10);
+
+  /** Fully extended. */
   public static final Angle MIN_ANGLE = Radians.of(0.5);
+
+  /** Fully retracted. */
   public static final Angle MAX_ANGLE = Radians.of(3);
 }
