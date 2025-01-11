@@ -14,7 +14,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     return new Hopper(new NoHopper());
   }
 
-  public final HopperIO hardware;
+  private final HopperIO hardware;
   public final Trigger beambreakTrigger;
 
   public Hopper(HopperIO hardware) {
