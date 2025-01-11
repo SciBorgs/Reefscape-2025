@@ -38,6 +38,10 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     return runHopper(-HopperConstants.INTAKE_POWER);
   }
 
+  public Command stop() {
+    return runHopper(0);
+  }
+
   @Override
   public void close() throws Exception {
     hardware.close();
