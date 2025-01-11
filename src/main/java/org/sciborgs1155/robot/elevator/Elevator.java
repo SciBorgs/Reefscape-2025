@@ -7,6 +7,8 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
+import org.sciborgs1155.robot.Constants.Field.Level;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.robot.Robot;
@@ -28,6 +31,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   private final ElevatorIO hardware;
+  //  private final SysIdRoutine sysIdRoutine;
 
   @Log.NT
   private final ProfiledPIDController pid =
@@ -35,7 +39,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           kP,
           kI,
           kD,
-          new TrapezoidProfile.Constraints(
+          new TrapezoidProfile.Constraints(   
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
@@ -49,6 +53,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
     setDefaultCommand(retract());
+    // sysIdRoutine =
+    //   new SysIdRoutine(
+    //     new SysIdRoutine.Config(),
+    //     new SysIdRoutine.Mechanism(v -> pivot.setVoltage(v.in(Volts)), null, this));
   }
 
   public Command extend() {
