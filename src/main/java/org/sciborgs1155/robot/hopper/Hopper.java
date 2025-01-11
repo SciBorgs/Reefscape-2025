@@ -31,7 +31,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
   }
 
   public Command intake() {
-    return runHopper(HopperConstants.INTAKE_POWER);
+    return runHopper(HopperConstants.INTAKE_POWER); // more logic later
   }
 
   public Command outtake() {
