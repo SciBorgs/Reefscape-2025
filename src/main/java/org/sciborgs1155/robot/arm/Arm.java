@@ -1,11 +1,17 @@
 package org.sciborgs1155.robot.arm;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Radians;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,16 +19,32 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.robot.Robot;
 
-/** Simple Arm subsystem used for climbing and intaking coral from the ground. */
+/**
+ * Simple Arm subsystem used for climbing and intaking coral from the ground.
+ */
 public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  @Log.NT private final ArmIO hardware;
+  @Log.NT
+  private final ArmIO hardware;
 
   private final PIDController feedbackController = new PIDController(kP, kI, kD);
   private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
+  @Log.NT
+  private final Mechanism2d armGUICanvas = new Mechanism2d(60, 60);
+  private final MechanismRoot2d armPivotGUI = armGUICanvas.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d armTowerGUI = armPivotGUI.append(new MechanismLigament2d("ArmTower", 30, -90));
+  private final MechanismLigament2d armGUI = armPivotGUI.append(
+      new MechanismLigament2d(
+          "Arm",
+          ARM_LENGTH.in(Centimeters),
+          STARTING_ANGLE.getDegrees(),
+          10,
+          new Color8Bit(Color.kSkyBlue)));
+
   /**
-   * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
+   * Returns a new {@link Arm} subsystem, which will have real hardware if the
+   * robot is real, and
    * simulated if it isn't.
    */
   public static Arm create() {
@@ -48,6 +70,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
+    armGUI.setAngle(Math.toDegrees(hardware.position()));
     return hardware.position();
   }
 
@@ -56,7 +79,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double velocity() {
-    return hardware.velocity();
+    return hardware.velocity(); 
   }
 
   /**
