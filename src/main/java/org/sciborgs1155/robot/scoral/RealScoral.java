@@ -35,7 +35,10 @@ public class RealScoral implements ScoralIO {
             topConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters));
 
     topConfig.apply(
-        topConfig.idleMode(IdleMode.kBrake).smartCurrentLimit((int) CURRENT_LIMI.in(Amps)).openLoopRampRate(RAMP_TIME.in(Seconds)));
+        topConfig
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit((int) CURRENT_LIMI.in(Amps))
+            .openLoopRampRate(RAMP_TIME.in(Seconds)));
 
     check(
         topMotor,
