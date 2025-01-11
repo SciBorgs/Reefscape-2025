@@ -20,6 +20,11 @@ public final class Ports {
     public static final int REAR_RIGHT_TURNING = 17;
   }
 
+  public static final class Elevator {
+    public static final int LEADER = -1;
+    public static final int FOLLOWER = -1;
+  }
+
   public static final class Scoral {
     public static final int TOP_ROLLER = 21;
     public static final int BOTTOM_ROLLER = 22;
