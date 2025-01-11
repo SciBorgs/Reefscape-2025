@@ -11,7 +11,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 
 public class ElevatorVisualizer implements Logged {
-  @Log private final Mechanism2d mech;
+  @Log.NT private final Mechanism2d mech;
   private final MechanismLigament2d elevator;
 
   public ElevatorVisualizer(Color8Bit color) {

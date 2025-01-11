@@ -29,7 +29,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   private final ElevatorIO hardware;
 
-  @Log
+  @Log.NT
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
           kP,
@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Log private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
@@ -65,12 +65,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   @Log.NT
   public double position() {
-    return hardware.getPosition();
+    return hardware.position();
   }
 
   @Log.NT
   public double velocity() {
-    return hardware.getVelocity();
+    return hardware.velocity();
   }
 
   @Log.NT
@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     position = MathUtil.clamp(position, MIN_HEIGHT.in(Meters), MAX_HEIGHT.in(Meters));
 
     double lastVelocity = pid.getSetpoint().velocity;
-    double feedback = pid.calculate(hardware.getPosition(), position);
+    double feedback = pid.calculate(hardware.position(), position);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
     hardware.setVoltage(feedforward + feedback);

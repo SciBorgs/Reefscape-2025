@@ -32,16 +32,15 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
-  public double getPosition() {
+  public double position() {
     return elevator.getPositionMeters();
   }
 
   @Override
-  public double getVelocity() {
+  public double velocity() {
     return elevator.getVelocityMetersPerSecond();
   }
 
   @Override
-  public void close() throws Exception {
-  }
+  public void close() throws Exception {}
 }

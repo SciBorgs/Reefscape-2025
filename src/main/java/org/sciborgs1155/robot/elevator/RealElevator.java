@@ -22,14 +22,13 @@ public class RealElevator implements ElevatorIO {
     lead.setVoltage(voltage);
   }
 
-  // I don't want to convert to actual units right now
   @Override
-  public double getPosition() {
+  public double position() {
     return lead.getPosition().getValueAsDouble();
   }
 
   @Override
-  public double getVelocity() {
+  public double velocity() {
     return lead.getVelocity().getValueAsDouble();
   }
 
