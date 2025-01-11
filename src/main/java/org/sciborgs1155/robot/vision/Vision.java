@@ -102,8 +102,8 @@ public class Vision implements Logged {
     for (int i = 0; i < estimators.length; i++) {
       var unread = cameras[i].getAllUnreadResults();
       Optional<EstimatedRobotPose> estimate = Optional.empty();
-     
-      for (var change : unread){
+
+      for (var change : unread) {
         estimate = estimators[i].update(change);
         changes[i] = change;
 
@@ -118,7 +118,8 @@ public class Vision implements Logged {
             .ifPresent(
                 e ->
                     estimates.add(
-                        new PoseEstimate(e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
+                        new PoseEstimate(
+                            e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
       }
     }
     return estimates.toArray(PoseEstimate[]::new);
@@ -129,7 +130,6 @@ public class Vision implements Logged {
    *
    * @return An array of Pose3ds.
    */
-
   @Log.NT
   public Pose3d[] getSeenTags() {
     return Arrays.stream(changes)
