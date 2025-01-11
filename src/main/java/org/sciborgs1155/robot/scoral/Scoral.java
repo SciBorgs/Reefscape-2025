@@ -11,10 +11,10 @@ import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
-  @Log.NT private final ScoralIO scoral;
+  @Log.NT private final ScoralIO hardware;
 
-  public Scoral(ScoralIO scoral) {
-    this.scoral = scoral;
+  public Scoral(ScoralIO hardware) {
+    this.hardware = hardware;
   }
 
   public static Scoral create() {
@@ -27,18 +27,18 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Runs the motor to outtake, as in pushing out of the robot's center, a coral. */
   public Command outtake() {
-    return run(() -> scoral.setPower(POWER)).withName("outtake");
+    return run(() -> hardware.setPower(POWER)).withName("outtake");
   }
 
   /** Runs the motor to intake, as in pulling towards the robot's center, a coral. */
   public Command intake() {
-    return run(() -> scoral.setPower(-POWER)).withName("intake");
+    return run(() -> hardware.setPower(-POWER)).withName("intake");
   }
 
   /** Returns the value of the beambreak. */
   @Log.NT
   public boolean beambreak() {
-    return scoral.beambreak();
+    return hardware.beambreak();
   }
 
   @Override
@@ -48,6 +48,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    scoral.close();
+    hardware.close();
   }
 }
