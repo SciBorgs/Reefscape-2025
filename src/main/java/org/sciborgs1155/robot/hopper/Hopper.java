@@ -7,10 +7,6 @@ import org.sciborgs1155.robot.Robot;
 
 public class Hopper extends SubsystemBase implements AutoCloseable {
   public static Hopper create() {
-    // HopperIO hardware = Robot.isReal() ? new RealHopper() : (Robot.isSimulation() ? new
-    // SimHopper() : new NoHopper());
-    // return new Hopper(hardware);
-
     return Robot.isReal() ? new Hopper(new RealHopper()) : Hopper.none();
   }
 
@@ -18,28 +14,28 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     return new Hopper(new NoHopper());
   }
 
-  private final HopperIO hardware;
-  private final Trigger beambreakTrigger;
+  public final HopperIO hardware;
+  public final Trigger beambreakTrigger;
 
   public Hopper(HopperIO hardware) {
     this.hardware = hardware;
     this.beambreakTrigger = new Trigger(hardware::beambreak);
   }
 
-  public Command runHopper(double power) {
+  public Command run(double power) {
     return runOnce(() -> hardware.setPower(power));
   }
 
   public Command intake() {
-    return runHopper(HopperConstants.INTAKE_POWER); // more logic later
+    return run(HopperConstants.INTAKE_POWER); // more logic later
   }
 
   public Command outtake() {
-    return runHopper(-HopperConstants.INTAKE_POWER);
+    return run(-HopperConstants.INTAKE_POWER);
   }
 
   public Command stop() {
-    return runHopper(0);
+    return run(0);
   }
 
   @Override
