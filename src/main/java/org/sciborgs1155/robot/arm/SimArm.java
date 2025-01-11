@@ -18,15 +18,15 @@ public class SimArm implements ArmIO {
       ARM_LENGTH.in(Meters),
       MIN_ANGLE.in(Radians),
       MAX_ANGLE.in(Radians),
-      true,
+      false,
       STARTING_ANGLE.getRadians());
 
-  private Time previousUpdateTime = Seconds.of(0);
+  private Time previousSimulationUpdateTimestamp = Seconds.of(0);
 
   @Override
   public double position() {
-    simulation.update(Timer.getFPGATimestamp() - previousUpdateTime.in(Seconds));
-    previousUpdateTime = Seconds.of(Timer.getFPGATimestamp());
+    simulation.update(Timer.getFPGATimestamp() - previousSimulationUpdateTimestamp.in(Seconds));
+    previousSimulationUpdateTimestamp = Seconds.of(Timer.getFPGATimestamp());
     return simulation.getAngleRads();
   }
 

@@ -1,14 +1,13 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -146,8 +145,8 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    operator.a().onTrue(arm.moveArmTo(MAX_ANGLE));
-    operator.b().onTrue(arm.moveArmTo(MIN_ANGLE));
+    operator.a().onTrue(arm.moveArmTo(Radians.of(1.5)));
+    operator.b().onTrue(arm.moveArmTo(Radians.of(-1.5)));
     // TODO: Add any additional bindings.
   }
 

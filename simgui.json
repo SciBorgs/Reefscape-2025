@@ -218,6 +218,15 @@
                 1.0
               ],
               "id": "NT:/Robot/arm/getVoltage"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Robot/arm/goalAngleRadians"
             }
           ]
         }

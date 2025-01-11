@@ -11,9 +11,9 @@ import edu.wpi.first.units.measure.Distance;
 /** Constants for the {@link Arm} subsystem. */
 public class ArmConstants {
   // TODO: not tuned (at all)
-  public static final double kP = 5;
+  public static final double kP = 1;
   public static final double kI = 0;
-  public static final double kD = 0.01;
+  public static final double kD = 0.5;
 
   public static final double kS = 1;
   public static final double kV = 0;
@@ -33,8 +33,8 @@ public class ArmConstants {
   public static final Distance ARM_LENGTH = Centimeters.of(10);
 
   /** Fully extended. */
-  public static final Angle MIN_ANGLE = Radians.of(-3);
+  public static final Angle MIN_ANGLE = Radians.of(-3.14);
 
   /** Fully retracted. */
-  public static final Angle MAX_ANGLE = Radians.of(3);
+  public static final Angle MAX_ANGLE = Radians.of(3.14);
 }
