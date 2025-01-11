@@ -10,4 +10,8 @@ public class ScoralConstants {
   public static final double POWER = 0.5;
   public static final Current CURRENT_LIMI = Amps.of(45);
   public static final Time RAMP_TIME = Milliseconds.of(50);
+
+  public static final double kS = 0;
+  public static final double kV = 0.2;
+  public static final double kA = 0.5;
 }

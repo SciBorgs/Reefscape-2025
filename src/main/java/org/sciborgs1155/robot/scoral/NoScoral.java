@@ -7,7 +7,7 @@ public class NoScoral implements ScoralIO {
 
   @Override
   public boolean beambreak() {
-    return false;
+    return true;
   }
 
   @Override
