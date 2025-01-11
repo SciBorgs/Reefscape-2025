@@ -143,6 +143,17 @@ public class Robot extends CommandRobot implements Logged {
 
     driver.x().onTrue(led.rainbow());
 
+    driver
+        .y()
+        .onTrue(
+            led.elevator(
+                () ->
+                    Math.abs(
+                        driver.getLeftX() * driver.getLeftY()
+                            + driver.getLeftX()
+                            + driver.getLeftY())));
+    driver.a().onTrue(led.music());
+
     // TODO: Add any additional bindings.
   }
 
