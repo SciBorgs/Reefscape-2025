@@ -38,12 +38,9 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class Robot extends CommandRobot implements Logged {
@@ -59,11 +56,9 @@ public class Robot extends CommandRobot implements Logged {
   private final Arm arm = Arm.create();
 
   // COMMANDS
-  @Log.NT
-  private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
 
-  @Log.NT
-  private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
+  @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -110,14 +105,15 @@ public class Robot extends CommandRobot implements Logged {
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max
     // speed
-    InputStream r = InputStream.hypot(x, y)
-        .log("Robot/raw joystick")
-        .scale(() -> speedMultiplier)
-        .clamp(1.0)
-        .deadband(Constants.DEADBAND, 1.0)
-        .signedPow(2.0)
-        .log("Robot/processed joystick")
-        .scale(MAX_SPEED.in(MetersPerSecond));
+    InputStream r =
+        InputStream.hypot(x, y)
+            .log("Robot/raw joystick")
+            .scale(() -> speedMultiplier)
+            .clamp(1.0)
+            .deadband(Constants.DEADBAND, 1.0)
+            .signedPow(2.0)
+            .log("Robot/processed joystick")
+            .scale(MAX_SPEED.in(MetersPerSecond));
 
     InputStream theta = InputStream.atan(x, y);
 
@@ -127,14 +123,15 @@ public class Robot extends CommandRobot implements Logged {
 
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max
     // teleop speed
-    InputStream omega = InputStream.of(driver::getRightX)
-        .negate()
-        .scale(() -> speedMultiplier)
-        .clamp(1.0)
-        .deadband(DEADBAND, 1.0)
-        .signedPow(2.0)
-        .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
-        .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
+    InputStream omega =
+        InputStream.of(driver::getRightX)
+            .negate()
+            .scale(() -> speedMultiplier)
+            .clamp(1.0)
+            .deadband(DEADBAND, 1.0)
+            .signedPow(2.0)
+            .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
+            .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
@@ -158,15 +155,15 @@ public class Robot extends CommandRobot implements Logged {
    * Command factory to make both controllers rumble.
    *
    * @param rumbleType The area of the controller to rumble.
-   * @param strength   The intensity of the rumble.
+   * @param strength The intensity of the rumble.
    * @return The command to rumble both controllers.
    */
   public Command rumble(RumbleType rumbleType, double strength) {
     return Commands.runOnce(
-        () -> {
-          driver.getHID().setRumble(rumbleType, strength);
-          operator.getHID().setRumble(rumbleType, strength);
-        })
+            () -> {
+              driver.getHID().setRumble(rumbleType, strength);
+              operator.getHID().setRumble(rumbleType, strength);
+            })
         .andThen(Commands.waitSeconds(0.3))
         .finallyDo(
             () -> {

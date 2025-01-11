@@ -2,16 +2,15 @@ package org.sciborgs1155.robot.roller;
 
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 /** {@link RollerIO} class with a {@link SparkMax} motor controller. */
 public class RealRoller implements RollerIO {
   /** Controls roller speed */
-  private final SparkMax motor;
+  private final TalonFX motor;
 
   public RealRoller() {
-    motor = new SparkMax(ROLLER_MOTOR, MotorType.kBrushless);
+    motor = new TalonFX(ROLLER_MOTOR);
   }
 
   @Override

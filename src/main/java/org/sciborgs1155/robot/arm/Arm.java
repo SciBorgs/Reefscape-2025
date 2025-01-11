@@ -35,6 +35,15 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
+   * Constructor.
+   *
+   * @param hardware
+   */
+  private Arm(ArmIO hardware) {
+    this.hardware = hardware;
+  }
+
+  /**
    * @return The position in radians.
    */
   @Log.NT
@@ -65,10 +74,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> hardware.setVoltage(feedBack + feedForward))
         .withName("Moving Arm To: " + goal.toString() + " radians")
         .andThen(Commands.print("Yippee"));
-  }
-
-  private Arm(ArmIO hardwareInterface) {
-    hardware = hardwareInterface;
   }
 
   @Override

@@ -17,6 +17,8 @@ public interface ArmIO extends AutoCloseable {
    */
   public double voltage();
 
+  // TODO remove this. just for testing PID and such
+
   /** Sets the voltage of the arm motor. */
   public void setVoltage(double voltage);
 }

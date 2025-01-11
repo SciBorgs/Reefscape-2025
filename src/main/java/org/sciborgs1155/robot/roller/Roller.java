@@ -35,8 +35,8 @@ public class Roller extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> hardware.setPower(OUTTAKE_POWER)).withName("Outtaking");
   }
 
-  private Roller(RollerIO hardwareInterface) {
-    this.hardware = hardwareInterface;
+  private Roller(RollerIO hardware) {
+    this.hardware = hardware;
   }
 
   @Override
