@@ -9,6 +9,7 @@ import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -20,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -61,6 +61,12 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
+    configureLog();
+  }
+
+  private void configureLog() {
+    SignalLogger.setPath("./logs/");
+    SignalLogger.enableAutoLogging(true);
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -94,9 +100,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    // x and y are switched: we use joystick Y axis to control field x motion
-    InputStream x = InputStream.of(driver::getLeftY).negate();
-    InputStream y = InputStream.of(driver::getLeftX).negate();
+    InputStream x = InputStream.of(driver::getLeftX).negate();
+    InputStream y = InputStream.of(driver::getLeftY).negate();
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
@@ -128,7 +133,7 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
 
@@ -140,6 +145,10 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
+    operator
+        .a()
+        .onTrue(Commands.runOnce(SignalLogger::start))
+        .onFalse(Commands.runOnce(SignalLogger::stop));
   }
 
   /**
