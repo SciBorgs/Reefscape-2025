@@ -11,6 +11,7 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+      "/Robot/arm/armGUICanvas": "Mechanism2d",
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/frontLeft/driveFeedback": "PIDController",
@@ -44,6 +45,11 @@
       "/SmartDashboard/turn quasistatic forward": "Command"
     },
     "windows": {
+      "/Robot/arm/armGUICanvas": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Robot/autos": {
         "window": {
           "visible": true
@@ -75,6 +81,9 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "Retained Values": {
       "open": false
     },
@@ -181,7 +190,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 338,
+          "height": 332,
           "series": [
             {
               "color": [
@@ -200,6 +209,15 @@
                 1.0
               ],
               "id": "NT:/Robot/arm/velocity"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Robot/arm/getVoltage"
             }
           ]
         }

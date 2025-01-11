@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.arm;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
@@ -9,6 +11,11 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +36,19 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEl.in(RadiansPerSecondPerSecond)));
   private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+
+  @Log.NT private final Mechanism2d armGUICanvas = new Mechanism2d(60, 60);
+  private final MechanismRoot2d armPivotGUI = armGUICanvas.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d armTowerGUI =
+      armPivotGUI.append(new MechanismLigament2d("ArmTower", 30, -90));
+  private final MechanismLigament2d armGUI =
+      armPivotGUI.append(
+          new MechanismLigament2d(
+              "Arm",
+              ARM_LENGTH.in(Centimeters),
+              STARTING_ANGLE.in(Degrees),
+              10,
+              new Color8Bit(Color.kSkyBlue)));
 
   /**
    * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
@@ -57,6 +77,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
+    armGUI.setAngle(Math.toDegrees(hardware.position()));
     return hardware.position();
   }
 
