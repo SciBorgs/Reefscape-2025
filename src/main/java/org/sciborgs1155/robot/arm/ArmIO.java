@@ -14,7 +14,7 @@ public interface ArmIO {
   public double velocity();
 
   /** Sets the voltage of the arm motor. */
-  public void setArmVoltage(double voltage);
+  public void setVoltage(double voltage);
 
   public void close();
 }

@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     this.hardware = hardware;
 
     // The yellow lines hurt me
-    this.hardware.setArmVoltage(1);
+    this.hardware.setVoltage(1);
     this.fb.atSetpoint();
     this.ff.getDt();
   }
@@ -52,7 +52,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   public Command setArm(double goal) {
     double feedForward = ff.calculate(hardware.position(), hardware.velocity());
     double feedBack = fb.calculate(hardware.position(), goal);
-    return run(() -> hardware.setArmVoltage(feedBack + feedForward));
+    return run(() -> hardware.setVoltage(feedBack + feedForward));
   }
 
   @Override

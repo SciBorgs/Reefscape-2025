@@ -10,32 +10,32 @@ import com.ctre.phoenix6.hardware.TalonFX;
 /** {@link ArmIO} class with {@link TalonFX} motor controllers */
 public class RealArm implements ArmIO {
   /** Controls arm orientation */
-  private final TalonFX pivotMotor;
+  private final TalonFX motor;
 
-  /** Controls intake power */
-  private final TalonFX rollerMotor;
+  public RealArm() {
+    motor = new TalonFX(ARM_MOTOR);
+
+    // Resetting configurations
+    motor.getConfigurator().apply(new TalonFXConfiguration());
+  }
 
   @Override
   public double position() {
-    return pivotMotor.getPosition().getValue().in(Radians);
+    return motor.getPosition().getValue().in(Radians);
   }
 
   @Override
   public double velocity() {
-    return rollerMotor.getVelocity().getValue().in(RadiansPerSecond);
+    return motor.getVelocity().getValue().in(RadiansPerSecond);
   }
 
   @Override
-  public void setArmVoltage(double voltage) {
-    pivotMotor.setVoltage(voltage);
+  public void setVoltage(double voltage) {
+    motor.setVoltage(voltage);
   }
 
-  public RealArm() {
-    pivotMotor = new TalonFX(ARM_MOTOR);
-    rollerMotor = new TalonFX(ROLLER_MOTOR);
-
-    // Resetting configurations
-    pivotMotor.getConfigurator().apply(new TalonFXConfiguration());
-    rollerMotor.getConfigurator().apply(new TalonFXConfiguration());
-  }
+@Override
+public void close() {
+    motor.close();
+}
 }

@@ -30,7 +30,11 @@ public class SimArm implements ArmIO {
   }
 
   @Override
-  public void setArmVoltage(double voltage) {
+  public void setVoltage(double voltage) {
     simulation.setInputVoltage(voltage);
   }
+
+@Override
+public void close() {}
+
 }

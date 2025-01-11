@@ -7,4 +7,7 @@ public class NoRoller implements RollerIO {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'set'");
   }
+
+  @Override
+  public void close() {}
 }

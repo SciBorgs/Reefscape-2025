@@ -13,8 +13,10 @@ public class NoArm implements ArmIO {
   }
 
   @Override
-  public void setArmVoltage(double voltage) {
-    // TODO Auto-generated method stub
+  public void setVoltage(double voltage) {
     throw new UnsupportedOperationException("Unimplemented method 'setArmVoltage'");
   }
+
+  @Override
+  public void close() {}
 }
