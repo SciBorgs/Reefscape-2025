@@ -1,31 +1,32 @@
-package org.sciborgs1155.robot.roller;
-
-import static org.sciborgs1155.robot.roller.RollerConstants.*;
+package org.sciborgs1155.robot.coroller;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
+
+import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
+
 import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
-public class Roller extends SubsystemBase implements Logged, AutoCloseable {
+public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  private final RollerIO hardware;
+  private final CorollerIO hardware;
 
   /**
-   * Returns a new {@link Roller} subsystem, which will have real hardware if the robot is real, and
+   * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real, and
    * no hardware connection if it isn't.
    */
-  public static Roller create() {
-    return Robot.isReal() ? new Roller(new RealRoller()) : new Roller(new NoRoller());
+  public static Coroller create() {
+    return Robot.isReal() ? new Coroller(new RealCoroller()) : new Coroller(new NoCoroller());
   }
 
-  /** Creates a new {@link Roller} with no hardware interface(does nothing). */
-  public static Roller none() {
-    return new Roller(new NoRoller());
+  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
+  public static Coroller none() {
+    return new Coroller(new NoCoroller());
   }
 
-  private Roller(RollerIO hardware) {
+  private Coroller(CorollerIO hardware) {
     this.hardware = hardware;
   }
 

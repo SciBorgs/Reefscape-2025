@@ -1,15 +1,15 @@
-package org.sciborgs1155.robot.roller;
+package org.sciborgs1155.robot.coroller;
 
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-/** {@link RollerIO} class with a {@link SparkMax} motor controller. */
-public class RealRoller implements RollerIO {
+/** {@link CorollerIO} class with a {@link SparkMax} motor controller. */
+public class RealCoroller implements CorollerIO {
   /** Controls roller speed */
   private final TalonFX motor;
 
-  public RealRoller() {
+  public RealCoroller() {
     motor = new TalonFX(ROLLER_MOTOR);
   }
 

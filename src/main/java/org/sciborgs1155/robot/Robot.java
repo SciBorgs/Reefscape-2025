@@ -35,8 +35,8 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.roller.Roller;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -56,7 +56,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
   private final Arm arm = Arm.create();
-  private final Roller roller = Roller.create();
+  private final Coroller roller = Coroller.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
