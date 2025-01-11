@@ -80,9 +80,6 @@
     },
     "transitory": {
       "Robot": {
-        "autos": {
-          "open": true
-        },
         "drive": {
           "Pose2d##v_/Robot/drive/getPose": {
             "Rotation2d##v_rotation": {
@@ -152,15 +149,20 @@
               "open": true
             },
             "open": true
-          },
-          "open": true
+          }
         },
         "open": true,
+        "scoral": {
+          "open": true
+        },
         "vision": {
           "open": true
         }
       },
       "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     }
