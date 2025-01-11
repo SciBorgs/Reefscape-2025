@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot.scoral;
 
-public interface ScoralIO {
+import monologue.Logged;
+
+public interface ScoralIO extends Logged, AutoCloseable {
 
   void setPower(double power);
 
