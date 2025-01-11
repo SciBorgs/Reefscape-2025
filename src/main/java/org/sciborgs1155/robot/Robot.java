@@ -33,8 +33,10 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.roller.Roller;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -54,6 +56,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
   private final Arm arm = Arm.create();
+  private final Roller roller = Roller.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -135,6 +138,10 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
+    arm.setDefaultCommand(arm.goTowards(ArmConstants.DEFAULT_ANGLE));
+
+    roller.setDefaultCommand(roller.halt());
+
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
 
     test().whileTrue(systemsCheck());
@@ -146,9 +153,10 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    operator.a().onTrue(arm.moveArmTo(MAX_ANGLE));
-    operator.b().onTrue(arm.moveArmTo(MIN_ANGLE));
+    operator.a().whileTrue(arm.goTowards(MAX_ANGLE));
+    operator.b().whileTrue(arm.goTowards(MIN_ANGLE));
     // TODO: Add any additional bindings.
+
   }
 
   /**

@@ -2,9 +2,11 @@ package org.sciborgs1155.robot.arm;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import org.sciborgs1155.robot.Constants;
 
 /** Simulated {@link ArmIO} hardware interface. */
 public class SimArm implements ArmIO {
@@ -17,7 +19,7 @@ public class SimArm implements ArmIO {
           MIN_ANGLE.in(Radians),
           MAX_ANGLE.in(Radians),
           true,
-          STARTING_ANGLE.getRadians());
+          STARTING_ANGLE.in(Radians));
 
   @Override
   public double position() {
@@ -32,6 +34,7 @@ public class SimArm implements ArmIO {
   @Override
   public void setVoltage(double voltage) {
     simulation.setInputVoltage(voltage);
+    simulation.update(Constants.PERIOD.in(Seconds));
   }
 
   @Override

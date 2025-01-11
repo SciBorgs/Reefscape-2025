@@ -1,10 +1,13 @@
 package org.sciborgs1155.robot.arm;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,7 +21,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
   @Log.NT private final ArmIO hardware;
 
-  private final PIDController feedbackController = new PIDController(kP, kI, kD);
+  private final ProfiledPIDController feedbackController =
+      new ProfiledPIDController(
+          kP,
+          kI,
+          kD,
+          new TrapezoidProfile.Constraints(
+              MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEl.in(RadiansPerSecondPerSecond)));
   private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
   /**
@@ -67,17 +76,27 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return hardware.voltage();
   }
 
-  /** Moves the arm to a specified goal angle. */
-  public Command moveArmTo(Angle goal) {
-    double feedForward = feedforwardController.calculate(hardware.position(), hardware.velocity());
-    double feedBack = feedbackController.calculate(hardware.position(), goal.in(Radians));
-    return run(() -> hardware.setVoltage(feedBack + feedForward))
+  /** Moves the arm towards a specified goal angle. */
+  public Command goTowards(Angle goal) {
+    return run(() -> {
+          double feedForward = feedforwardController.calculate(goal.in(Radians), 0);
+          double feedBack = feedbackController.calculate(hardware.position(), goal.in(Radians));
+          hardware.setVoltage(feedBack + feedForward);
+        })
         .withName("Moving Arm To: " + goal.toString() + " radians")
         .andThen(Commands.print("Yippee"));
+  }
+
+  public Command goTo(Angle goal) {
+    return goTowards(goal)
+        .until(() -> (Math.abs(goal.in(Radians) - position()) < GOTO_TOLERANCE.in(Radians)));
   }
 
   @Override
   public void close() throws Exception {
     hardware.close();
   }
+
+  @Override
+  public void simulationPeriodic() {}
 }

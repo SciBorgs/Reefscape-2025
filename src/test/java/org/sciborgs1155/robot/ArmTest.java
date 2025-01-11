@@ -35,7 +35,7 @@ public class ArmTest {
     Angle positionSetpoint = angle;
     System.out.println("Position Setpoint: " + positionSetpoint.toString());
 
-    run(arm.moveArmTo(positionSetpoint));
+    arm.goTowards(positionSetpoint);
     fastForward(500);
 
     assertEquals(positionSetpoint.in(Radians), arm.position(), TOLERANCE);
