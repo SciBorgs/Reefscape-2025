@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT private final ArmIO hardware;
 
   /** Trapezoid profile feedback (PID) controller */
-  
+  @Log
   private final ProfiledPIDController fb =
       new ProfiledPIDController(
           kP,
