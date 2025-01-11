@@ -34,16 +34,13 @@ public class LedStrip extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @param percent A double supplier that supplies the elevator's percent raised.
    */
-  public Command elevator(DoubleSupplier percent) {
+  public Command elevatorLED(DoubleSupplier percent) {
     return set(
         LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kGreen, Color.kYellow)
             .mask(LEDPattern.progressMaskLayer(percent)));
   }
 
-  /**
-   * A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many songs, such
-   * as common 120 bpm songs today.
-   */
+  /** A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many song. */
   public Command music() {
     return set(MUSIC_60_BPM);
   }

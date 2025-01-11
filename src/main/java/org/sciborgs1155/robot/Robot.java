@@ -141,19 +141,6 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    driver.x().onTrue(led.rainbow());
-
-    driver
-        .y()
-        .onTrue(
-            led.elevator(
-                () ->
-                    Math.abs(
-                        driver.getLeftX() * driver.getLeftY()
-                            + driver.getLeftX()
-                            + driver.getLeftY())));
-    driver.a().onTrue(led.music());
-
     // TODO: Add any additional bindings.
   }
 
