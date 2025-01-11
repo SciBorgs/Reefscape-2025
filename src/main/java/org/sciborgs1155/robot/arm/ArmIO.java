@@ -1,8 +1,7 @@
 package org.sciborgs1155.robot.arm;
 
 /** Hardware interface for {@link Arm} subsystem */
-public interface ArmIO {
-
+public interface ArmIO extends AutoCloseable {
   /**
    * @return The position in radians.
    */
@@ -15,6 +14,4 @@ public interface ArmIO {
 
   /** Sets the voltage of the arm motor. */
   public void setVoltage(double voltage);
-
-  public void close();
 }

@@ -8,22 +8,24 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
+/** Constants for the {@link Arm} subsystem. */
 public class ArmConstants {
-  // TODO not tuned (at all)
+  // TODO: not tuned (at all)
   public static final double kP = 1;
   public static final double kI = 0;
   public static final double kD = 0.01;
 
-  public static final double kS = 1; // TODO do tese
+  public static final double kS = 1;
   public static final double kV = 0;
   public static final double kA = 0.01;
   public static final double kG = 0.01;
 
-  public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(0); // TODO figure this out
-  public static final Rotation2d OUTTAKE_ANGLE =
-      Rotation2d.fromRadians(0); // TODO figure this one out too
-  public static final Rotation2d STARTING_ANGLE = Rotation2d.fromRadians(0); // TODO ??????
+  // TODO: figure these out
+  public static final Rotation2d INTAKE_ANGLE = Rotation2d.fromRadians(0);
+  public static final Rotation2d OUTTAKE_ANGLE = Rotation2d.fromRadians(0);
+  public static final Rotation2d STARTING_ANGLE = Rotation2d.fromRadians(0);
 
+  // TODO: and these...
   public static final DCMotor GEARBOX = DCMotor.getNEO(1);
   public static final double GEARING = 8.21;
   public static final double MOI = 1;

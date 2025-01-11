@@ -1,25 +1,26 @@
 package org.sciborgs1155.robot.roller;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
+/** {@link RollerIO} class with a {@link SparkMax} motor controller. */
 public class RealRoller implements RollerIO {
+  /** Controls roller speed */
+  private final SparkMax motor;
 
-      /** Controls intake power */
-  private final TalonFX motor;
-  //TODO this should not be a talonfx
-
-    public RealRoller() {
-        motor = new TalonFX(ARM_MOTOR);
-    }
-
-  @Override
-  public void set(double power) {
+  public RealRoller() {
+    motor = new SparkMax(ROLLER_MOTOR, MotorType.kBrushless);
   }
 
-@Override
-public void close() {
+  @Override
+  public void setPower(double power) {
+    motor.set(power);
+  }
+
+  @Override
+  public void close() {
     motor.close();
-}
+  }
 }

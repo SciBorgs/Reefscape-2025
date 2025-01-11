@@ -6,7 +6,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-/** Simulated {@link ArmIO} class */
+/** Simulated {@link ArmIO} hardware interface. */
 public class SimArm implements ArmIO {
   private final SingleJointedArmSim simulation =
       new SingleJointedArmSim(
@@ -34,7 +34,6 @@ public class SimArm implements ArmIO {
     simulation.setInputVoltage(voltage);
   }
 
-@Override
-public void close() {}
-
+  @Override
+  public void close() {}
 }

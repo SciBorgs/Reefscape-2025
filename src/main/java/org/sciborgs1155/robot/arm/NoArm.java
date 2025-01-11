@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.arm;
 
-/** Disfunctional Placeholder {@link ArmIO} */
+/** Disfunctional Placeholder for {@link ArmIO} (In cases where the Arm is unusable) */
 public class NoArm implements ArmIO {
   @Override
   public double position() {
@@ -13,9 +13,7 @@ public class NoArm implements ArmIO {
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    throw new UnsupportedOperationException("Unimplemented method 'setArmVoltage'");
-  }
+  public void setVoltage(double voltage) {}
 
   @Override
   public void close() {}
