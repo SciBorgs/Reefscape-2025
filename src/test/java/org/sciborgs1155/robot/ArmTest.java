@@ -9,7 +9,6 @@ import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 import edu.wpi.first.units.measure.Angle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.arm.Arm;
@@ -33,23 +32,20 @@ public class ArmTest {
 
   /** Moves arm to a specific angle. */
   public void pointExtension(Angle angle) {
-    Angle positionSetpoint = angle;
-    System.out.println("Position Setpoint: " + positionSetpoint.toString());
+    System.out.println("Position Setpoint: " + angle.toString());
 
-    arm.goTowards(positionSetpoint);
+    run(arm.goTowards(angle));
     fastForward(500);
 
-    assertEquals(positionSetpoint.in(Radians), arm.position(), TOLERANCE);
+    assertEquals(angle.in(Radians), arm.position(), TOLERANCE);
   }
 
-  @Disabled
   @Test
   public void fullExtension() {
     pointExtension(MIN_ANGLE);
     pointExtension(MAX_ANGLE);
   }
 
-  @Disabled
   @RepeatedTest(5)
   public void pointExtensionTest() {
     pointExtension(

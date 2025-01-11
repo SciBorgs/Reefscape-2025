@@ -1,11 +1,10 @@
 package org.sciborgs1155.robot.coroller;
 
+import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
-
-import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
-
 import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
@@ -14,8 +13,8 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   private final CorollerIO hardware;
 
   /**
-   * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real, and
-   * no hardware connection if it isn't.
+   * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real,
+   * and no hardware connection if it isn't.
    */
   public static Coroller create() {
     return Robot.isReal() ? new Coroller(new RealCoroller()) : new Coroller(new NoCoroller());

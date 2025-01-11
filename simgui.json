@@ -12,6 +12,7 @@
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
       "/Robot/arm/armGUICanvas": "Mechanism2d",
+      "/Robot/arm/fb": "ProfiledPIDController",
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/frontLeft/driveFeedback": "PIDController",
