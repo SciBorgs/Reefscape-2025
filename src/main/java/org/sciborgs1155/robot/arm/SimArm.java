@@ -23,7 +23,6 @@ public class SimArm implements ArmIO {
 
   @Override
   public double position() {
-    simulation.update(Constants.PERIOD.in(Seconds));
     return simulation.getAngleRads();
   }
 

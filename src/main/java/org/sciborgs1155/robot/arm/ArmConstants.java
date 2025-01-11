@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Distance;
 /** Constants for the {@link Arm} subsystem. */
 public class ArmConstants {
   // TODO: not tuned (at all)
-  public static final double kP = 10;
+  public static final double kP = 1;
   public static final double kI = 0;
   public static final double kD = 0.1;
 
@@ -35,7 +35,7 @@ public class ArmConstants {
   // TODO: and these...
   public static final DCMotor GEARBOX = DCMotor.getKrakenX60(2);
   public static final double GEARING = 8.21;
-  public static final double MOI = 0.7765;
+  public static final double MOI = 0.001;
 
   public static final Distance ARM_LENGTH = Centimeters.of(10);
 
@@ -48,5 +48,5 @@ public class ArmConstants {
   public static final Angle GOTO_TOLERANCE = Degrees.of(2);
 
   public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(4);
-  public static final AngularAcceleration MAX_ACCEl = RadiansPerSecondPerSecond.of(10);
+  public static final AngularAcceleration MAX_ACCEL = RadiansPerSecondPerSecond.of(10);
 }

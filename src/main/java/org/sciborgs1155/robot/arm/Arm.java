@@ -28,14 +28,18 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
   @Log.NT private final ArmIO hardware;
 
-  private final ProfiledPIDController feedbackController =
+  /** Trapezoid profile feedback (PID) controller */
+  
+  private final ProfiledPIDController fb =
       new ProfiledPIDController(
           kP,
           kI,
           kD,
           new TrapezoidProfile.Constraints(
-              MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEl.in(RadiansPerSecondPerSecond)));
-  private final ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+              MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
+
+  /** Arm feed forward controller. */
+  private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
   @Log.NT private final Mechanism2d armGUICanvas = new Mechanism2d(60, 60);
   private final MechanismRoot2d armPivotGUI = armGUICanvas.getRoot("ArmPivot", 30, 30);
@@ -97,11 +101,12 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return hardware.voltage();
   }
 
+  @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTowards(Angle goal) {
     return run(() -> {
-          double feedForward = feedforwardController.calculate(goal.in(Radians), 0);
-          double feedBack = feedbackController.calculate(hardware.position(), goal.in(Radians));
+          double feedForward = ff.calculate(goal.in(Radians), 0);
+          double feedBack = fb.calculate(hardware.position(), goal.in(Radians));
           hardware.setVoltage(feedBack + feedForward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians")

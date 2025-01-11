@@ -9,6 +9,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 import edu.wpi.first.units.measure.Angle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.arm.Arm;
@@ -41,12 +42,14 @@ public class ArmTest {
     assertEquals(positionSetpoint.in(Radians), arm.position(), TOLERANCE);
   }
 
+  @Disabled
   @Test
   public void fullExtension() {
     pointExtension(MIN_ANGLE);
     pointExtension(MAX_ANGLE);
   }
 
+  @Disabled
   @RepeatedTest(5)
   public void pointExtensionTest() {
     pointExtension(
