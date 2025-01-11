@@ -27,5 +27,5 @@ public class ElevatorConstants {
 
   public static final Mass WEIGHT = Kilograms.of(20);
   public static final Distance DRUM_RADIUS = Meters.of(.1);
-  public static final double gearing = 20 / 1;
+  public static final double GEARING = 20 / 1;
 }
