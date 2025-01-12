@@ -26,6 +26,10 @@ public class SimArm implements ArmIO {
     return simulation.getAngleRads();
   }
 
+  public SimArm() {
+    simulation.update(0);
+  }
+
   @Override
   public double velocity() {
     return simulation.getVelocityRadPerSec();

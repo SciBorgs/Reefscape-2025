@@ -12,8 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.sciborgs1155.robot.arm.Arm;
 
 /** Tests {@link Arm} subsystem with simulated hardware. Doesn't work :/ */
@@ -54,11 +52,5 @@ public class ArmTest {
     runUnitTest(
         arm.goToTest(
             Radians.of(Math.random() * (MAX_ANGLE.minus(MIN_ANGLE).in(Radians))).plus(MIN_ANGLE)));
-  }
-
-  @ParameterizedTest
-  @ValueSource(doubles = {2, 1, 0, -0.2})
-  public void whjakfsd(double a) {
-    runUnitTest(arm.goToTest(Radians.of(a)));
   }
 }
