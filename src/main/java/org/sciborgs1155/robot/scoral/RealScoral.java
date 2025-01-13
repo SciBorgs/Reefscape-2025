@@ -1,7 +1,11 @@
 package org.sciborgs1155.robot.scoral;
 
+import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Ports.Scoral.*;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -20,6 +24,16 @@ public class RealScoral implements ScoralIO {
     bottomMotor = new TalonFX(BOTTOM_ROLLER);
 
     beambreak = new DigitalInput(BEAMBREAK);
+
+    TalonFXConfigurator topConfig = topMotor.getConfigurator();
+    TalonFXConfigurator bottomConfig = topMotor.getConfigurator();
+
+    CurrentLimitsConfigs limits = new CurrentLimitsConfigs();
+    limits.StatorCurrentLimit = CURRENT_LIMIT.in(Amps);
+    limits.StatorCurrentLimitEnable = true;
+
+    topConfig.apply(limits);
+    bottomConfig.apply(limits);
 
     bottomMotor.setControl(new Follower(TOP_ROLLER, true));
 

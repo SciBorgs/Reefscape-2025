@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 public class SimScoral implements ScoralIO {
 
   private final DCMotorSim sim =
-      new DCMotorSim(LinearSystemId.createDCMotorSystem(kV, kA), DCMotor.getNEO(1));
+      new DCMotorSim(LinearSystemId.createDCMotorSystem(kV, kA), DCMotor.getKrakenX60(1));
 
   @Override
   public void setPower(double power) {

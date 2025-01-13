@@ -25,12 +25,12 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return new Scoral(new NoScoral());
   }
 
-  /** Runs the motor to outtake, as in pushing out of the robot's center, a coral. */
+  /** Runs the motor to outtake, as in pushing out, a coral. */
   public Command outtake() {
     return run(() -> hardware.setPower(POWER)).withName("outtake");
   }
 
-  /** Runs the motor to intake, as in pulling towards the robot's center, a coral. */
+  /** Runs the motor to intake, as in pulling in, a coral. */
   public Command intake() {
     return run(() -> hardware.setPower(-POWER)).withName("intake");
   }
