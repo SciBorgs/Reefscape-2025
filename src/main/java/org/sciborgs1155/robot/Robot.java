@@ -115,8 +115,7 @@ public class Robot extends CommandRobot implements Logged {
     InputStream x = InputStream.of(driver::getLeftY).negate();
     InputStream y = InputStream.of(driver::getLeftX).negate();
 
-    // Apply speed multiplier, deadband, square inputs, and scale translation to max
-    // speed
+    // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(x, y)
             .log("Robot/raw joystick")
@@ -133,8 +132,7 @@ public class Robot extends CommandRobot implements Logged {
     x = r.scale(theta.map(Math::cos)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
     y = r.scale(theta.map(Math::sin)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
 
-    // Apply speed multiplier, deadband, square inputs, and scale rotation to max
-    // teleop speed
+    // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =
         InputStream.of(driver::getRightX)
             .negate()

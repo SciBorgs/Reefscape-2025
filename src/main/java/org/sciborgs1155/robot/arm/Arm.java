@@ -102,7 +102,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
     return run(() -> {
-          double feedforward = ff.calculate(goal.in(Radians), 0);
+          double feedforward = ff.calculate(fb.getSetpoint().position, 0);
           double feedback = fb.calculate(hardware.position(), goal.in(Radians));
           hardware.setVoltage(feedback + feedforward);
         })
