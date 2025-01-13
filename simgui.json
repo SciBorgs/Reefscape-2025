@@ -1,5 +1,13 @@
 {
   "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 64
+      },
+      "window": {
+        "visible": true
+      }
+    },
     "Other Devices": {
       "window": {
         "visible": false
@@ -190,7 +198,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 278,
+          "height": 140,
           "series": [
             {
               "color": [
