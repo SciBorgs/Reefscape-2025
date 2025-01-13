@@ -5,12 +5,14 @@ import static org.sciborgs1155.robot.led.LedConstants.*;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 import monologue.Logged;
+import org.sciborgs1155.robot.Constants;
 
 public class LedStrip extends SubsystemBase implements Logged, AutoCloseable {
 
@@ -43,6 +45,20 @@ public class LedStrip extends SubsystemBase implements Logged, AutoCloseable {
   /** A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many song. */
   public Command music() {
     return set(MUSIC_60_BPM);
+  }
+
+  /** A solid yellow green that is scrolled through. */
+  public Command scrolling() {
+    return set(SCROLLING);
+  }
+
+  /** A breathing gradient that matches the alliance colors. */
+  public Command autos() {
+    if (Constants.alliance() == Alliance.Red) {
+      return set(BREATHE_RED);
+    } else {
+      return set(BREATHE_BLUE);
+    }
   }
 
   public Command set(LEDPattern pattern) {

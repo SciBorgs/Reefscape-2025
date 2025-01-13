@@ -34,7 +34,7 @@ public final class Ports {
   public static final class LEDs {
     public static final int LED_PORT = 1;
   }
-  
+
   public static final class Hopper {
     public static final int LEFT_MOTOR = -1;
     public static final int RIGHT_MOTOR = -1;

@@ -32,8 +32,8 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.led.LedStrip;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.led.LedStrip;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -136,8 +136,10 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
+    led.setDefaultCommand(led.scrolling());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
+    autonomous().whileTrue(led.autos());
 
     test().whileTrue(systemsCheck());
 
