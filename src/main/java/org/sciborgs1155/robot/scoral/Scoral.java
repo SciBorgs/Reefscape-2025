@@ -45,6 +45,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return hardware.beambreak();
   }
 
+  /** Tests that the outtake is functioning by telling it to spin, and making sure that it is. */
   public Test outtakeTest() {
     Command testCommand = outtake().withTimeout(2);
     TruthAssertion moving =
