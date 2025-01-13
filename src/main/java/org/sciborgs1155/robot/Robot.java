@@ -5,15 +5,12 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-<<<<<<< HEAD
+import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
-=======
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
->>>>>>> main
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -61,12 +58,9 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
-<<<<<<< HEAD
   private final Arm arm = Arm.create();
   private final Coroller roller = Coroller.create();
-=======
   private final Elevator elevator = Elevator.create();
->>>>>>> main
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
