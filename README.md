@@ -1,6 +1,15 @@
 # Hydrogen
 The SciBorgs' base repository. It is a living document that should be updated yearly for new libraries and other changes.
 
+# note
+**TEST CHASSIS USE! NOT EXPECTED TO BE MERGED INTO MAIN!**
+
+so im just gonna write some reminders here
+
+- Kraken Turn Motors
+- Neo Drive Motors
+
+
 ## Structure
 Our robot code is centered around [Robot.java](src/main/java/org/sciborgs1155/robot/Robot.java).
 
