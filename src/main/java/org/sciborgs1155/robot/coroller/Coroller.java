@@ -45,7 +45,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Stops the roller motors. */
-  public Command halt() {
+  public Command stop() {
     return run(() -> hardware.setPower(0));
   }
 

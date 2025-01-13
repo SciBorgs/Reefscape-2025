@@ -59,7 +59,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
   private final Arm arm = Arm.create();
-  private final Coroller roller = Coroller.create();
+  private final Coroller coroller = Coroller.create();
   private final Elevator elevator = Elevator.create();
 
   // COMMANDS
@@ -149,7 +149,7 @@ public class Robot extends CommandRobot implements Logged {
 
     arm.setDefaultCommand(arm.goTo(ArmConstants.DEFAULT_ANGLE));
 
-    roller.setDefaultCommand(roller.halt());
+    coroller.setDefaultCommand(coroller.stop());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
 

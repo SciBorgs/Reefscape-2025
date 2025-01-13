@@ -13,12 +13,10 @@ public class NoArm implements ArmIO {
   }
 
   @Override
-  public double voltage() {
-    return 0;
-  }
+  public void setVoltage(double voltage) {}
 
   @Override
-  public void setVoltage(double voltage) {}
+  public void currentLimit(double limit) {}
 
   @Override
   public void close() {}

@@ -45,11 +45,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
   /** Arm visualization software. */
-  @Log.NT private final Mechanism2d armGUICanvas = new Mechanism2d(60, 60);
+  @Log.NT private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
-  private final MechanismRoot2d armPivotGUI = armGUICanvas.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d armGUI =
-      armPivotGUI.append(
+  private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
+  private final MechanismLigament2d armLigament =
+      armRoot.append(
           new MechanismLigament2d(
               "Arm",
               ARM_LENGTH.in(Centimeters),
@@ -98,28 +98,24 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return hardware.velocity();
   }
 
-  /**
-   * @return The position in radians/sec.
-   */
-  @Log.NT
-  public double getVoltage() {
-    return hardware.voltage();
-  }
-
   @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
     return run(() -> {
-          double feedForward = ff.calculate(goal.in(Radians), 0);
-          double feedBack = fb.calculate(hardware.position(), goal.in(Radians));
-          hardware.setVoltage(feedBack + feedForward);
+          double feedforward = ff.calculate(goal.in(Radians), 0);
+          double feedback = fb.calculate(hardware.position(), goal.in(Radians));
+          hardware.setVoltage(feedback + feedforward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians");
   }
 
-  @Override
-  public void close() throws Exception {
-    hardware.close();
+  /**
+   * Changes the current limit of the arm motor.
+   *
+   * @param limit The limit, in amps.
+   */
+  public void currentLimit(double limit) {
+    hardware.currentLimit(limit);
   }
 
   /**
@@ -138,6 +134,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
 
   @Override
   public void periodic() {
-    armGUI.setAngle(Math.toDegrees(hardware.position()));
+    armLigament.setAngle(Math.toDegrees(hardware.position()));
+  }
+
+  @Override
+  public void close() throws Exception {
+    hardware.close();
   }
 }

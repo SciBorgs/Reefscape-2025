@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.arm;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.STRATOR_LIMIT;
+import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -16,11 +18,18 @@ public class RealArm implements ArmIO {
   /** Controls arm orientation. */
   private final TalonFX motor;
 
+  private TalonFXConfiguration config;
+
   public RealArm() {
     motor = new TalonFX(ARM_MOTOR);
 
     // Resetting configuration
-    motor.getConfigurator().apply(new TalonFXConfiguration());
+    config = new TalonFXConfiguration();
+
+    config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
+    config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
+    motor.getConfigurator().apply(config);
+
     FaultLogger.register(motor);
     TalonUtils.addMotor(motor);
   }
@@ -38,13 +47,14 @@ public class RealArm implements ArmIO {
   }
 
   @Override
-  public double voltage() {
-    return motor.getMotorVoltage().getValue().in(Volts);
+  public void setVoltage(double voltage) {
+    motor.setVoltage(voltage);
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    motor.setVoltage(voltage);
+  public void currentLimit(double limit) {
+    config.CurrentLimits.SupplyCurrentLimit = limit;
+    motor.getConfigurator().apply(config);
   }
 
   @Override

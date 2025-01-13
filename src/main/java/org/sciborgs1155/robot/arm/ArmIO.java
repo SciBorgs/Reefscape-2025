@@ -12,13 +12,13 @@ public interface ArmIO extends AutoCloseable {
    */
   public double velocity();
 
-  /**
-   * @return Returns the voltage of the arm motor.
-   */
-  public double voltage();
-
-  // TODO remove this. just for testing PID and such
-
   /** Sets the voltage of the arm motor. */
   public void setVoltage(double voltage);
+
+  /**
+   * Changes the current limit of the arm motor.
+   *
+   * @param limit The limit, in amps.
+   */
+  public void currentLimit(double limit);
 }

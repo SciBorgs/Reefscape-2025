@@ -10,7 +10,7 @@ import org.sciborgs1155.robot.Constants;
 
 /** Simulated {@link ArmIO} hardware interface. */
 public class SimArm implements ArmIO {
-  private final SingleJointedArmSim simulation =
+  private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           GEARBOX,
           GEARING,
@@ -23,28 +23,26 @@ public class SimArm implements ArmIO {
 
   @Override
   public double position() {
-    return simulation.getAngleRads();
+    return sim.getAngleRads();
   }
 
   public SimArm() {
-    simulation.update(0);
+    sim.update(0);
   }
 
   @Override
   public double velocity() {
-    return simulation.getVelocityRadPerSec();
+    return sim.getVelocityRadPerSec();
   }
 
   @Override
   public void setVoltage(double voltage) {
-    simulation.setInputVoltage(voltage);
-    simulation.update(Constants.PERIOD.in(Seconds));
+    sim.setInputVoltage(voltage);
+    sim.update(Constants.PERIOD.in(Seconds));
   }
 
   @Override
-  public double voltage() {
-    return simulation.getInput().elementSum();
-  }
+  public void currentLimit(double limit) {}
 
   @Override
   public void close() {}

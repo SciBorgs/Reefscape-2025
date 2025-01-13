@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.arm;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 
 /** Constants for the {@link Arm} subsystem. */
@@ -49,4 +51,9 @@ public class ArmConstants {
 
   public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(4);
   public static final AngularAcceleration MAX_ACCEL = RadiansPerSecondPerSecond.of(10);
+
+  // TODO arbitrary value for climb_limit and strator limit
+  public static final Current SUPPLY_LIMIT = Amps.of(60);
+  public static final Current CLIMB_LIMIT = Amps.of(120);
+  public static final Current STRATOR_LIMIT = Amps.of(60);
 }
