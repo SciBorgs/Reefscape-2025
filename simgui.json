@@ -11,8 +11,11 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+<<<<<<< HEAD
       "/Robot/arm/armGUICanvas": "Mechanism2d",
       "/Robot/arm/fb": "ProfiledPIDController",
+=======
+>>>>>>> main
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/frontLeft/driveFeedback": "PIDController",
@@ -25,6 +28,12 @@
       "/Robot/drive/rearRight/turnFeedback": "PIDController",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
+<<<<<<< HEAD
+=======
+      "/Robot/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/elevator/pid": "ProfiledPIDController",
+      "/Robot/elevator/setpoint/mech": "Mechanism2d",
+>>>>>>> main
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -78,6 +87,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/Robot/elevator/measurement/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -90,12 +109,15 @@
     },
     "transitory": {
       "Robot": {
+<<<<<<< HEAD
         "arm": {
           "open": true
         },
         "autos": {
           "open": true
         },
+=======
+>>>>>>> main
         "drive": {
           "Pose2d##v_/Robot/drive/getPose": {
             "Rotation2d##v_rotation": {
@@ -165,7 +187,9 @@
               "open": true
             },
             "open": true
-          },
+          }
+        },
+        "elevator": {
           "open": true
         },
         "open": true,
@@ -191,7 +215,11 @@
             0.0,
             0.8500000238418579
           ],
+<<<<<<< HEAD
           "height": 338,
+=======
+          "height": 278,
+>>>>>>> main
           "series": [
             {
               "color": [
@@ -200,7 +228,11 @@
                 0.6901960968971252,
                 1.0
               ],
+<<<<<<< HEAD
               "id": "NT:/Robot/arm/position"
+=======
+              "id": "NT:/Robot/elevator/positionSetpoint"
+>>>>>>> main
             },
             {
               "color": [
@@ -209,6 +241,7 @@
                 0.32156863808631897,
                 1.0
               ],
+<<<<<<< HEAD
               "id": "NT:/Robot/arm/velocity"
             },
             {
@@ -223,6 +256,16 @@
           ]
         }
       ]
+=======
+              "id": "NT:/Robot/elevator/position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Elevator"
+      }
+>>>>>>> main
     }
   }
 }

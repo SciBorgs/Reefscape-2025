@@ -8,6 +8,8 @@ import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkMax;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.TalonUtils;
 
 /** {@link ArmIO} class with a {@link SparkMax} motor controller. */
 public class RealArm implements ArmIO {
@@ -19,6 +21,8 @@ public class RealArm implements ArmIO {
 
     // Resetting configuration
     motor.getConfigurator().apply(new TalonFXConfiguration());
+    FaultLogger.register(motor);
+    TalonUtils.addMotor(motor);
   }
 
   @Override
