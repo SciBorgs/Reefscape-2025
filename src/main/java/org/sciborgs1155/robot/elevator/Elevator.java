@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
@@ -17,9 +18,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants.Field.Level;
@@ -36,7 +40,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   private final ElevatorIO hardware;
 
-  //  private final SysIdRoutine sysIdRoutine;
+   private final SysIdRoutine sysIdRoutine;
 
   @Log.NT
   private final ProfiledPIDController pid =
@@ -58,10 +62,15 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
     setDefaultCommand(retract());
-    // sysIdRoutine =
-    //   new SysIdRoutine(
-    //     new SysIdRoutine.Config(),
-    //     new SysIdRoutine.Mechanism(v -> pivot.setVoltage(v.in(Volts)), null, this));
+    sysIdRoutine =
+      new SysIdRoutine(
+        new SysIdRoutine.Config(),
+        new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
+
+    SmartDashboard.putData("pivot quasistatic forward", sysIdRoutine.quasistatic(Direction.kForward));
+    SmartDashboard.putData("pivot quasistatic backward", sysIdRoutine.quasistatic(Direction.kReverse));
+    SmartDashboard.putData("pivot dynamic forward", sysIdRoutine.dynamic(Direction.kForward));
+    SmartDashboard.putData("pivot dynamic backward", sysIdRoutine.dynamic(Direction.kReverse));
   }
 
   public Command extend() {
