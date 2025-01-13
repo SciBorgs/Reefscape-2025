@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -59,7 +60,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
-    setDefaultCommand(retract());
+
+    pid.setTolerance(POSITION_TOLERANCE.in(Meters));
+    pid.reset(hardware.position());
+    pid.setGoal(MIN_HEIGHT.in(Meters));
+
+
     sysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(),
@@ -82,7 +88,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command scoreLevel(Level level) {
-    return run(() -> update(level.getHeight()));
+    return goTo(level.getHeight().in(Meters));
   }
 
   /**
@@ -113,6 +119,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return pid.getSetpoint().velocity;
   }
 
+  public boolean atGoal() {
+    return pid.atGoal();
+  }
+
   private void update(double position) {
     position = MathUtil.clamp(position, MIN_HEIGHT.in(Meters), MAX_HEIGHT.in(Meters));
 
@@ -129,15 +139,15 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     measurement.setLength(position());
   }
 
-  public Test systemsCheck() {
-    Command testCommand = goTo(TEST_HEIGHT.in(Meters));
+  public Test goToTest(Distance testHeight) {
+    Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(3);
     Set<Assertion> assertions =
         Set.of(
             eAssert(
                 "Elevator syst check (position)",
-                () -> TEST_HEIGHT.in(Meters),
+                () -> testHeight.in(Meters),
                 this::position,
-                .1));
+                POSITION_TOLERANCE.in(Meters)));
 
     return new Test(testCommand, assertions);
   }

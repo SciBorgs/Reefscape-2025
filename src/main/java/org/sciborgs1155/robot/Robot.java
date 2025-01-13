@@ -135,6 +135,8 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
+    elevator.setDefaultCommand(elevator.retract());
+
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
 
     test().whileTrue(systemsCheck());
@@ -171,7 +173,7 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck(), elevator.systemsCheck())
+    return Test.toCommand(drive.systemsCheck(), elevator.goToTest(Level.L1.getHeight()))
         .withName("Test Mechanisms");
   }
 

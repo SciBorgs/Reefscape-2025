@@ -19,9 +19,6 @@ public class RealElevator implements ElevatorIO {
   public RealElevator() {
     TalonFXConfiguration talonConfig = new TalonFXConfiguration();
 
-    leader.getConfigurator().apply(talonConfig);
-    follower.getConfigurator().apply(talonConfig);
-
     follower.setControl(new Follower(LEADER, true));
 
     talonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

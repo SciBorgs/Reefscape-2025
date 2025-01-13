@@ -62,18 +62,18 @@ public class Constants {
     }
 
     public enum Level {
-      L1(.3),
-      L2(.7),
-      L3(1),
-      L4(1.5);
+      L1(Meters.of(.3)),
+      L2(Meters.of(.7)),
+      L3(Meters.of(1)),
+      L4(Meters.of(1.5));
 
-      public final double height;
+      public final Distance height;
 
-      Level(double height) {
+      Level(Distance height) {
         this.height = height;
       }
 
-      public double getHeight() {
+      public Distance getHeight() {
         return this.height;
       }
     }

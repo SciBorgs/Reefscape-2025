@@ -22,6 +22,8 @@ public class ElevatorConstants {
   public static final double kV = 1;
   public static final double kA = 0;
 
+  public static final Distance POSITION_TOLERANCE = Meters.of(.1);
+
   public static final Distance MIN_HEIGHT = Meters.of(.2);
   public static final Distance MAX_HEIGHT = Meters.of(2);
 
@@ -36,6 +38,4 @@ public class ElevatorConstants {
   public static final double CONVERSION_FACTOR = SPROCKET_CIRCUMFRENCE.in(Meters) * 2 / GEARING;
 
   public static final Current CURRENT_LIMIT = Amps.of(50);
-
-  public static final Distance TEST_HEIGHT = MIN_HEIGHT.plus(Meters.of(.2));
 }

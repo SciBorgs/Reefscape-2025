@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
@@ -33,7 +34,7 @@ public class ElevatorTest {
   @MethodSource("providePositionValues")
   public void reachesPosition(Level level) {
     run(elevator.scoreLevel(level), 200);
-    assertEquals(level.getHeight(), elevator.position(), DELTA);
+    assertEquals(level.getHeight().in(Meters), elevator.position(), DELTA);
   }
 
   private static Stream<Arguments> providePositionValues() {
