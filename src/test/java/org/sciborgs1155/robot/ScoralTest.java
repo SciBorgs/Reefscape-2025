@@ -12,7 +12,7 @@ public class ScoralTest {
   @Test
   public void init() throws Exception {
     scoral = Scoral.create();
-    runUnitTest(scoral.intakeTest());
+    runUnitTest(scoral.outtakeTest());
     scoral.close();
     reset();
   }

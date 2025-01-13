@@ -45,12 +45,12 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return hardware.beambreak();
   }
 
-  public Test intakeTest() {
-    Command testCommand = intake().withTimeout(2);
+  public Test outtakeTest() {
+    Command testCommand = outtake().withTimeout(2);
     TruthAssertion moving =
         tAssert(
-            () -> Math.abs(hardware.getAngularVelocity()) > 0.5,
-            "Scoral Intake Test (speed)",
+            () -> hardware.getAngularVelocity() > 0.5,
+            "Scoral Outtake Test (speed)",
             () -> "" + hardware.getAngularVelocity());
     return new Test(testCommand, Set.of(moving));
   }
