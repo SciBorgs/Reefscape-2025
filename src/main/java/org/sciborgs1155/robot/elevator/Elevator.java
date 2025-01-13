@@ -3,9 +3,15 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
+
+import java.util.Set;
+
+import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Test;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -70,6 +76,14 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> update(level.getHeight()));
   }
 
+  /**
+   * @param height in meters
+   * @return
+   */
+  public Command goTo(double height) {
+    return run(() -> update(height));
+  }
+
   @Log.NT
   public double position() {
     return hardware.position();
@@ -104,6 +118,13 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+  }
+
+  public Test systemsCheck() {
+    Command testCommand = goTo(TEST_HEIGHT.in(Meters));
+    Set<Assertion> assertions = Set.of(eAssert("Elevator syst check (position)", () -> TEST_HEIGHT.in(Meters), this::position, .1));
+
+    return new Test(testCommand, assertions);
   }
 
   @Override

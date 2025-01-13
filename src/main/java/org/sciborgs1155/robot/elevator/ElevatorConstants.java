@@ -32,4 +32,6 @@ public class ElevatorConstants {
   public static final Distance SPROCKET_RADIUS = Inches.of(1);
   public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
   public static final double CONVERSION_FACTOR = SPROCKET_CIRCUMFRENCE.in(Meters) * 2 / GEARING;
+
+  public static final Distance TEST_HEIGHT = MIN_HEIGHT.plus(Meters.of(.2));
 }
