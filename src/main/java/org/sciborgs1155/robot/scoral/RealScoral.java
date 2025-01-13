@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Ports.Scoral.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
 
@@ -58,5 +59,10 @@ public class RealScoral implements ScoralIO {
   public void close() throws Exception {
     topMotor.close();
     bottomMotor.close();
+  }
+
+  @Override
+  public double getAngularVelocity() {
+    return topMotor.getVelocity().getValue().in(RadiansPerSecond);
   }
 }

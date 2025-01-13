@@ -7,4 +7,6 @@ public interface ScoralIO extends Logged, AutoCloseable {
   void setPower(double power);
 
   boolean beambreak();
+
+  double getAngularVelocity();
 }

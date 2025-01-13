@@ -26,4 +26,9 @@ public class SimScoral implements ScoralIO {
 
   @Override
   public void close() throws Exception {}
+
+  @Override
+  public double getAngularVelocity() {
+    return sim.getAngularVelocityRadPerSec();
+  }
 }

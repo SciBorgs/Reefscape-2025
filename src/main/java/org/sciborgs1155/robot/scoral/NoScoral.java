@@ -12,4 +12,9 @@ public class NoScoral implements ScoralIO {
 
   @Override
   public void close() throws Exception {}
+
+  @Override
+  public double getAngularVelocity() {
+    return 0;
+  }
 }

@@ -1,12 +1,16 @@
 package org.sciborgs1155.robot.scoral;
 
+import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
@@ -39,6 +43,16 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public boolean beambreak() {
     return hardware.beambreak();
+  }
+
+  public Test intakeTest() {
+    Command testCommand = intake().withTimeout(2);
+    TruthAssertion moving =
+        tAssert(
+            () -> Math.abs(hardware.getAngularVelocity()) > 0.5,
+            "Scoral Intake Test (speed)",
+            () -> "" + hardware.getAngularVelocity());
+    return new Test(testCommand, Set.of(moving));
   }
 
   @Override
