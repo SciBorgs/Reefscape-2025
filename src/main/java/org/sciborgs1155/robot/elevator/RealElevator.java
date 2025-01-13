@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.lib.FaultLogger.register;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
@@ -15,14 +17,24 @@ public class RealElevator implements ElevatorIO {
   private final TalonFX follower = new TalonFX(FOLLOWER);
 
   public RealElevator() {
-    TalonFXConfiguration drumConfig = new TalonFXConfiguration();
-    follower.setControl(new Follower(LEADER, false));
+    TalonFXConfiguration talonConfig = new TalonFXConfiguration();
 
-    drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    drumConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
+    leader.getConfigurator().apply(talonConfig);
+    follower.getConfigurator().apply(talonConfig);
 
-    leader.getConfigurator().apply(drumConfig);
+    follower.setControl(new Follower(LEADER, true));
+
+    talonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
+    talonConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
+
+    leader.getConfigurator().apply(talonConfig);
+    follower.getConfigurator().apply(talonConfig);
+
     TalonUtils.addMotor(leader);
+    TalonUtils.addMotor(follower);
+    register(leader);
+    register(follower);
   }
 
   @Override

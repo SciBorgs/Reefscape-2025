@@ -1,11 +1,13 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -32,6 +34,8 @@ public class ElevatorConstants {
   public static final Distance SPROCKET_RADIUS = Inches.of(1);
   public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
   public static final double CONVERSION_FACTOR = SPROCKET_CIRCUMFRENCE.in(Meters) * 2 / GEARING;
+
+  public static final Current CURRENT_LIMIT = Amps.of(50);
 
   public static final Distance TEST_HEIGHT = MIN_HEIGHT.plus(Meters.of(.2));
 }
