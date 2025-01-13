@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Set;
 import monologue.Annotations.Log;
@@ -45,10 +44,10 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Arm feed forward controller. */
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
+  /** Arm visualization software. */
   @Log.NT private final Mechanism2d armGUICanvas = new Mechanism2d(60, 60);
+
   private final MechanismRoot2d armPivotGUI = armGUICanvas.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d armTowerGUI =
-      armPivotGUI.append(new MechanismLigament2d("ArmTower", 30, -90));
   private final MechanismLigament2d armGUI =
       armPivotGUI.append(
           new MechanismLigament2d(
@@ -63,7 +62,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * simulated if it isn't.
    */
   public static Arm create() {
-    return Robot.isReal() ? new Arm(new RealArm()) : new Arm(new SimArm());
+    return new Arm(Robot.isReal() ? new RealArm() : new SimArm());
   }
 
   /** Creates a new {@link Arm} with no hardware interface(does nothing). */
@@ -74,11 +73,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param hardware
+   * @param hardware The ArmIO object (real/simulated/nonexistant) that will be operated on.
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
+    fb.reset(STARTING_ANGLE.in(Radians));
+    fb.setGoal(STARTING_ANGLE.in(Radians));
   }
 
   /**
@@ -86,7 +87,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    armGUI.setAngle(Math.toDegrees(hardware.position()));
     return hardware.position();
   }
 
@@ -114,8 +114,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
           double feedBack = fb.calculate(hardware.position(), goal.in(Radians));
           hardware.setVoltage(feedBack + feedForward);
         })
-        .withName("Moving Arm To: " + goal.toString() + " radians")
-        .andThen(Commands.print("Yippee"));
+        .withName("Moving Arm To: " + goal.toString() + " radians");
   }
 
   @Override
@@ -123,8 +122,14 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     hardware.close();
   }
 
+  /**
+   * A Test which moves the arm towards a goal angle and then asserts that it got there.
+   *
+   * @param goal The goal angle to which the arm will move to.
+   * @return A Test object which moves the arm and checks it got to its destination.
+   */
   public Test goToTest(Angle goal) {
-    Command testCommand = goTo(goal).until(fb::atGoal);
+    Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(3);
     EqualityAssertion atGoal =
         Assertion.eAssert(
             "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
@@ -132,5 +137,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Override
-  public void simulationPeriodic() {}
+  public void periodic() {
+    armGUI.setAngle(Math.toDegrees(hardware.position()));
+  }
 }

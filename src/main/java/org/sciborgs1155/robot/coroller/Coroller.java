@@ -17,7 +17,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
    * and no hardware connection if it isn't.
    */
   public static Coroller create() {
-    return Robot.isReal() ? new Coroller(new RealCoroller()) : new Coroller(new NoCoroller());
+    return new Coroller(Robot.isReal() ? new RealCoroller() : new NoCoroller());
   }
 
   /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
@@ -25,6 +25,11 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
     return new Coroller(new NoCoroller());
   }
 
+  /**
+   * Constructor.
+   *
+   * @param hardware The CorollerIO object (real/nonexistant) that will be operated.
+   */
   private Coroller(CorollerIO hardware) {
     this.hardware = hardware;
   }
