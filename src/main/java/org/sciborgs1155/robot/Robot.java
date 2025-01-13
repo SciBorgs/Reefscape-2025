@@ -9,6 +9,9 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -29,11 +32,17 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.vision.Vision;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,12 +51,38 @@ import org.sciborgs1155.robot.vision.Vision;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class Robot extends CommandRobot implements Logged {
+  private final DriveTrainSimulationConfig driveTrainSimulationConfig = DriveTrainSimulationConfig.Default()
+        // Specify gyro type (for realistic gyro drifting and error simulation)
+        .withGyro(COTS.ofPigeon2())
+        // Specify swerve module (for realistic swerve dynamics)
+        .withSwerveModule(new SwerveModuleSimulationConfig(
+            DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
+            DCMotor.getFalcon500(1), // Steer motor is a Falcon 500
+              DGR, // Drive motor gear ratio.
+              SGR, // Steer motor gear ratio.
+              DFV, // Drive friction voltage.
+              SFV, // Steer friction voltage
+              WR, // Wheel radius
+              SMOI, // Steer MOI
+              CWF //Wheel coefficent of friction
+        )) 
+        // Configures the track length and track width (spacing between swerve modules)
+        .withTrackLengthTrackWidth(TLX, TLY)
+        // Configures the bumper size (dimensions of the robot bumper)
+        .withBumperSize(BLX, BLY);
+
+  /* Create a swerve drive simulation */
+  SwerveDriveSimulation swerveDriveSimulation = new SwerveDriveSimulation(
+          // Specify Configuration
+          driveTrainSimulationConfig,
+          // Specify starting pose
+          new Pose2d(3, 3, new Rotation2d())
+  );
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   private final PowerDistribution pdh = new PowerDistribution();
-
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
@@ -83,6 +118,8 @@ public class Robot extends CommandRobot implements Logged {
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
+
+
 
     if (isReal()) {
       URCL.start();
