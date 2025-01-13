@@ -30,4 +30,10 @@ public final class Ports {
     public static final int BOTTOM_ROLLER = 22;
     public static final int BEAMBREAK = 23;
   }
+
+  public static final class Hopper {
+    public static final int LEFT_MOTOR = -1;
+    public static final int RIGHT_MOTOR = -1;
+    public static final int BEAMBREAK = -1;
+  }
 }

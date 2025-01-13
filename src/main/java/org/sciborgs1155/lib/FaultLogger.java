@@ -329,6 +329,9 @@ public final class FaultLogger {
    */
   public static void register(TalonFX talon) {
     int id = talon.getDeviceID();
+
+    register(() -> !talon.isConnected(), "Talon ID: " + id, "disconnected", FaultType.ERROR);
+
     BiConsumer<StatusSignal<Boolean>, String> regFault =
         (f, d) -> register(() -> f.getValue(), "Talon ID: " + id, d, FaultType.ERROR);
 
