@@ -31,6 +31,9 @@
       "/Robot/drive/rearRight/turnFeedback": "PIDController",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
+      "/Robot/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/elevator/pid": "ProfiledPIDController",
+      "/Robot/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -79,6 +82,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/Robot/elevator/measurement/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -88,9 +101,6 @@
     },
     "transitory": {
       "Robot": {
-        "autos": {
-          "open": true
-        },
         "drive": {
           "Pose2d##v_/Robot/drive/getPose": {
             "Rotation2d##v_rotation": {
@@ -160,7 +170,9 @@
               "open": true
             },
             "open": true
-          },
+          }
+        },
+        "elevator": {
           "open": true
         },
         "open": true,
@@ -175,5 +187,43 @@
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 278,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/positionSetpoint"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Elevator"
+      }
+    }
   }
 }
