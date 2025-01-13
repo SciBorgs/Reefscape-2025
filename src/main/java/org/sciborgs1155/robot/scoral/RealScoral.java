@@ -6,6 +6,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.TalonUtils;
 
 public class RealScoral implements ScoralIO {
 
@@ -24,6 +25,9 @@ public class RealScoral implements ScoralIO {
 
     FaultLogger.register(topMotor);
     FaultLogger.register(bottomMotor);
+
+    TalonUtils.addMotor(topMotor);
+    TalonUtils.addMotor(bottomMotor);
   }
 
   @Override
