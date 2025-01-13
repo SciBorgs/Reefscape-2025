@@ -4,11 +4,13 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.GEARING;
 import static org.sciborgs1155.robot.arm.ArmConstants.STRATOR_LIMIT;
 import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
@@ -28,6 +30,8 @@ public class RealArm implements ArmIO {
 
     config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Feedback.SensorToMechanismRatio = GEARING;
     motor.getConfigurator().apply(config);
 
     FaultLogger.register(motor);

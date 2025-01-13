@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
@@ -25,6 +26,7 @@ public class RealCoroller implements CorollerIO {
     // TODO change one of these
     config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     motor.getConfigurator().apply(config);
 
     FaultLogger.register(motor);
