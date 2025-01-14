@@ -161,7 +161,7 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public void updateSetpoint(SwerveModuleState setpoint, ControlMode mode) {
-    setpoint = SwerveModuleState.optimize(setpoint, rotation());
+    setpoint.optimize(rotation());
     // Scale setpoint by cos of turning error to reduce tread wear
     setpoint.speedMetersPerSecond *= setpoint.angle.minus(rotation()).getCos();
 

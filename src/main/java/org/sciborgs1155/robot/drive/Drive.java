@@ -122,7 +122,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 new SparkModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS.get(2), "RL"),
                 new SparkModule(
                     REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS.get(3), "RR"));
-        case TEST_CHASSIS ->
+        case NEOKRAKEN ->
             new Drive(
                 new NavXGyro(),
                 new NeoKrakenModule(
