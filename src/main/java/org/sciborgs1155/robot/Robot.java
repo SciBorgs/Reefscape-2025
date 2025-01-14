@@ -63,12 +63,6 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
-    configureLog();
-  }
-
-  private void configureLog() {
-    SignalLogger.setPath("./logs/");
-    SignalLogger.enableAutoLogging(true);
   }
 
   /** Configures basic behavior for different periods during the game. */

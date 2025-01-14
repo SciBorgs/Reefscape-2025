@@ -24,16 +24,14 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 public class TalonModule implements ModuleIO {
   private final TalonFX driveMotor; // Kraken X60
-  private final TalonFX turnMotor; // Kraken X60 -- NEW
+  private final TalonFX turnMotor; // Kraken X60 
 
   private final StatusSignal<Angle> drivePos;
   private final StatusSignal<AngularVelocity> driveVelocity;
-  // private final SparkAbsoluteEncoder turningEncoder;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage radiansOut = new PositionVoltage(0);
 
-  // private final SparkPIDController turnPID;
   private final SimpleMotorFeedforward driveFF;
   private final SimpleMotorFeedforward turnFF;
 
@@ -60,9 +58,6 @@ public class TalonModule implements ModuleIO {
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
-    // reset config
-    driveMotor.getConfigurator().apply(talonDriveConfig);
-    turnMotor.getConfigurator().apply(talonTurnConfig);
 
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonDriveConfig.Feedback.SensorToMechanismRatio = Driving.POSITION_FACTOR.in(Meters);
@@ -123,7 +118,7 @@ public class TalonModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRadians(turnMotor.getRotorPosition().getValueAsDouble())
+        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble())
             .minus(angularOffset);
     return lastRotation;
   }
@@ -162,7 +157,7 @@ public class TalonModule implements ModuleIO {
   @Override
   public void updateSetpoint(SwerveModuleState setpoint, ControlMode mode) {
     setpoint.optimize(rotation());
-    // Scale setpoint by cos of turning error to reduce tread wear
+    // Scale setpoint by cos of turning error to reduce tread wear00
     setpoint.speedMetersPerSecond *= setpoint.angle.minus(rotation()).getCos();
 
     if (mode == ControlMode.OPEN_LOOP_VELOCITY) {
