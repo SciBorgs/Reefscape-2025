@@ -108,8 +108,6 @@ public class NeoKrakenModule implements ModuleIO {
     turnFF = new SimpleMotorFeedforward(Turning.FF.S, Turning.FF.V, Turning.FF.A);
 
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
-    // reset config
-    turnMotor.getConfigurator().apply(talonTurnConfig);
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
