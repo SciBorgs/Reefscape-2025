@@ -54,8 +54,20 @@ public class SimModule implements ModuleIO {
       };
 
   private final DCMotorSim turn =
-      new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A), DCMotor.getNeo550(1));
+      switch (TYPE) {
+        case SPARK ->
+            new DCMotorSim(
+                LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A),
+                DCMotor.getNeo550(1));
+        case TALON ->
+            new DCMotorSim(
+                LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A),
+                DCMotor.getNeo550(1));
+        case NEOKRAKEN ->
+            new DCMotorSim(
+                LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A),
+                DCMotor.getKrakenX60(1));
+      };
 
   private final PIDController turnFeedback =
       new PIDController(Turning.PID.P, Turning.PID.I, Turning.PID.D);
