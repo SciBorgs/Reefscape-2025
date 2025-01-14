@@ -24,7 +24,7 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 public class TalonModule implements ModuleIO {
   private final TalonFX driveMotor; // Kraken X60
-  private final TalonFX turnMotor; // Kraken X60 
+  private final TalonFX turnMotor; // Kraken X60
 
   private final StatusSignal<Angle> drivePos;
   private final StatusSignal<AngularVelocity> driveVelocity;
@@ -118,8 +118,7 @@ public class TalonModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble())
-            .minus(angularOffset);
+        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
     return lastRotation;
   }
 
