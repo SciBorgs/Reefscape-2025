@@ -36,7 +36,7 @@ public class Vision implements Logged {
   private final PhotonCamera[] cameras;
   private final PhotonPoseEstimator[] estimators;
   private final PhotonCameraSim[] simCameras;
-  private final PhotonPipelineResult[] changes;
+  private final PhotonPipelineResult[][] changes;
 
   private VisionSystemSim visionSim;
 
@@ -49,7 +49,7 @@ public class Vision implements Logged {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
-    changes = new PhotonPipelineResult[configs.length];
+    changes = new PhotonPipelineResult[configs.length][20];
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
@@ -62,9 +62,12 @@ public class Vision implements Logged {
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
       cameras[i] = camera;
       estimators[i] = estimator;
-      changes[i] = new PhotonPipelineResult();
 
       FaultLogger.register(camera);
+
+      for (int j = 0; j < 20; j++) {
+        changes[i][j] = new PhotonPipelineResult();
+      }
     }
 
     if (Robot.isSimulation()) {
@@ -103,9 +106,10 @@ public class Vision implements Logged {
       var unread = cameras[i].getAllUnreadResults();
       Optional<EstimatedRobotPose> estimate = Optional.empty();
 
-      for (var change : unread) {
+      for (int j = 0; j < unread.size(); j++) {
+        var change = unread.get(j);
+        changes[i][j] = unread.get(j);
         estimate = estimators[i].update(change);
-        changes[i] = change;
 
         log("estimates present " + i, estimate.isPresent());
         estimate
@@ -133,6 +137,7 @@ public class Vision implements Logged {
   @Log.NT
   public Pose3d[] getSeenTags() {
     return Arrays.stream(changes)
+        .flatMap(Arrays::stream)
         .flatMap(c -> c.targets.stream())
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
