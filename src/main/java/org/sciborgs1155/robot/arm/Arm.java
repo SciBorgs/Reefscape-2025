@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-
 import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -34,22 +33,20 @@ import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
-/**
- * Simple Arm subsystem used for climbing and intaking coral from the ground.
- */
+/** Simple Arm subsystem used for climbing and intaking coral from the ground. */
 public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  @Log.NT
-  private final ArmIO hardware;
+  @Log.NT private final ArmIO hardware;
 
   /** Trapezoid profile feedback (PID) controller */
   @Log.NT
-  private final ProfiledPIDController fb = new ProfiledPIDController(
-      kP,
-      kI,
-      kD,
-      new TrapezoidProfile.Constraints(
-          MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
+  private final ProfiledPIDController fb =
+      new ProfiledPIDController(
+          kP,
+          kI,
+          kD,
+          new TrapezoidProfile.Constraints(
+              MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
   /** Arm feed forward controller. */
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
@@ -58,21 +55,20 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine sysIdRoutine;
 
   /** Arm visualization software. */
-  @Log.NT
-  private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
+  @Log.NT private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
   private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
-  private final MechanismLigament2d armLigament = armRoot.append(
-      new MechanismLigament2d(
-          "Arm",
-          ARM_LENGTH.in(Centimeters),
-          STARTING_ANGLE.in(Degrees),
-          10,
-          new Color8Bit(Color.kSkyBlue)));
+  private final MechanismLigament2d armLigament =
+      armRoot.append(
+          new MechanismLigament2d(
+              "Arm",
+              ARM_LENGTH.in(Centimeters),
+              STARTING_ANGLE.in(Degrees),
+              10,
+              new Color8Bit(Color.kSkyBlue)));
 
   /**
-   * Returns a new {@link Arm} subsystem, which will have real hardware if the
-   * robot is real, and
+   * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
    * simulated if it isn't.
    */
   public static Arm create() {
@@ -87,8 +83,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param hardware The ArmIO object (real/simulated/nonexistant) that will be
-   *                 operated on.
+   * @param hardware The ArmIO object (real/simulated/nonexistant) that will be operated on.
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
@@ -96,8 +91,10 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
 
-    this.sysIdRoutine = new SysIdRoutine(new Config(Volts.of(0.5).per(Second), Volts.of(0.2), Seconds.of(5)),
-        new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
+    this.sysIdRoutine =
+        new SysIdRoutine(
+            new Config(Volts.of(0.5).per(Second), Volts.of(0.2), Seconds.of(5)),
+            new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
   }
 
   /**
@@ -120,10 +117,10 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
     return run(() -> {
-      double feedforward = ff.calculate(fb.getSetpoint().position, 0);
-      double feedback = fb.calculate(hardware.position(), goal.in(Radians));
-      hardware.setVoltage(feedback + feedforward);
-    })
+          double feedforward = ff.calculate(fb.getSetpoint().position, 0);
+          double feedback = fb.calculate(hardware.position(), goal.in(Radians));
+          hardware.setVoltage(feedback + feedforward);
+        })
         .withName("Moving Arm To: " + goal.toString() + " radians");
   }
 
@@ -137,27 +134,30 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * A Test which moves the arm towards a goal angle and then asserts that it got
-   * there.
+   * A Test which moves the arm towards a goal angle and then asserts that it got there.
    *
    * @param goal The goal angle to which the arm will move to.
-   * @return A Test object which moves the arm and checks it got to its
-   *         destination.
+   * @return A Test object which moves the arm and checks it got to its destination.
    */
   public Test goToTest(Angle goal) {
     Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(3).withName("Arm Test");
-    EqualityAssertion atGoal = Assertion.eAssert(
-        "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
+    EqualityAssertion atGoal =
+        Assertion.eAssert(
+            "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
     return new Test(testCommand, Set.of(atGoal));
   }
 
-  /** 
-   * Runs all 4 {@link SysIdRoutine}'s in sequence. 
+  /**
+   * Runs all 4 {@link SysIdRoutine}'s in sequence.
+   *
    * @return A command to run the routine.
-  */
+   */
   public Command sysIdRoutine() {
-    return sysIdRoutine.quasistatic(Direction.kForward).andThen(sysIdRoutine.quasistatic(Direction.kReverse))
-        .andThen(sysIdRoutine.dynamic(Direction.kForward)).andThen(sysIdRoutine.dynamic(Direction.kReverse))
+    return sysIdRoutine
+        .quasistatic(Direction.kForward)
+        .andThen(sysIdRoutine.quasistatic(Direction.kReverse))
+        .andThen(sysIdRoutine.dynamic(Direction.kForward))
+        .andThen(sysIdRoutine.dynamic(Direction.kReverse))
         .withName("Arm SysID");
   }
 
