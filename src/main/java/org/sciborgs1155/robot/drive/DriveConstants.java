@@ -29,13 +29,14 @@ public final class DriveConstants {
   /** The type of modules being used. */
   public static enum ModuleType {
     TALON, // Kraken X60 Drive, NEO 550 Turn
-    SPARK; // NEO Vortex Drive, NEO 550 Turn
+    SPARK, // NEO Vortex Drive, NEO 550 Turn
+    TEST_CHASSIS; // NEO Drive, Kraken Turn
   }
 
   // TODO: Change central drivetrain constants as needed.
 
   // The type of module on the chassis
-  public static final ModuleType TYPE = ModuleType.SPARK;
+  public static final ModuleType TYPE = ModuleType.TEST_CHASSIS;
 
   // The control loop used by all of the modules when driving
   public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;

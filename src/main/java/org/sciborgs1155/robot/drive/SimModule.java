@@ -28,6 +28,10 @@ public class SimModule implements ModuleIO {
             new DCMotorSim(
                 LinearSystemId.createDCMotorSystem(Driving.FF.TALON.V, Driving.FF.TALON.A),
                 DCMotor.getKrakenX60(1));
+        case TEST_CHASSIS ->
+            new DCMotorSim(
+                LinearSystemId.createDCMotorSystem(Driving.FF.SPARK.V, Driving.FF.SPARK.A),
+                DCMotor.getNeoVortex(1));
       };
 
   private final PIDController driveFeedback =
@@ -36,6 +40,8 @@ public class SimModule implements ModuleIO {
             new PIDController(Driving.PID.SPARK.P, Driving.PID.SPARK.I, Driving.PID.SPARK.D);
         case TALON ->
             new PIDController(Driving.PID.TALON.P, Driving.PID.TALON.I, Driving.PID.TALON.D);
+        case TEST_CHASSIS ->
+            new PIDController(Driving.PID.SPARK.P, Driving.PID.SPARK.I, Driving.PID.SPARK.D);
       };
   private final SimpleMotorFeedforward driveFF =
       switch (TYPE) {
@@ -43,6 +49,8 @@ public class SimModule implements ModuleIO {
             new SimpleMotorFeedforward(Driving.FF.SPARK.S, Driving.FF.SPARK.V, Driving.FF.SPARK.A);
         case TALON ->
             new SimpleMotorFeedforward(Driving.FF.TALON.S, Driving.FF.TALON.V, Driving.FF.TALON.A);
+        case TEST_CHASSIS ->
+            new SimpleMotorFeedforward(Driving.FF.SPARK.S, Driving.FF.SPARK.V, Driving.FF.SPARK.A);
       };
 
   private final DCMotorSim turn =

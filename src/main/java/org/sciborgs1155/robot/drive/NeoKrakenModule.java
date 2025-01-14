@@ -4,30 +4,25 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.COUPLING_RATIO;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
-
 import java.util.Set;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.SparkUtils;
@@ -43,9 +38,9 @@ public class NeoKrakenModule implements ModuleIO {
   private final SparkFlexConfig driveMotorConfig;
   private final TalonFX turnMotor; // Kraken
 
-  private final StatusSignal<Angle> drivePos;
   private final RelativeEncoder driveEncoder;
 
+  private final PositionVoltage radiansOut = new PositionVoltage(0);
   private final SparkClosedLoopController drivePID;
 
   private final SimpleMotorFeedforward driveFF;
@@ -53,6 +48,7 @@ public class NeoKrakenModule implements ModuleIO {
 
   private final Rotation2d angularOffset;
 
+  private double lastPosition;
   private double lastVelocity;
   private Rotation2d lastRotation;
 
@@ -124,10 +120,10 @@ public class NeoKrakenModule implements ModuleIO {
     talonTurnConfig.Slot0.kD = Turning.PID.D;
 
     turnMotor.getConfigurator().apply(talonTurnConfig);
-    
+
     register(driveMotor);
     register(turnMotor);
-        
+
     TalonUtils.addMotor(turnMotor);
     resetEncoders();
 
@@ -150,12 +146,13 @@ public class NeoKrakenModule implements ModuleIO {
   @Override
   public void setTurnVoltage(double voltage) {
     turnMotor.setVoltage(voltage);
-    check(turnMotor);
   }
 
   @Override
   public double drivePosition() {
-    return drivePos.getValueAsDouble();
+    lastPosition = SparkUtils.wrapCall(driveMotor, driveEncoder.getPosition()).orElse(lastPosition);
+    // account for rotation of turn motor on rotation of drive motor
+    return lastPosition - turnMotor.getRotorPosition().getValueAsDouble() * COUPLING_RATIO;
   }
 
   @Override
