@@ -5,8 +5,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.Constants.*;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -32,6 +32,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -50,6 +51,7 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
+  private final Elevator elevator = Elevator.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -100,6 +102,11 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+    operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+
     InputStream x = InputStream.of(driver::getLeftX).negate();
     InputStream y = InputStream.of(driver::getLeftY).negate();
 

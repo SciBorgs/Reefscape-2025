@@ -13,7 +13,7 @@ import org.sciborgs1155.robot.vision.Vision.CameraConfig;
 
 public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
   /** TODO: Create cameras with updated constants; be sure to add in {@link Vision#create} */
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
@@ -38,10 +38,15 @@ public class VisionConstants {
   public static final double MAX_HEIGHT = 0.305;
   public static final double MAX_ANGLE = 0.3;
 
-  /** TODO: Modify AprilTag information as needed. */
-  // Total of n AprilTags
-  // Reference:
-  // Tag Locations (1-n) | Description...
+  // Total of 22 AprilTags
+  // Reference: https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf (page 35)
+  // Tag Locations (1-22)
+  // Reef | Red: 6-11, Blue: 17-22
+  // Cage | Red Side: 4-5, Blue Side: 14-15
+  // Coral Station | Red Side: 1-2, Blue Side: 12-13
+  // Processor | Red Side: 3 | Blue Side: 16
 
-  public static final double[] TAG_WEIGHTS = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  public static final double[] TAG_WEIGHTS = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+  };
 }
