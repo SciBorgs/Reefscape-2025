@@ -117,6 +117,8 @@ public final class DriveConstants {
       // bevel pinion
       public static final double GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
 
+      public static final double KRAKEN_GEARING = 5.68;
+
       public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
       public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
 
@@ -154,6 +156,8 @@ public final class DriveConstants {
     static final class Turning {
       public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double ENCODER_GEARING = 1;
+      public static final double SENSOR_TO_MECHANISM_RATIO = 12.1;
+      public static final double SUPPLY_CURRENT_LIMIT = 70;
 
       public static final Angle POSITION_FACTOR = Rotations.of(ENCODER_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
@@ -161,6 +165,7 @@ public final class DriveConstants {
       public static final boolean ENCODER_INVERTED = true;
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
+
 
       public static final class PID {
         public static final double P = 9;

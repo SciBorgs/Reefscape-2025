@@ -7,6 +7,7 @@ import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.COUPLI
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -56,7 +57,7 @@ public class NeoKrakenModule implements ModuleIO {
 
   private final String name;
 
-  public NeoKrakenModule(int drivePort, int turnPort, Rotation2d angularOffset, String name) {
+  public NeoKrakenModule(int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
 
     // Drive Motor
 
@@ -110,8 +111,16 @@ public class NeoKrakenModule implements ModuleIO {
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
+
     talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
+    talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.SUPPLY_CURRENT_LIMIT;
+    
+    talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
+    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;

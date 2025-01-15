@@ -50,8 +50,8 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
-  private final Elevator elevator = Elevator.create();
+  // private final Vision vision = Vision.create();
+  // private final Elevator elevator = Elevator.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -86,7 +86,7 @@ public class Robot extends CommandRobot implements Logged {
     FaultLogger.register(pdh);
 
     // Configure pose estimation updates every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -96,16 +96,16 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    // operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    // operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    // operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    // operator.y().onTrue(elevator.scoreLevel(Level.L4));
 
     InputStream x = InputStream.of(driver::getLeftX).negate();
     InputStream y = InputStream.of(driver::getLeftY).negate();
