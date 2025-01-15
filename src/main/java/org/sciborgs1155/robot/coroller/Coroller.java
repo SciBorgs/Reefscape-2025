@@ -4,16 +4,14 @@ import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
-import org.sciborgs1155.lib.SimpleMotor;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import monologue.Logged;
-import org.sciborgs1155.robot.Robot;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import monologue.Logged;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
 public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
@@ -31,7 +29,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   public static Coroller none() {
     return new Coroller(SimpleMotor.none());
   }
-  
+
   private static SimpleMotor realMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
