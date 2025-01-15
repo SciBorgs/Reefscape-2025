@@ -76,7 +76,7 @@ public class NeoKrakenModule implements ModuleIO {
         driveMotorConfig
             .closedLoop
             .pid(Driving.PID.SPARK.P, Driving.PID.SPARK.I, Driving.PID.SPARK.D)
-            .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kAbsoluteEncoder));
+            .feedbackSensor(ClosedLoopConfig.FeedbackSensor.kPrimaryEncoder));
 
     driveMotorConfig.apply(
         driveMotorConfig
@@ -150,7 +150,7 @@ public class NeoKrakenModule implements ModuleIO {
   public double drivePosition() {
     lastPosition = SparkUtils.wrapCall(driveMotor, driveEncoder.getPosition()).orElse(lastPosition);
     // account for rotation of turn motor on rotation of drive motor
-    return lastPosition - turnMotor.getRotorPosition().getValueAsDouble() * COUPLING_RATIO;
+    return lastPosition - turnMotor.getPosition().getValueAsDouble() * COUPLING_RATIO;
   }
 
   @Override
@@ -162,8 +162,7 @@ public class NeoKrakenModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRadians(turnMotor.getRotorPosition().getValueAsDouble())
-            .minus(angularOffset);
+        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
     return lastRotation;
   }
 
@@ -203,7 +202,7 @@ public class NeoKrakenModule implements ModuleIO {
     // Optimize the reference state to avoid spinning further than 90 degrees
     setpoint.optimize(rotation());
     // Scale setpoint by cos of turning error to reduce tread wear
-    setpoint.speedMetersPerSecond *= setpoint.angle.minus(rotation()).getCos();
+    setpoint.cosineScale(rotation());
 
     if (mode == ControlMode.OPEN_LOOP_VELOCITY) {
       setDriveVoltage(driveFF.calculate(setpoint.speedMetersPerSecond));
