@@ -160,8 +160,13 @@ public class Constants {
             Rotation2d.fromDegrees(60).times(times));
       }
 
-      public static Pose2d nearest(Pose2d pose) {
-        return pose.nearest(poseList()).rotateBy(allianceRotation());
+      public static Branch nearest(Pose2d pose) {
+        for (int i = 0; i < values().length; i++) {
+          if (Branch.values()[i].pose == pose.nearest(poseList())) {
+            return Branch.values()[i];
+          }
+        }
+        return L;
       }
     }
 

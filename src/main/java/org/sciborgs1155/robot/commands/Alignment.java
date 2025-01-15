@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.commands;
 
-import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +27,12 @@ public class Alignment {
     this.scoral = scoral;
   }
 
+  /**
+   * Drives to a designated reef branch while raising the elevator, and then scores onto a designated level on that branch.
+   * @param level The level (L1, L2, L3, L4) being scored on.
+   * @param branch The reef branch (A, B, C, etc.) being scored on.
+   * @return A command to quickly prepare and then score in the reef.
+   */
   public Command reef(Level level, Branch branch) {
     return drive
         .driveTo(branch.pose)
@@ -35,6 +40,12 @@ public class Alignment {
         .andThen(scoral.outtake());
   }
 
+  /**
+   * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated level on that branch.
+   * @param level The level (L1, L2, L3, L4) being scored on.
+   * @param branch The reef branch (A, B, C, etc.) being scored on.
+   * @return A command to score in the reef without raising the elevator while moving.
+   */
   public Command safeReef(Level level, Branch branch) {
     return drive
         .driveTo(branch.pose)
@@ -42,11 +53,13 @@ public class Alignment {
         .andThen(scoral.outtake());
   }
 
+  /**
+   * Drives to the nearest reef branch while raising the elevator, and then scores
+   * @param level
+   * @return
+   */
   public Command reef(Level level) {
-    return drive
-        .driveTo(Branch.nearest(drive.pose()))
-        .alongWith(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
-        .andThen(scoral.outtake());
+    return reef(level, Branch.nearest(drive.pose()));
   }
 
   public Command source() {
