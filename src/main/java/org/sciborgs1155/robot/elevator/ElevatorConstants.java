@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
@@ -32,4 +33,6 @@ public class ElevatorConstants {
   public static final Distance SPROCKET_RADIUS = Inches.of(1);
   public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
   public static final double CONVERSION_FACTOR = SPROCKET_CIRCUMFRENCE.in(Meters) * 2 / GEARING;
+
+  public static final Distance POSITION_TOLERANCE = Centimeters.of(1.5);
 }

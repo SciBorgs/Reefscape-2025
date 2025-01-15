@@ -100,6 +100,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     hardware.setVoltage(feedforward + feedback);
   }
 
+  public boolean atPosition(double position) {
+    return Meters.of(position).minus(Meters.of(position())).magnitude()
+        < POSITION_TOLERANCE.in(Meters);
+  }
+
   @Override
   public void periodic() {
     setpoint.setLength(positionSetpoint());
