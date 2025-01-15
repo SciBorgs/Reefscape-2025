@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Time;
 
 public class ScoralConstants {
   public static final double POWER = 0.5;
+  public static final Current STATOR_LIMIT = Amps.of(90);
   public static final Current CURRENT_LIMIT = Amps.of(45);
   public static final Time RAMP_TIME = Milliseconds.of(50);
 

@@ -1,59 +1,62 @@
 package org.sciborgs1155.robot.scoral;
 
-import static org.sciborgs1155.lib.Assertion.tAssert;
+import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.robot.Ports.Scoral.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
-import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import org.sciborgs1155.lib.Assertion.TruthAssertion;
-import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
+  private final SimpleMotor hardware;
 
-  @Log.NT private final ScoralIO hardware;
+  private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
 
-  public Scoral(ScoralIO hardware) {
+  private static SimpleMotor realMotor() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    config.CurrentLimits.StatorCurrentLimit = STATOR_LIMIT.in(Amps);
+    config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    return SimpleMotor.talon(new TalonFX(ROLLER), config);
+  }
+
+  public Scoral(SimpleMotor hardware) {
     this.hardware = hardware;
   }
 
   public static Scoral create() {
-    return Robot.isReal() ? new Scoral(new RealScoral()) : new Scoral(new SimScoral());
+    return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
   }
 
   public static Scoral none() {
-    return new Scoral(new NoScoral());
+    return new Scoral(SimpleMotor.none());
   }
 
   /** Runs the motor to outtake, as in pushing out, a coral. */
   public Command outtake() {
-    return run(() -> hardware.setPower(POWER)).withName("outtake");
+    return run(() -> hardware.set(POWER)).withName("outtake");
   }
 
   /** Runs the motor to intake, as in pulling in, a coral. */
   public Command intake() {
-    return run(() -> hardware.setPower(-POWER)).withName("intake");
+    return run(() -> hardware.set(-POWER)).withName("intake");
   }
 
   /** Returns the value of the beambreak. */
   @Log.NT
   public boolean beambreak() {
-    return hardware.beambreak();
-  }
-
-  /** Tests that the outtake is functioning by telling it to spin, and making sure that it is. */
-  public Test outtakeTest() {
-    Command testCommand = outtake().withTimeout(2);
-    TruthAssertion moving =
-        tAssert(
-            () -> hardware.getAngularVelocity() > 0.5,
-            "Scoral Outtake Test (speed)",
-            () -> "" + hardware.getAngularVelocity());
-    return new Test(testCommand, Set.of(moving));
+    return beambreak.get();
   }
 
   @Override

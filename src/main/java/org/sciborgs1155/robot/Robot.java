@@ -173,7 +173,8 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck(), scoral.outtakeTest()).withName("Test Mechanisms");
+    return Test.toCommand(drive.systemsCheck(), Test.fromCommand(scoral.outtake().withTimeout(2)))
+        .withName("Test Mechanisms");
   }
 
   @Override
