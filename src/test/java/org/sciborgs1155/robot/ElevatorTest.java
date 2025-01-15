@@ -1,10 +1,10 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.sciborgs1155.lib.Test.*;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
+import edu.wpi.first.units.measure.Distance;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.SimElevator;
-import static org.sciborgs1155.lib.Test.*;
-
-import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorTest {
   private Elevator elevator;
