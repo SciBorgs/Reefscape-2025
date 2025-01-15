@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Random;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.sciborgs1155.robot.Constants.Field.Branch;
 
 public class RobotTest {
   @Test
@@ -19,6 +20,7 @@ public class RobotTest {
 
   @RepeatedTest(5)
   void reflectionTest() {
+    Branch.print();
     Random rand = new Random();
     Pose2d bluePose =
         new Pose2d(

@@ -111,10 +111,22 @@ public class Constants {
       }
     }
 
+    // The center of the blue alliance reef hexagon
+    public static final Translation2d CENTER_REEF =
+        new Translation2d(Inches.of(65.5 / 2).plus(Feet.of(12)), WIDTH.div(2));
+
     // The field poses for blue alliance's reef branches A and B. Both are the farthest to the blue
     // alliance side, and B is counter-clockwise of A.
-    public static final Pose2d REEF_BRANCH_A = new Pose2d();
-    public static final Pose2d REEF_BRANCH_B = new Pose2d();
+    public static final Pose2d REEF_BRANCH_A =
+        new Pose2d(
+            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2)),
+            CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
+            Rotation2d.fromRotations(0));
+    public static final Pose2d REEF_BRANCH_B =
+        new Pose2d(
+            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2)),
+            CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+            Rotation2d.fromRotations(0));
 
     // Poses for scoraling.
     // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
@@ -145,6 +157,12 @@ public class Constants {
         return List.of(Branch.values()).stream().map(b -> b.pose).collect(Collectors.toList());
       }
 
+      public static void print() {
+        for (Pose2d el : poseList()) {
+          System.out.println(el.toString());
+        }
+      }
+
       /**
        * Moves the pose counter-clockwise to the next side of the
        *
@@ -169,10 +187,6 @@ public class Constants {
         return L;
       }
     }
-
-    // The center of the reef hexagon
-    public static final Translation2d CENTER_REEF =
-        new Translation2d(Inches.of(65.5 / 2).plus(Feet.of(12)), WIDTH.div(2));
 
     public static enum Cage {
       LEFT,

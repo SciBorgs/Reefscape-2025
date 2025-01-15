@@ -28,7 +28,9 @@ public class Alignment {
   }
 
   /**
-   * Drives to a designated reef branch while raising the elevator, and then scores onto a designated level on that branch.
+   * Drives to a designated reef branch while raising the elevator, and then scores onto a
+   * designated level on that branch.
+   *
    * @param level The level (L1, L2, L3, L4) being scored on.
    * @param branch The reef branch (A, B, C, etc.) being scored on.
    * @return A command to quickly prepare and then score in the reef.
@@ -41,7 +43,9 @@ public class Alignment {
   }
 
   /**
-   * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated level on that branch.
+   * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
+   * level on that branch.
+   *
    * @param level The level (L1, L2, L3, L4) being scored on.
    * @param branch The reef branch (A, B, C, etc.) being scored on.
    * @return A command to score in the reef without raising the elevator while moving.
@@ -54,14 +58,21 @@ public class Alignment {
   }
 
   /**
-   * Drives to the nearest reef branch while raising the elevator, and then scores
-   * @param level
-   * @return
+   * Drives to the nearest reef branch while raising the elevator, and then scores onto a designated
+   * level.
+   *
+   * @param level The level (L1, L2, L3, L4) being scored on.
+   * @return A command to score in the nearest reef branch.
    */
-  public Command reef(Level level) {
+  public Command nearReef(Level level) {
     return reef(level, Branch.nearest(drive.pose()));
   }
 
+  /**
+   * Drives to the nearest source and then retracts the elevator for intaking.
+   *
+   * @return A command to align with the human player station source.
+   */
   public Command source() {
     return drive
         .driveTo(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)))
@@ -70,9 +81,11 @@ public class Alignment {
 
   public Command processor() {
     return drive.driveTo(PROCESSOR);
+    // TODO idk how this would work. research this a bit more
   }
 
   public Command cage() {
     return drive.driveTo(nearestCage(drive.pose()));
+    // TODO it should do more. when we have a plan, update this
   }
 }
