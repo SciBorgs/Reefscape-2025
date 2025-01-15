@@ -44,7 +44,7 @@ public class Alignment {
 
   public Command reef(Level level) {
     return drive
-        .driveTo(nearestReef(drive.pose()))
+        .driveTo(Branch.nearest(drive.pose()))
         .alongWith(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
         .andThen(scoral.outtake());
   }

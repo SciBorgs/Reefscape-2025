@@ -111,24 +111,29 @@ public class Constants {
       }
     }
 
+    // The field poses for blue alliance's reef branches A and B. Both are the farthest to the blue
+    // alliance side, and B is counter-clockwise of A.
+    public static final Pose2d REEF_BRANCH_A = new Pose2d();
+    public static final Pose2d REEF_BRANCH_B = new Pose2d();
+
     // Poses for scoraling.
     // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
     // There are two reef branches per side, so the more counter-clockwise one is 1, and the
     // clockwise one is 2
 
     public static enum Branch {
-      A(new Pose2d()),
-      B(new Pose2d()),
-      C(swapSides(A.pose, 1)),
-      D(swapSides(B.pose, 1)),
-      E(swapSides(A.pose, 2)),
-      F(swapSides(B.pose, 2)),
-      G(swapSides(A.pose, 3)),
-      H(swapSides(B.pose, 3)),
-      I(swapSides(A.pose, 4)),
-      J(swapSides(B.pose, 4)),
-      K(swapSides(A.pose, 5)),
-      L(swapSides(B.pose, 5));
+      A(REEF_BRANCH_A),
+      B(REEF_BRANCH_B),
+      C(swapSides(REEF_BRANCH_A, 1)),
+      D(swapSides(REEF_BRANCH_B, 1)),
+      E(swapSides(REEF_BRANCH_A, 2)),
+      F(swapSides(REEF_BRANCH_B, 2)),
+      G(swapSides(REEF_BRANCH_A, 3)),
+      H(swapSides(REEF_BRANCH_B, 3)),
+      I(swapSides(REEF_BRANCH_A, 4)),
+      J(swapSides(REEF_BRANCH_B, 4)),
+      K(swapSides(REEF_BRANCH_A, 5)),
+      L(swapSides(REEF_BRANCH_B, 5));
 
       public final Pose2d pose;
 
@@ -154,6 +159,10 @@ public class Constants {
                 .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(-60).times(times)),
             Rotation2d.fromDegrees(60).times(times));
       }
+
+      public static Pose2d nearest(Pose2d pose) {
+        return pose.nearest(poseList()).rotateBy(allianceRotation());
+      }
     }
 
     // The center of the reef hexagon
@@ -164,10 +173,6 @@ public class Constants {
       LEFT,
       MID,
       RIGHT;
-    }
-
-    public static Pose2d nearestReef(Pose2d pose) {
-      return pose.nearest(Branch.poseList()).rotateBy(allianceRotation());
     }
 
     // Not poses of the game element itself, rather the needed pose of the robot to use it.
