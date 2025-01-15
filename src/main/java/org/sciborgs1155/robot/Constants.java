@@ -41,16 +41,30 @@ public class Constants {
   }
 
   /**
-   * Returns the reflection of a pose about the center of the field, effectively swapping the
-   * alliance from blue to red.
+   * Returns the reflection of a pose about the center of the field, effectively swapping alliances.
+   *
+   * @param pose The pose being reflected.
+   * @param allianceDependent If true, doesn't reflect if on the blue alliance. If false, reflects
+   *     anyway.
    */
-  public static Pose2d allianceReflect(Pose2d pose) {
-    return alliance() == Alliance.Blue
+  public static Pose2d allianceReflect(Pose2d pose, boolean allianceDependent) {
+    return alliance() == Alliance.Blue && allianceDependent
         ? pose
         : new Pose2d(
-            LENGTH.in(Meter) - pose.getX(),
-            WIDTH.in(Meter) - pose.getY(),
+            pose.getTranslation()
+                .rotateAround(
+                    new Translation2d(LENGTH.div(2), WIDTH.div(2)), Rotation2d.fromRotations(0.5)),
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
+  }
+
+  /**
+   * Returns the reflection of a pose about the center point of the field, only if the alliance is
+   * not blue.
+   *
+   * @param pose The pose being reflected.
+   */
+  public static Pose2d allianceReflect(Pose2d pose) {
+    return allianceReflect(pose, true);
   }
 
   /** Describes physical properites of the robot. */
@@ -105,16 +119,16 @@ public class Constants {
     public static enum Branch {
       A(new Pose2d()),
       B(new Pose2d()),
-      C(new Pose2d()),
-      D(new Pose2d()),
-      E(new Pose2d()),
-      F(new Pose2d()),
-      G(new Pose2d()),
-      H(new Pose2d()),
-      I(new Pose2d()),
-      J(new Pose2d()),
-      K(new Pose2d()),
-      L(new Pose2d());
+      C(swapSides(A.pose, 1)),
+      D(swapSides(B.pose, 1)),
+      E(swapSides(A.pose, 2)),
+      F(swapSides(B.pose, 2)),
+      G(swapSides(A.pose, 3)),
+      H(swapSides(B.pose, 3)),
+      I(swapSides(A.pose, 4)),
+      J(swapSides(B.pose, 4)),
+      K(swapSides(A.pose, 5)),
+      L(swapSides(B.pose, 5));
 
       public final Pose2d pose;
 
@@ -124,6 +138,21 @@ public class Constants {
 
       public static List<Pose2d> poseList() {
         return List.of(Branch.values()).stream().map(b -> b.pose).collect(Collectors.toList());
+      }
+
+      /**
+       * Moves the pose counter-clockwise to the next side of the
+       *
+       * @param input
+       * @param times
+       * @return
+       */
+      private static Pose2d swapSides(Pose2d input, int times) {
+        return new Pose2d(
+            input
+                .getTranslation()
+                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(-60).times(times)),
+            Rotation2d.fromDegrees(60).times(times));
       }
     }
 

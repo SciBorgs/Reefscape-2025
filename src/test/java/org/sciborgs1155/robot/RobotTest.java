@@ -25,7 +25,7 @@ public class RobotTest {
             Field.LENGTH.times(rand.nextDouble()),
             Field.WIDTH.times(rand.nextDouble()),
             Rotation2d.fromRotations(rand.nextDouble()));
-    Pose2d redPose = allianceReflect(bluePose);
+    Pose2d redPose = allianceReflect(bluePose, false);
 
     assertEquals(Field.LENGTH.minus(bluePose.getMeasureX()), redPose.getMeasureX());
     assertEquals(Field.WIDTH.minus(bluePose.getMeasureY()), redPose.getMeasureY());
