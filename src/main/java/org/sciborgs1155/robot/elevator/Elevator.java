@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;
@@ -79,50 +77,97 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     SmartDashboard.putData("pivot dynamic backward", sysIdRoutine.dynamic(Direction.kReverse));
   }
 
+  /**
+   * drives elevator to its maximum height
+   * 
+   * @return a command which drives the elevator to its maximum height
+   */
   public Command extend() {
     return run(() -> update(MAX_HEIGHT.in(Meters)));
   }
 
+  /**
+   * drives elevator to its minimum
+   * 
+   * @return a command which drives the elevator to its minimum height
+   */
   public Command retract() {
     return run(() -> update(MIN_HEIGHT.in(Meters)));
   }
 
+  /**
+   * drives elevator to one of the 4 levels
+   * 
+   * @param level an enum that can be L1-L4
+   * @return a command which drives the elevator to one of the 4 levels
+   */
   public Command scoreLevel(Level level) {
     return goTo(level.getHeight().in(Meters));
   }
 
   /**
-   * @param height in meters
-   * @return
+   * drives elevator to the desired height, within its physical boundaries
+   * 
+   * @param height desired height in meters
+   * @return a command which drives the elevator to the desired height
    */
   public Command goTo(double height) {
     return run(() -> update(height));
   }
 
+  /**
+   * give measured encoder height of elevator
+   * 
+   * @return position of the elevator in meters
+   */
   @Log.NT
   public double position() {
     return hardware.position();
   }
 
+  /**
+   * give measured encoder velocity of elevator
+   * 
+   * @return velocity of the elevator in meters per second
+   */
   @Log.NT
   public double velocity() {
     return hardware.velocity();
   }
 
+  /**
+   * give desired encoder height of elevator
+   * 
+   * @return desired position of the elevator in meters
+   */
   @Log.NT
   public double positionSetpoint() {
     return pid.getSetpoint().position;
   }
 
+  /**
+   * give desired encoder velocity of elevator
+   * 
+   * @return desired velocity of the elevator in meters per second
+   */
   @Log.NT
   public double velocitySetpoint() {
     return pid.getSetpoint().velocity;
   }
 
+  /**
+   * @return whether or not the elevator is at its desired state
+   */
   public boolean atGoal() {
     return pid.atGoal();
   }
 
+  /**
+   * method to set voltages to the hardware based off feedforward and feedback control
+   * should only be used in a command
+   * 
+   * @param position goal height for the elevator to achieve
+   */
   private void update(double position) {
     position = MathUtil.clamp(position, MIN_HEIGHT.in(Meters), MAX_HEIGHT.in(Meters));
 
@@ -139,6 +184,13 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     measurement.setLength(position());
   }
 
+  /**
+   * drives the elevator to a desired height and asserts that it has reached said height
+   * can be used in unit tests or for real-life systems checks
+   * 
+   * @param testHeight desired height for the elevator to reach
+   * @return command to drive elevator to desired position and check whether it has achieved its goal
+   */
   public Test goToTest(Distance testHeight) {
     Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(3);
     Set<Assertion> assertions =

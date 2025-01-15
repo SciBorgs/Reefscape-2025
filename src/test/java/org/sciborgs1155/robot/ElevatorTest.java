@@ -14,10 +14,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.SimElevator;
+import static org.sciborgs1155.lib.Test.*;
+
+import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorTest {
   private Elevator elevator;
-  private final double DELTA = .05;
 
   @BeforeEach
   public void initialize() {
@@ -32,16 +34,17 @@ public class ElevatorTest {
 
   @ParameterizedTest
   @MethodSource("providePositionValues")
-  public void reachesPosition(Level level) {
-    run(elevator.scoreLevel(level), 200);
-    assertEquals(level.getHeight().in(Meters), elevator.position(), DELTA);
+  public void reachesPosition(Distance height) {
+    runUnitTest(elevator.goToTest(height));
   }
 
   private static Stream<Arguments> providePositionValues() {
     return Stream.of(
-        Arguments.of(Level.L1),
-        Arguments.of(Level.L2),
-        Arguments.of(Level.L3),
-        Arguments.of(Level.L4));
+        Arguments.of(MIN_HEIGHT),
+        Arguments.of(Level.L1.getHeight()),
+        Arguments.of(Level.L2.getHeight()),
+        Arguments.of(Level.L3.getHeight()),
+        Arguments.of(Level.L4.getHeight()),
+        Arguments.of(MAX_HEIGHT));
   }
 }

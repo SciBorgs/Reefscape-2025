@@ -41,12 +41,12 @@ public class RealElevator implements ElevatorIO {
 
   @Override
   public double position() {
-    return leader.getPosition().getValueAsDouble() * CONVERSION_FACTOR;
+    return leader.getPosition().getValueAsDouble();
   }
 
   @Override
   public double velocity() {
-    return leader.getVelocity().getValueAsDouble() * CONVERSION_FACTOR;
+    return leader.getVelocity().getValueAsDouble();
   }
 
   @Override
