@@ -48,8 +48,8 @@ public class Constants {
    * @param allianceDependent If true, doesn't reflect if on the blue alliance. If false, reflects
    *     anyway.
    */
-  public static Pose2d allianceReflect(Pose2d pose, boolean allianceDependent) {
-    return alliance() == Alliance.Blue && allianceDependent
+  public static Pose2d allianceReflect(Pose2d pose) {
+    return alliance() == Alliance.Blue
         ? pose
         : new Pose2d(
             pose.getTranslation()
@@ -58,22 +58,13 @@ public class Constants {
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  /**
-   * Returns the reflection of a pose about the center point of the field, only if the alliance is
-   * not blue.
-   *
-   * @param pose The pose being reflected.
-   */
-  public static Pose2d allianceReflect(Pose2d pose) {
-    return allianceReflect(pose, true);
-  }
-
   /** Describes physical properites of the robot. */
   public static class Robot {
     public static final Mass MASS = Kilograms.of(25);
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
 
     public static final Distance SIDE_LENGTH = Inches.of(28);
+    // TODO add bumper length to this
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
@@ -140,16 +131,16 @@ public class Constants {
     public static enum Branch {
       A(REEF_BRANCH_A),
       B(REEF_BRANCH_B),
-      C(swapSides(REEF_BRANCH_A, 1)),
-      D(swapSides(REEF_BRANCH_B, 1)),
-      E(swapSides(REEF_BRANCH_A, 2)),
-      F(swapSides(REEF_BRANCH_B, 2)),
-      G(swapSides(REEF_BRANCH_A, 3)),
-      H(swapSides(REEF_BRANCH_B, 3)),
-      I(swapSides(REEF_BRANCH_A, 4)),
-      J(swapSides(REEF_BRANCH_B, 4)),
-      K(swapSides(REEF_BRANCH_A, 5)),
-      L(swapSides(REEF_BRANCH_B, 5));
+      C(swapReefFace(REEF_BRANCH_A, 1)),
+      D(swapReefFace(REEF_BRANCH_B, 1)),
+      E(swapReefFace(REEF_BRANCH_A, 2)),
+      F(swapReefFace(REEF_BRANCH_B, 2)),
+      G(swapReefFace(REEF_BRANCH_A, 3)),
+      H(swapReefFace(REEF_BRANCH_B, 3)),
+      I(swapReefFace(REEF_BRANCH_A, 4)),
+      J(swapReefFace(REEF_BRANCH_B, 4)),
+      K(swapReefFace(REEF_BRANCH_A, 5)),
+      L(swapReefFace(REEF_BRANCH_B, 5));
 
       public final Pose2d pose;
 
@@ -164,21 +155,14 @@ public class Constants {
         return List.of(Branch.values()).stream().map(b -> b.pose).collect(Collectors.toList());
       }
 
-      // TODO remove this later but used for testing purposes rn
-      public static void print() {
-        for (Pose2d el : poseList()) {
-          System.out.println(el.toString());
-        }
-      }
-
       /**
-       * Moves the pose counter-clockwise to be relative to the next side of the reef hexagon.
+       * Moves the pose counter-clockwise to be relative to the next face of the reef hexagon.
        *
        * @param input The input pose.
        * @param times The number of sides, counter-clockwise to swap to.
-       * @return
+       * @return A Pose2d that has been rotated counter-clockwise about the center of the reef.
        */
-      private static Pose2d swapSides(Pose2d input, int times) {
+      private static Pose2d swapReefFace(Pose2d input, int times) {
         return new Pose2d(
             input
                 .getTranslation()
