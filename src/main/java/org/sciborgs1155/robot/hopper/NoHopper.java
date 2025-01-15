@@ -2,7 +2,7 @@ package org.sciborgs1155.robot.hopper;
 
 public class NoHopper implements HopperIO {
   @Override
-  public void setPower(double power) {}
+  public void setVoltage(double voltage) {}
 
   @Override
   public boolean beambreak() {

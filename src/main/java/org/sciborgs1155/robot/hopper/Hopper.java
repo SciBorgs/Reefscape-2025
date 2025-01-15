@@ -27,11 +27,11 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
   /**
    * Runs the motors of the hopper.
    *
-   * @param power The power to set the hoppers motors to.
-   * @return A command to set the power of the hopper motors.
+   * @param voltage The voltage to set the hoppers motors to.
+   * @return A command to set the voltage of the hopper motors.
    */
-  public Command run(double power) {
-    return runOnce(() -> hardware.setPower(power));
+  public Command run(double voltage) {
+    return runOnce(() -> hardware.setVoltage(voltage));
   }
 
   /**
@@ -40,7 +40,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to intake corals.
    */
   public Command intake() {
-    return run(HopperConstants.INTAKE_POWER); // more logic later
+    return run(HopperConstants.INTAKE_VOLTAGE); // more logic later
   }
 
   /**
@@ -49,7 +49,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to outtake corals.
    */
   public Command outtake() {
-    return run(-HopperConstants.INTAKE_POWER);
+    return run(-HopperConstants.INTAKE_VOLTAGE);
   }
 
   /**
