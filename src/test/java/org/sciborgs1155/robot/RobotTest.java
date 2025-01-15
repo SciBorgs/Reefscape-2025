@@ -20,7 +20,7 @@ public class RobotTest {
 
   @RepeatedTest(5)
   void reflectionTest() {
-    Branch.print();
+    Branch.print(); // TODO remove this after
     Random rand = new Random();
     Pose2d bluePose =
         new Pose2d(

@@ -3,6 +3,7 @@ package org.sciborgs1155.robot;
 import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
+import static org.sciborgs1155.robot.Constants.Robot.SIDE_LENGTH;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -71,6 +72,8 @@ public class Constants {
   public static class Robot {
     public static final Mass MASS = Kilograms.of(25);
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
+
+    public static final Distance SIDE_LENGTH = Inches.of(28);
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
@@ -115,16 +118,17 @@ public class Constants {
     public static final Translation2d CENTER_REEF =
         new Translation2d(Inches.of(65.5 / 2).plus(Feet.of(12)), WIDTH.div(2));
 
-    // The field poses for blue alliance's reef branches A and B. Both are the farthest to the blue
+    // The field robot poses for blue alliance's reef branches A and B. Both are the farthest to the
+    // blue
     // alliance side, and B is counter-clockwise of A.
     public static final Pose2d REEF_BRANCH_A =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2)),
+            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2).plus(SIDE_LENGTH)),
             CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
     public static final Pose2d REEF_BRANCH_B =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2)),
+            CENTER_REEF.getMeasureX().minus(Inches.of(65.5 / 2).plus(SIDE_LENGTH)),
             CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
 
@@ -153,10 +157,14 @@ public class Constants {
         this.pose = pose;
       }
 
+      /**
+       * @return A list of all branch poses.
+       */
       public static List<Pose2d> poseList() {
         return List.of(Branch.values()).stream().map(b -> b.pose).collect(Collectors.toList());
       }
 
+      // TODO remove this later but used for testing purposes rn
       public static void print() {
         for (Pose2d el : poseList()) {
           System.out.println(el.toString());
@@ -164,10 +172,10 @@ public class Constants {
       }
 
       /**
-       * Moves the pose counter-clockwise to the next side of the
+       * Moves the pose counter-clockwise to be relative to the next side of the reef hexagon.
        *
-       * @param input
-       * @param times
+       * @param input The input pose.
+       * @param times The number of sides, counter-clockwise to swap to.
        * @return
        */
       private static Pose2d swapSides(Pose2d input, int times) {
@@ -178,6 +186,12 @@ public class Constants {
             Rotation2d.fromDegrees(60).times(times));
       }
 
+      /**
+       * Returns the nearest branch to an input pose.
+       *
+       * @param pose The pose.
+       * @return The nearest branch to a pose.
+       */
       public static Branch nearest(Pose2d pose) {
         for (int i = 0; i < values().length; i++) {
           if (Branch.values()[i].pose == pose.nearest(poseList())) {
@@ -189,9 +203,32 @@ public class Constants {
     }
 
     public static enum Cage {
-      LEFT,
-      MID,
-      RIGHT;
+      LEFT(new Pose2d()),
+      MID(new Pose2d()),
+      RIGHT(new Pose2d());
+
+      public final Pose2d pose;
+
+      Cage(Pose2d pose) {
+        this.pose = pose;
+      }
+
+      /**
+       * Returns the nearest cage to an input pose.
+       *
+       * @param pose The pose.
+       * @return The nearest cage to the pose.
+       */
+      public static Cage nearest(Pose2d pose) {
+        for (int i = 0; i < values().length; i++) {
+          if (Cage.values()[i].pose
+              == pose.nearest(
+                  List.of(values()).stream().map(b -> b.pose).collect(Collectors.toList()))) {
+            return Cage.values()[i];
+          }
+        }
+        return LEFT;
+      }
     }
 
     // Not poses of the game element itself, rather the needed pose of the robot to use it.
