@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
@@ -15,6 +14,7 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -53,8 +53,7 @@ public class Alignment {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return drive
-        .driveTo(branch.pose)
+    return pathfind(branch.pose)
         .alongWith(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
         .andThen(scoral.outtake());
   }
@@ -68,8 +67,7 @@ public class Alignment {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return drive
-        .driveTo(branch.pose)
+    return pathfind(branch.pose)
         .andThen(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
         .andThen(scoral.outtake());
   }
@@ -91,21 +89,26 @@ public class Alignment {
    * @return A command to align with the human player station source.
    */
   public Command source() {
-    return drive
-        .driveTo(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)))
+    return pathfind(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)))
         .alongWith(elevator.retract());
   }
 
   public Command processor() {
-    return drive.driveTo(PROCESSOR);
+    return pathfind(PROCESSOR);
     // TODO idk how this would work. research this a bit more
   }
 
   public Command cage() {
-    return drive.driveTo(nearestCage(drive.pose()));
+    return pathfind(nearestCage(drive.pose()));
     // TODO it should do more. when we have a plan, update this
   }
 
+  /**
+   * Creates a pathplanner path to a goal (while avoiding obstacles) and then follows it.
+   *
+   * @param goal The goal ending pose for the robot.
+   * @return A command to pathfind and drive to a goal pose.
+   */
   public Command pathfind(Pose2d goal) {
     PathConstraints constraints =
         new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
@@ -117,7 +120,7 @@ public class Alignment {
         path,
         drive::pose,
         drive::robotRelativeChassisSpeeds,
-        (ChassisSpeeds a, DriveFeedForward b) -> drive.setChassisSpeeds(a, b),
+        (ChassisSpeeds a, DriveFeedforwards b) -> drive.setChassisSpeeds(a, DRIVE_MODE),
         new PPHolonomicDriveController(
             new PIDConstants(Translation.P, Translation.I, Translation.D),
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
@@ -133,7 +136,7 @@ public class Alignment {
                 DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
                 1),
             DriveConstants.TRACK_WIDTH),
-        false,
+        () -> false,
         drive);
   }
 }
