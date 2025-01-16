@@ -36,8 +36,7 @@ public final class Ports {
   }
 
   public static final class Hopper {
-    public static final int LEFT_MOTOR = -1;
-    public static final int RIGHT_MOTOR = -1;
+    public static final int MOTOR = -1;
     public static final int BEAMBREAK = -1;
   }
 }
