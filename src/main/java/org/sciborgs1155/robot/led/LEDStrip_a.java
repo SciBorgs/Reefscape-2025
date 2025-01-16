@@ -3,7 +3,7 @@ package org.sciborgs1155.robot.led;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Ports.LEDs.*;
-import static org.sciborgs1155.robot.led.LEDConstants.*;
+import static org.sciborgs1155.robot.led.LEDConstants_a.*;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -18,12 +18,12 @@ import java.util.function.DoubleSupplier;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
 
-public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
+public class LEDStrip_a extends SubsystemBase implements Logged, AutoCloseable {
 
   private final AddressableLED led = new AddressableLED(LED_PORT);
   private final AddressableLEDBuffer buffer;
 
-  public LEDStrip() {
+  public LEDStrip_a() {
     led.setLength(LED_LENGTH);
     buffer = new AddressableLEDBuffer(LED_LENGTH);
     led.setData(buffer);
