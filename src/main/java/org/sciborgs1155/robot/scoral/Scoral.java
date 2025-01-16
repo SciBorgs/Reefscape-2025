@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.sciborgs1155.robot.Robot;
 
-public class Scoral extends SubsystemBase {
+public class Scoral extends SubsystemBase implements AutoCloseable {
 
   private ScoralIO scoral;
 
@@ -35,5 +35,10 @@ public class Scoral extends SubsystemBase {
   /** Returns the value of the beambreak. */
   public boolean beambreak() {
     return scoral.beambreak();
+  }
+
+  @Override
+  public void close() throws Exception {
+    // TODO Auto-generated method stub
   }
 }

@@ -11,11 +11,13 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -114,7 +116,7 @@ public class Alignment {
         new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(goal);
     PathPlannerPath path =
-        new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0, goal.getRotation()));
+        new PathPlannerPath(waypoints, constraints, new IdealStartingState(0, new Rotation2d()), new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
     return new FollowPathCommand(
         path,
