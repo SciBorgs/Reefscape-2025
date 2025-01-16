@@ -36,7 +36,7 @@ public class Vision implements Logged {
   private final PhotonCamera[] cameras;
   private final PhotonPoseEstimator[] estimators;
   private final PhotonCameraSim[] simCameras;
-  private final PhotonPipelineResult[] lastResults;
+  private final PhotonPipelineResult[][] changes;
 
   private VisionSystemSim visionSim;
 
@@ -49,7 +49,7 @@ public class Vision implements Logged {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
-    lastResults = new PhotonPipelineResult[configs.length];
+    changes = new PhotonPipelineResult[configs.length][20];
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
@@ -62,9 +62,12 @@ public class Vision implements Logged {
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
       cameras[i] = camera;
       estimators[i] = estimator;
-      lastResults[i] = new PhotonPipelineResult();
 
       FaultLogger.register(camera);
+
+      for (int j = 0; j < 20; j++) {
+        changes[i][j] = new PhotonPipelineResult();
+      }
     }
 
     if (Robot.isSimulation()) {
@@ -101,40 +104,27 @@ public class Vision implements Logged {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
       var unread = cameras[i].getAllUnreadResults();
-      PhotonPipelineResult result;
-      if (unread.size() > 1) {
-        // gets the latest result if there are multiple unread results
-        int maxIndex = 0;
-        double max = 0;
-        int unreadLength = unread.size();
-        for (int ie = 0; ie < unreadLength; ie++) {
-          double temp = unread.get(ie).getTimestampSeconds();
-          if (temp > max) {
-            max = temp;
-            maxIndex = ie;
-          }
-        }
-        result = unread.get(maxIndex);
-        lastResults[i] = result;
-      } else if (unread.size() == 1) {
-        result = unread.get(0);
-        lastResults[i] = result;
-      } else {
-        result = lastResults[i];
+      Optional<EstimatedRobotPose> estimate = Optional.empty();
+
+      for (int j = 0; j < unread.size(); j++) {
+        var change = unread.get(j);
+        changes[i][j] = unread.get(j);
+        estimate = estimators[i].update(change);
+
+        log("estimates present " + i, estimate.isPresent());
+        estimate
+            .filter(
+                f ->
+                    Field.inField(f.estimatedPose)
+                        && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                        && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                        && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+            .ifPresent(
+                e ->
+                    estimates.add(
+                        new PoseEstimate(
+                            e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
       }
-      var estimate = estimators[i].update(result);
-      log("estimates present " + i, estimate.isPresent());
-      estimate
-          .filter(
-              f ->
-                  Field.inField(f.estimatedPose)
-                      && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                      && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                      && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
-          .ifPresent(
-              e ->
-                  estimates.add(
-                      new PoseEstimate(e, estimationStdDevs(e.estimatedPose.toPose2d(), result))));
     }
     return estimates.toArray(PoseEstimate[]::new);
   }
@@ -146,7 +136,8 @@ public class Vision implements Logged {
    */
   @Log.NT
   public Pose3d[] getSeenTags() {
-    return Arrays.stream(lastResults)
+    return Arrays.stream(changes)
+        .flatMap(Arrays::stream)
         .flatMap(c -> c.targets.stream())
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
@@ -181,7 +172,7 @@ public class Vision implements Logged {
     avgDist /= numTags;
     avgWeight /= numTags;
 
-    // Decrease std devs if multiple targets are visibleX
+    // Decrease std devs if multiple targets are visible
     if (numTags > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
     // Increase std devs based on (average) distance
     if (numTags == 1 && avgDist > 4)
