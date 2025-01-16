@@ -33,7 +33,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.led.LedStrip;
+import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -52,7 +52,7 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
-  private final LedStrip led = new LedStrip();
+  private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
 
   // COMMANDS
