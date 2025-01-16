@@ -53,7 +53,7 @@ public class AlignTest {
 
   @AfterEach
   public void destroy() throws Exception {
-    reset(drive, elevator, scoral);
+    reset();
   }
 
   @RepeatedTest(5)
@@ -72,6 +72,8 @@ public class AlignTest {
     assertEquals(Field.WIDTH.minus(bluePose.getMeasureY()), redPose.getMeasureY());
     assertEquals(
         bluePose.getRotation().rotateBy(Rotation2d.fromRotations(0.5)), redPose.getRotation());
+    DriverStationSim.resetData();
+    DriverStationSim.notifyNewData();
     reset();
   }
 
@@ -79,7 +81,7 @@ public class AlignTest {
   @MethodSource("pathGoals")
   void pathfindTest(Pose2d goal) {
 
-    align.pathfind(drive.pose());
+    align.pathfind(goal);
     fastForward(Seconds.of(5));
     assertEquals(goal.getX(), drive.pose().getY(), DELTA.in(Meters));
     assertEquals(goal.getY(), drive.pose().getY(), DELTA.in(Meters));
@@ -89,6 +91,7 @@ public class AlignTest {
   @Test
   void obstacleTest() {
     align.pathfind(new Pose2d(CENTER_REEF, Rotation2d.fromDegrees(0)));
+    fastForward(Seconds.of(10));
     assertNotEquals(CENTER_REEF.getX(), drive.pose().getX(), DELTA.in(Meters));
     assertNotEquals(CENTER_REEF.getY(), drive.pose().getY(), DELTA.in(Meters));
   }
