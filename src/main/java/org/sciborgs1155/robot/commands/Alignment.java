@@ -114,9 +114,13 @@ public class Alignment {
   public Command pathfind(Pose2d goal) {
     PathConstraints constraints =
         new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(goal);
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drive.pose(), goal);
     PathPlannerPath path =
-        new PathPlannerPath(waypoints, constraints, new IdealStartingState(0, new Rotation2d()), new GoalEndState(0, goal.getRotation()));
+        new PathPlannerPath(
+            waypoints,
+            constraints,
+            new IdealStartingState(0, new Rotation2d()),
+            new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
     return new FollowPathCommand(
         path,

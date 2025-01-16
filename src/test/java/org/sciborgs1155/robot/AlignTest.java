@@ -28,23 +28,14 @@ import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.drive.NoGyro;
-import org.sciborgs1155.robot.drive.SimModule;
 import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.SimElevator;
 import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.scoral.SimScoral;
 
 public class AlignTest {
 
   private final Distance DELTA = Centimeters.of(3);
   private Alignment align;
 
-  private SimModule frontLeft;
-  private SimModule frontRight;
-  private SimModule rearLeft;
-  private SimModule rearRight;
-  private NoGyro gyro;
   private Drive drive;
 
   private Elevator elevator;
@@ -52,10 +43,9 @@ public class AlignTest {
 
   @BeforeEach
   public void setup() {
-    gyro = new NoGyro();
-    drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
-    elevator = new Elevator(new SimElevator());
-    scoral = new Scoral(new SimScoral());
+    this.drive = Drive.create();
+    elevator = Elevator.create();
+    scoral = Scoral.create();
     drive.resetEncoders();
 
     align = new Alignment(drive, elevator, scoral);
@@ -63,7 +53,7 @@ public class AlignTest {
 
   @AfterEach
   public void destroy() throws Exception {
-    reset(drive, elevator, scoral, gyro);
+    reset(drive, elevator, scoral);
   }
 
   @RepeatedTest(5)
@@ -89,7 +79,7 @@ public class AlignTest {
   @MethodSource("pathGoals")
   void pathfindTest(Pose2d goal) {
 
-    align.pathfind(goal);
+    align.pathfind(drive.pose());
     fastForward(Seconds.of(5));
     assertEquals(goal.getX(), drive.pose().getY(), DELTA.in(Meters));
     assertEquals(goal.getY(), drive.pose().getY(), DELTA.in(Meters));
@@ -104,6 +94,13 @@ public class AlignTest {
   }
 
   private static Stream<Arguments> pathGoals() {
-    return Stream.of(Arguments.of(Branch.B.pose, Branch.A.pose, Branch.L.pose, Branch.D.pose, Branch.G.pose, Branch.H.pose));
+    return Stream.of(
+        Arguments.of(
+            Branch.B.pose,
+            Branch.A.pose,
+            Branch.L.pose,
+            Branch.D.pose,
+            Branch.G.pose,
+            Branch.H.pose));
   }
 }
