@@ -13,9 +13,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Torque;
-import edu.wpi.first.units.measure.Voltage;
-
 import java.util.List;
 
 /**
@@ -152,7 +149,7 @@ public final class DriveConstants {
         }
       }
     }
-    
+
     static final class Turning {
       public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double ENCODER_GEARING = 1;

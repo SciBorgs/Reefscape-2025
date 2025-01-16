@@ -1,28 +1,10 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.kD;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.kI;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.kP;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj2.command.Command;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import org.sciborgs1155.robot.Constants.Field.Branch;
-import org.sciborgs1155.robot.Constants.Field.Level;
-import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.drive.DriveConstants;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.scoral.Scoral;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -33,6 +15,17 @@ import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj2.command.Command;
+import java.util.List;
+import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.Constants.Field.Level;
+import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment {
   private Drive drive;
@@ -114,15 +107,33 @@ public class Alignment {
   }
 
   public Command pathfind(Pose2d goal) {
-    PathConstraints constraints = new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
+    PathConstraints constraints =
+        new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(goal);
-    PathPlannerPath path = new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0, goal.getRotation()));
+    PathPlannerPath path =
+        new PathPlannerPath(waypoints, constraints, null, new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
-    return new FollowPathCommand(path, drive::pose, drive::robotRelativeChassisSpeeds, (ChassisSpeeds a, DriveFeedForward b) -> drive.setChassisSpeeds(a, b),
-      new PPHolonomicDriveController(
-        new PIDConstants(Translation.P, Translation.I, Translation.D), 
-        new PIDConstants(Rotation.P, Rotation.I, Rotation.D)), 
-      new RobotConfig(MASS, MOI, 
-        new ModuleConfig(WHEEL_RADIUS, MAX_SPEED, WHEEL_COF, DCMotor.getKrakenX60(1), DriveConstants.ModuleConstants.Driving.GEARING, DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT), DriveConstants.TRACK_WIDTH.in(Meters)), false, drive);
+    return new FollowPathCommand(
+        path,
+        drive::pose,
+        drive::robotRelativeChassisSpeeds,
+        (ChassisSpeeds a, DriveFeedForward b) -> drive.setChassisSpeeds(a, b),
+        new PPHolonomicDriveController(
+            new PIDConstants(Translation.P, Translation.I, Translation.D),
+            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+        new RobotConfig(
+            MASS,
+            MOI,
+            new ModuleConfig(
+                WHEEL_RADIUS,
+                MAX_SPEED,
+                WHEEL_COF,
+                DCMotor.getKrakenX60(1),
+                DriveConstants.ModuleConstants.Driving.GEARING,
+                DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+                1),
+            DriveConstants.TRACK_WIDTH),
+        false,
+        drive);
   }
 }
