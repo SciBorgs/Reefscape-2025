@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +46,7 @@ public class TalonModule implements ModuleIO {
 
   private final String name;
 
-  public TalonModule(int drivePort, int turnPort, Rotation2d angularOffset, String name) {
+  public TalonModule(int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
     driveMotor = new TalonFX(drivePort);
     turnMotor = new TalonFX(turnPort);
 
@@ -69,6 +70,11 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
+
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
+    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
     talonDriveConfig.Slot0.kP = Driving.PID.TALON.P;
     talonDriveConfig.Slot0.kI = Driving.PID.TALON.I;
@@ -159,8 +165,8 @@ public class TalonModule implements ModuleIO {
   @Override
   public void updateSetpoint(SwerveModuleState setpoint, ControlMode mode) {
     setpoint.optimize(rotation());
-    // Scale setpoint by cos of turning error to reduce tread wear00
-    setpoint.speedMetersPerSecond *= setpoint.angle.minus(rotation()).getCos();
+    // Scale setpoint by cos of turning error to reduce tread wear
+    setpoint.cosineScale(rotation());
 
     if (mode == ControlMode.OPEN_LOOP_VELOCITY) {
       setDriveVoltage(driveFF.calculate(setpoint.speedMetersPerSecond));

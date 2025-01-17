@@ -36,7 +36,7 @@ public class Vision implements Logged {
   private final PhotonCamera[] cameras;
   private final PhotonPoseEstimator[] estimators;
   private final PhotonCameraSim[] simCameras;
-  private final PhotonPipelineResult[][] changes;
+  private final ArrayList<PhotonPipelineResult> changes;
 
   private VisionSystemSim visionSim;
 
@@ -49,7 +49,7 @@ public class Vision implements Logged {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
-    changes = new PhotonPipelineResult[configs.length][20];
+    changes = new ArrayList<>();
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
@@ -64,10 +64,6 @@ public class Vision implements Logged {
       estimators[i] = estimator;
 
       FaultLogger.register(camera);
-
-      for (int j = 0; j < 20; j++) {
-        changes[i][j] = new PhotonPipelineResult();
-      }
     }
 
     if (Robot.isSimulation()) {
@@ -108,7 +104,7 @@ public class Vision implements Logged {
 
       for (int j = 0; j < unread.size(); j++) {
         var change = unread.get(j);
-        changes[i][j] = unread.get(j);
+        changes.add(change);
         estimate = estimators[i].update(change);
 
         log("estimates present " + i, estimate.isPresent());
@@ -136,7 +132,8 @@ public class Vision implements Logged {
    */
   @Log.NT
   public Pose3d[] getSeenTags() {
-    return Arrays.stream(changes)
+    var results = changes.toArray();
+    return Arrays.stream(results)
         .flatMap(Arrays::stream)
         .flatMap(c -> c.targets.stream())
         .map(PhotonTrackedTarget::getFiducialId)
