@@ -166,7 +166,6 @@ public final class DriveConstants {
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
-
       public static final class PID {
         public static final double P = 9;
         public static final double I = 0.0;

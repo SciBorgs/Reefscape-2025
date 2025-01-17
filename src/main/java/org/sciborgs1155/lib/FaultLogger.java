@@ -1,5 +1,8 @@
 package org.sciborgs1155.lib;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.CANBus.CANBusStatus;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
@@ -383,6 +386,22 @@ public final class FaultLogger {
     regFault.accept(
         talon.getFault_UsingFusedCANcoderWhileUnlicensed(),
         "Using Fused CANcoder feature while unlicensed. Device has fallen back to remote CANcoder.");
+  }
+
+  public static void register(CANBus bus) {
+    CANBusStatus status = bus.getStatus();
+    check(status.Status, bus.getName());
+    register(
+        () -> status.BusUtilization > 0.8,
+        bus.getName() + ": ",
+        "Bus utilization over 80%!",
+        FaultType.WARNING);
+  }
+
+  public static void check(StatusCode status, String name) {
+    if (status.isError()) {
+      report(name + ": " + status.getName(), status.getDescription(), FaultType.ERROR);
+    }
   }
 
   /**

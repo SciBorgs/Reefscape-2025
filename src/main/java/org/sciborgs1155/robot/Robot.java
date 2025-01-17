@@ -9,6 +9,7 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,8 +33,6 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,6 +46,7 @@ public class Robot extends CommandRobot implements Logged {
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
   private final PowerDistribution pdh = new PowerDistribution();
+  private final CANBus canivore = new CANBus("*");
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
@@ -84,6 +84,7 @@ public class Robot extends CommandRobot implements Logged {
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
+    FaultLogger.register(canivore);
 
     // Configure pose estimation updates every tick
     // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));

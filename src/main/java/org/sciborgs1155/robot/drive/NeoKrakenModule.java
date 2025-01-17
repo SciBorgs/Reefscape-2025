@@ -15,11 +15,11 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -35,8 +35,8 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 public class NeoKrakenModule implements ModuleIO {
-  private final SparkFlex driveMotor; // NEO
-  private final SparkFlexConfig driveMotorConfig;
+  private final SparkMax driveMotor; // NEO
+  private final SparkMaxConfig driveMotorConfig;
   private final TalonFX turnMotor; // Kraken
 
   private final RelativeEncoder driveEncoder;
@@ -45,7 +45,6 @@ public class NeoKrakenModule implements ModuleIO {
   private final SparkClosedLoopController drivePID;
 
   private final SimpleMotorFeedforward driveFF;
-  private final SimpleMotorFeedforward turnFF;
 
   private final Rotation2d angularOffset;
 
@@ -57,16 +56,15 @@ public class NeoKrakenModule implements ModuleIO {
 
   private final String name;
 
-  public NeoKrakenModule(int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
-
+  public NeoKrakenModule(
+      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
     // Drive Motor
-
-    driveMotor = new SparkFlex(drivePort, MotorType.kBrushless);
+    driveMotor = new SparkMax(drivePort, MotorType.kBrushless);
     driveEncoder = driveMotor.getEncoder();
     drivePID = driveMotor.getClosedLoopController();
     driveFF =
         new SimpleMotorFeedforward(Driving.FF.SPARK.S, Driving.FF.SPARK.V, Driving.FF.SPARK.A);
-    driveMotorConfig = new SparkFlexConfig();
+    driveMotorConfig = new SparkMaxConfig();
 
     check(
         driveMotor,
@@ -105,8 +103,7 @@ public class NeoKrakenModule implements ModuleIO {
 
     // Turn Motor
 
-    turnMotor = new TalonFX(turnPort);
-    turnFF = new SimpleMotorFeedforward(Turning.FF.S, Turning.FF.V, Turning.FF.A);
+    turnMotor = new TalonFX(turnPort, "*");
 
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
@@ -114,9 +111,9 @@ public class NeoKrakenModule implements ModuleIO {
 
     talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
     talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.SUPPLY_CURRENT_LIMIT;
-    
+
     talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-    
+
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
@@ -203,7 +200,7 @@ public class NeoKrakenModule implements ModuleIO {
 
   @Override
   public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle).withFeedForward(turnFF.calculate(angle)));
+    turnMotor.setControl(radiansOut.withPosition(angle));
   }
 
   @Override

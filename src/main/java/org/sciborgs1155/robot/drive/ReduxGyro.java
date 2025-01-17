@@ -6,7 +6,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation3d;
 import org.sciborgs1155.lib.FaultLogger;
 
-/** GyroIO implementation for NavX */
+/** GyroIO implementation for a Canandgyro */
 public class ReduxGyro implements GyroIO {
   private final Canandgyro canandgyro = new Canandgyro(CANANDGYRO);
 
@@ -24,7 +24,8 @@ public class ReduxGyro implements GyroIO {
 
   @Override
   public Rotation3d rotation3d() {
-    return canandgyro.getRotation3d();
+    // TODO remove the rotation once gyro is correctly oriented
+    return canandgyro.getRotation3d().rotateBy(new Rotation3d(0, 0, -Math.PI / 2));
   }
 
   @Override
