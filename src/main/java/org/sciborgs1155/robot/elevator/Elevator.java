@@ -77,15 +77,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * drives elevator to its maximum height
-   *
-   * @return a command which drives the elevator to its maximum height
-   */
-  public Command extend() {
-    return run(() -> update(MAX_HEIGHT.in(Meters)));
-  }
-
-  /**
    * drives elevator to its minimum
    *
    * @return a command which drives the elevator to its minimum height
