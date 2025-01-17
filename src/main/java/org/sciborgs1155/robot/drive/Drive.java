@@ -130,25 +130,29 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     FRONT_LEFT_TURNING,
                     FRONT_LEFT_CANCODER,
                     ANGULAR_OFFSETS.get(0),
-                    "FL"),
+                    "FL",
+                    true),
                 new NeoKrakenModule(
                     FRONT_RIGHT_DRIVE,
                     FRONT_RIGHT_TURNING,
                     FRONT_RIGHT_CANCODER,
                     ANGULAR_OFFSETS.get(1),
-                    "FR"),
+                    "FR",
+                    false),
                 new NeoKrakenModule(
                     REAR_LEFT_DRIVE,
                     REAR_LEFT_TURNING,
                     REAR_LEFT_CANCODER,
                     ANGULAR_OFFSETS.get(2),
-                    "RL"),
+                    "RL",
+                    true),
                 new NeoKrakenModule(
                     REAR_RIGHT_DRIVE,
                     REAR_RIGHT_TURNING,
                     REAR_RIGHT_CANCODER,
                     ANGULAR_OFFSETS.get(3),
-                    "RR"));
+                    "RR",
+                    true));
       };
     } else {
       return new Drive(
@@ -267,6 +271,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The rotation.
    */
+  @Log.NT
   public Rotation2d heading() {
     return pose().getRotation();
   }

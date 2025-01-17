@@ -79,10 +79,10 @@ public final class DriveConstants {
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
       List.of(
-          Rotation2d.fromRadians(-Math.PI / 2), // front left
+          Rotation2d.fromRadians(0), // front left
           Rotation2d.fromRadians(0), // front right
-          Rotation2d.fromRadians(Math.PI), // rear left
-          Rotation2d.fromRadians(Math.PI / 2) // rear right
+          Rotation2d.fromRadians(0), // rear left
+          Rotation2d.fromRadians(0) // rear right
           );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
@@ -167,9 +167,9 @@ public final class DriveConstants {
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
       public static final class PID {
-        public static final double P = 9;
+        public static final double P = 5;
         public static final double I = 0.0;
-        public static final double D = 0.05;
+        public static final double D = 0.00;
       }
 
       // system constants only used in simulation

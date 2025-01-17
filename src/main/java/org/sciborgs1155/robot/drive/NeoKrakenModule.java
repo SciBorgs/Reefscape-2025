@@ -57,7 +57,12 @@ public class NeoKrakenModule implements ModuleIO {
   private final String name;
 
   public NeoKrakenModule(
-      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
+      int drivePort,
+      int turnPort,
+      int sensorID,
+      Rotation2d angularOffset,
+      String name,
+      boolean useCANCoder) {
     // Drive Motor
     driveMotor = new SparkMax(drivePort, MotorType.kBrushless);
     driveEncoder = driveMotor.getEncoder();
@@ -115,9 +120,12 @@ public class NeoKrakenModule implements ModuleIO {
     talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
-    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
-    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
+
+    if (useCANCoder) {
+      talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+      talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
+    }
 
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;

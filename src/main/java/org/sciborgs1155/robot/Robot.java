@@ -83,7 +83,7 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    FaultLogger.register(pdh);
+    // FaultLogger.register(pdh);
     FaultLogger.register(canivore);
 
     // Configure pose estimation updates every tick
