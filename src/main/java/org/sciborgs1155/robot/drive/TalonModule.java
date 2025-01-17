@@ -5,6 +5,8 @@ import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -33,7 +35,7 @@ public class TalonModule implements ModuleIO {
   private final PositionVoltage radiansOut = new PositionVoltage(0);
 
   private final SimpleMotorFeedforward driveFF;
-  private final SimpleMotorFeedforward turnFF;
+  // private final SimpleMotorFeedforward turnFF;
 
   private final Rotation2d angularOffset;
 
@@ -51,7 +53,7 @@ public class TalonModule implements ModuleIO {
     driveVelocity = driveMotor.getVelocity();
     driveFF =
         new SimpleMotorFeedforward(Driving.FF.TALON.S, Driving.FF.TALON.V, Driving.FF.TALON.A);
-    turnFF = new SimpleMotorFeedforward(Turning.FF.S, Turning.FF.V, Turning.FF.A);
+    // turnFF = new SimpleMotorFeedforward(Turning.FF.S, Turning.FF.V, Turning.FF.A);
 
     drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
     driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
@@ -62,6 +64,7 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonDriveConfig.Feedback.SensorToMechanismRatio = Driving.POSITION_FACTOR.in(Meters);
     talonDriveConfig.CurrentLimits.SupplyCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
+    talonDriveConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
@@ -150,7 +153,7 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle).withFeedForward(turnFF.calculate(angle)));
+    turnMotor.setControl(radiansOut.withPosition(angle));
   }
 
   @Override
