@@ -58,6 +58,8 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
   private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
+
+  /** Arm visualizer. */
   private final MechanismLigament2d armLigament =
       armRoot.append(
           new MechanismLigament2d(
@@ -83,7 +85,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param hardware The ArmIO object (real/simulated/nonexistant) that will be operated on.
+   * @param hardware : The ArmIO object (real/simulated/nonexistent) that will be operated on.
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;

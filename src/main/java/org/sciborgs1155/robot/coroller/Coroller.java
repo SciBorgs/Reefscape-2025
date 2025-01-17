@@ -1,16 +1,13 @@
 package org.sciborgs1155.robot.coroller;
 
-import static edu.wpi.first.units.Units.Amps;
-import static org.sciborgs1155.robot.Ports.GroundIntake.*;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Ports.GroundIntake;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
@@ -23,22 +20,15 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
    * and no hardware connection if it isn't.
    */
   public static Coroller create() {
-    return new Coroller(Robot.isReal() ? realMotor() : SimpleMotor.none());
+    return new Coroller(
+        Robot.isReal()
+            ? SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), MOTOR_CONFIGURATION)
+            : SimpleMotor.none());
   }
 
+  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
   public static Coroller none() {
     return new Coroller(SimpleMotor.none());
-  }
-
-  private static SimpleMotor realMotor() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-
-    // TODO change one of these
-    config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
-    config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    return SimpleMotor.talon(new TalonFX(ROLLER_MOTOR), config);
   }
 
   private Coroller(SimpleMotor hardware) {
@@ -57,7 +47,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Stops the roller motors. */
   public Command stop() {
-    return run(() -> hardware.set(0));
+    return run(() -> hardware.set(0)).withName("Stopping");
   }
 
   @Override
