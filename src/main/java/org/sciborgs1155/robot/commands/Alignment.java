@@ -119,10 +119,10 @@ public class Alignment {
         new PathPlannerPath(
             waypoints,
             constraints,
-            new IdealStartingState(0, new Rotation2d()),
+            null,
             new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
-    return new FollowPathCommand(
+    return drive.run(() -> new FollowPathCommand(
         path,
         drive::pose,
         drive::robotRelativeChassisSpeeds,
@@ -143,6 +143,6 @@ public class Alignment {
                 1),
             DriveConstants.TRACK_WIDTH),
         () -> false,
-        drive);
+        drive).execute());
   }
 }

@@ -81,8 +81,9 @@ public class AlignTest {
   @MethodSource("pathGoals")
   void pathfindTest(Pose2d goal) {
 
+    drive.resetOdometry(new Pose2d(Meters.of(1), WIDTH.div(2), Rotation2d.fromRadians(0)));
     align.pathfind(goal);
-    fastForward(Seconds.of(5));
+    fastForward(Seconds.of(10));
     assertEquals(goal.getX(), drive.pose().getY(), DELTA.in(Meters));
     assertEquals(goal.getY(), drive.pose().getY(), DELTA.in(Meters));
     assertEquals(goal.getRotation().getRadians(), drive.pose().getRotation().getRadians(), 0.1);
