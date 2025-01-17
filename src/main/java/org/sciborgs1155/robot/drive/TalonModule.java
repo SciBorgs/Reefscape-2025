@@ -5,8 +5,6 @@ import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -46,7 +44,8 @@ public class TalonModule implements ModuleIO {
 
   private final String name;
 
-  public TalonModule(int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
+  public TalonModule(
+      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
     driveMotor = new TalonFX(drivePort);
     turnMotor = new TalonFX(turnPort);
 
