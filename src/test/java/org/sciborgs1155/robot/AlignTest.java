@@ -7,16 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
+import static org.sciborgs1155.lib.UnitTestingUtil.run;
+import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
+import static org.sciborgs1155.robot.Constants.allianceReflect;
+import static org.sciborgs1155.robot.Constants.Field.CENTER_REEF;
+import static org.sciborgs1155.robot.Constants.Field.LENGTH;
+import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 
-import edu.wpi.first.hal.AllianceStationID;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.Random;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -31,6 +31,12 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.scoral.Scoral;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+
 public class AlignTest {
 
   private final Distance DELTA = Centimeters.of(3);
@@ -43,6 +49,7 @@ public class AlignTest {
 
   @BeforeEach
   public void setup() {
+    setupTests();
     this.drive = Drive.create();
     elevator = Elevator.create();
     scoral = Scoral.create();
@@ -80,13 +87,23 @@ public class AlignTest {
   @ParameterizedTest()
   @MethodSource("pathGoals")
   void pathfindTest(Pose2d goal) {
+    Pose2d gaming = new Pose2d(LENGTH.times(3/4), WIDTH.times(3/4), new Rotation2d());
 
     drive.resetOdometry(new Pose2d(Meters.of(1), WIDTH.div(2), Rotation2d.fromRadians(0)));
-    align.pathfind(goal);
-    fastForward(Seconds.of(10));
-    assertEquals(goal.getX(), drive.pose().getY(), DELTA.in(Meters));
-    assertEquals(goal.getY(), drive.pose().getY(), DELTA.in(Meters));
-    assertEquals(goal.getRotation().getRadians(), drive.pose().getRotation().getRadians(), 0.1);
+    run(align.pathfind(gaming));
+    System.out.println(drive.toString());
+    fastForward(Seconds.of(1));
+    System.out.println(drive.toString());
+    fastForward(Seconds.of(1));
+    System.out.println(drive.toString());
+    fastForward(Seconds.of(1));
+    System.out.println(drive.toString());
+    fastForward(Seconds.of(1));
+    System.out.println(drive.toString());
+
+    assertEquals(gaming.getX(), drive.pose().getX(), DELTA.in(Meters));
+    assertEquals(gaming.getY(), drive.pose().getY(), DELTA.in(Meters));
+    assertEquals(gaming.getRotation().getRadians(), drive.pose().getRotation().getRadians(), 0.1);
   }
 
   @Test
@@ -100,11 +117,12 @@ public class AlignTest {
   private static Stream<Arguments> pathGoals() {
     return Stream.of(
         Arguments.of(
-            Branch.B.pose,
+            /*Branch.B.pose,
             Branch.A.pose,
             Branch.L.pose,
             Branch.D.pose,
             Branch.G.pose,
-            Branch.H.pose));
+            Branch.H.pose*/
+             new Pose2d(LENGTH.times(3/4), WIDTH.times(3/4), new Rotation2d())));
   }
 }

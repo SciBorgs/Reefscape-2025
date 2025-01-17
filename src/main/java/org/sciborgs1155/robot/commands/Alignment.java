@@ -11,13 +11,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -122,27 +120,27 @@ public class Alignment {
             null,
             new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
-    return drive.run(() -> new FollowPathCommand(
-        path,
-        drive::pose,
-        drive::robotRelativeChassisSpeeds,
-        (ChassisSpeeds a, DriveFeedforwards b) -> drive.setChassisSpeeds(a, DRIVE_MODE),
-        new PPHolonomicDriveController(
-            new PIDConstants(Translation.P, Translation.I, Translation.D),
-            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-        new RobotConfig(
-            MASS,
-            MOI,
-            new ModuleConfig(
-                WHEEL_RADIUS,
-                MAX_SPEED,
-                WHEEL_COF,
-                DCMotor.getKrakenX60(1),
-                DriveConstants.ModuleConstants.Driving.GEARING,
-                DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
-                1),
-            DriveConstants.TRACK_WIDTH),
-        () -> false,
-        drive).execute());
+    return new FollowPathCommand(
+      path,
+      drive::pose,
+      drive::robotRelativeChassisSpeeds,
+      (ChassisSpeeds a, DriveFeedforwards b) -> drive.setChassisSpeeds(a, DRIVE_MODE),
+      new PPHolonomicDriveController(
+          new PIDConstants(Translation.P, Translation.I, Translation.D),
+          new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              DriveConstants.ModuleConstants.Driving.GEARING,
+              DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+              1),
+          DriveConstants.TRACK_WIDTH),
+      () -> false,
+      drive);
   }
 }
