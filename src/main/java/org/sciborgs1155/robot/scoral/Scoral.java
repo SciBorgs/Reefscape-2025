@@ -21,6 +21,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
 
+  public static Scoral create() {
+    return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
+  }
+
   private static SimpleMotor realMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -31,26 +35,22 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(ROLLER), config);
   }
 
-  public Scoral(SimpleMotor hardware) {
-    this.hardware = hardware;
-  }
-
-  public static Scoral create() {
-    return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
-  }
-
   public static Scoral none() {
     return new Scoral(SimpleMotor.none());
   }
 
-  /** Runs the motor to outtake, as in pushing out, a coral. */
-  public Command outtake() {
-    return run(() -> hardware.set(POWER)).withName("outtake");
+  public Scoral(SimpleMotor hardware) {
+    this.hardware = hardware;
   }
 
-  /** Runs the motor to intake, as in pulling in, a coral. */
-  public Command intake() {
-    return run(() -> hardware.set(-POWER)).withName("intake");
+  /** Runs the motor to move a coral outwards. */
+  public Command outwards() {
+    return run(() -> hardware.set(POWER)).withName("outwards");
+  }
+
+  /** Runs the motor to move a coral inwards. */
+  public Command inwards() {
+    return run(() -> hardware.set(-POWER)).withName("inwards");
   }
 
   /** Returns the value of the beambreak. */
