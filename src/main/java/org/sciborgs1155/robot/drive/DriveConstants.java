@@ -126,7 +126,7 @@ public final class DriveConstants {
 
       public static final class PID {
         public static final class SPARK {
-          public static final double P = 3.2;
+          public static final double P = 2;
           public static final double I = 0.0;
           public static final double D = 0.0;
         }
@@ -140,9 +140,9 @@ public final class DriveConstants {
 
       public static final class FF {
         public static final class SPARK {
-          public static final double S = 0.088468;
-          public static final double V = 2.1314;
-          public static final double A = 0.33291;
+          public static final double S = 0; // 0.088468;
+          public static final double V = 0; // 2.1314;
+          public static final double A = 0; // 0.33291;
         }
 
         public static final class TALON {
@@ -157,19 +157,17 @@ public final class DriveConstants {
       public static final double MAXSWERVE_MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double MAXSWERVE_ENCODER_GEARING = 1;
 
-      public static final double X2T_GEARING = 12.1;
+      public static final double X2T_GEARING = 0.4 / (12.1 * 1.3) ;
 
       public static final Angle POSITION_FACTOR = Rotations.of(X2T_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
 
-      public static final boolean ENCODER_INVERTED = true;
-
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
       public static final class PID {
-        public static final double P = 5;
+        public static final double P = 14;
         public static final double I = 0.0;
-        public static final double D = 0.00;
+        public static final double D = 0.05;
       }
 
       // system constants only used in simulation

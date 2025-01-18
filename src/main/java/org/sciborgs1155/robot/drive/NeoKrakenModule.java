@@ -8,7 +8,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -41,7 +43,7 @@ public class NeoKrakenModule implements ModuleIO {
 
   private final RelativeEncoder driveEncoder;
 
-  private final PositionVoltage radiansOut = new PositionVoltage(0);
+  private final PositionVoltage rotationIn = new PositionVoltage(0);
   private final SparkClosedLoopController drivePID;
   private final SimpleMotorFeedforward driveFF;
 
@@ -56,12 +58,7 @@ public class NeoKrakenModule implements ModuleIO {
   private final String name;
 
   public NeoKrakenModule(
-      int drivePort,
-      int turnPort,
-      int sensorID,
-      Rotation2d angularOffset,
-      String name,
-      boolean useCANCoder) {
+      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
     // Drive Motor
     driveMotor = new SparkMax(drivePort, MotorType.kBrushless);
     driveEncoder = driveMotor.getEncoder();
@@ -112,17 +109,15 @@ public class NeoKrakenModule implements ModuleIO {
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonTurnConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
     talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
-
-    if (useCANCoder) {
-      talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-      talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
-    }
+    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
@@ -205,7 +200,7 @@ public class NeoKrakenModule implements ModuleIO {
 
   @Override
   public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle));
+    turnMotor.setControl(rotationIn.withPosition(angle).withSlot(0));
   }
 
   @Override
@@ -220,8 +215,8 @@ public class NeoKrakenModule implements ModuleIO {
     } else {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
-
-    setTurnSetpoint(setpoint.angle.getRadians());
+    setpoint.angle = Rotation2d.fromRotations(1);
+    setTurnSetpoint(setpoint.angle.getRotations());
     this.setpoint = setpoint;
   }
 
@@ -229,7 +224,7 @@ public class NeoKrakenModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {
     setpoint.angle = angle;
     setDriveVoltage(voltage);
-    setTurnSetpoint(angle.getRadians());
+    setTurnSetpoint(angle.getRotations());
   }
 
   @Override

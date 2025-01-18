@@ -24,7 +24,7 @@ public class ReduxGyro implements GyroIO {
   @Override
   public Rotation3d rotation3d() {
     // TODO remove the rotation once gyro is correctly oriented
-    return canandgyro.getRotation3d().rotateBy(new Rotation3d(0, 0, -Math.PI / 2));
+    return canandgyro.getRotation3d(); // .rotateBy(new Rotation3d(0, 0, -Math.PI / 2));
   }
 
   @Override
