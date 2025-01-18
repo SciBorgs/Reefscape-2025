@@ -78,7 +78,7 @@ public final class DriveConstants {
               MAX_SPEED,
               WHEEL_COF,
               DCMotor.getKrakenX60(1),
-              ModuleConstants.Driving.GEARING,
+              1 / ModuleConstants.Driving.GEARING,
               ModuleConstants.Driving.CURRENT_LIMIT,
               1),
           TRACK_WIDTH);

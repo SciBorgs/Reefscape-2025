@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Set;
 import monologue.Annotations.Log;
@@ -146,7 +145,7 @@ public class Robot extends CommandRobot implements Logged {
 
     test().whileTrue(systemsCheck());
 
-    driver.b().whileTrue(drive.zeroHeading());
+    // driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()
         .or(driver.rightBumper())
@@ -154,7 +153,9 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
-    driver.a().onTrue(Commands.defer(() -> align.pathfollow(align.pathfind(new Pose2d(2,2,new Rotation2d()))), Set.of(drive)).withName("path"));
+    driver.a().onTrue(Commands.defer( () -> align.pathfollow(align.pathfind(new Pose2d(2, 2, new Rotation2d()))), Set.of(drive)));
+
+    driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(7, 4, new Rotation2d()))));
   }
 
   /**

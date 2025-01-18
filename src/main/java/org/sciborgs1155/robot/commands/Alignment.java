@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -14,12 +13,9 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
-import java.util.Set;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.drive.Drive;
@@ -122,11 +118,11 @@ public class Alignment {
             waypoints,
             constraints,
             new IdealStartingState(currentSpeed, drive.heading()),
-            new GoalEndState(1, goal.getRotation()));
+            new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
     return path;
   }
- 
+
   /**
    * Follows a given pathplanner path.
    *
@@ -144,18 +140,17 @@ public class Alignment {
         path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG)
             .getTotalTimeSeconds());
 
-    return 
-                new FollowPathCommand(
-                    path,
-                    drive::pose,
-                    drive::robotRelativeChassisSpeeds,
-                    (ChassisSpeeds a, DriveFeedforwards b) ->
-                        drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
-                    new PPHolonomicDriveController(
-                        new PIDConstants(Translation.P, Translation.I, Translation.D),
-                        new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-                    ROBOT_CONFIG,
-                    () -> false,
-                    drive);
+    return new FollowPathCommand(
+        path,
+        drive::pose,
+        drive::robotRelativeChassisSpeeds,
+        (ChassisSpeeds a, DriveFeedforwards b) ->
+            drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+        new PPHolonomicDriveController(
+            new PIDConstants(Translation.P, Translation.I, Translation.D),
+            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+        ROBOT_CONFIG,
+        () -> false,
+        drive);
   }
 }
