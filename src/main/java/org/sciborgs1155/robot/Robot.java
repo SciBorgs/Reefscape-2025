@@ -26,6 +26,7 @@ import monologue.Logged;
 import monologue.Monologue;
 import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.Dashboard;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
@@ -47,6 +48,7 @@ public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
+  private final Dashboard dashboard = new Dashboard();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -153,6 +155,8 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
+
+    dashboard.BA().onTrue(led.rainbow());
   }
 
   /**
