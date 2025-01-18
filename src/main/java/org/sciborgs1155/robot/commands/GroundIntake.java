@@ -31,7 +31,7 @@ public class GroundIntake {
    * @return A command for outtaking algae in the processor.
    */
   public Command processor() {
-    return arm.goTo(PROCESSOR_OUTTAKE_ANGLE).andThen(roller.outtake());
+    return arm.goTo(PROCESSOR_OUTTAKE_ANGLE).until(arm::atGoal).andThen(roller.outtake());
   }
 
   /**
