@@ -11,6 +11,7 @@ import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -120,6 +121,11 @@ public class Alignment {
             new IdealStartingState(currentSpeed, drive.heading()),
             new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
+    List<PathPlannerTrajectoryState> states = path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG).getStates();
+
+    for (int i = 0; i < states.size(); i++) {
+      System.out.println(states.get(i).linearVelocity);
+    }
     return path;
   }
 

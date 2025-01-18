@@ -120,6 +120,6 @@ public class AlignTest {
             Branch.D.pose,
             Branch.G.pose,
             Branch.H.pose*/
-            new Pose2d(LENGTH.times(3 / 4), WIDTH.times(3 / 4), new Rotation2d())));
+            new Pose2d(LENGTH.times(3. / 4), WIDTH.times(3. / 4), new Rotation2d())));
   }
 }
