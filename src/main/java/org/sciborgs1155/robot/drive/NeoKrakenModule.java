@@ -4,13 +4,13 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.COUPLING_RATIO;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -111,19 +111,22 @@ public class NeoKrakenModule implements ModuleIO {
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonTurnConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
-
-    talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.RotorToSensorRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
+
+    talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
     talonTurnConfig.Slot0.kD = Turning.PID.D;
 
-    turnMotor.getConfigurator().apply(talonTurnConfig);
+    talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
+
+    for (int i = 0; i < 5; i++) {
+      StatusCode success = turnMotor.getConfigurator().apply(talonTurnConfig);
+      if (success.isOK()) break;
+    }
 
     register(driveMotor);
     register(turnMotor);
@@ -168,7 +171,7 @@ public class NeoKrakenModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
+        Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
     return lastRotation;
   }
 
@@ -215,7 +218,6 @@ public class NeoKrakenModule implements ModuleIO {
     } else {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
-    setpoint.angle = Rotation2d.fromRotations(1);
     setTurnSetpoint(setpoint.angle.getRotations());
     this.setpoint = setpoint;
   }

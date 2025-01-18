@@ -181,7 +181,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(4),
+                Volts.of(7),
                 null,
                 (state) -> SignalLogger.writeString("translation state", state.toString())),
             new SysIdRoutine.Mechanism(
@@ -300,7 +300,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     vy.getAsDouble(),
                     vOmega.getAsDouble(),
                     heading().plus(allianceRotation())),
-                ControlMode.OPEN_LOOP_VELOCITY));
+                ControlMode.CLOSED_LOOP_VELOCITY));
   }
 
   /**
@@ -379,10 +379,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED.in(MetersPerSecond));
 
-    // for (int i = 0; i < modules.size(); i++) {
-    //   modules.get(i).updateSetpoint(desiredStates[i], mode);
-    // }
-    frontLeft.updateSetpoint(desiredStates[0], mode);
+    for (int i = 0; i < modules.size(); i++) {
+      modules.get(i).updateSetpoint(desiredStates[i], mode);
+    }
   }
 
   /**

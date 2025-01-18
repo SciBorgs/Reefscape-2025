@@ -126,7 +126,7 @@ public final class DriveConstants {
 
       public static final class PID {
         public static final class SPARK {
-          public static final double P = 2;
+          public static final double P = 0.02;
           public static final double I = 0.0;
           public static final double D = 0.0;
         }
@@ -157,7 +157,7 @@ public final class DriveConstants {
       public static final double MAXSWERVE_MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double MAXSWERVE_ENCODER_GEARING = 1;
 
-      public static final double X2T_GEARING = 0.4 / (12.1 * 1.3) ;
+      public static final double X2T_GEARING = 0.4 / (12.1 * 1.3);
 
       public static final Angle POSITION_FACTOR = Rotations.of(X2T_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
