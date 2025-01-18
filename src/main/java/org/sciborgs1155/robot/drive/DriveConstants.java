@@ -75,15 +75,16 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
 
-  // angular offsets of the modules, since we use absolute encoders
+  // angular offsets of the modules for our absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
-  public static final List<Rotation2d> ANGULAR_OFFSETS =
+  public static final List<Rotation2d>
+      ANGULAR_OFFSETS = // current zeroing method is align w box tubing
       List.of(
-          Rotation2d.fromRadians(0), // front left
-          Rotation2d.fromRadians(0), // front right
-          Rotation2d.fromRadians(0), // rear left
-          Rotation2d.fromRadians(0) // rear right
-          );
+              Rotation2d.fromRadians(0), // front left
+              Rotation2d.fromRadians(0), // front right
+              Rotation2d.fromRadians(0), // rear left
+              Rotation2d.fromRadians(0) // rear right
+              );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
@@ -111,13 +112,12 @@ public final class DriveConstants {
       // Possible pinion configurations : 12T, 13T, or 14T.
       public static final int PINION_TEETH = 14;
 
-      public static final Distance CIRCUMFERENCE = Meters.of(2.0 * Math.PI * 0.0381);
+      public static final Distance CIRCUMFERENCE = Inches.of(4.0 * Math.PI);
 
       // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the
       // bevel pinion
-      public static final double GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
-
-      public static final double KRAKEN_GEARING = 5.68;
+      public static final double MAXSWERVE_GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
+      public static final double GEARING = 5.68;
 
       public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
       public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
@@ -154,12 +154,12 @@ public final class DriveConstants {
     }
 
     static final class Turning {
-      public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
-      public static final double ENCODER_GEARING = 1;
-      public static final double SENSOR_TO_MECHANISM_RATIO = 12.1;
-      public static final double SUPPLY_CURRENT_LIMIT = 70;
+      public static final double MAXSWERVE_MOTOR_GEARING = 1.0 / 4.0 / 3.0;
+      public static final double MAXSWERVE_ENCODER_GEARING = 1;
 
-      public static final Angle POSITION_FACTOR = Rotations.of(ENCODER_GEARING);
+      public static final double X2T_GEARING = 12.1;
+
+      public static final Angle POSITION_FACTOR = Rotations.of(X2T_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
 
       public static final boolean ENCODER_INVERTED = true;

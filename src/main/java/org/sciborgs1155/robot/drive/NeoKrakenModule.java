@@ -43,7 +43,6 @@ public class NeoKrakenModule implements ModuleIO {
 
   private final PositionVoltage radiansOut = new PositionVoltage(0);
   private final SparkClosedLoopController drivePID;
-
   private final SimpleMotorFeedforward driveFF;
 
   private final Rotation2d angularOffset;
@@ -114,13 +113,11 @@ public class NeoKrakenModule implements ModuleIO {
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
-    talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.SUPPLY_CURRENT_LIMIT;
+    talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
     talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
 
     if (useCANCoder) {
       talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;

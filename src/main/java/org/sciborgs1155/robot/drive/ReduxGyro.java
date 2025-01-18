@@ -12,7 +12,6 @@ public class ReduxGyro implements GyroIO {
 
   public ReduxGyro() {
     FaultLogger.register(canandgyro);
-    canandgyro.setYaw(0);
     // See https://docs.reduxrobotics.com/canandgyro/programming/normal-operation#party-mode
     canandgyro.setPartyMode(0);
   }
