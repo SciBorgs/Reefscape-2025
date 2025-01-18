@@ -91,6 +91,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
+   * @return True if the arm's position is close enough to its goal, False if it isn't.
+   */
+  public boolean atGoal() {
+    return Math.abs(fb.getGoal().position - position()) < POSITION_TOLERANCE.in(Radians);
+  }
+
+  /**
    * @return The position in radians/sec.
    */
   @Log.NT

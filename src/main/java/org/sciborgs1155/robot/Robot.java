@@ -160,8 +160,6 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    operator.a().whileTrue(arm.goTo(MAX_ANGLE));
-    operator.b().whileTrue(arm.goTo(MIN_ANGLE));
     // TODO: Add any additional bindings.
 
   }

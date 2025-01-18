@@ -18,11 +18,11 @@ public class GroundIntake {
   }
 
   public Command intake() {
-    return arm.goTo(INTAKE_ANGLE).alongWith(roller.intake());
+    return arm.goTo(INTAKE_ANGLE).until(arm::atGoal).alongWith(roller.intake());
   }
 
   public Command outtake() {
-    return arm.goTo(OUTTAKE_ANGLE).andThen(roller.outtake());
+    return arm.goTo(OUTTAKE_ANGLE).until(arm::atGoal).andThen(roller.outtake());
   }
 
   public Command climbSetup() {
@@ -30,7 +30,6 @@ public class GroundIntake {
   }
 
   public Command climbExecute() {
-    arm.currentLimit(CLIMB_LIMIT.in(Amps));
-    return arm.goTo(CLIMB_FINAL_ANGLE);
+    return arm.run(() -> arm.currentLimit(CLIMB_LIMIT.in(Amps))).andThen(arm.goTo(CLIMB_FINAL_ANGLE));
   }
 }
