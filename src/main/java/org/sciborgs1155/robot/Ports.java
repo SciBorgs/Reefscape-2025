@@ -23,7 +23,7 @@ public final class Ports {
   public static final class GroundIntake {
     public static final int ARM_MOTOR = 18;
     public static final int ROLLER_MOTOR = 19;
-    public static final int CANCODER = 2; //TODO change i think
+    public static final int CANCODER = 2; // TODO change i think
   }
 
   public static final class Elevator {

@@ -157,14 +157,12 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return new Test(testCommand, Set.of(atGoal));
   }
 
-
   public Command climbSetup() {
     return goTo(CLIMB_INTAKE_ANGLE);
   }
 
   public Command climbExecute() {
-    return run(() -> currentLimit(CLIMB_LIMIT.in(Amps)))
-        .andThen(goTo(CLIMB_FINAL_ANGLE));
+    return run(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
   }
 
   /**

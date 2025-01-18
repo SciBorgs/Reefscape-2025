@@ -34,10 +34,9 @@ public class RealArm implements ArmIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.SensorToMechanismRatio = GEARING;
 
-    
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     config.Feedback.FeedbackRemoteSensorID = CANCODER;
-    
+
     motor.getConfigurator().apply(config);
 
     FaultLogger.register(motor);
