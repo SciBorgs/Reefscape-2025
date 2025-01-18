@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.*;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
+import static org.sciborgs1155.robot.Constants.Robot.MASS;
+import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -27,6 +29,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -49,6 +52,8 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -57,6 +62,14 @@ import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
+
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // Modules
@@ -371,6 +384,36 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         })
         .until(translationController::atGoal)
         .withName("drive to pose");
+  }
+
+    /**
+   * Follows a given pathplanner path.
+   * @param path A pathplanner path.
+   * @return A command to follow a path.
+   */
+  public Command pathfollow(PathPlannerPath path) {
+    return new FollowPathCommand(
+      path,
+      this::pose,
+      this::robotRelativeChassisSpeeds,
+      (ChassisSpeeds a, DriveFeedforwards b) -> setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+      new PPHolonomicDriveController(
+          new PIDConstants(Translation.P, Translation.I, Translation.D),
+          new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              DriveConstants.ModuleConstants.Driving.GEARING,
+              DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+              1),
+          DriveConstants.TRACK_WIDTH),
+      () -> false,
+      this);
   }
 
   /** Resets all drive encoders to read a position of 0. */

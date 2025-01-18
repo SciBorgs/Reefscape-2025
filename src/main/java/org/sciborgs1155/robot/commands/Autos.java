@@ -28,7 +28,7 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 
 public class Autos {
-  private static Optional<Rotation2d> rotation = Optional.empty();
+  // private static Optional<Rotation2d> rotation = Optional.empty();
 
   public static SendableChooser<Command> configureAutos(Drive drive) {
     AutoBuilder.configure(
@@ -53,7 +53,7 @@ public class Autos {
         () -> alliance() == Alliance.Red,
         drive);
 
-    PPHolonomicDriveController.overrideRotationFeedback(() -> rotation.get().getRadians());
+    // PPHolonomicDriveController.overrideRotationFeedback(() -> rotation.get().getRadians());
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());

@@ -162,9 +162,7 @@
               "open": true
             },
             "open": true
-          }
-        },
-        "elevator": {
+          },
           "open": true
         },
         "open": true,
@@ -190,7 +188,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 278,
+          "height": 0,
           "series": [
             {
               "color": [
@@ -199,7 +197,7 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/Robot/elevator/positionSetpoint"
+              "id": "NT:/Robot/drive/pose/translation/x"
             },
             {
               "color": [
@@ -208,7 +206,7 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/Robot/elevator/position"
+              "id": "NT:/Robot/drive/pose/translation/y"
             }
           ]
         }
