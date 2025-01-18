@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -7,6 +8,7 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -16,11 +18,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
-
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.drive.Drive;
@@ -43,7 +42,7 @@ public class Alignment {
     this.elevator = elevator;
     this.scoral = scoral;
   }
-  
+
   /**
    * Drives to a designated reef branch while raising the elevator, and then scores onto a
    * designated level on that branch.
@@ -112,34 +111,53 @@ public class Alignment {
   public PathPlannerPath pathfind(Pose2d goal) {
     PathConstraints constraints =
         new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(new Pose2d(5,5,new Rotation2d()), goal);
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drive.pose(), goal);
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints,
             constraints,
-            null,
+            new IdealStartingState(0, new Rotation2d()),
             new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = true;
-  return path;
+    return path;
   }
 
   /**
    * Follows a given pathplanner path.
+   *
    * @param path A pathplanner path.
    * @return A command to follow a path.
    */
   public Command pathfollow(PathPlannerPath path) {
-    return Commands.defer(() -> new FollowPathCommand(
-      path,
-      drive::pose,
-      drive::robotRelativeChassisSpeeds,
-      (ChassisSpeeds a, DriveFeedforwards b) -> drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
-      new PPHolonomicDriveController(
-          new PIDConstants(Translation.P, Translation.I, Translation.D),
-          new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-      ROBOT_CONFIG,
-      () -> false,
-      drive), Set.of(drive));
-  }
+    System.out.println(
+        "Waypoint 1: "
+            + path.getWaypoints().get(path.getWaypoints().size() - 2).anchor().toString());
+    System.out.println(
+        "Waypoint 2: "
+            + path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().toString());
 
+    return Commands.defer(
+            () ->
+                new FollowPathCommand(
+                    path,
+                    drive::pose,
+                    drive::robotRelativeChassisSpeeds,
+                    (ChassisSpeeds a, DriveFeedforwards b) ->
+                        drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+                    new PPHolonomicDriveController(
+                        new PIDConstants(Translation.P, Translation.I, Translation.D),
+                        new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+                    ROBOT_CONFIG,
+                    () -> false,
+                    drive),
+            Set.of(drive))
+        .repeatedly()
+        .until(
+            () ->
+                path.getWaypoints()
+                        .get(path.getWaypoints().size() - 1)
+                        .anchor()
+                        .getDistance(drive.pose().getTranslation())
+                    < Translation.TOLERANCE.in(Meters));
+  }
 }

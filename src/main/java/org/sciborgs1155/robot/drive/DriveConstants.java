@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,9 +19,6 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import java.util.List;
-
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 
 /**
  * Constants for our 2024 MAXSwerve drivetrain. All fields in this file should be updated for the
@@ -62,8 +61,6 @@ public final class DriveConstants {
   // Robot width with bumpers
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
 
-  
-
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(16.0);
@@ -72,18 +69,19 @@ public final class DriveConstants {
   public static final AngularAcceleration MAX_ANGULAR_ACCEL =
       RadiansPerSecond.per(Second).of(MAX_ACCEL.in(MetersPerSecondPerSecond) / RADIUS.in(Meters));
 
-  public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
-    MASS,
-    MOI,
-    new ModuleConfig(
-        WHEEL_RADIUS,
-        MAX_SPEED,
-        WHEEL_COF,
-        DCMotor.getKrakenX60(1),
-        ModuleConstants.Driving.GEARING,
-        ModuleConstants.Driving.CURRENT_LIMIT,
-        1),
-    TRACK_WIDTH);
+  public static final RobotConfig ROBOT_CONFIG =
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              ModuleConstants.Driving.GEARING,
+              ModuleConstants.Driving.CURRENT_LIMIT,
+              1),
+          TRACK_WIDTH);
 
   // Arbitrary max rotational velocity for the driver to effectively control the robot
   public static final AngularVelocity TELEOP_ANGULAR_SPEED = Radians.per(Second).of(2 * Math.PI);
