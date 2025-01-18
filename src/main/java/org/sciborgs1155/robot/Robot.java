@@ -9,8 +9,6 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;

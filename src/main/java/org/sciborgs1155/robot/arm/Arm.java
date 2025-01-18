@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -18,6 +21,10 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -44,10 +51,15 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Arm feed forward controller. */
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
+  /** Routine for recording and analyzing motor data. */
+  private final SysIdRoutine sysIdRoutine;
+
   /** Arm visualization software. */
   @Log.NT private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
   private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
+
+  /** Arm visualizer. */
   private final MechanismLigament2d armLigament =
       armRoot.append(
           new MechanismLigament2d(
@@ -73,13 +85,18 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Constructor.
    *
-   * @param hardware The ArmIO object (real/simulated/nonexistant) that will be operated on.
+   * @param hardware : The ArmIO object (real/simulated/nonexistent) that will be operated on.
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
+
+    this.sysIdRoutine =
+        new SysIdRoutine(
+            new Config(Volts.of(0.5).per(Second), Volts.of(0.2), Seconds.of(5)),
+            new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
   }
 
   /**
@@ -132,11 +149,25 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A Test object which moves the arm and checks it got to its destination.
    */
   public Test goToTest(Angle goal) {
-    Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(3);
+    Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(3).withName("Arm Test");
     EqualityAssertion atGoal =
         Assertion.eAssert(
             "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
     return new Test(testCommand, Set.of(atGoal));
+  }
+
+  /**
+   * Runs all 4 {@link SysIdRoutine}'s in sequence.
+   *
+   * @return A command to run the routine.
+   */
+  public Command sysIdRoutine() {
+    return sysIdRoutine
+        .quasistatic(Direction.kForward)
+        .andThen(sysIdRoutine.quasistatic(Direction.kReverse))
+        .andThen(sysIdRoutine.dynamic(Direction.kForward))
+        .andThen(sysIdRoutine.dynamic(Direction.kReverse))
+        .withName("Arm SysID");
   }
 
   @Override

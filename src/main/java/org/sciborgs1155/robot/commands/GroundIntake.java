@@ -30,6 +30,7 @@ public class GroundIntake {
   }
 
   public Command climbExecute() {
-    return arm.run(() -> arm.currentLimit(CLIMB_LIMIT.in(Amps))).andThen(arm.goTo(CLIMB_FINAL_ANGLE));
+    return arm.run(() -> arm.currentLimit(CLIMB_LIMIT.in(Amps)))
+        .andThen(arm.goTo(CLIMB_FINAL_ANGLE));
   }
 }
