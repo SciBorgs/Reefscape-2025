@@ -17,7 +17,9 @@ public class Dashboard {
   public Dashboard() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
     entryTargetBranch = base.getEntry("branch");
+    entryTargetBranch.setString("");
     entryTargetLevel = base.getEntry("level");
+    entryTargetLevel.setInteger(0);
   }
 
   private Trigger setTriggerBranch(String branch) {
@@ -28,51 +30,51 @@ public class Dashboard {
     return new Trigger(() -> (level == entryTargetLevel.getInteger(0)));
   }
 
-  public Trigger BA() {
+  public Trigger A() {
     return setTriggerBranch("A");
   }
 
-  public Trigger BB() {
+  public Trigger B() {
     return setTriggerBranch("B");
   }
 
-  public Trigger BC() {
+  public Trigger C() {
     return setTriggerBranch("C");
   }
 
-  public Trigger BD() {
+  public Trigger D() {
     return setTriggerBranch("D");
   }
 
-  public Trigger BE() {
+  public Trigger E() {
     return setTriggerBranch("E");
   }
 
-  public Trigger BF() {
+  public Trigger F() {
     return setTriggerBranch("F");
   }
 
-  public Trigger BG() {
+  public Trigger G() {
     return setTriggerBranch("G");
   }
 
-  public Trigger BH() {
+  public Trigger H() {
     return setTriggerBranch("H");
   }
 
-  public Trigger BI() {
+  public Trigger I() {
     return setTriggerBranch("I");
   }
 
-  public Trigger BJ() {
+  public Trigger J() {
     return setTriggerBranch("J");
   }
 
-  public Trigger BK() {
+  public Trigger K() {
     return setTriggerBranch("K");
   }
 
-  public Trigger BL() {
+  public Trigger L() {
     return setTriggerBranch("L");
   }
 

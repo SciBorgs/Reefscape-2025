@@ -156,7 +156,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // TODO: Add any additional bindings.
 
-    dashboard.BA().onTrue(led.rainbow());
+    dashboard.A().onTrue(led.rainbow());
   }
 
   /**
