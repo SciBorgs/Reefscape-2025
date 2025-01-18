@@ -21,7 +21,8 @@ public class Scoraling {
   public Command hpsIntake() {
     // elevator goes to default position with retract
     // andThen -> hopper and scoral outtakes (since outtakaing will intake this way) until the
-    // scoral beambreak is false and the hps beambreak is true
+    // scoral beambreak is false OR the hps beambreak is true
+    // onlyIf -> scoral beambreak is true (don't have a coral)
 
     return Commands.idle(hopper, scoral, elevator);
   }
@@ -38,6 +39,7 @@ public class Scoraling {
 
     // elevator goes to the algae height
     // andThen -> intake with scoral
+    // onlyIf -> scoral beambreak is true (don't have a coral)
 
     return Commands.idle(scoral, elevator);
   }
