@@ -91,6 +91,11 @@
     "Retained Values": {
       "open": false
     },
+    "retained": {
+      "Robot": {
+        "open": true
+      }
+    },
     "transitory": {
       "Robot": {
         "drive": {

@@ -2,7 +2,6 @@ package org.sciborgs1155.robot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;

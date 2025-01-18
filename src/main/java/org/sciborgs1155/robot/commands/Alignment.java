@@ -23,6 +23,9 @@ import java.util.Set;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.scoral.Scoral;
 
@@ -121,7 +124,7 @@ public class Alignment {
     path.preventFlipping = true;
     return path;
   }
-
+ 
   /**
    * Follows a given pathplanner path.
    *
@@ -135,9 +138,11 @@ public class Alignment {
     System.out.println(
         "Waypoint 2: "
             + path.getWaypoints().get(path.getWaypoints().size() - 1).anchor().toString());
+    System.out.println(
+        path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG)
+            .getTotalTimeSeconds());
 
-    return Commands.defer(
-            () ->
+    return 
                 new FollowPathCommand(
                     path,
                     drive::pose,
@@ -149,15 +154,6 @@ public class Alignment {
                         new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
                     ROBOT_CONFIG,
                     () -> false,
-                    drive),
-            Set.of(drive))
-        .repeatedly()
-        .until(
-            () ->
-                path.getWaypoints()
-                        .get(path.getWaypoints().size() - 1)
-                        .anchor()
-                        .getDistance(drive.pose().getTranslation())
-                    < Translation.TOLERANCE.in(Meters));
+                    drive);
   }
 }
