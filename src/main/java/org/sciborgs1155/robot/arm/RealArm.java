@@ -10,6 +10,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import org.sciborgs1155.lib.FaultLogger;
@@ -32,6 +33,11 @@ public class RealArm implements ArmIO {
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.SensorToMechanismRatio = GEARING;
+
+    
+    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    config.Feedback.FeedbackRemoteSensorID = CANCODER;
+    
     motor.getConfigurator().apply(config);
 
     FaultLogger.register(motor);

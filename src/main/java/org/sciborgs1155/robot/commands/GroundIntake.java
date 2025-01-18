@@ -17,20 +17,27 @@ public class GroundIntake {
     this.roller = roller;
   }
 
+  /**
+   * Moves the arm to the intake angle and then begins to intake.
+   * @return A command for ground intaking.
+   */
   public Command intake() {
-    return arm.goTo(INTAKE_ANGLE).until(arm::atGoal).alongWith(roller.intake());
+    return arm.goTo(INTAKE_ANGLE).alongWith(roller.intake());
+  }
+  
+  /**
+   * Moves the arm to the processor angle and then outtakes.
+   * @return A command for outtaking algae in the processor.
+   */
+  public Command processor() {
+    return arm.goTo(PROCESSOR_OUTTAKE_ANGLE).andThen(roller.outtake());
   }
 
-  public Command outtake() {
-    return arm.goTo(OUTTAKE_ANGLE).until(arm::atGoal).andThen(roller.outtake());
-  }
-
-  public Command climbSetup() {
-    return arm.goTo(CLIMB_INTAKE_ANGLE);
-  }
-
-  public Command climbExecute() {
-    return arm.run(() -> arm.currentLimit(CLIMB_LIMIT.in(Amps)))
-        .andThen(arm.goTo(CLIMB_FINAL_ANGLE));
+  /**
+   * Moves the arm to the trough angle and then outtakes.
+   * @return A command for outtaking coral into the trough (L1).
+   */
+  public Command trough() {
+    return arm.goTo(TROUGH_OUTTAKE_ANGLE).until(arm::atGoal).andThen(roller.outtake()).alongWith(arm.goTo(TROUGH_OUTTAKE_ANGLE));
   }
 }

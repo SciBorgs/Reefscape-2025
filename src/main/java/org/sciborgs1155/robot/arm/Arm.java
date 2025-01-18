@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.arm;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
@@ -154,6 +155,16 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         Assertion.eAssert(
             "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
     return new Test(testCommand, Set.of(atGoal));
+  }
+
+
+  public Command climbSetup() {
+    return goTo(CLIMB_INTAKE_ANGLE);
+  }
+
+  public Command climbExecute() {
+    return run(() -> currentLimit(CLIMB_LIMIT.in(Amps)))
+        .andThen(goTo(CLIMB_FINAL_ANGLE));
   }
 
   /**
