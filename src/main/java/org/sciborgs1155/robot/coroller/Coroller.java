@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.coroller;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,12 +19,15 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
    * and no hardware connection if it isn't.
    */
   public static Coroller create() {
-    return new Coroller();
+    return new Coroller(
+        Robot.isReal()
+            ? SimpleMotor.none() //lmao change this later when its no longer a skeleton
+            : SimpleMotor.none());
   }
 
-  /** Creates a new {@link Coroller} with no hardware interface (does nothing). */
+  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
   public static Coroller none() {
-    return new Coroller();
+    return new Coroller(SimpleMotor.none());
   }
 
   /** Constructor. */
