@@ -15,14 +15,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.arm.ArmConstants;
-import org.sciborgs1155.robot.commands.GroundIntake;
+import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.coroller.Coroller;
 
 public class GroundIntakeTest {
   Arm arm;
   Coroller coroller;
 
-  GroundIntake intake;
+  Corolling intake;
 
   @BeforeEach
   public void setup() {
@@ -30,7 +30,7 @@ public class GroundIntakeTest {
     arm = Arm.create();
     coroller = Coroller.create();
 
-    intake = new GroundIntake(arm, coroller);
+    intake = new Corolling(arm, coroller);
   }
 
   @AfterEach

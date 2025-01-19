@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.coroller.Coroller;
 
-public class GroundIntake {
+public class Corolling {
 
   private Arm arm;
   private Coroller roller;
 
-  public GroundIntake(Arm arm, Coroller roller) {
+  public Corolling(Arm arm, Coroller roller) {
     this.arm = arm;
     this.roller = roller;
   }
