@@ -2,6 +2,8 @@ package org.sciborgs1155.robot.coroller;
 
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
+import org.sciborgs1155.lib.SimpleMotor;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
@@ -9,23 +11,23 @@ import monologue.Logged;
 /** Roller subsystem used for intaking/outtaking coral and algae. */
 public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  private final CorollerIO hardware;
+  private final SimpleMotor hardware;
 
   /**
    * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real,
    * and no hardware connection if it isn't.
    */
   public static Coroller create() {
-    return new Coroller(new NoCoroller());
+    return new Coroller();
   }
 
   /** Creates a new {@link Coroller} with no hardware interface (does nothing). */
   public static Coroller none() {
-    return new Coroller(new NoCoroller());
+    return new Coroller();
   }
 
   /** Constructor. */
-  private Coroller(CorollerIO hardware) {
+  private Coroller(SimpleMotor hardware) {
     this.hardware = hardware;
   }
 
