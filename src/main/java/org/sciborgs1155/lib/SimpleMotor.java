@@ -24,12 +24,6 @@ public class SimpleMotor {
   /** Interface for getting motor power. */
   private final DoubleSupplier get;
 
-  /** Interface for getting motor position. */
-  private final DoubleSupplier position;
-
-  /** Interface for getting motor position. */
-  private final DoubleSupplier velocity;
-
   /** Interface for closing the motor. */
   private final Runnable close;
 
@@ -38,21 +32,15 @@ public class SimpleMotor {
    *
    * @param set : {@link DoubleConsumer} for setting motor power.
    * @param get : {@link DoubleSupplier} for getting the power of the motor.
-   * @param position : {@link DoubleSupplier} for getting the position of the motor.
-   * @param velocity : {@link DoubleSupplier} for getting the velocity of the motor.
    * @param close : {@link Runnable} interface for the motor.
    */
   public SimpleMotor(
       DoubleConsumer set,
       DoubleSupplier get,
-      DoubleSupplier position,
-      DoubleSupplier velocity,
       DoubleConsumer current,
       Runnable close) {
     this.set = set;
     this.get = get;
-    this.position = position;
-    this.velocity = velocity;
     this.close = close;
   }
 
@@ -65,8 +53,6 @@ public class SimpleMotor {
   public SimpleMotor(DoubleConsumer set, Runnable close) {
     this.set = set;
     this.get = () -> 0;
-    this.position = () -> 0;
-    this.velocity = () -> 0;
     this.close = close;
   }
 
@@ -83,8 +69,6 @@ public class SimpleMotor {
     return new SimpleMotor(
         motor::set,
         motor::get,
-        () -> motor.getPosition().getValue().in(Radians),
-        () -> motor.getVelocity().getValue().in(RadiansPerSecond),
         (current) ->
             motor
                 .getConfigurator()
@@ -104,8 +88,6 @@ public class SimpleMotor {
     return new SimpleMotor(
         motor::set,
         motor::get,
-        () -> motor.getAbsoluteEncoder().getPosition(),
-        () -> motor.getAbsoluteEncoder().getVelocity(),
         (current) -> motor.configureAsync(config.smartCurrentLimit((int) current), null, null),
         motor::close);
   }
@@ -126,21 +108,7 @@ public class SimpleMotor {
   public double get() {
     return get.getAsDouble();
   }
-
-  /**
-   * @return The position from the {@link #position} supplier specified in the constructor.
-   */
-  public double position() {
-    return position.getAsDouble();
-  }
-
-  /**
-   * @return The velocity from the {@link #velocity} supplier specified in the constructor.
-   */
-  public double velocity() {
-    return velocity.getAsDouble();
-  }
-
+  
   public void close() {
     close.run();
   }
