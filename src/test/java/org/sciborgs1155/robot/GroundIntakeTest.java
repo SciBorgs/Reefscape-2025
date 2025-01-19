@@ -9,6 +9,7 @@ import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.run;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,6 @@ import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.GroundIntake;
 import org.sciborgs1155.robot.coroller.Coroller;
-
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class GroundIntakeTest {
   Arm arm;
@@ -42,7 +41,8 @@ public class GroundIntakeTest {
   }
 
   /**
-   * A test to determine if the intake command is scheduled and follows through, as well as finishing.
+   * A test to determine if the intake command is scheduled and follows through, as well as
+   * finishing.
    */
   @Test
   public void finishTest() {
