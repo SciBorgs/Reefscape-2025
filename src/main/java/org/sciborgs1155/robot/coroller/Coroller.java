@@ -2,15 +2,18 @@ package org.sciborgs1155.robot.coroller;
 
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Ports.GroundIntake;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
 public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  private final CorollerIO hardware;
+  private final SimpleMotor hardware;
 
   /**
    * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real,
@@ -19,19 +22,16 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   public static Coroller create() {
     return new Coroller(
         Robot.isReal()
-            ? new RealCoroller()
-            : new NoCoroller());
+            ? SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), MOTOR_CONFIGURATION)
+            : SimpleMotor.none());
   }
 
   /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
   public static Coroller none() {
-    return new Coroller(new NoCoroller());
+    return new Coroller(SimpleMotor.none());
   }
 
-  /**
-   * Constructor.
-   */
-  private Coroller(CorollerIO hardware) {
+  private Coroller(SimpleMotor hardware) {
     this.hardware = hardware;
   }
 

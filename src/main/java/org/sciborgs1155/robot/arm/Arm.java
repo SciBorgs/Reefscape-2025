@@ -49,6 +49,8 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
+
+
   /** Arm feed forward controller. */
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
@@ -165,18 +167,28 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
   }
 
-  /**
-   * Runs all 4 {@link SysIdRoutine}'s in sequence.
-   *
-   * @return A command to run the routine.
-   */
-  public Command sysIdRoutine() {
+  public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
-        .andThen(sysIdRoutine.quasistatic(Direction.kReverse))
-        .andThen(sysIdRoutine.dynamic(Direction.kForward))
-        .andThen(sysIdRoutine.dynamic(Direction.kReverse))
-        .withName("Arm SysID");
+        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
+  }
+
+  public Command quasistaticBack() {
+    return sysIdRoutine
+        .quasistatic(Direction.kReverse)
+        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
+  }
+
+  public Command dynamicForward() {
+    return sysIdRoutine
+        .dynamic(Direction.kForward)
+        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
+  }
+
+  public Command dynamicBack() {
+    return sysIdRoutine
+        .dynamic(Direction.kReverse)
+        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
   }
 
   @Override
