@@ -1,15 +1,9 @@
 package org.sciborgs1155.lib;
 
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -35,10 +29,7 @@ public class SimpleMotor {
    * @param close : {@link Runnable} interface for the motor.
    */
   public SimpleMotor(
-      DoubleConsumer set,
-      DoubleSupplier get,
-      DoubleConsumer current,
-      Runnable close) {
+      DoubleConsumer set, DoubleSupplier get, DoubleConsumer current, Runnable close) {
     this.set = set;
     this.get = get;
     this.close = close;
@@ -76,22 +67,6 @@ public class SimpleMotor {
         motor::close);
   }
 
-  /**
-   * @return Returns a new {@link SimpleMotor} that controls a {@link SparkBase} motor. The motor is
-   *     registered with {@link FaultLogger}.
-   * @param motor : {@link SparkBase} controller instance with device ID.
-   * @param config : {@link SparkBaseConfig} to apply to the motor.
-   */
-  public static SimpleMotor spark(SparkBase motor, SparkBaseConfig config) {
-    FaultLogger.register(motor);
-    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-    return new SimpleMotor(
-        motor::set,
-        motor::get,
-        (current) -> motor.configureAsync(config.smartCurrentLimit((int) current), null, null),
-        motor::close);
-  }
-
   /** Returns a new {@link SimpleMotor} that does absoluteley nothing. */
   public static SimpleMotor none() {
     return new SimpleMotor(v -> {}, () -> {});
@@ -108,7 +83,7 @@ public class SimpleMotor {
   public double get() {
     return get.getAsDouble();
   }
-  
+
   public void close() {
     close.run();
   }

@@ -40,9 +40,6 @@ public class Corolling {
    * @return A command for outtaking coral into the trough (L1).
    */
   public Command trough() {
-    return arm.goTo(TROUGH_OUTTAKE_ANGLE)
-        .until(arm::atGoal)
-        .andThen(roller.outtake())
-        .alongWith(arm.goTo(TROUGH_OUTTAKE_ANGLE));
+    return arm.goTo(TROUGH_OUTTAKE_ANGLE).until(arm::atGoal).andThen(roller.outtake());
   }
 }

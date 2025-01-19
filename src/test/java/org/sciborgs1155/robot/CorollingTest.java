@@ -1,7 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Radian;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
@@ -14,15 +12,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.coroller.Coroller;
 
-public class GroundIntakeTest {
+public class CorollingTest {
   Arm arm;
   Coroller coroller;
 
-  Corolling intake;
+  Corolling corolling;
 
   @BeforeEach
   public void setup() {
@@ -30,7 +27,7 @@ public class GroundIntakeTest {
     arm = Arm.create();
     coroller = Coroller.create();
 
-    intake = new Corolling(arm, coroller);
+    corolling = new Corolling(arm, coroller);
   }
 
   @AfterEach
@@ -44,16 +41,21 @@ public class GroundIntakeTest {
    * A test to determine if the intake command is scheduled and follows through, as well as
    * finishing.
    */
-  @Test
-  public void finishTest() {
-    Command testcmd = intake.intake();
+  public void finishes(Command testcmd) {
     run(testcmd);
     assert testcmd.isScheduled();
     assertFalse(arm.getCurrentCommand().equals(arm.getDefaultCommand()));
     assertFalse(coroller.getCurrentCommand().equals(coroller.getDefaultCommand()));
     fastForward();
-    assertEquals(arm.position(), ArmConstants.INTAKE_ANGLE.in(Radian), 0.02);
+    assertTrue(arm::atGoal);
     assertFalse(coroller.getCurrentCommand().equals(coroller.getDefaultCommand()));
     assertTrue(testcmd::isScheduled);
+  }
+
+  @Test
+  public void finishTest() {
+    finishes(corolling.intake());
+    finishes(corolling.processor());
+    finishes(corolling.trough());
   }
 }

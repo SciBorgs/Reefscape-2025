@@ -49,8 +49,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
-
-
   /** Arm feed forward controller. */
   private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
@@ -159,14 +157,25 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return new Test(testCommand, Set.of(atGoal));
   }
 
+  /**
+   * Moves the arm to an angle necessary to attach to the cage.
+   *
+   * @return A command to move the arm to be horizontal.
+   */
   public Command climbSetup() {
     return goTo(CLIMB_INTAKE_ANGLE);
   }
 
+  /**
+   * Increases the current limit for the arm, then moves the arm back to climb.
+   *
+   * @return A command to climb.
+   */
   public Command climbExecute() {
     return run(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
   }
 
+  // funny sysid stuff
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
