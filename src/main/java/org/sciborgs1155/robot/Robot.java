@@ -26,12 +26,12 @@ import monologue.Logged;
 import monologue.Monologue;
 import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.Dashboard;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -156,7 +156,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // TODO: Add any additional bindings.
 
-    dashboard.A().onTrue(led.rainbow());
+    dashboard.a().whileTrue(led.rainbow());
   }
 
   /**

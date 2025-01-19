@@ -1,4 +1,4 @@
-package org.sciborgs1155.lib;
+package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -23,74 +23,74 @@ public class Dashboard {
   }
 
   private Trigger setTriggerBranch(String branch) {
-    return new Trigger(() -> (branch == entryTargetBranch.getString("")));
+    return new Trigger(() -> (branch.equals(entryTargetBranch.getString(""))));
   }
 
   private Trigger setTriggerLevel(int level) {
     return new Trigger(() -> (level == entryTargetLevel.getInteger(0)));
   }
 
-  public Trigger A() {
+  public Trigger a() {
     return setTriggerBranch("A");
   }
 
-  public Trigger B() {
+  public Trigger b() {
     return setTriggerBranch("B");
   }
 
-  public Trigger C() {
+  public Trigger c() {
     return setTriggerBranch("C");
   }
 
-  public Trigger D() {
+  public Trigger d() {
     return setTriggerBranch("D");
   }
 
-  public Trigger E() {
+  public Trigger e() {
     return setTriggerBranch("E");
   }
 
-  public Trigger F() {
+  public Trigger f() {
     return setTriggerBranch("F");
   }
 
-  public Trigger G() {
+  public Trigger g() {
     return setTriggerBranch("G");
   }
 
-  public Trigger H() {
+  public Trigger h() {
     return setTriggerBranch("H");
   }
 
-  public Trigger I() {
+  public Trigger i() {
     return setTriggerBranch("I");
   }
 
-  public Trigger J() {
+  public Trigger j() {
     return setTriggerBranch("J");
   }
 
-  public Trigger K() {
+  public Trigger k() {
     return setTriggerBranch("K");
   }
 
-  public Trigger L() {
+  public Trigger l() {
     return setTriggerBranch("L");
   }
 
-  public Trigger L1() {
+  public Trigger level1() {
     return setTriggerLevel(1);
   }
 
-  public Trigger L2() {
+  public Trigger level2() {
     return setTriggerLevel(2);
   }
 
-  public Trigger L3() {
+  public Trigger level3() {
     return setTriggerLevel(3);
   }
 
-  public Trigger L4() {
+  public Trigger level4() {
     return setTriggerLevel(4);
   }
 }
