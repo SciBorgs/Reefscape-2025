@@ -69,20 +69,6 @@ public final class DriveConstants {
   public static final AngularAcceleration MAX_ANGULAR_ACCEL =
       RadiansPerSecond.per(Second).of(MAX_ACCEL.in(MetersPerSecondPerSecond) / RADIUS.in(Meters));
 
-  public static final RobotConfig ROBOT_CONFIG =
-      new RobotConfig(
-          MASS,
-          MOI,
-          new ModuleConfig(
-              WHEEL_RADIUS,
-              MAX_SPEED,
-              WHEEL_COF,
-              DCMotor.getKrakenX60(1),
-              1 / ModuleConstants.Driving.GEARING,
-              ModuleConstants.Driving.CURRENT_LIMIT,
-              1),
-          TRACK_WIDTH);
-
   // Arbitrary max rotational velocity for the driver to effectively control the robot
   public static final AngularVelocity TELEOP_ANGULAR_SPEED = Radians.per(Second).of(2 * Math.PI);
 
@@ -92,6 +78,16 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(2)), // rear left
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
+
+  public static final RobotConfig ROBOT_CONFIG = 
+  new RobotConfig(MASS, MOI, new ModuleConfig(
+    WHEEL_RADIUS,
+    MAX_SPEED,
+    WHEEL_COF,
+    DCMotor.getKrakenX60(1),
+    1 / ModuleConstants.Driving.GEARING,
+    ModuleConstants.Driving.CURRENT_LIMIT,
+    1), MODULE_OFFSET);
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets

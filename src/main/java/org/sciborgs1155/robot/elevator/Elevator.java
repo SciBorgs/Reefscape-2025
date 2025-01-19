@@ -3,8 +3,6 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;

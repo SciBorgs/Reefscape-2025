@@ -153,7 +153,7 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
-    driver.a().onTrue(Commands.defer( () -> align.pathfollow(align.pathfind(new Pose2d(100, 2, new Rotation2d()))), Set.of(drive)));
+    driver.a().onTrue(Commands.defer( () -> align.pathfollow(align.pathfind(new Pose2d(2, 2, new Rotation2d()))), Set.of(drive)));
 
     //driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
   }
