@@ -2,12 +2,11 @@ package org.sciborgs1155.robot.coroller;
 
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
-import org.sciborgs1155.lib.SimpleMotor;
-import org.sciborgs1155.robot.Robot;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Robot;
 
 /** Roller subsystem used for intaking/outtaking coral and algae. */
 public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
@@ -21,7 +20,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   public static Coroller create() {
     return new Coroller(
         Robot.isReal()
-            ? SimpleMotor.none() //lmao change this later when its no longer a skeleton
+            ? SimpleMotor.none() // lmao change this later when its no longer a skeleton
             : SimpleMotor.none());
   }
 
