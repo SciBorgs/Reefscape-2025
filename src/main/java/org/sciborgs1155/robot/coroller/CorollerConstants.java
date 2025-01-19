@@ -1,5 +1,3 @@
 package org.sciborgs1155.robot.coroller;
 
-public class CorollerConstants {
-    
-}
+public class CorollerConstants {}

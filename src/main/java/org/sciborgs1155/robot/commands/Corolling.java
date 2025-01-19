@@ -1,5 +1,3 @@
 package org.sciborgs1155.robot.commands;
 
-public class Corolling {
-    
-}
+public class Corolling {}
