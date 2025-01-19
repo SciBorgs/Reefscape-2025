@@ -1,5 +1,10 @@
 package org.sciborgs1155.robot.coroller;
 
-public class RealCoroller {
-    
+public class RealCoroller implements CorollerIO {
+
+  @Override
+  public void set(double power) {}
+
+  @Override
+  public void close() throws Exception {}
 }
