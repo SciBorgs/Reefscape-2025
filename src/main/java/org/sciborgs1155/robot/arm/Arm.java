@@ -6,6 +6,14 @@ import monologue.Logged;
 public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   private ArmIO hardware;
 
+  public static Arm create() {
+    return new NoArm();
+  }
+
+  public static Arm none() {
+    return new NoArm();
+  }
+
   /** Constructor */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
