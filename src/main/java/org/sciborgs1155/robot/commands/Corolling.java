@@ -16,12 +16,13 @@ public class Corolling {
   }
 
   /**
-   * Moves the arm to the intake angle and then begins to intake.
+   * Moves the arm to the intake angle and then begins to intake. Can be used for both coral and
+   * algae.
    *
    * @return A command for ground intaking.
    */
   public Command intake() {
-    return arm.goTo(Radians.of(0));
+    return arm.goTo(Radians.of(0)).alongWith(coroller.intake());
   }
 
   /**
@@ -30,7 +31,7 @@ public class Corolling {
    * @return A command for outtaking algae in the processor.
    */
   public Command processor() {
-    return arm.goTo(Radians.of(0));
+    return arm.goTo(Radians.of(0)).alongWith(coroller.outtake());
   }
 
   /**
@@ -39,6 +40,6 @@ public class Corolling {
    * @return A command for outtaking coral into the trough (L1).
    */
   public Command trough() {
-    return arm.goTo(Radians.of(0));
+    return arm.goTo(Radians.of(0)).alongWith(coroller.outtake());
   }
 }
