@@ -69,8 +69,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @param limit The limit, in amps.
    */
-  public void currentLimit(double limit) {
-  }
+  public void currentLimit(double limit) {}
 
   public Command climbSetup() {
     return Commands.none();
