@@ -15,9 +15,7 @@ public class Dashboard {
   private final NetworkTableEntry entryTargetLevel;
   private final NetworkTableEntry entryRobotConnected;
 
-  /**
-   * Creates a Dashboard object.
-   */
+  /** Creates a Dashboard object. */
   public Dashboard() {
     // setup NetworkTables
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
@@ -31,6 +29,7 @@ public class Dashboard {
 
   /**
    * Returns a Trigger, given a reef branch.
+   *
    * @param branch the branch for the trigger (A-L)
    * @return a Trigger for that branch
    */
@@ -40,6 +39,7 @@ public class Dashboard {
 
   /**
    * Returns a Trigger, given a reef branch level.
+   *
    * @param level the level for the trigger (1-4)
    * @return a Trigger for that level
    */
