@@ -38,10 +38,10 @@ public class ElevatorTest {
   private static Stream<Arguments> providePositionValues() {
     return Stream.of(
         Arguments.of(MIN_HEIGHT),
-        Arguments.of(Level.L1.getHeight()),
-        Arguments.of(Level.L2.getHeight()),
-        Arguments.of(Level.L3.getHeight()),
-        Arguments.of(Level.L4.getHeight()),
+        Arguments.of(Level.L1.height),
+        Arguments.of(Level.L2.height),
+        Arguments.of(Level.L3.height),
+        Arguments.of(Level.L4.height),
         Arguments.of(MAX_HEIGHT));
   }
 }

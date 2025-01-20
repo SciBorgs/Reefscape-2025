@@ -28,7 +28,7 @@ import org.sciborgs1155.robot.Robot;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public static Elevator create() {
-    return Robot.isReal() ? new Elevator(new RealElevator()) : new Elevator(new SimElevator());
+    return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
   }
 
   public static Elevator none() {
@@ -84,7 +84,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return a command which drives the elevator to its minimum height
    */
   public Command retract() {
-    return run(() -> update(MIN_HEIGHT.in(Meters)));
+    return goTo(MIN_HEIGHT.in(Meters));
   }
 
   /**
@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return a command which drives the elevator to one of the 4 levels
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.getHeight().in(Meters));
+    return goTo(level.height.in(Meters));
   }
 
   /**

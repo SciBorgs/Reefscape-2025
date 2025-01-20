@@ -72,10 +72,6 @@ public class Constants {
       Level(Distance height) {
         this.height = height;
       }
-
-      public Distance getHeight() {
-        return this.height;
-      }
     }
   }
 }
