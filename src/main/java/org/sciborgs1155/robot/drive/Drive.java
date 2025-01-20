@@ -233,23 +233,44 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     SmartDashboard.putData(
         "translation quasistatic forward",
-        translationCharacterization.quasistatic(Direction.kForward));
+        translationCharacterization
+            .quasistatic(Direction.kForward)
+            .withName("translation quasistatic forward"));
     SmartDashboard.putData(
-        "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
+        "translation dynamic forward",
+        translationCharacterization
+            .dynamic(Direction.kForward)
+            .withName("translation dynamic forward"));
     SmartDashboard.putData(
         "translation quasistatic backward",
-        translationCharacterization.quasistatic(Direction.kReverse));
+        translationCharacterization
+            .quasistatic(Direction.kReverse)
+            .withName("translation quasistatic backward"));
     SmartDashboard.putData(
-        "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
+        "translation dynamic backward",
+        translationCharacterization
+            .dynamic(Direction.kReverse)
+            .withName("translation dynamic backward"));
     SmartDashboard.putData(
-        "rotation quasistatic forward", rotationalCharacterization.quasistatic(Direction.kForward));
+        "rotation quasistatic forward",
+        rotationalCharacterization
+            .quasistatic(Direction.kForward)
+            .withName("rotation quasistatic forward"));
     SmartDashboard.putData(
-        "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
+        "rotation dynamic forward",
+        rotationalCharacterization
+            .dynamic(Direction.kForward)
+            .withName("rotation dynamic forward"));
     SmartDashboard.putData(
         "rotation quasistatic backward",
-        rotationalCharacterization.quasistatic(Direction.kReverse));
+        rotationalCharacterization
+            .quasistatic(Direction.kReverse)
+            .withName("rotation quasistatic backward"));
     SmartDashboard.putData(
-        "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+        "rotation dynamic backward",
+        rotationalCharacterization
+            .dynamic(Direction.kReverse)
+            .withName("rotation dynamic backward"));
   }
 
   /**
