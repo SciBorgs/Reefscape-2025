@@ -1,8 +1,7 @@
 package org.sciborgs1155.robot.coroller;
 
-import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
 import org.sciborgs1155.lib.SimpleMotor;
@@ -36,17 +35,17 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Makes the roller spin inwards(towards robot). */
   public Command intake() {
-    return run(() -> hardware.set(INTAKE_POWER)).withName("Intaking");
+    return Commands.none();
   }
 
   /** Makes the roller spin outwards(away from robot). */
   public Command outtake() {
-    return run(() -> hardware.set(OUTTAKE_POWER)).withName("Outtaking");
+    return Commands.none();
   }
 
   /** Stops the roller motors. */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("Stopping");
+    return Commands.none();
   }
 
   @Override
