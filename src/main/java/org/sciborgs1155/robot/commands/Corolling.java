@@ -1,8 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Radians;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.coroller.Coroller;
 
@@ -22,7 +21,7 @@ public class Corolling {
    * @return A command for ground intaking.
    */
   public Command intake() {
-    return arm.goTo(Radians.of(0)).alongWith(coroller.intake());
+    return Commands.idle(arm, coroller);
   }
 
   /**
@@ -31,7 +30,7 @@ public class Corolling {
    * @return A command for outtaking algae in the processor.
    */
   public Command processor() {
-    return arm.goTo(Radians.of(0)).alongWith(coroller.outtake());
+    return Commands.idle(arm, coroller);
   }
 
   /**
@@ -40,6 +39,6 @@ public class Corolling {
    * @return A command for outtaking coral into the trough (L1).
    */
   public Command trough() {
-    return arm.goTo(Radians.of(0)).alongWith(coroller.outtake());
+    return Commands.idle(arm, coroller);
   }
 }
