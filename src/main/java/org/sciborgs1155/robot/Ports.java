@@ -23,7 +23,6 @@ public final class Ports {
   public static final class Elevator {
     public static final int LEADER = -1;
     public static final int FOLLOWER = -1;
-    public static final int CANCODER = -1;
   }
 
   public static final class Scoral {

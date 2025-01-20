@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
                 null,
                 Volts.of(4),
                 null,
-                (state) -> SignalLogger.writeString("state", state.toString())),
+                (state) -> SignalLogger.writeString("elevator state", state.toString())),
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
     SmartDashboard.putData(
@@ -84,38 +84,36 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * drives elevator to its minimum
+   * Drives elevator to its minimum.
    *
-   * @return a command which drives the elevator to its minimum height
+   * @return A command which drives the elevator to its minimum height.
    */
   public Command retract() {
     return goTo(MIN_HEIGHT.in(Meters));
   }
 
   /**
-   * drives elevator to one of the 4 levels
+   * Drives elevator to one of the 4 levels.
    *
-   * @param level an enum that can be L1-L4
-   * @return a command which drives the elevator to one of the 4 levels
+   * @param level An enum that can be L1-L4.
+   * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
     return goTo(level.height.in(Meters));
   }
 
   /**
-   * drives elevator to the desired height, within its physical boundaries
+   * Drives elevator to the desired height, within its physical boundaries.
    *
-   * @param height desired height in meters
-   * @return a command which drives the elevator to the desired height
+   * @param height Desired height in meters.
+   * @return A command which drives the elevator to the desired height.
    */
   public Command goTo(double height) {
     return run(() -> update(height));
   }
 
   /**
-   * give measured encoder height of elevator
-   *
-   * @return position of the elevator in meters
+   * @return Position of the elevator in meters.
    */
   @Log.NT
   public double position() {
@@ -123,9 +121,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * give measured encoder velocity of elevator
-   *
-   * @return velocity of the elevator in meters per second
+   * @return Velocity of the elevator in meters per second.
    */
   @Log.NT
   public double velocity() {
@@ -133,9 +129,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * give desired encoder height of elevator
-   *
-   * @return desired position of the elevator in meters
+   * @return Desired position of the elevator in meters
    */
   @Log.NT
   public double positionSetpoint() {
@@ -143,9 +137,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * give desired encoder velocity of elevator
-   *
-   * @return desired velocity of the elevator in meters per second
+   * @return Desired velocity of the elevator in meters per second.
    */
   @Log.NT
   public double velocitySetpoint() {
@@ -153,17 +145,17 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * @return whether or not the elevator is at its desired state
+   * @return Whether or not the elevator is at its desired state.
    */
   public boolean atGoal() {
     return pid.atGoal();
   }
 
   /**
-   * method to set voltages to the hardware based off feedforward and feedback control should only
-   * be used in a command
+   * Method to set voltages to the hardware based off feedforward and feedback. Control should only
+   * be used in a command.
    *
-   * @param position goal height for the elevator to achieve
+   * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
     position = MathUtil.clamp(position, MIN_HEIGHT.in(Meters), MAX_HEIGHT.in(Meters));
@@ -182,12 +174,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * drives the elevator to a desired height and asserts that it has reached said height can be used
-   * in unit tests or for real-life systems checks
+   * Drives the elevator to a desired height and asserts that it has reached said height. Can be
+   * used in unit tests or for real-life systems checks.
    *
-   * @param testHeight desired height for the elevator to reach
-   * @return command to drive elevator to desired position and check whether it has achieved its
-   *     goal
+   * @param testHeight Desired height for the elevator to reach.
+   * @return Command to drive elevator to desired position and check whether it has achieved its
+   *     goal.
    */
   public Test goToTest(Distance testHeight) {
     Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(3);
