@@ -13,19 +13,36 @@ public class Dashboard {
   private final NetworkTable base;
   private final NetworkTableEntry entryTargetBranch;
   private final NetworkTableEntry entryTargetLevel;
+  private final NetworkTableEntry entryRobotConnected;
 
+  /**
+   * Creates a Dashboard object.
+   */
   public Dashboard() {
+    // setup NetworkTables
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
     entryTargetBranch = base.getEntry("branch");
     entryTargetBranch.setString("");
     entryTargetLevel = base.getEntry("level");
     entryTargetLevel.setInteger(0);
+    entryRobotConnected = base.getEntry("robotConnected");
+    entryRobotConnected.setBoolean(true);
   }
 
+  /**
+   * Returns a Trigger, given a reef branch.
+   * @param branch the branch for the trigger (A-L)
+   * @return a Trigger for that branch
+   */
   private Trigger setTriggerBranch(String branch) {
     return new Trigger(() -> (branch.equals(entryTargetBranch.getString(""))));
   }
 
+  /**
+   * Returns a Trigger, given a reef branch level.
+   * @param level the level for the trigger (1-4)
+   * @return a Trigger for that level
+   */
   private Trigger setTriggerLevel(int level) {
     return new Trigger(() -> (level == entryTargetLevel.getInteger(0)));
   }
