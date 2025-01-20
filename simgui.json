@@ -19,6 +19,8 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+      "/Faults/Active Faults": "Alerts",
+      "/Faults/Total Faults": "Alerts",
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/frontLeft/driveFeedback": "PIDController",
@@ -31,10 +33,6 @@
       "/Robot/drive/rearRight/turnFeedback": "PIDController",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
-      "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
-      "/Robot/elevator/setpoint/mech": "Mechanism2d",
-      "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/drive dynamic backward": "Command",
@@ -170,17 +168,17 @@
               "open": true
             },
             "open": true
-          }
-        },
-        "elevator": {
+          },
           "open": true
         },
-        "open": true,
         "vision": {
           "open": true
         }
       },
       "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     }
