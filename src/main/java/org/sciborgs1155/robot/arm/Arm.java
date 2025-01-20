@@ -1,9 +1,8 @@
 package org.sciborgs1155.robot.arm;
 
-import static edu.wpi.first.units.Units.Radians;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -41,7 +40,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    return hardware.position();
+    return 0;
   }
 
   /**
@@ -56,13 +55,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double velocity() {
-    return hardware.velocity();
+    return 0;
   }
 
   @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
-    return run(() -> hardware.setVoltage(0));
+    return Commands.none();
   }
 
   /**
@@ -71,15 +70,14 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @param limit The limit, in amps.
    */
   public void currentLimit(double limit) {
-    hardware.currentLimit(limit);
   }
 
   public Command climbSetup() {
-    return goTo(Radians.of(0));
+    return Commands.none();
   }
 
   public Command climbExecute() {
-    return goTo(Radians.of(0));
+    return Commands.none();
   }
 
   @Override
