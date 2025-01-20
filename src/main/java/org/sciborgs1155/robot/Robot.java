@@ -33,6 +33,8 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.led.LEDStrip;
+import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
 /**
@@ -51,7 +53,9 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
+  private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
+  private final Scoral scoral = Scoral.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -134,10 +138,12 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
+    led.setDefaultCommand(led.scrolling());
 
     elevator.setDefaultCommand(elevator.retract());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
+    autonomous().whileTrue(led.autos());
 
     test().whileTrue(systemsCheck());
 
@@ -173,7 +179,10 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck(), elevator.goToTest(Level.L1.getHeight()))
+    return Test.toCommand(
+            drive.systemsCheck(),
+            elevator.goToTest(Level.L1.getHeight()),
+            Test.fromCommand(scoral.outtake().withTimeout(2)))
         .withName("Test Mechanisms");
   }
 

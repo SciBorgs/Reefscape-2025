@@ -10,7 +10,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import org.sciborgs1155.lib.TalonUtils;
 
 public class RealElevator implements ElevatorIO {

@@ -1,5 +1,13 @@
 {
   "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 64
+      },
+      "window": {
+        "visible": true
+      }
+    },
     "Other Devices": {
       "window": {
         "visible": false
@@ -9,6 +17,8 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Faults/Active Faults": "Alerts",
+      "/Faults/Total Faults": "Alerts",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
       "/Robot/autos": "String Chooser",
@@ -23,10 +33,6 @@
       "/Robot/drive/rearRight/turnFeedback": "PIDController",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
-      "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
-      "/Robot/elevator/setpoint/mech": "Mechanism2d",
-      "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/drive dynamic backward": "Command",
@@ -166,17 +172,17 @@
               "open": true
             },
             "open": true
-          }
-        },
-        "elevator": {
+          },
           "open": true
         },
-        "open": true,
         "vision": {
           "open": true
         }
       },
       "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     }
@@ -194,7 +200,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 278,
+          "height": 140,
           "series": [
             {
               "color": [
