@@ -63,6 +63,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     pid.reset(hardware.position());
     pid.setGoal(MIN_HEIGHT.in(Meters));
 
+    setDefaultCommand(retract());
+
     sysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(),

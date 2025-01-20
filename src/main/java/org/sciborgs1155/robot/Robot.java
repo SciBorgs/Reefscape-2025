@@ -140,8 +140,6 @@ public class Robot extends CommandRobot implements Logged {
     drive.setDefaultCommand(drive.drive(x, y, omega));
     led.setDefaultCommand(led.scrolling());
 
-    elevator.setDefaultCommand(elevator.retract());
-
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
     autonomous().whileTrue(led.autos());
 
