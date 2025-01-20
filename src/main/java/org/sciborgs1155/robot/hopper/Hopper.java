@@ -1,27 +1,43 @@
 package org.sciborgs1155.robot.hopper;
 
+import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.robot.Ports.Hopper.*;
+
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
 public class Hopper extends SubsystemBase implements AutoCloseable {
-  /** Creates a real or non-existent hopper based on {@link Robot#isReal()}. */
-  public static Hopper create() {
-    return Robot.isReal() ? new Hopper(new RealHopper()) : Hopper.none();
-  }
-
-  /** Creates a non-existent hopper. */
-  public static Hopper none() {
-    return new Hopper(new NoHopper());
-  }
-
-  private final HopperIO hardware;
+  private final SimpleMotor motor;
+  private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
   public final Trigger beambreakTrigger;
 
-  public Hopper(HopperIO hardware) {
-    this.hardware = hardware;
-    this.beambreakTrigger = new Trigger(hardware::beambreak);
+  public static Hopper create() {
+    return new Hopper(Robot.isReal() ? realMotor() : Hopper.none());
+  }
+
+  private static SimpleMotor realMotor() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+
+    config.CurrentLimits.SupplyCurrentLimit = HopperConstants.CURRENT_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    return SimpleMotor.talon(new TalonFX(MOTOR), config);
+  }
+
+  public static SimpleMotor none() {
+    return SimpleMotor.none();
+  }
+
+  public Hopper(SimpleMotor motor) {
+    this.motor = motor;
+    this.beambreakTrigger = new Trigger(beambreak::get);
   }
 
   /**
@@ -31,7 +47,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to set the power of the hopper motors.
    */
   public Command run(double power) {
-    return runOnce(() -> hardware.set(power));
+    return runOnce(() -> motor.set(power));
   }
 
   /**
@@ -63,6 +79,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    hardware.close();
+    motor.close();
+    beambreak.close();
   }
 }
