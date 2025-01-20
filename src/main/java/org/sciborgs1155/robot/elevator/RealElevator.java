@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.lib.FaultLogger.register;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
@@ -10,19 +12,25 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.sciborgs1155.lib.TalonUtils;
 
 public class RealElevator implements ElevatorIO {
-  // idk how many there are
   private final TalonFX leader = new TalonFX(LEADER);
   private final TalonFX follower = new TalonFX(FOLLOWER);
 
   public RealElevator() {
-    TalonFXConfiguration drumConfig = new TalonFXConfiguration();
-    follower.setControl(new Follower(LEADER, false));
+    TalonFXConfiguration talonConfig = new TalonFXConfiguration();
 
-    drumConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    drumConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
+    follower.setControl(new Follower(LEADER, true));
 
-    leader.getConfigurator().apply(drumConfig);
+    talonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
+    talonConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
+
+    leader.getConfigurator().apply(talonConfig);
+    follower.getConfigurator().apply(talonConfig);
+
     TalonUtils.addMotor(leader);
+    TalonUtils.addMotor(follower);
+    register(leader);
+    register(follower);
   }
 
   @Override
@@ -32,12 +40,12 @@ public class RealElevator implements ElevatorIO {
 
   @Override
   public double position() {
-    return leader.getPosition().getValueAsDouble() * CONVERSION_FACTOR;
+    return leader.getPosition().getValueAsDouble();
   }
 
   @Override
   public double velocity() {
-    return leader.getVelocity().getValueAsDouble() * CONVERSION_FACTOR;
+    return leader.getVelocity().getValueAsDouble();
   }
 
   @Override
