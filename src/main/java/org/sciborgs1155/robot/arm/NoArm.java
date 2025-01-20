@@ -16,7 +16,7 @@ public class NoArm implements ArmIO {
   public void setVoltage(double voltage) {}
 
   @Override
-  public void currentLimit(double limit) {}
+  public void setCurrentLimit(double limit) {}
 
   @Override
   public void close() throws Exception {}
