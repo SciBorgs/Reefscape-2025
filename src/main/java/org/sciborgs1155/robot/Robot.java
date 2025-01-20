@@ -31,6 +31,7 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -47,6 +48,7 @@ public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
+  private final Dashboard dashboard = new Dashboard();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -153,6 +155,8 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
+
+    dashboard.a().whileTrue(led.rainbow());
   }
 
   /**
