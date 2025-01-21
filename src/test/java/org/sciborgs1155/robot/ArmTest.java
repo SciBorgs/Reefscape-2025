@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.Test.runUnitTest;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_FINAL_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
@@ -44,7 +45,8 @@ public class ArmTest {
     fastForward();
     assertEquals(CLIMB_INTAKE_ANGLE.in(Radians), arm.position(), TOLERANCE);
     run(arm.climbExecute());
-    assertTrue(arm::atGoal);
+    fastForward();
+    assertEquals(CLIMB_FINAL_ANGLE.in(Radians),arm.position(),TOLERANCE);
   }
 
   @RepeatedTest(5)
