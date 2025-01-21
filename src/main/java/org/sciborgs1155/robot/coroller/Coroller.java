@@ -1,0 +1,55 @@
+package org.sciborgs1155.robot.coroller;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import monologue.Logged;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Robot;
+
+/** Roller subsystem used for intaking/outtaking coral and algae. */
+public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
+  /** Interface for interacting with the motor itself. */
+  private final SimpleMotor hardware;
+
+  /**
+   * Returns a new {@link Coroller} subsystem, which will have real hardware if the robot is real,
+   * and no hardware connection if it isn't.
+   */
+  public static Coroller create() {
+    return new Coroller(
+        Robot.isReal()
+            ? SimpleMotor.none() // lmao change this later when its no longer a skeleton
+            : SimpleMotor.none());
+  }
+
+  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
+  public static Coroller none() {
+    return new Coroller(SimpleMotor.none());
+  }
+
+  /** Constructor. */
+  private Coroller(SimpleMotor hardware) {
+    this.hardware = hardware;
+  }
+
+  /** Makes the roller spin inwards(towards robot). */
+  public Command intake() {
+    return Commands.none();
+  }
+
+  /** Makes the roller spin outwards(away from robot). */
+  public Command outtake() {
+    return Commands.none();
+  }
+
+  /** Stops the roller motors. */
+  public Command stop() {
+    return Commands.none();
+  }
+
+  @Override
+  public void close() throws Exception {
+    hardware.close();
+  }
+}
