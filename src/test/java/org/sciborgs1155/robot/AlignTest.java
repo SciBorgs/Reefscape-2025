@@ -87,14 +87,14 @@ public class AlignTest {
   void pathfindTest(Pose2d goal) {
     Pose2d gaming = new Pose2d(Meters.of(2), WIDTH.div(2), new Rotation2d());
 
-    PathPlannerPath path = align.pathfind(gaming);
+    PathPlannerPath path = align.directPathfind(gaming);
     System.out.println(path.numPoints());
 
     System.out.println(
         path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG)
             .getTotalTimeSeconds());
 
-    align.pathfollow(path);
+    align.directPathfollow(path);
     fastForward();
 
     // assertEquals(gaming.getX(), drive.pose().getX(), DELTA.in(Meters));
@@ -105,7 +105,7 @@ public class AlignTest {
 
   @Test
   void obstacleTest() {
-    align.pathfind(new Pose2d(CENTER_REEF, Rotation2d.fromDegrees(0)));
+    align.directPathfind(new Pose2d(CENTER_REEF, Rotation2d.fromDegrees(0)));
     fastForward(Seconds.of(10));
     assertNotEquals(CENTER_REEF.getX(), drive.pose().getX(), DELTA.in(Meters));
     assertNotEquals(CENTER_REEF.getY(), drive.pose().getY(), DELTA.in(Meters));

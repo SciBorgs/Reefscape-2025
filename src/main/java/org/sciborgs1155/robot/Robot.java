@@ -39,6 +39,9 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -89,6 +92,8 @@ public class Robot extends CommandRobot implements Logged {
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
+
+    Pathfinding.setPathfinder(new LocalADStar());
 
     if (isReal()) {
       URCL.start();
@@ -153,9 +158,17 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
-    driver.a().onTrue(Commands.defer( () -> align.pathfollow(align.pathfind(new Pose2d(2, 2, new Rotation2d()))), Set.of(drive)));
+    // driver
+    //     .a()
+    //     .onTrue(
+    //         Commands.defer(
+    //             () -> align.directPathfollow(align.directPathfind(new Pose2d(2, 2, new Rotation2d()))),
+    //             Set.of(drive)));
+    
+    driver.a().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
+    driver.b().onTrue(Commands.defer(() -> align.directPathfollow(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
 
-    //driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
+    // driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
   }
 
   /**

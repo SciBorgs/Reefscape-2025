@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -79,15 +80,22 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
 
-  public static final RobotConfig ROBOT_CONFIG = 
-  new RobotConfig(MASS, MOI, new ModuleConfig(
-    WHEEL_RADIUS,
-    MAX_SPEED,
-    WHEEL_COF,
-    DCMotor.getKrakenX60(1),
-    1 / ModuleConstants.Driving.GEARING,
-    ModuleConstants.Driving.CURRENT_LIMIT,
-    1), MODULE_OFFSET);
+  public static final RobotConfig ROBOT_CONFIG =
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              1 / ModuleConstants.Driving.GEARING,
+              ModuleConstants.Driving.CURRENT_LIMIT,
+              1),
+          MODULE_OFFSET);
+
+  public static final PathConstraints PATH_CONSTRAINTS =
+      new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
