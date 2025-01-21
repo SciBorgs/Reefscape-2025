@@ -93,6 +93,8 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
+    
+    setDefaultCommand(goTo(ArmConstants.DEFAULT_ANGLE));
 
     this.sysIdRoutine =
         new SysIdRoutine(
@@ -137,7 +139,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Changes the current limit of the arm motor.
    *
-   * @param limit The limit, in amps.
+   * @param limit : The limit, in amps.
    */
   public void currentLimit(double limit) {
     hardware.currentLimit(limit);
@@ -172,28 +174,35 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to climb.
    */
   public Command climbExecute() {
-    return run(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
+    return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_INTAKE_ANGLE));
   }
 
-  // funny sysid stuff
+  /** @return A command that runs a quasistatic {@link SysIdRoutine}*/
+  @Log.NT
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
         .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
   }
 
+  /** @return A command that runs a quasistatic {@link SysIdRoutine}*/
+  @Log.NT
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
         .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
   }
 
+  /** @return A command that runs a dynamic {@link SysIdRoutine}*/
+  @Log.NT
   public Command dynamicForward() {
     return sysIdRoutine
         .dynamic(Direction.kForward)
         .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
   }
 
+  /** @return A command that runs a dynamic {@link SysIdRoutine}*/
+  @Log.NT
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)

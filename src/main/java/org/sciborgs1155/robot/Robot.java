@@ -148,7 +148,6 @@ public class Robot extends CommandRobot implements Logged {
     drive.setDefaultCommand(drive.drive(x, y, omega));
     led.setDefaultCommand(led.scrolling());
 
-    arm.setDefaultCommand(arm.goTo(ArmConstants.DEFAULT_ANGLE));
 
     coroller.setDefaultCommand(coroller.stop());
 
@@ -163,8 +162,6 @@ public class Robot extends CommandRobot implements Logged {
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
-
-    // TODO: Add any additional bindings.
 
   }
 
