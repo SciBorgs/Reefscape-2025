@@ -174,7 +174,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to climb.
    */
   public Command climbExecute() {
-    return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_INTAKE_ANGLE));
+      return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_INTAKE_ANGLE));
   }
 
   /** @return A command that runs a quasistatic {@link SysIdRoutine}*/
