@@ -33,6 +33,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -56,6 +57,7 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
+  private final Hopper hopper = Hopper.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -100,10 +102,36 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    operator
+        .povDown()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L1)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povLeft()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L2)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povRight()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L3)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povUp()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L4)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+
+    // TODO: algae stuff, coroller (talk to ivan/kishan)
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
@@ -152,7 +180,7 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    // TODO: Add any additional bindings.
+    driver.leftTrigger().onTrue(hopper.intake().alongWith(scoral.intake()));
   }
 
   /**
