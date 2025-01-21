@@ -181,7 +181,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public Command quasistaticForward() {
     return sysIdRoutine
-        .quasistatic(Direction.kForward)
+        .quasistatic(Direction.kForward) 
         .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
   }
 
