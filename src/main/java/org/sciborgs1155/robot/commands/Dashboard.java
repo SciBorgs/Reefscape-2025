@@ -3,7 +3,9 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.sciborgs1155.robot.Constants;
 
 /**
  * Dashboard listens to NetworkTable information from the Reefscape-2025-Dashboard, which can be
@@ -14,6 +16,7 @@ public class Dashboard {
   private final NetworkTableEntry entryTargetBranch;
   private final NetworkTableEntry entryTargetLevel;
   private final NetworkTableEntry entryRobotConnected;
+  private final NetworkTableEntry entryBlueAlliance;
 
   /** Creates a Dashboard object. */
   public Dashboard() {
@@ -25,6 +28,8 @@ public class Dashboard {
     entryTargetLevel.setInteger(0);
     entryRobotConnected = base.getEntry("robotConnected");
     entryRobotConnected.setBoolean(true);
+    entryBlueAlliance = base.getEntry("blueAlliance");
+    entryBlueAlliance.setBoolean(Constants.alliance() == Alliance.Blue);
   }
 
   /**
