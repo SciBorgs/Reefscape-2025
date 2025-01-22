@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -30,6 +31,7 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -58,6 +60,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
   private final Hopper hopper = Hopper.create();
+  private final Arm arm = Arm.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -130,6 +133,11 @@ public class Robot extends CommandRobot implements Logged {
                 .scoreLevel(Level.L4)
                 .until(() -> elevator.atGoal())
                 .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator.leftBumper().onTrue(arm.climbSetup());
+    operator.leftTrigger().onTrue(arm.climbExecute());
+    operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE));
+    operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE));
+    operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE));
 
     // TODO: algae stuff, coroller (talk to ivan/kishan)
 
