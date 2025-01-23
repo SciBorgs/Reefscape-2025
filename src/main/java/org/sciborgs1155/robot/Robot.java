@@ -181,7 +181,10 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck(), Test.fromCommand(scoral.outtake().withTimeout(2)))
+    return Test.toCommand(
+            drive.systemsCheck(),
+            elevator.goToTest(Level.L1.height),
+            Test.fromCommand(scoral.outtake().withTimeout(2)))
         .withName("Test Mechanisms");
   }
 
