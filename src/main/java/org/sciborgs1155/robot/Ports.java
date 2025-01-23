@@ -27,7 +27,7 @@ public final class Ports {
 
   public static final class Scoral {
     public static final int ROLLER = 21;
-    public static final int BEAMBREAK = 3;
+    public static final int BEAMBREAK = 22;
   }
 
   public static final class LEDs {

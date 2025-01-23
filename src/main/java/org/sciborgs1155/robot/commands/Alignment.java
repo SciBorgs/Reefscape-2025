@@ -156,7 +156,8 @@ public class Alignment {
                     ROBOT_CONFIG,
                     () -> false,
                     drive)
-                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+                .andThen(drive.driveTo(goal)),
         Set.of(drive));
   }
 }

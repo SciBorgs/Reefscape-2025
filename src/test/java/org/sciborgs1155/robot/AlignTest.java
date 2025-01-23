@@ -10,6 +10,7 @@ import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.run;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
+import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
 
 import edu.wpi.first.hal.AllianceStationID;
@@ -50,20 +51,20 @@ public class AlignTest {
   public void setup() {
     setupTests();
     this.drive = Drive.create();
-    elevator = Elevator.create();
-    scoral = Scoral.create();
-    drive.resetEncoders();
+    this.elevator = Elevator.create();
+    this.scoral = Scoral.create();
+    this.drive.resetEncoders();
 
     align = new Alignment(drive, elevator, scoral);
   }
 
   @AfterEach
   public void destroy() throws Exception {
-    reset();
+    reset(drive, elevator, scoral);
   }
 
   @RepeatedTest(5)
-  void reflectionTest() throws Exception {
+  public void reflectionTest() throws Exception {
     Random rand = new Random();
     DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
     DriverStationSim.notifyNewData();
@@ -85,23 +86,32 @@ public class AlignTest {
 
   @ParameterizedTest()
   @MethodSource("pathGoals")
-  void pathfindTest(Branch branch) {
+  public void pathfindTest(Branch branch) {
     Command testcmd = align.reef(Level.L4, branch);
     run(testcmd);
     fastForward(Seconds.of(5));
     assertTrue(() -> !testcmd.isScheduled());
-    assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters) * 3);
+    assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
     assertEquals(branch.pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));
     assertEquals(
-        branch.pose.getRotation().getRadians(),
-        drive.pose().getRotation().getRadians(),
-        Rotation.TOLERANCE.in(Radian) * 3);
+        branch.pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
+        0,
+        Rotation.TOLERANCE.in(Radian) * 2);
   }
 
   private static Stream<Arguments> pathGoals() {
     return Stream.of(
-        Arguments.of(
-            Branch.A, Branch.B, Branch.C, Branch.D, Branch.E, Branch.F, Branch.G, Branch.H,
-            Branch.I, Branch.J, Branch.K, Branch.L));
+        Arguments.of(A),
+        Arguments.of(B),
+        Arguments.of(C),
+        Arguments.of(D),
+        Arguments.of(E),
+        Arguments.of(F),
+        Arguments.of(G),
+        Arguments.of(H),
+        Arguments.of(I),
+        Arguments.of(J),
+        Arguments.of(K),
+        Arguments.of(L));
   }
 }
