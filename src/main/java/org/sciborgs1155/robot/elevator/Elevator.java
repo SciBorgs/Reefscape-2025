@@ -103,10 +103,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return goTo(level.height.in(Meters));
   }
 
-  /**
-   * Goes to an offset height above the level given to clean algae
-   * ONLY L2 and L3!
-   */
+  /** Goes to an offset height above the level given to clean algae ONLY L2 and L3! */
   public Command clean(Level level) {
     if (level == Level.L1 || level == Level.L4) {
       throw new RuntimeException("Not a valid algae height! Only L2 and L3!");

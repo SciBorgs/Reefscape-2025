@@ -45,9 +45,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     this.hardware = hardware;
   }
 
-  /**
-   * Runs the motor to move a coral out of the scoral outwards.
-   */
+  /** Runs the motor to move a coral out of the scoral outwards. */
   public Command outtake() {
     return run(() -> hardware.set(POWER)).withName("outtake");
   }
