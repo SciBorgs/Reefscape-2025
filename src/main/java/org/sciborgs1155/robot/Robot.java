@@ -37,6 +37,8 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -48,7 +50,6 @@ public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
-  private final Dashboard dashboard = new Dashboard();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -77,6 +78,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
+    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -98,14 +100,16 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
+
+    addPeriodic(() -> Dashboard.info.get("closestBranch").setString(drive.closestBranch()), PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
+    L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
+    L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
+    L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
@@ -156,7 +160,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // TODO: Add any additional bindings.
 
-    dashboard.a().whileTrue(led.rainbow());
+    A.trigger.whileTrue(led.rainbow());
   }
 
   /**
