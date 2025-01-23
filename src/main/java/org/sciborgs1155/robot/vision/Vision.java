@@ -101,6 +101,7 @@ public class Vision implements Logged {
     for (int i = 0; i < estimators.length; i++) {
       var unread = cameras[i].getAllUnreadResults();
       Optional<EstimatedRobotPose> estimate = Optional.empty();
+      changes.clear();
 
       for (int j = 0; j < unread.size(); j++) {
         var change = unread.get(j);
@@ -132,9 +133,7 @@ public class Vision implements Logged {
    */
   @Log.NT
   public Pose3d[] getSeenTags() {
-    var results = changes.toArray();
-    return Arrays.stream(results)
-        .flatMap(Arrays::stream)
+    return Arrays.stream(changes.toArray(PhotonPipelineResult[]::new))
         .flatMap(c -> c.targets.stream())
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
