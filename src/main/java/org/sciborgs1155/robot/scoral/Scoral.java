@@ -46,16 +46,20 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Runs the motor to move a coral out of the scoral outwards. Ends when the beam is no longer
-   * broken.
+   * Runs the motor to move a coral out of the scoral outwards.
    */
   public Command outtake() {
-    return run(() -> hardware.set(POWER)).until(() -> beambreak()).withName("outtake");
+    return run(() -> hardware.set(POWER)).withName("outtake");
   }
 
-  /** Runs the motor to move a coral into the scoral. Ends when the beam is broken. */
+  /** Runs the motor to move a coral into the scoral. */
   public Command intake() {
-    return run(() -> hardware.set(POWER)).until(() -> !beambreak()).withName("intake");
+    return run(() -> hardware.set(POWER)).withName("intake");
+  }
+
+  /** Stops the motor */
+  public Command stop() {
+    return run(() -> hardware.set(0)).withName("stop");
   }
 
   /** Returns the value of the beambreak, which is false when the beam is broken. */

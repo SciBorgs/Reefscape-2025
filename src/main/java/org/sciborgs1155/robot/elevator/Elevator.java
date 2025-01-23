@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.robot.Constants.Field.algaeOffset;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -100,6 +101,18 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command scoreLevel(Level level) {
     return goTo(level.height.in(Meters));
+  }
+
+  /**
+   * Goes to an offset height above the level given to clean algae
+   * ONLY L2 and L3!
+   */
+  public Command clean(Level level) {
+    if (level == Level.L1 || level == Level.L4) {
+      throw new RuntimeException("Not a valid algae height! Only L2 and L3!");
+    }
+
+    return goTo(level.height.plus(algaeOffset).in(Meters));
   }
 
   /**
