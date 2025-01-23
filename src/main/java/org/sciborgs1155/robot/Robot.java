@@ -30,6 +30,7 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Alignment;
@@ -165,8 +166,8 @@ public class Robot extends CommandRobot implements Logged {
     //             () -> align.directPathfollow(align.directPathfind(new Pose2d(2, 2, new Rotation2d()))),
     //             Set.of(drive)));
     
-    driver.a().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
-    driver.b().onTrue(Commands.defer(() -> align.directPathfollow(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
+    // driver.b().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
+    driver.a().onTrue(align.reef(Level.L4, Branch.A));
 
     // driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
   }

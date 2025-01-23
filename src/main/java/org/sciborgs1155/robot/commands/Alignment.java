@@ -56,9 +56,9 @@ public class Alignment {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return directPathfollow(directPathfind(branch.pose))
+    return directPathfollow(branch.pose)
         .alongWith(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
-        .andThen(scoral.outtake());
+        .andThen(scoral.outtake().onlyWhile(scoral::beambreak));
   }
 
   /**
@@ -70,7 +70,7 @@ public class Alignment {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return directPathfollow(directPathfind(branch.pose))
+    return directPathfollow(branch.pose)
         .andThen(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
         .andThen(scoral.outtake());
   }
@@ -92,17 +92,17 @@ public class Alignment {
    * @return A command to align with the human player station source.
    */
   public Command source() {
-    return directPathfollow(directPathfind(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE))))
+    return directPathfollow(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)))
         .alongWith(elevator.retract());
   }
 
   public Command processor() {
-    return directPathfollow(directPathfind(PROCESSOR));
+    return directPathfollow(PROCESSOR);
     // TODO idk how this would work. research this a bit more
   }
 
   public Command cage() {
-    return directPathfollow(directPathfind(nearestCage(drive.pose())));
+    return directPathfollow(nearestCage(drive.pose()));
     // TODO it should do more. when we have a plan, update this
   }
 
@@ -112,13 +112,13 @@ public class Alignment {
    * @param goal The goal ending pose for the robot.
    * @return A pathplanner path to get to a field position.
    */
-  public PathPlannerPath directPathfind(Pose2d goal) {
+  public PathPlannerPath directPath(Pose2d goal) {
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drive.pose(), goal);
     double speed = Math.hypot(drive.robotRelativeChassisSpeeds().vxMetersPerSecond, drive.robotRelativeChassisSpeeds().vyMetersPerSecond);
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints, PATH_CONSTRAINTS, new IdealStartingState(speed, drive.heading()), new GoalEndState(0, goal.getRotation()));
-    path.preventFlipping = true;
+    path.preventFlipping = false;
     return path;
   }
 
@@ -136,10 +136,9 @@ public Command pathfind(PathPlannerPath path) {
    * @param path A pathplanner path.
    * @return A command to follow a path.
    */
-  public Command directPathfollow(PathPlannerPath path) {
-
-    return new FollowPathCommand(
-        path,
+  public Command directPathfollow(Pose2d goal) {
+    return Commands.defer(() -> new FollowPathCommand(
+        directPath(goal),
         drive::pose,
         drive::robotRelativeChassisSpeeds,
         (ChassisSpeeds a, DriveFeedforwards b) ->
@@ -149,6 +148,6 @@ public Command pathfind(PathPlannerPath path) {
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
         ROBOT_CONFIG,
         () -> false,
-        drive).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        drive).withInterruptBehavior(InterruptionBehavior.kCancelSelf), Set.of(drive));
   }
 }

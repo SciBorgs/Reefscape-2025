@@ -28,7 +28,7 @@ public class Autos {
             new PIDConstants(Translation.P, Translation.I, Translation.D),
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
         ROBOT_CONFIG,
-        autonomous()::getAsBoolean,
+        () -> true,
         drive);
 
     // PPHolonomicDriveController.overrideRotationFeedback(() -> rotation.get().getRadians());
