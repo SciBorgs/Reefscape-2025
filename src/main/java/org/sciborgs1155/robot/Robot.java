@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
@@ -18,18 +17,14 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 import java.util.Set;
-
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
-
 import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
