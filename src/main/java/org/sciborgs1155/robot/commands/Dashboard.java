@@ -3,19 +3,14 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import org.sciborgs1155.robot.Constants;
 
 /**
  * Dashboard listens to NetworkTable information from the Reefscape-2025-Dashboard, which can be
- * used as Triggers. Must call the configure() method
+ * used as Triggers. Must call the configure() method.
  */
 public class Dashboard {
   private static NetworkTable base;
@@ -23,9 +18,9 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetLevel;
   private static NetworkTableEntry entryRobotConnected;
   private static NetworkTableEntry entryBlueAlliance;
-  public final static HashMap<String, NetworkTableEntry> info = new HashMap<>();
-  
-  /** Setups up dashboard */
+  public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
+
+  /** Sets up the dashboard. */
   public static void configure() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
     entryTargetBranch = base.getEntry("branch");
@@ -37,14 +32,16 @@ public class Dashboard {
     entryBlueAlliance = base.getEntry("blueAlliance");
     entryBlueAlliance.setBoolean(Constants.alliance() == Alliance.Blue);
 
-    //info setup
-    upload("closestBranch");
+    // info setup
+    transmit("closestBranch");
   }
 
   /**
-   * adds the key/entry pair to the info hashmap
+   * Adds a key/entry pair to the info hashmap.
+   *
+   * @param key the key of the NetworkTables entry
    */
-  public static void upload(String key) {
+  public static void transmit(String key) {
     NetworkTableEntry entry = base.getEntry(key);
     info.put(key, entry);
   }
@@ -69,6 +66,7 @@ public class Dashboard {
     return new Trigger(() -> (level == entryTargetLevel.getInteger(0)));
   }
 
+  /** An enum for each branch of the alliance's reef. */
   public static enum Branches {
     A("A"),
     B("B"),
@@ -92,6 +90,7 @@ public class Dashboard {
     }
   }
 
+  /** An enum for each level of a branch of the alliance's reef. */
   public static enum Levels {
     L1(1),
     L2(2),

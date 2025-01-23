@@ -7,6 +7,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -37,8 +39,6 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
-import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
-import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -101,7 +101,9 @@ public class Robot extends CommandRobot implements Logged {
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
-    addPeriodic(() -> Dashboard.info.get("closestBranch").setString(drive.closestBranch()), PERIOD.in(Seconds));
+    addPeriodic(
+        () -> Dashboard.info.get("closestBranch").setString(drive.closestBranch()),
+        PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
