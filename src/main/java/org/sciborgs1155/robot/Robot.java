@@ -33,6 +33,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.hopper.Hopper;
@@ -61,6 +62,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Scoral scoral = Scoral.create();
   private final Hopper hopper = Hopper.create();
   private final Arm arm = Arm.create();
+  private final Coroller coroller = Coroller.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -135,11 +137,9 @@ public class Robot extends CommandRobot implements Logged {
                 .andThen(scoral.outtake().until(() -> scoral.beambreak())));
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
-    operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE));
-    operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE));
-    operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE));
-
-    // TODO: algae stuff, coroller (talk to ivan/kishan)
+    operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
+    operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
+    operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
