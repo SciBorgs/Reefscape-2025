@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -169,33 +170,39 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Increases the current limit for the arm, then moves the arm back to climb.
+   * Increases the current limit for the arm, then moves the arm back to climb. Keep in mind that
+   * this is a one-time command, and is completely uninteruptible.
    *
-   * @return A command to climb.
+   * @return A command to climb, once the climb arm is hooked onto the cage.
    */
   public Command climbExecute() {
-    return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
+    return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps)))
+        .andThen(goTo(CLIMB_FINAL_ANGLE))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
-  // funny sysid stuff
+  @Log
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
         .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
   }
 
+  @Log
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
         .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
   }
 
+  @Log
   public Command dynamicForward() {
     return sysIdRoutine
         .dynamic(Direction.kForward)
         .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
   }
 
+  @Log
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)
