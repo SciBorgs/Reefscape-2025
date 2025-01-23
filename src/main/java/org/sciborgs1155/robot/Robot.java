@@ -67,8 +67,9 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   private void configureLog() {
-    SignalLogger.setPath("./logs/");
-    SignalLogger.enableAutoLogging(true);
+    // SignalLogger.setPath("./logs/");
+    //n SignalLogger.enableAutoLogging(true);
+    // SignalLogger.start();
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -108,8 +109,8 @@ public class Robot extends CommandRobot implements Logged {
     // operator.x().onTrue(elevator.scoreLevel(Level.L3));
     // operator.y().onTrue(elevator.scoreLevel(Level.L4));
 
-    InputStream x = InputStream.of(driver::getLeftX).negate();
-    InputStream y = InputStream.of(driver::getLeftY).negate();
+    InputStream x = InputStream.of(driver::getLeftX).log("raw x");
+    InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
@@ -131,7 +132,6 @@ public class Robot extends CommandRobot implements Logged {
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =
         InputStream.of(driver::getRightX)
-            .negate()
             .scale(() -> speedMultiplier)
             .clamp(1.0)
             .deadband(DEADBAND, 1.0)
@@ -144,7 +144,7 @@ public class Robot extends CommandRobot implements Logged {
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
-
+    driver.a().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
     driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()

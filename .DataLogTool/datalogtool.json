@@ -1,6 +1,7 @@
 {
   "download": {
-    "localDir": "C:\\Users\\Ivan\\Code\\2024-2025 Repos\\Reefscape-2025\\logs",
+    "deleteAfter": false,
+    "localDir": "C:\\Users\\admin.CT48-11\\Desktop\\Code\\23-24 Crescendo\\Crescendo-2024\\logs",
     "serverTeam": "1155"
   }
 }

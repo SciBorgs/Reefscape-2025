@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -181,9 +182,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(7),
-                null,
-                (state) -> SignalLogger.writeString("translation state", state.toString())),
+                Volts.of(4),
+                Seconds.of(6),
+                // (state) -> SignalLogger.writeString("translation state", state.toString())),
+                null),
             new SysIdRoutine.Mechanism(
                 volts ->
                     modules.forEach(
@@ -321,7 +323,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     vy.getAsDouble(),
                     vOmega.getAsDouble(),
                     heading().plus(allianceRotation())),
-                ControlMode.CLOSED_LOOP_VELOCITY));
+                DRIVE_MODE));
   }
 
   /**

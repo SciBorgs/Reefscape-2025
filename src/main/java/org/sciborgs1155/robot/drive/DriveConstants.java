@@ -117,7 +117,7 @@ public final class DriveConstants {
       // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the
       // bevel pinion
       public static final double MAXSWERVE_GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
-      public static final double GEARING = 5.68;
+      public static final double GEARING = 1 / 5.68;
 
       public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
       public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
@@ -140,9 +140,9 @@ public final class DriveConstants {
 
       public static final class FF {
         public static final class SPARK {
-          public static final double S = 0; // 0.088468;
-          public static final double V = 0; // 2.1314;
-          public static final double A = 0; // 0.33291;
+          public static final double S = 0.2; // 0.088468;
+          public static final double V = 2.131; // 2.1314;
+          public static final double A = 0.38; // 0.33291;
         }
 
         public static final class TALON {
@@ -157,7 +157,7 @@ public final class DriveConstants {
       public static final double MAXSWERVE_MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double MAXSWERVE_ENCODER_GEARING = 1;
 
-      public static final double X2T_GEARING = 0.4 / (12.1 * 1.3);
+      public static final double X2T_GEARING = 1 / 12.1; //0.4 / (12.1 * 1.3);
 
       public static final Angle POSITION_FACTOR = Rotations.of(X2T_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
