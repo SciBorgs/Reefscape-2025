@@ -26,9 +26,12 @@ public final class Ports {
   }
 
   public static final class Scoral {
-    public static final int TOP_ROLLER = 21;
-    public static final int BOTTOM_ROLLER = 22;
+    public static final int ROLLER = 21;
     public static final int BEAMBREAK = 23;
+  }
+
+  public static final class LEDs {
+    public static final int LED_PORT = 1;
   }
 
   public static final class Hopper {

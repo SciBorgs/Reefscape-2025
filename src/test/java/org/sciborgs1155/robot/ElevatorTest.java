@@ -15,7 +15,7 @@ import org.sciborgs1155.robot.elevator.SimElevator;
 
 public class ElevatorTest {
   private Elevator elevator;
-  private final double DELTA = .05;
+  private final double DELTA = 0.05;
 
   @BeforeEach
   public void initialize() {
