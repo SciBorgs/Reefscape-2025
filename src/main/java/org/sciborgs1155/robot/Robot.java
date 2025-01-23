@@ -33,7 +33,6 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
@@ -147,10 +146,6 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
     led.setDefaultCommand(led.scrolling());
-
-    arm.setDefaultCommand(arm.goTo(ArmConstants.DEFAULT_ANGLE));
-
-    coroller.setDefaultCommand(coroller.stop());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
     autonomous().whileTrue(led.autos());

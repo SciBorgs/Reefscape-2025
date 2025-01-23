@@ -33,6 +33,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
 
   private Coroller(SimpleMotor hardware) {
     this.hardware = hardware;
+    setDefaultCommand(stop());
   }
 
   /** Makes the roller spin inwards(towards robot). */

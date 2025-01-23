@@ -93,6 +93,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
+    setDefaultCommand(goTo(DEFAULT_ANGLE));
 
     this.sysIdRoutine =
         new SysIdRoutine(
@@ -109,10 +110,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * @return True if the arm's position is close enough to its goal, False if it isn't.
+   * @param radians The position, in radians.
+   * @return True if the arm's position is close enough to a given position, False if it isn't.
    */
-  public boolean atGoal() {
-    return Math.abs(fb.getGoal().position - position()) < POSITION_TOLERANCE.in(Radians);
+  public boolean atPosition(double radians) {
+    return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
   }
 
   /**
@@ -172,7 +174,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to climb.
    */
   public Command climbExecute() {
-    return run(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
+    return runOnce(() -> currentLimit(CLIMB_LIMIT.in(Amps))).andThen(goTo(CLIMB_FINAL_ANGLE));
   }
 
   // funny sysid stuff
