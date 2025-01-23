@@ -2,36 +2,37 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
+import static org.sciborgs1155.lib.UnitTestingUtil.run;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
-import static org.sciborgs1155.robot.Constants.Field.CENTER_REEF;
-import static org.sciborgs1155.robot.Constants.Field.LENGTH;
-import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.drive.DriveConstants.ROBOT_CONFIG;
 
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field;
+import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.scoral.Scoral;
 
@@ -84,42 +85,23 @@ public class AlignTest {
 
   @ParameterizedTest()
   @MethodSource("pathGoals")
-  void pathfindTest(Pose2d goal) {
-    Pose2d gaming = new Pose2d(Meters.of(2), WIDTH.div(2), new Rotation2d());
-
-    PathPlannerPath path = align.directPath(gaming);
-    System.out.println(path.numPoints());
-
-    System.out.println(
-        path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG)
-            .getTotalTimeSeconds());
-
-    align.directPathfollow(gaming);
-    fastForward();
-
-    // assertEquals(gaming.getX(), drive.pose().getX(), DELTA.in(Meters));
-    // assertEquals(gaming.getY(), drive.pose().getY(), DELTA.in(Meters));
-    // assertEquals(gaming.getRotation().getRadians(), drive.pose().getRotation().getRadians(),
-    // 0.1);
-  }
-
-  @Test
-  void obstacleTest() {
-    align.directPath(new Pose2d(CENTER_REEF, Rotation2d.fromDegrees(0)));
-    fastForward(Seconds.of(10));
-    assertNotEquals(CENTER_REEF.getX(), drive.pose().getX(), DELTA.in(Meters));
-    assertNotEquals(CENTER_REEF.getY(), drive.pose().getY(), DELTA.in(Meters));
+  void pathfindTest(Branch branch) {
+    Command testcmd = align.reef(Level.L4, branch);
+    run(testcmd);
+    fastForward(Seconds.of(5));
+    assertTrue(() -> !testcmd.isScheduled());
+    assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters) * 3);
+    assertEquals(branch.pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));
+    assertEquals(
+        branch.pose.getRotation().getRadians(),
+        drive.pose().getRotation().getRadians(),
+        Rotation.TOLERANCE.in(Radian) * 3);
   }
 
   private static Stream<Arguments> pathGoals() {
     return Stream.of(
         Arguments.of(
-            /*Branch.B.pose,
-            Branch.A.pose,
-            Branch.L.pose,
-            Branch.D.pose,
-            Branch.G.pose,
-            Branch.H.pose*/
-            new Pose2d(LENGTH.times(3. / 4), WIDTH.times(3. / 4), new Rotation2d())));
+            Branch.A, Branch.B, Branch.C, Branch.D, Branch.E, Branch.F, Branch.G, Branch.H,
+            Branch.I, Branch.J, Branch.K, Branch.L));
   }
 }

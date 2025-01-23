@@ -15,12 +15,10 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Set;
-
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.drive.Drive;
@@ -114,21 +112,28 @@ public class Alignment {
    */
   public PathPlannerPath directPath(Pose2d goal) {
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(drive.pose(), goal);
-    double speed = Math.hypot(drive.robotRelativeChassisSpeeds().vxMetersPerSecond, drive.robotRelativeChassisSpeeds().vyMetersPerSecond);
+    double speed =
+        Math.hypot(
+            drive.robotRelativeChassisSpeeds().vxMetersPerSecond,
+            drive.robotRelativeChassisSpeeds().vyMetersPerSecond);
     PathPlannerPath path =
         new PathPlannerPath(
-            waypoints, PATH_CONSTRAINTS, new IdealStartingState(speed, drive.heading()), new GoalEndState(0, goal.getRotation()));
+            waypoints,
+            PATH_CONSTRAINTS,
+            new IdealStartingState(speed, drive.heading()),
+            new GoalEndState(0, goal.getRotation()));
     path.preventFlipping = false;
     return path;
   }
 
-public Command pathfind(PathPlannerPath path) {
-  // PathPlannerPath path = directPathfind(goal);
-  // System.out.println(path.getPoint(1));
-  // System.out.println(path.generateTrajectory(drive.robotRelativeChassisSpeeds(), drive.heading(), ROBOT_CONFIG).getStates().size());
-  // System.out.println(path.getAllPathPoints().size() + "\n");
-  return AutoBuilder.pathfindThenFollowPath(path, PATH_CONSTRAINTS);
-}
+  public Command pathfind(PathPlannerPath path) {
+    // PathPlannerPath path = directPathfind(goal);
+    // System.out.println(path.getPoint(1));
+    // System.out.println(path.generateTrajectory(drive.robotRelativeChassisSpeeds(),
+    // drive.heading(), ROBOT_CONFIG).getStates().size());
+    // System.out.println(path.getAllPathPoints().size() + "\n");
+    return AutoBuilder.pathfindThenFollowPath(path, PATH_CONSTRAINTS);
+  }
 
   /**
    * Follows a given pathplanner path.
@@ -137,17 +142,21 @@ public Command pathfind(PathPlannerPath path) {
    * @return A command to follow a path.
    */
   public Command directPathfollow(Pose2d goal) {
-    return Commands.defer(() -> new FollowPathCommand(
-        directPath(goal),
-        drive::pose,
-        drive::robotRelativeChassisSpeeds,
-        (ChassisSpeeds a, DriveFeedforwards b) ->
-            drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
-        new PPHolonomicDriveController(
-            new PIDConstants(Translation.P, Translation.I, Translation.D),
-            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-        ROBOT_CONFIG,
-        () -> false,
-        drive).withInterruptBehavior(InterruptionBehavior.kCancelSelf), Set.of(drive));
+    return Commands.defer(
+        () ->
+            new FollowPathCommand(
+                    directPath(goal),
+                    drive::pose,
+                    drive::robotRelativeChassisSpeeds,
+                    (ChassisSpeeds a, DriveFeedforwards b) ->
+                        drive.setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+                    new PPHolonomicDriveController(
+                        new PIDConstants(Translation.P, Translation.I, Translation.D),
+                        new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+                    ROBOT_CONFIG,
+                    () -> false,
+                    drive)
+                .withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+        Set.of(drive));
   }
 }

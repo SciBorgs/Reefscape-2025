@@ -1,8 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 import static org.sciborgs1155.robot.drive.DriveConstants.ROBOT_CONFIG;
-
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;

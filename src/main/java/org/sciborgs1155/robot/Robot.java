@@ -8,8 +8,8 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -40,9 +40,6 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
-
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -167,10 +164,12 @@ public class Robot extends CommandRobot implements Logged {
     //     .a()
     //     .onTrue(
     //         Commands.defer(
-    //             () -> align.directPathfollow(align.directPathfind(new Pose2d(2, 2, new Rotation2d()))),
+    //             () -> align.directPathfollow(align.directPathfind(new Pose2d(2, 2, new
+    // Rotation2d()))),
     //             Set.of(drive)));
-    
-    // driver.b().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
+
+    // driver.b().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new
+    // Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
     driver.a().onTrue(align.reef(Level.L4, Branch.A));
 
     // driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
