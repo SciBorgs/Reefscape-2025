@@ -4,11 +4,16 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.arm.ArmConstants.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
+import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,6 +35,7 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
@@ -220,11 +226,26 @@ public class Robot extends CommandRobot implements Logged {
         .withName("Test Mechanisms");
   }
 
+  // drive = Drive.create();
+  // private final Vision vision = Vision.create();
+  // private final LEDStrip led = new LEDStrip();
+  // private final Elevator elevator = Elevator.create();
+  // private final Scoral scoral = Scoral.create();
+  // private final Hopper hopper = Hopper.create();
+  // private final Arm arm = Arm.create();
+  // private final Coroller coroller = Coroller
+
   @Override
   public void close() {
     super.close();
     try {
       drive.close();
+      coroller.close();
+      led.close();
+      elevator.close();
+      scoral.close();
+      hopper.close();
+      arm.close();
     } catch (Exception e) {
     }
   }
