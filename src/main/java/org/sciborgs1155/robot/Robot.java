@@ -9,8 +9,12 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import javax.xml.crypto.Data;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -93,7 +97,7 @@ public class Robot extends CommandRobot implements Logged {
     RobotController.setBrownoutVoltage(6.0);
 
     if (isReal()) {
-      URCL.start();
+      URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
     } else {
@@ -132,6 +136,7 @@ public class Robot extends CommandRobot implements Logged {
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =
         InputStream.of(driver::getRightX)
+        .negate()
             .scale(() -> speedMultiplier)
             .clamp(1.0)
             .deadband(DEADBAND, 1.0)

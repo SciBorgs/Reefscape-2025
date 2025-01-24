@@ -39,7 +39,7 @@ public final class DriveConstants {
   public static final ModuleType TYPE = ModuleType.NEOKRAKEN;
 
   // The control loop used by all of the modules when driving
-  public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
+  public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;
 
   // Rate at which sensors update periodicially
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
@@ -126,7 +126,7 @@ public final class DriveConstants {
 
       public static final class PID {
         public static final class SPARK {
-          public static final double P = 0.02;
+          public static final double P = 0.04;
           public static final double I = 0.0;
           public static final double D = 0.0;
         }

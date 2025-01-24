@@ -9,10 +9,10 @@ public final class Ports {
 
   public static final class Drive {
     public static final int CANANDGYRO = 50; // TODO get correct value
-    public static final int FRONT_LEFT_DRIVE = 2;
-    public static final int REAR_LEFT_DRIVE = 16;
-    public static final int FRONT_RIGHT_DRIVE = 6;
-    public static final int REAR_RIGHT_DRIVE = 42;
+    public static final int FRONT_LEFT_DRIVE = 42;
+    public static final int REAR_LEFT_DRIVE = 6;
+    public static final int FRONT_RIGHT_DRIVE = 2;
+    public static final int REAR_RIGHT_DRIVE = 16;
 
     public static final int FRONT_LEFT_TURNING = 4;
     public static final int REAR_LEFT_TURNING = 1;
