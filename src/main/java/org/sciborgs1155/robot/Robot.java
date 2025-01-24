@@ -68,7 +68,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private void configureLog() {
     // SignalLogger.setPath("./logs/");
-    //n SignalLogger.enableAutoLogging(true);
+    // n SignalLogger.enableAutoLogging(true);
     // SignalLogger.start();
   }
 

@@ -72,6 +72,8 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
+    talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
     talonDriveConfig.Slot0.kP = Driving.PID.TALON.P;
     talonDriveConfig.Slot0.kI = Driving.PID.TALON.I;
     talonDriveConfig.Slot0.kD = Driving.PID.TALON.D;

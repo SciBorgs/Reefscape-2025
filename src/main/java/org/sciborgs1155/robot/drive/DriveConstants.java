@@ -157,7 +157,7 @@ public final class DriveConstants {
       public static final double MAXSWERVE_MOTOR_GEARING = 1.0 / 4.0 / 3.0;
       public static final double MAXSWERVE_ENCODER_GEARING = 1;
 
-      public static final double X2T_GEARING = 1 / 12.1; //0.4 / (12.1 * 1.3);
+      public static final double X2T_GEARING = 1 / 12.1; // 0.4 / (12.1 * 1.3);
 
       public static final Angle POSITION_FACTOR = Rotations.of(X2T_GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
