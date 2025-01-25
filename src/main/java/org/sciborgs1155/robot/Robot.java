@@ -7,8 +7,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.commands.Dashboard.Dashboard.Branches.*;
-import static org.sciborgs1155.robot.commands.Dashboard.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -73,6 +71,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  Dashboard dashboard = new Dashboard();
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -89,7 +88,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
-    Dashboard.configure();
+    addPeriodic(dashboard::update, PERIOD.in(Seconds));
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -111,18 +110,15 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
-
-    addPeriodic(
-        () -> Dashboard.info.get("closestBranch").setString(drive.closestBranch()),
-        PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
-    L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
-    L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
-    L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
+    // L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
+    // L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
+    // L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
+    // L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
+    dashboard.go().onTrue(drive.drive(() -> 0.1, () -> 0.1, () -> 0).withName("Spaz driving"));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
@@ -173,7 +169,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // TODO: Add any additional bindings.
 
-    A.trigger.whileTrue(led.rainbow());
+    // A.trigger.whileTrue(led.rainbow());
   }
 
   /**

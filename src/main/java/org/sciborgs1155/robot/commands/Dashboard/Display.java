@@ -23,18 +23,14 @@ public class Display {
   private Color bgColor = new Color(0, 131, 174);
   private JLabel bgImage;
 
-  // Branch names, used to determine order of branches. Modification is not recommended.
-  public static final List<String> branchNames =
-      List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L");
-
   // Side (A-L)
   public JButton SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, SK, SL;
-  public List<JButton> branches;
+  public List<Button> branches;
 
   // Level (1-4)
   public JButton L1, L2, L3, L4;
   public List<JButton> levelsButtons;
-  public List<JButton> levels;
+  public List<Button> levels;
   public List<JButton> otherButtons;
 
   public JButton processor;
@@ -101,7 +97,20 @@ public class Display {
     SK = bindButtonWithBranch("K", "images/br_Ks.png", 278, 421, 124, 152);
     SL = bindButtonWithBranch("L", "images/br_Lp.png", 411, 573, 124, 152);
 
-    branches = List.of(SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, SK, SL);
+    branches =
+        List.of(
+            new Button(SA, "A"),
+            new Button(SB, "B"),
+            new Button(SC, "C"),
+            new Button(SD, "D"),
+            new Button(SE, "E"),
+            new Button(SF, "F"),
+            new Button(SG, "G"),
+            new Button(SH, "H"),
+            new Button(SI, "I"),
+            new Button(SJ, "J"),
+            new Button(SK, "K"),
+            new Button(SL, "L"));
     processor = bindButton("images/processor.png", 1309, 6, 147, 185);
     processor.addActionListener(
         e -> {
@@ -128,7 +137,8 @@ public class Display {
     JButton l3Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
     L4 = bindButton("images/lb_L4.png", 1333, 219, 103, 99);
     JButton l4Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
-    levels = List.of(L1, L2, L3, L4);
+    levels =
+        List.of(new Button(L1, "1"), new Button(L2, "2"), new Button(L3, "3"), new Button(L4, "4"));
 
     levelsButtons = List.of(l1Button, l2Button, l3Button, l4Button);
     levelsButtons.forEach(
@@ -294,7 +304,7 @@ public class Display {
   private void generateStimulation(int x, int y) {
     JLabel stimulation = new JLabel(" ");
     try {
-      URL url = Dashboard.class.getResource("images/subway guy.gif");
+      URL url = Display.class.getResource("images/subway guy.gif");
       Icon icon = new ImageIcon(url);
       stimulation.setIcon(icon);
       stimulation.setBounds(x, y, 136, 240);
@@ -307,6 +317,8 @@ public class Display {
       e.printStackTrace();
     }
   }
+
+  public static record Button(JButton button, String name) {}
 
   /**
    * Sets the stimulation of the operator. Use wisely.
