@@ -24,6 +24,8 @@ import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
@@ -106,7 +108,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /** Goes to an offset height above the level given to clean algae ONLY L2 and L3! */
   public Command clean(Level level) {
     if (level == Level.L1 || level == Level.L4) {
-      throw new RuntimeException("Not a valid algae height! Only L2 and L3!");
+      retract();
+      FaultLogger.report(
+          "Algae level fault",
+          "an invalid level has been passed to the clean command, L1 or L4",
+          FaultType.WARNING);
     }
 
     return goTo(level.height.plus(algaeOffset).in(Meters));
