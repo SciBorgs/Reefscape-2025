@@ -8,6 +8,9 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -140,9 +143,10 @@ public class Robot extends CommandRobot implements Logged {
                 .andThen(scoral.outtake().until(() -> scoral.beambreak())));
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
-    // operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
-    // operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
-    // operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
+
+    operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
+    operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
+    operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
