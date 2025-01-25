@@ -110,34 +110,34 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    // operator
-    //     .povDown()
-    //     .onTrue(
-    //         elevator
-    //             .scoreLevel(Level.L1)
-    //             .until(() -> elevator.atGoal())
-    //             .andThen(scoral.outtake().until(() -> scoral.beambreak())));
-    // operator
-    //     .povLeft()
-    //     .onTrue(
-    //         elevator
-    //             .scoreLevel(Level.L2)
-    //             .until(() -> elevator.atGoal())
-    //             .andThen(scoral.outtake().until(() -> scoral.beambreak())));
-    // operator
-    //     .povRight()
-    //     .onTrue(
-    //         elevator
-    //             .scoreLevel(Level.L3)
-    //             .until(() -> elevator.atGoal())
-    //             .andThen(scoral.outtake().until(() -> scoral.beambreak())));
-    // operator
-    //     .povUp()
-    //     .onTrue(
-    //         elevator
-    //             .scoreLevel(Level.L4)
-    //             .until(() -> elevator.atGoal())
-    //             .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povDown()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L1)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povLeft()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L2)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povRight()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L3)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+    operator
+        .povUp()
+        .onTrue(
+            elevator
+                .scoreLevel(Level.L4)
+                .until(() -> elevator.atGoal())
+                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
     // operator.leftBumper().onTrue(arm.climbSetup());
     // operator.leftTrigger().onTrue(arm.climbExecute());
     // operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
