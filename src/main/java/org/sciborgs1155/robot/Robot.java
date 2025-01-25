@@ -138,8 +138,8 @@ public class Robot extends CommandRobot implements Logged {
                 .scoreLevel(Level.L4)
                 .until(() -> elevator.atGoal())
                 .andThen(scoral.outtake().until(() -> scoral.beambreak())));
-    // operator.leftBumper().onTrue(arm.climbSetup());
-    // operator.leftTrigger().onTrue(arm.climbExecute());
+    operator.leftBumper().onTrue(arm.climbSetup());
+    operator.leftTrigger().onTrue(arm.climbExecute());
     // operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
     // operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
     // operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
