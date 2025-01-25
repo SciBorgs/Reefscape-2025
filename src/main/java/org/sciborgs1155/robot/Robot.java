@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -168,10 +171,10 @@ public class Robot extends CommandRobot implements Logged {
     // drive.setDefaultCommand(drive.drive(x, y, omega));
     // led.setDefaultCommand(led.scrolling());
 
-    // autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
-    // autonomous().whileTrue(led.autos());
+    autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
+    autonomous().whileTrue(led.autos());
 
-    // test().whileTrue(systemsCheck());
+    test().whileTrue(systemsCheck());
 
     // driver.b().whileTrue(drive.zeroHeading());
     // driver
