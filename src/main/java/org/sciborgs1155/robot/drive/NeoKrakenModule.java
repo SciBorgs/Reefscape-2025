@@ -58,7 +58,12 @@ public class NeoKrakenModule implements ModuleIO {
   private final String name;
 
   public NeoKrakenModule(
-      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name, boolean invert) {
+      int drivePort,
+      int turnPort,
+      int sensorID,
+      Rotation2d angularOffset,
+      String name,
+      boolean invert) {
     // Drive Motor
     driveMotor = new SparkMax(drivePort, MotorType.kBrushless);
     driveEncoder = driveMotor.getEncoder();
@@ -90,8 +95,7 @@ public class NeoKrakenModule implements ModuleIO {
             .positionConversionFactor(Driving.POSITION_FACTOR.in(Meters))
             .velocityConversionFactor(Driving.VELOCITY_FACTOR.in(MetersPerSecond))
             .uvwAverageDepth(16)
-            .uvwMeasurementPeriod(32)
-            );
+            .uvwMeasurementPeriod(32));
 
     driveMotorConfig.apply(
         SparkUtils.getSignalsConfigurationFrameStrategy(
@@ -111,7 +115,8 @@ public class NeoKrakenModule implements ModuleIO {
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonTurnConfig.MotorOutput.Inverted = invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+    talonTurnConfig.MotorOutput.Inverted =
+        invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     talonTurnConfig.Feedback.RotorToSensorRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;

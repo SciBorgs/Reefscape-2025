@@ -9,12 +9,8 @@ import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import javax.xml.crypto.Data;
-
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -33,6 +29,7 @@ import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -68,11 +65,12 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
     configureLog();
+
+    TalonUtils.configureOrchestra("rick.chrp");
   }
 
   private void configureLog() {
     // SignalLogger.setPath("./logs/");
-    // n SignalLogger.enableAutoLogging(true);
     // SignalLogger.start();
   }
 
@@ -136,7 +134,7 @@ public class Robot extends CommandRobot implements Logged {
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =
         InputStream.of(driver::getRightX)
-        .negate()
+            .negate()
             .scale(() -> speedMultiplier)
             .clamp(1.0)
             .deadband(DEADBAND, 1.0)
@@ -156,6 +154,9 @@ public class Robot extends CommandRobot implements Logged {
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
+
+    driver.x().onTrue(Commands.runOnce(TalonUtils::play).andThen(Commands.idle(drive)));
+    driver.y().onTrue(Commands.runOnce(TalonUtils::stop));
 
     // TODO: Add any additional bindings.
     operator
