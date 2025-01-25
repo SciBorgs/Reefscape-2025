@@ -23,6 +23,15 @@ import org.sciborgs1155.robot.drive.DriveConstants;
  * @see Units
  */
 public class Constants {
+  /** Represents the model of robot this code is controlling. */
+  public static enum RobotType {
+    COMPLETE,
+    CHASSIS
+  }
+
+  /** The current model of robot this code is controlling. */
+  public static final RobotType ROBOT_TYPE = RobotType.COMPLETE;
+
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   public static Alliance alliance() {

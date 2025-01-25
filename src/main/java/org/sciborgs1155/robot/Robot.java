@@ -7,8 +7,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
-import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Dashboard.Branches.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -31,9 +31,10 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Dashboard;
+import org.sciborgs1155.robot.commands.Dashboard.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -57,8 +58,18 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
   private final LEDStrip led = new LEDStrip();
-  private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.create();
+
+  private final Elevator elevator =
+      switch (Constants.ROBOT_TYPE) {
+        case CHASSIS -> Elevator.none();
+        default -> Elevator.create();
+      };
+
+  private final Scoral scoral =
+      switch (Constants.ROBOT_TYPE) {
+        case CHASSIS -> Scoral.none();
+        default -> Scoral.create();
+      };
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
