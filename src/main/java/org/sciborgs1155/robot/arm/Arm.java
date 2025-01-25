@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.arm;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
@@ -156,7 +155,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to move the arm to be horizontal.
    */
   public Command climbSetup() {
-    return goTo(CLIMB_INTAKE_ANGLE);
+    return goTo(CLIMB_INTAKE_ANGLE).withName("climb setup");
   }
 
   /**
@@ -166,37 +165,42 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to climb, once the climb arm is hooked onto the cage.
    */
   public Command climbExecute() {
-    return runOnce(() -> hardware.setCurrentLimit(CLIMB_LIMIT.in(Amps)))
+    return runOnce(() -> hardware.setCurrentLimit(CLIMB_LIMIT))
         .andThen(goTo(CLIMB_FINAL_ANGLE))
-        .finallyDo(() -> hardware.setCurrentLimit(SUPPLY_LIMIT.in(Amps)));
+        .finallyDo(() -> hardware.setCurrentLimit(SUPPLY_LIMIT))
+        .withName("climb execute");
   }
 
   @Log
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
-        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
+        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2)
+        .withName("quasistatic forward");
   }
 
   @Log
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
+        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        .withName("quasistatic backward");
   }
 
   @Log
   public Command dynamicForward() {
     return sysIdRoutine
         .dynamic(Direction.kForward)
-        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2);
+        .until(() -> position() > MAX_ANGLE.in(Radians) - 0.2)
+        .withName("dynamic forward");
   }
 
   @Log
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2);
+        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        .withName("dynamic backward");
   }
 
   @Override

@@ -27,7 +27,8 @@ public class Corolling {
     return arm.goTo(INTAKE_ANGLE)
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radians)))
-                .andThen(roller.intake().asProxy().withTimeout(1)));
+                .andThen(roller.intake().asProxy().withTimeout(1)))
+        .withName("ground intake");
   }
 
   /**
@@ -52,6 +53,7 @@ public class Corolling {
     return arm.goTo(TROUGH_OUTTAKE_ANGLE)
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.outtake().asProxy().withTimeout(1)));
+                .andThen(roller.outtake().asProxy().withTimeout(1)))
+        .withName("trough");
   }
 }

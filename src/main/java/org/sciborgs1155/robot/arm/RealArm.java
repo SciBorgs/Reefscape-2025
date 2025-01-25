@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.units.measure.Current;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
 
@@ -61,8 +62,8 @@ public class RealArm implements ArmIO {
   }
 
   @Override
-  public void setCurrentLimit(double limit) {
-    config.CurrentLimits.SupplyCurrentLimit = limit;
+  public void setCurrentLimit(Current limit) {
+    config.CurrentLimits.SupplyCurrentLimit = limit.in(Amps);
     motor.getConfigurator().apply(config);
   }
 

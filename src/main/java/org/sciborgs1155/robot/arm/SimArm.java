@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.sciborgs1155.robot.Constants;
 
@@ -42,7 +43,7 @@ public class SimArm implements ArmIO {
   }
 
   @Override
-  public void setCurrentLimit(double limit) {}
+  public void setCurrentLimit(Current limit) {}
 
   @Override
   public void close() {}
