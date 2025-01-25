@@ -180,7 +180,7 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
-    // led.setDefaultCommand(led.scrolling());
+    led.setDefaultCommand(led.scrolling());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
     autonomous().whileTrue(led.autos());
