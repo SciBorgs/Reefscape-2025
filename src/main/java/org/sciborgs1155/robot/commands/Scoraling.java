@@ -16,13 +16,20 @@ public class Scoraling {
     this.scoral = scoral;
     this.elevator = elevator;
 
-    hopper.beambreakTrigger.onTrue(stop());
-    scoral.beambreakTrigger.onFalse(stop());
+    hopper
+        .beambreakTrigger
+        .negate()
+        .or(scoral.beambreakTrigger)
+        .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("IntakingHPS")));
   }
 
   /** intakes from the human player station */
   public Command hpsIntake() {
-    return elevator.retract().andThen(runRollers()).onlyIf(scoral.beambreakTrigger);
+    return elevator
+        .retract()
+        .andThen(runRollers())
+        .onlyIf(scoral.beambreakTrigger)
+        .withName("IntakingHPS");
   }
 
   /**
@@ -31,21 +38,25 @@ public class Scoraling {
    * @param level the level the scoral scores in
    */
   public Command scoral(Level level) {
-    return elevator.scoreLevel(level).andThen(scoral.outtake());
+    return elevator.scoreLevel(level).andThen(scoral.outtake()).withName("scoraling");
   }
 
   /** grabs the algae from the level given (goes above the level) ONLY L2 and L3 */
   public Command grabAlgae(Level level) {
-    return elevator.clean(level).andThen(scoral.intake()).onlyIf(scoral.beambreakTrigger);
+    return elevator
+        .clean(level)
+        .andThen(scoral.intake())
+        .onlyIf(scoral.beambreakTrigger)
+        .withName("cleanAlgae");
   }
 
   /** halts both the hopper and the scoral */
   public Command stop() {
-    return hopper.stop().alongWith(scoral.stop());
+    return hopper.stop().alongWith(scoral.stop()).withName("stopping");
   }
 
   /** runs the hps + scoral rollers forward (intaking) */
   public Command runRollers() {
-    return hopper.intake().alongWith(scoral.outtake());
+    return hopper.intake().alongWith(scoral.outtake()).withName("runningRollers");
   }
 }
