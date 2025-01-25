@@ -143,7 +143,6 @@ public class Robot extends CommandRobot implements Logged {
                 .andThen(scoral.outtake().until(() -> scoral.beambreak())));
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
-
     operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
     operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
     operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
@@ -195,7 +194,7 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    // driver.leftTrigger().onTrue(hopper.intake().alongWith(scoral.intake()));
+    driver.leftTrigger().onTrue(hopper.intake().alongWith(scoral.intake()));
   }
 
   /**
