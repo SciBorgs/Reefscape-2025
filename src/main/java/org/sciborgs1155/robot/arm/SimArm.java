@@ -42,7 +42,7 @@ public class SimArm implements ArmIO {
   }
 
   @Override
-  public void currentLimit(double limit) {}
+  public void setCurrentLimit(double limit) {}
 
   @Override
   public void close() {}

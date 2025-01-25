@@ -20,5 +20,5 @@ public interface ArmIO extends AutoCloseable {
    *
    * @param limit The limit, in amps.
    */
-  public void currentLimit(double limit);
+  public void setCurrentLimit(double limit);
 }

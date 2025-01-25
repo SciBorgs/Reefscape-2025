@@ -52,6 +52,7 @@ public class CorollingTest {
         PROCESSOR_OUTTAKE_ANGLE.in(Radians),
         ArmConstants.POSITION_TOLERANCE.in(Radians));
     assertTrue(testcmd::isFinished);
+
     assertTrue(arm.getDefaultCommand().equals(arm.getCurrentCommand()));
     fastForward();
     assertEquals(
@@ -65,6 +66,7 @@ public class CorollingTest {
     assertEquals(
         arm.position(), INTAKE_ANGLE.in(Radians), ArmConstants.POSITION_TOLERANCE.in(Radians));
     assertTrue(testcmd::isFinished);
+
     assertTrue(arm.getDefaultCommand().equals(arm.getCurrentCommand()));
     fastForward();
     assertEquals(

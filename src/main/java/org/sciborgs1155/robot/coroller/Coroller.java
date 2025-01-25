@@ -1,8 +1,11 @@
 package org.sciborgs1155.robot.coroller;
 
+import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
@@ -20,10 +23,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
    * and no hardware connection if it isn't.
    */
   public static Coroller create() {
-    return new Coroller(
-        Robot.isReal()
-            ? SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), MOTOR_CONFIGURATION)
-            : SimpleMotor.none());
+    return new Coroller(Robot.isReal() ? real() : SimpleMotor.none());
   }
 
   /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
@@ -34,6 +34,15 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   private Coroller(SimpleMotor hardware) {
     this.hardware = hardware;
     setDefaultCommand(stop());
+  }
+
+  private static SimpleMotor real() {
+    /** Configuration of the motor used in the Coroller. */
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
+    config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), config);
   }
 
   /** Makes the roller spin inwards(towards robot). */

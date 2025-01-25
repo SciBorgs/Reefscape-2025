@@ -1,6 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,7 +26,7 @@ public class Corolling {
   public Command intake() {
     return arm.goTo(INTAKE_ANGLE)
         .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radian)))
+            Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radians)))
                 .andThen(roller.intake().asProxy().withTimeout(1)));
   }
 
@@ -38,7 +38,7 @@ public class Corolling {
   public Command processor() {
     return arm.goTo(PROCESSOR_OUTTAKE_ANGLE)
         .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radian)))
+            Commands.waitUntil(() -> arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radians)))
                 .andThen(roller.outtake().asProxy().withTimeout(1)))
         .withName("processor");
   }
@@ -51,7 +51,7 @@ public class Corolling {
   public Command trough() {
     return arm.goTo(TROUGH_OUTTAKE_ANGLE)
         .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radian)))
+            Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radians)))
                 .andThen(roller.outtake().asProxy().withTimeout(1)));
   }
 }

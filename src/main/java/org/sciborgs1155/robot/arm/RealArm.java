@@ -61,7 +61,7 @@ public class RealArm implements ArmIO {
   }
 
   @Override
-  public void currentLimit(double limit) {
+  public void setCurrentLimit(double limit) {
     config.CurrentLimits.SupplyCurrentLimit = limit;
     motor.getConfigurator().apply(config);
   }
