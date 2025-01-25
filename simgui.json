@@ -19,8 +19,11 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+<<<<<<< HEAD
       "/Robot/arm/armCanvas": "Mechanism2d",
       "/Robot/arm/fb": "ProfiledPIDController",
+=======
+>>>>>>> main
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
@@ -31,6 +34,17 @@
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
+<<<<<<< HEAD
+=======
+      "/SmartDashboard/drive dynamic backward": "Command",
+      "/SmartDashboard/drive dynamic forward": "Command",
+      "/SmartDashboard/drive quasistatic backward": "Command",
+      "/SmartDashboard/drive quasistatic forward": "Command",
+      "/SmartDashboard/pivot dynamic backward": "Command",
+      "/SmartDashboard/pivot dynamic forward": "Command",
+      "/SmartDashboard/pivot quasistatic backward": "Command",
+      "/SmartDashboard/pivot quasistatic forward": "Command",
+>>>>>>> main
       "/SmartDashboard/rotation dynamic backward": "Command",
       "/SmartDashboard/rotation dynamic forward": "Command",
       "/SmartDashboard/rotation quasistatic backward": "Command",
@@ -188,7 +202,11 @@
             0.0,
             0.8500000238418579
           ],
+<<<<<<< HEAD
           "height": 0,
+=======
+          "height": 405,
+>>>>>>> main
           "series": [
             {
               "color": [
