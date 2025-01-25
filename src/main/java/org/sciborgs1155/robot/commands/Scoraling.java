@@ -20,7 +20,7 @@ public class Scoraling {
         .beambreakTrigger
         .negate()
         .or(scoral.beambreakTrigger)
-        .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("IntakingHPS")));
+        .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
   /** intakes from the human player station */
@@ -29,7 +29,7 @@ public class Scoraling {
         .retract()
         .andThen(runRollers())
         .onlyIf(scoral.beambreakTrigger)
-        .withName("IntakingHPS");
+        .withName("intakingHPS");
   }
 
   /**
@@ -42,7 +42,7 @@ public class Scoraling {
   }
 
   /** grabs the algae from the level given (goes above the level) ONLY L2 and L3 */
-  public Command grabAlgae(Level level) {
+  public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
         .andThen(scoral.intake())

@@ -7,24 +7,28 @@ import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor hardware;
 
-  private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
-  public final Trigger beambreakTrigger = new Trigger(() -> beambreak());
+  private final Beambreak beambreak;
+  public final Trigger beambreakTrigger;
 
   public static Scoral create() {
-    return new Scoral(Robot.isReal() ? realMotor() : Scoral.none());
+    return Robot.isReal() ? new Scoral(realMotor(), Beambreak.real(BEAMBREAK)) : none();
+  }
+
+  public static Scoral none() {
+    return new Scoral(SimpleMotor.none(), Beambreak.none());
   }
 
   private static SimpleMotor realMotor() {
@@ -37,12 +41,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(ROLLER), config);
   }
 
-  public static SimpleMotor none() {
-    return SimpleMotor.none();
-  }
-
-  public Scoral(SimpleMotor hardware) {
+  public Scoral(SimpleMotor hardware, Beambreak beambreak) {
     this.hardware = hardware;
+    this.beambreak = beambreak;
+    beambreakTrigger = new Trigger(beambreak::get);
   }
 
   /** Runs the motor to move a coral out of the scoral outwards. */
