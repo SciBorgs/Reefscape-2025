@@ -5,6 +5,6 @@ import org.junit.jupiter.api.Test;
 public class RobotTest {
   @Test
   void setup() throws Exception {
-    new Robot();
+    new Robot().close();
   }
 }
