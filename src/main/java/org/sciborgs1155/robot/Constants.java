@@ -30,7 +30,7 @@ public class Constants {
   }
 
   /** The current model of robot this code is controlling. */
-  public static final RobotType ROBOT_TYPE = RobotType.COMPLETE;
+  public static final RobotType ROBOT_TYPE = RobotType.CHASSIS;
 
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */

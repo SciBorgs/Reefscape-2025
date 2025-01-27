@@ -71,7 +71,6 @@ public class Robot extends CommandRobot implements Logged {
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
-  Dashboard dashboard = new Dashboard();
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -88,7 +87,8 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
-    addPeriodic(dashboard::update, PERIOD.in(Seconds));
+    Dashboard.configure();
+    addPeriodic(Dashboard::update, Constants.PERIOD);
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -114,11 +114,11 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    // L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
-    // L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
-    // L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
-    // L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
-    dashboard.go().onTrue(drive.drive(() -> 0.1, () -> 0.1, () -> 0).withName("Spaz driving"));
+    Dashboard.Level.L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
+    Dashboard.Level.L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
+    Dashboard.Level.L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
+    Dashboard.Level.L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
+    Dashboard.processor().onTrue(drive.drive(() -> 0.1, () -> 0.1, () -> 0).withName("brrrrrr"));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();

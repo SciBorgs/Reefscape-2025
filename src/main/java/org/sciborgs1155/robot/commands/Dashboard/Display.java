@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands.Dashboard;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -24,13 +25,12 @@ public class Display {
   private JLabel bgImage;
 
   // Side (A-L)
-  public JButton SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, SK, SL;
-  public List<Button> branches;
+  public Button A, B, C, D, E, F, G, H, I, J, K, L;
+  public final List<Button> branches;
 
   // Level (1-4)
-  public JButton L1, L2, L3, L4;
-  public List<JButton> levelsButtons;
-  public List<Button> levels;
+  public Button L1, L2, L3, L4;
+  public final List<Button> levels;
   public List<JButton> otherButtons;
 
   public JButton processor;
@@ -84,12 +84,13 @@ public class Display {
     }
     this.bgImage = bgImage;
 
+    JButton SA, SB, SC, SD, SE, SF, SG, SH, SI, SJ, SK, SL;
     SA = bindButtonWithBranch("A", "images/br_As.png", 602, 647, 126, 153);
     SB = bindButtonWithBranch("B", "images/br_Bm.png", 742, 647, 126, 153);
     SC = bindButtonWithBranch("C", "images/br_Ct.png", 915, 573, 124, 151);
-    SE = bindButtonWithBranch("D", "images/br_Dw.png", 1048, 421, 126, 152);
-    SF = bindButtonWithBranch("E", "images/br_Ev.png", 1010, 251, 124, 152);
-    SD = bindButtonWithBranch("F", "images/br_Fg.png", 917, 97, 126, 151);
+    SD = bindButtonWithBranch("D", "images/br_Dw.png", 1048, 421, 126, 152);
+    SE = bindButtonWithBranch("E", "images/br_Ev.png", 1010, 251, 124, 152);
+    SF = bindButtonWithBranch("F", "images/br_Fg.png", 917, 97, 126, 151);
     SG = bindButtonWithBranch("G", "images/br_Go.png", 742, 31, 122, 152);
     SH = bindButtonWithBranch("H", "images/br_Hl.png", 601, 31, 126, 151);
     SI = bindButtonWithBranch("I", "images/br_Ik.png", 420, 97, 126, 152);
@@ -97,64 +98,67 @@ public class Display {
     SK = bindButtonWithBranch("K", "images/br_Ks.png", 278, 421, 124, 152);
     SL = bindButtonWithBranch("L", "images/br_Lp.png", 411, 573, 124, 152);
 
-    branches =
-        List.of(
-            new Button(SA, "A"),
-            new Button(SB, "B"),
-            new Button(SC, "C"),
-            new Button(SD, "D"),
-            new Button(SE, "E"),
-            new Button(SF, "F"),
-            new Button(SG, "G"),
-            new Button(SH, "H"),
-            new Button(SI, "I"),
-            new Button(SJ, "J"),
-            new Button(SK, "K"),
-            new Button(SL, "L"));
+    A = new Button(SA, "A");
+    B = new Button(SB, "B");
+    C = new Button(SC, "C");
+    D = new Button(SD, "D");
+    E = new Button(SE, "E");
+    F = new Button(SF, "F");
+    G = new Button(SG, "G");
+    H = new Button(SH, "H");
+    I = new Button(SI, "I");
+    J = new Button(SJ, "J");
+    K = new Button(SK, "K");
+    L = new Button(SL, "L");
+
+    branches = List.of(A, B, C, D, E, F, G, H, I, J, K, L);
+
+    JButton JL1, JL2, JL3, JL4;
+    JL1 = bindButton("images/lb_L1.png", 1333, 532, 103, 99);
+    JL2 = bindButton("images/lb_L2.png", 1333, 428, 103, 99);
+    JL3 = bindButton("images/lb_L3.png", 1333, 322, 103, 99);
+    JL4 = bindButton("images/lb_L4.png", 1333, 219, 103, 99);
+
+    L1 = new Button(JL1, "1");
+    L2 = new Button(JL2, "2");
+    L3 = new Button(JL3, "3");
+    L4 = new Button(JL4, "4");
+
+    levels = List.of(L1, L2, L3, L4);
+
+    levels.forEach(
+        e -> {
+          e.button.setEnabled(true);
+          e.button.setBorderPainted(false);
+        });
+    levels.forEach(
+        level ->
+            level.button.addActionListener(
+                e -> {
+                  selectedLevel = " " + (levels.indexOf(level) + 1);
+                  displayLabel.setHorizontalAlignment(JLabel.CENTER);
+                  displayLabel.setText(selectedBranch + selectedLevel);
+                  GO.setEnabled(!selectedBranch.isEmpty() && !selectedLevel.isEmpty());
+                }));
+
     processor = bindButton("images/processor.png", 1309, 6, 147, 185);
     processor.addActionListener(
         e -> {
-          if (processor.isSelected()) {
+          if (displayLabel.getText() == "PCSR") {
             processor.setSelected(false);
-            GO.setEnabled(false);
             displayLabel.setText("");
-            levelsButtons.forEach(levelButton -> levelButton.setEnabled(true));
+            levels.forEach(level -> level.button.setEnabled(true));
+            branches.forEach(branch -> branch.button.setEnabled(true));
           } else {
             processor.setSelected(true);
             GO.setEnabled(true);
             displayLabel.setHorizontalAlignment(JLabel.CENTER);
             displayLabel.setFont(new Font("Arial", Font.BOLD, 38));
             displayLabel.setText("PCSR" + selectedBranch + selectedLevel);
-            levelsButtons.forEach(levelButton -> levelButton.setEnabled(false));
+            levels.forEach(level -> level.button.setEnabled(false));
+            branches.forEach(branch -> branch.button.setEnabled(false));
           }
         });
-
-    L1 = bindButton("images/lb_L1.png", 1333, 532, 103, 99);
-    JButton l1Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
-    L2 = bindButton("images/lb_L2.png", 1333, 428, 103, 99);
-    JButton l2Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
-    L3 = bindButton("images/lb_L3.png", 1333, 322, 103, 99);
-    JButton l3Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
-    L4 = bindButton("images/lb_L4.png", 1333, 219, 103, 99);
-    JButton l4Button = (JButton) panel.getComponent(panel.getComponentCount() - 1);
-    levels =
-        List.of(new Button(L1, "1"), new Button(L2, "2"), new Button(L3, "3"), new Button(L4, "4"));
-
-    levelsButtons = List.of(l1Button, l2Button, l3Button, l4Button);
-    levelsButtons.forEach(
-        e -> {
-          e.setEnabled(true);
-          e.setBorderPainted(false);
-        });
-    levelsButtons.forEach(
-        levelButton ->
-            levelButton.addActionListener(
-                e -> {
-                  selectedLevel = " " + (levelsButtons.indexOf(levelButton) + 1);
-                  displayLabel.setHorizontalAlignment(JLabel.CENTER);
-                  displayLabel.setText(selectedBranch + selectedLevel);
-                  GO.setEnabled(!selectedBranch.isEmpty() && !selectedLevel.isEmpty());
-                }));
 
     GO = bindButton("images/goo.png", 1333, 660, 100, 99);
     GO.setEnabled(false);
@@ -166,11 +170,22 @@ public class Display {
           selectedLevel = "";
           displayLabel.setText(selectedBranch + selectedLevel);
           processor.setEnabled(true);
-          levelsButtons.forEach(levelButton -> levelButton.setEnabled(true));
+          levels.forEach(level -> level.button.setEnabled(true));
         });
 
     RESET = bindButton("images/reset_b.png", 16, 513, 100, 100);
     RESET.setBorderPainted(false);
+
+    RESET.addActionListener(
+        e -> {
+          GO.setEnabled(false);
+          processor.setEnabled(true);
+          branches.forEach(branch -> branch.button.setEnabled(true));
+          levels.forEach(level -> level.button.setEnabled(true));
+          selectedBranch = "";
+          selectedLevel = "";
+          displayLabel.setText(selectedBranch + selectedLevel);
+        });
 
     otherButtons = List.of(processor, RESET, GO);
     changeBackground("images/bg_blue.png");
@@ -180,19 +195,6 @@ public class Display {
     frame.add(panel, BorderLayout.CENTER);
     frame.setVisible(true);
   }
-
-  // private void resetAll() {
-  //   scoredBranches.clear(); // Clear scored branches map
-  //   cbxAction(); // Reset levels and GO button
-  //   if (selectedBranchButton != null) {
-  //     selectedBranchButton.setBorder(null); // Remove border from selected branch button
-  //     selectedBranchButton = null;
-  //   }
-  //   if (selectedLevelButton != null) {
-  //     selectedLevelButton.setBorder(null); // Remove border from selected level button
-  //     selectedLevelButton = null;
-  //   }
-  // }
 
   public JButton bindButtonWithBranch(String branch, String imgPath, int x, int y, int w, int h) {
     JButton buttonB = bindButton(imgPath, x, y, w, h);
@@ -204,7 +206,7 @@ public class Display {
             selectedBranch = "";
             selectedLevel = "";
             button.setSelected(false);
-            levelsButtons.forEach(levelButton -> levelButton.setSelected(false));
+            levels.forEach(level -> level.button.setSelected(false));
           } else {
             selectedBranch = branch;
             button.setSelected(true);
@@ -255,17 +257,21 @@ public class Display {
       if (imgPath.contains("bg_blue")) {
         bgColor = new Color(0, 131, 174); // Blue background
         displayLabel.setForeground(bgColor);
-        levelsButtons
+        levels
             .get(0)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lb_L1.png"))));
-        levelsButtons
+        levels
             .get(1)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lb_L2.png"))));
-        levelsButtons
+        levels
             .get(2)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lb_L3.png"))));
-        levelsButtons
+        levels
             .get(3)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lb_L4.png"))));
         GO.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/goo.png"))));
         RESET.setIcon(
@@ -274,17 +280,21 @@ public class Display {
       } else if (imgPath.contains("bg_red")) {
         bgColor = new Color(197, 45, 60); // Red background
         displayLabel.setForeground(bgColor);
-        levelsButtons
+        levels
             .get(0)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lr_L1.png"))));
-        levelsButtons
+        levels
             .get(1)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lr_L2.png"))));
-        levelsButtons
+        levels
             .get(2)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lr_L3.png"))));
-        levelsButtons
+        levels
             .get(3)
+            .button
             .setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/lr_L4.png"))));
         GO.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("images/rgoo.png"))));
         RESET.setIcon(
@@ -318,7 +328,17 @@ public class Display {
     }
   }
 
-  public static record Button(JButton button, String name) {}
+  public static class Button {
+    public final Trigger pressed;
+    public final JButton button;
+    public final String name;
+
+    public Button(JButton button, String name) {
+      this.button = button;
+      this.name = name;
+      this.pressed = new Trigger(() -> button.getModel().isPressed());
+    }
+  }
 
   /**
    * Sets the stimulation of the operator. Use wisely.
