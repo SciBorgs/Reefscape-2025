@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +12,6 @@ import static org.sciborgs1155.robot.Constants.allianceReflect;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.Random;
@@ -36,7 +34,6 @@ import org.sciborgs1155.robot.scoral.Scoral;
 
 public class AlignTest {
 
-  private final Distance DELTA = Centimeters.of(3);
   private Alignment align;
 
   private Drive drive;

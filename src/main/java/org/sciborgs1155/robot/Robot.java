@@ -5,7 +5,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.*;
+import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -30,11 +31,12 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -57,6 +59,8 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
+  private final Arm arm = Arm.create();
+  private final Coroller coroller = Coroller.create();
   private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
@@ -76,7 +80,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem interaction
+    // TODO: Add configs for all additional libraries, components, intersubsystem
+    // interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
@@ -160,19 +165,6 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
-    // driver
-    //     .a()
-    //     .onTrue(
-    //         Commands.defer(
-    //             () -> align.directPathfollow(align.directPathfind(new Pose2d(2, 2, new
-    // Rotation2d()))),
-    //             Set.of(drive)));
-
-    // driver.b().onTrue(Commands.defer(() -> align.pathfind(align.directPathfind(new
-    // Pose2d(2,2,Rotation2d.fromDegrees(20)))), Set.of(drive)));
-    driver.a().onTrue(align.reef(Level.L4, Branch.A));
-
-    // driver.b().onTrue(align.pathfollow(align.pathfind(new Pose2d(100, 4, new Rotation2d()))));
   }
 
   /**
@@ -197,7 +189,10 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck(), Test.fromCommand(scoral.outtake().withTimeout(2)))
+    return Test.toCommand(
+            drive.systemsCheck(),
+            elevator.goToTest(Level.L1.height),
+            Test.fromCommand(scoral.outtake().withTimeout(2)))
         .withName("Test Mechanisms");
   }
 

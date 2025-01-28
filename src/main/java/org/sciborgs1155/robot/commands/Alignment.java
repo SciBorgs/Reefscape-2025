@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -55,13 +56,12 @@ public class Alignment {
   public Command reef(Level level, Branch branch) {
     return (directPathfollow(branch.pose)
             .andThen(
-                Commands.waitUntil(() -> elevator.atPosition(level.height))
+                Commands.waitUntil(() -> elevator.atPosition(level.height.in(Meters)))
                     .andThen(
                         scoral
                             .outtake()
-                            .until(scoral::beambreak)
                             .withTimeout(
-                                1)))) // timeout needed because sim beambreak does not change value
+                                1)))) // timeout needed because no sim beambreak
         .deadlineFor(elevator.scoreLevel(level));
   }
 
@@ -79,7 +79,8 @@ public class Alignment {
         .until(scoral::beambreak)
         .withTimeout(1)
         .deadlineFor(
-            Commands.waitUntil(() -> elevator.atPosition(level.height)).andThen(scoral.outtake()));
+            Commands.waitUntil(() -> elevator.atPosition(level.height.in(Meters)))
+                .andThen(scoral.outtake()));
   }
 
   /**
