@@ -102,8 +102,12 @@ public class Robot extends CommandRobot implements Logged {
     }
 
     addPeriodic(
-        () -> Dashboard.info.get("closestBranch").setString(drive.closestBranch()),
+        () -> {
+          Dashboard.info.get("closestBranch").setString(drive.closestBranch());
+          Dashboard.tick();
+        },
         PERIOD.in(Seconds));
+    // addPeriodic(() -> , PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */

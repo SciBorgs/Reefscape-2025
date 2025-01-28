@@ -16,7 +16,8 @@ public class Dashboard {
   private static NetworkTable base;
   private static NetworkTableEntry entryTargetBranch;
   private static NetworkTableEntry entryTargetLevel;
-  private static NetworkTableEntry entryRobotConnected;
+  private static NetworkTableEntry entryRobotTick;
+  private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
   public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
 
@@ -27,13 +28,20 @@ public class Dashboard {
     entryTargetBranch.setString("");
     entryTargetLevel = base.getEntry("level");
     entryTargetLevel.setInteger(0);
-    entryRobotConnected = base.getEntry("robotConnected");
-    entryRobotConnected.setBoolean(true);
+    entryRobotTick = base.getEntry("robotTick");
+    entryRobotTick.setInteger(0);
+    tick = 0;
     entryBlueAlliance = base.getEntry("blueAlliance");
     entryBlueAlliance.setBoolean(Constants.alliance() == Alliance.Blue);
 
     // info setup
     transmit("closestBranch");
+  }
+
+  /** Increments the robot tick value. Used by Dashboard to detect disconnects. */
+  public static void tick() {
+    tick += 1;
+    entryRobotTick.setInteger(tick);
   }
 
   /**
