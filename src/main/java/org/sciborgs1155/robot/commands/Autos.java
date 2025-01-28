@@ -10,6 +10,7 @@ import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
 import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -20,17 +21,22 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import java.util.Optional;
+import org.sciborgs1155.robot.Constants.Field.Level;
+import org.sciborgs1155.robot.Robot.*;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
+import org.sciborgs1155.robot.elevator.*;
+import org.sciborgs1155.robot.hopper.*;
+import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Autos {
-  private static Optional<Rotation2d> rotation = Optional.empty();
-
-  public static SendableChooser<Command> configureAutos(Drive drive) {
+  public static SendableChooser<Command> configureAutos(
+      Drive drive, Scoraling scoraling) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -53,7 +59,35 @@ public class Autos {
         () -> alliance() == Alliance.Red,
         drive);
 
-    PPHolonomicDriveController.overrideRotationFeedback(() -> rotation.get().getRadians());
+    NamedCommands.registerCommand(
+        "score L1",
+        new ScheduleCommand(
+            scoraling.scoral(Level.L1)));
+
+    NamedCommands.registerCommand(
+        "score L2",
+        new ScheduleCommand(
+            scoraling.scoral(Level.L2)));
+
+    NamedCommands.registerCommand(
+        "score L3",
+        new ScheduleCommand(
+            scoraling.scoral(Level.L3)));
+
+    NamedCommands.registerCommand(
+        "score L4",
+        new ScheduleCommand(
+            scoraling.scoral(Level.L4)));
+
+    NamedCommands.registerCommand(
+        "intake",
+        new ScheduleCommand(
+            scoraling.hpsIntake()));
+
+    NamedCommands.registerCommand(
+        "retract",
+        new ScheduleCommand(
+            scoraling.retract()));
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());

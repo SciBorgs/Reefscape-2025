@@ -24,14 +24,20 @@ public class Scoraling {
     // scoral beambreak is false OR the hps beambreak is true
     // onlyIf -> scoral beambreak is true (don't have a coral)
 
-    return Commands.idle(hopper, scoral, elevator);
+    return hopper.intake();
   }
 
   public Command scoral(Level level) {
     // elevator goes to the level selected
     // andThen -> scoral outtakes until its beambreak is true
 
-    return Commands.idle(scoral, elevator);
+    return elevator.scoreLevel(level);
+  }
+
+  public Command retract() {
+    //elevator retracts
+
+    return elevator.retract();
   }
 
   public Command grabAlgae(double algaeLevel) {
