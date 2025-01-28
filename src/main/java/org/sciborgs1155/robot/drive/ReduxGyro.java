@@ -12,9 +12,8 @@ public class ReduxGyro implements GyroIO {
 
   public ReduxGyro() {
     FaultLogger.register(canandgyro);
-
     // See https://docs.reduxrobotics.com/canandgyro/programming/normal-operation#party-mode
-    canandgyro.setPartyMode(5);
+    canandgyro.setPartyMode(0);
   }
 
   @Override
@@ -24,7 +23,8 @@ public class ReduxGyro implements GyroIO {
 
   @Override
   public Rotation3d rotation3d() {
-    return canandgyro.getRotation3d();
+    // TODO remove the rotation once gyro is correctly oriented
+    return canandgyro.getRotation3d().rotateBy(new Rotation3d(0, 0, Math.PI / 2));
   }
 
   @Override

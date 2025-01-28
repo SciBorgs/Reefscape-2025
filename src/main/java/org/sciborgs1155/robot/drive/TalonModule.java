@@ -4,12 +4,14 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,12 +31,12 @@ public class TalonModule implements ModuleIO {
 
   private final StatusSignal<Angle> drivePos;
   private final StatusSignal<AngularVelocity> driveVelocity;
+  private final StatusSignal<Angle> turnPos;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage radiansOut = new PositionVoltage(0);
 
   private final SimpleMotorFeedforward driveFF;
-  // private final SimpleMotorFeedforward turnFF;
 
   private final Rotation2d angularOffset;
 
@@ -45,43 +47,58 @@ public class TalonModule implements ModuleIO {
   private final String name;
 
   public TalonModule(
-      int drivePort, int turnPort, int sensorID, Rotation2d angularOffset, String name) {
-    driveMotor = new TalonFX(drivePort);
-    turnMotor = new TalonFX(turnPort);
-
+      int drivePort,
+      int turnPort,
+      int sensorID,
+      Rotation2d angularOffset,
+      String name,
+      boolean invert) {
+    driveMotor = new TalonFX(drivePort, "*");
     drivePos = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();
     driveFF =
         new SimpleMotorFeedforward(Driving.FF.TALON.S, Driving.FF.TALON.V, Driving.FF.TALON.A);
-    // turnFF = new SimpleMotorFeedforward(Turning.FF.S, Turning.FF.V, Turning.FF.A);
 
     drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
     driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
-    TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonDriveConfig.Feedback.SensorToMechanismRatio = Driving.POSITION_FACTOR.in(Meters);
     talonDriveConfig.CurrentLimits.SupplyCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
-    talonDriveConfig.ClosedLoopGeneral.ContinuousWrap = true;
-
-    talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
-    talonTurnConfig.CurrentLimits.SupplyCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
-
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR.in(Radians);
-    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    // talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.SENSOR_TO_MECHANISM_RATIO;
-    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
     talonDriveConfig.Slot0.kP = Driving.PID.TALON.P;
     talonDriveConfig.Slot0.kI = Driving.PID.TALON.I;
     talonDriveConfig.Slot0.kD = Driving.PID.TALON.D;
 
+    turnMotor = new TalonFX(turnPort, "*");
+    turnPos = turnMotor.getPosition();
+
+    turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+
+    TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
+
+    talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonTurnConfig.MotorOutput.Inverted =
+        invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+
+    talonTurnConfig.Feedback.RotorToSensorRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
+
+    talonTurnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
     talonTurnConfig.Slot0.kD = Turning.PID.D;
+
+    talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
+
+    for (int i = 0; i < 5; i++) {
+      StatusCode success = turnMotor.getConfigurator().apply(talonTurnConfig);
+      if (success.isOK()) break;
+    }
 
     driveMotor.getConfigurator().apply(talonDriveConfig);
     turnMotor.getConfigurator().apply(talonTurnConfig);

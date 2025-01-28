@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Time;
 import java.util.List;
 
 /**
- * Constants for our 2024 MAXSwerve drivetrain. All fields in this file should be updated for the
+ * Constants for our 2025 REEFSCAPE drivetrain. All fields in this file should be updated for the
  * current robot configuration!
  */
 public final class DriveConstants {
@@ -28,14 +28,14 @@ public final class DriveConstants {
 
   /** The type of modules being used. */
   public static enum ModuleType {
-    TALON, // Kraken X60 Drive, NEO 550 Turn
+    TALON, // Kraken X60 Drive, Kraken X60 Turn
     SPARK; // NEO Vortex Drive, NEO 550 Turn
   }
 
   // TODO: Change central drivetrain constants as needed.
 
   // The type of module on the chassis
-  public static final ModuleType TYPE = ModuleType.SPARK;
+  public static final ModuleType TYPE = ModuleType.TALON;
 
   // The control loop used by all of the modules when driving
   public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
@@ -78,10 +78,10 @@ public final class DriveConstants {
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
       List.of(
-          Rotation2d.fromRadians(-Math.PI / 2), // front left
+          Rotation2d.fromRadians(0), // front left
           Rotation2d.fromRadians(0), // front right
-          Rotation2d.fromRadians(Math.PI), // rear left
-          Rotation2d.fromRadians(Math.PI / 2) // rear right
+          Rotation2d.fromRadians(0), // rear left
+          Rotation2d.fromRadians(0) // rear right
           );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
@@ -107,14 +107,9 @@ public final class DriveConstants {
     public static final double COUPLING_RATIO = 0;
 
     public static final class Driving {
-      // Possible pinion configurations : 12T, 13T, or 14T.
-      public static final int PINION_TEETH = 14;
+      public static final Distance CIRCUMFERENCE = Inches.of(4.0 * Math.PI);
 
-      public static final Distance CIRCUMFERENCE = Meters.of(2.0 * Math.PI * 0.0381);
-
-      // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the
-      // bevel pinion
-      public static final double GEARING = 1.0 / 45.0 / 22.0 * 15.0 * 14.0;
+      public static final double GEARING = 1 / 5.68;
 
       public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
       public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
@@ -123,7 +118,7 @@ public final class DriveConstants {
 
       public static final class PID {
         public static final class SPARK {
-          public static final double P = 3.2;
+          public static final double P = 0.04;
           public static final double I = 0.0;
           public static final double D = 0.0;
         }
@@ -137,9 +132,9 @@ public final class DriveConstants {
 
       public static final class FF {
         public static final class SPARK {
-          public static final double S = 0.088468;
-          public static final double V = 2.1314;
-          public static final double A = 0.33291;
+          public static final double S = 0.2; // 0.088468;
+          public static final double V = 2.131; // 2.1314;
+          public static final double A = 0.38; // 0.33291;
         }
 
         public static final class TALON {
@@ -151,18 +146,15 @@ public final class DriveConstants {
     }
 
     static final class Turning {
-      public static final double MOTOR_GEARING = 1.0 / 4.0 / 3.0;
-      public static final double ENCODER_GEARING = 1;
+      public static final double GEARING = 1 / 12.1; // 0.4 / (12.1 * 1.3);
 
-      public static final Angle POSITION_FACTOR = Rotations.of(ENCODER_GEARING);
+      public static final Angle POSITION_FACTOR = Rotations.of(GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
-
-      public static final boolean ENCODER_INVERTED = true;
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
       public static final class PID {
-        public static final double P = 9;
+        public static final double P = 14;
         public static final double I = 0.0;
         public static final double D = 0.05;
       }
