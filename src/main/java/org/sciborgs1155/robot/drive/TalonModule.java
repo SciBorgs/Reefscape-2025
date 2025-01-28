@@ -58,14 +58,17 @@ public class TalonModule implements ModuleIO {
     driveVelocity = driveMotor.getVelocity();
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
-    drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
-    driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+    // drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+    // driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
 
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonDriveConfig.Feedback.SensorToMechanismRatio = Driving.POSITION_FACTOR.in(Meters);
-    talonDriveConfig.CurrentLimits.SupplyCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
+    talonDriveConfig.Feedback.SensorToMechanismRatio = 1 / Driving.POSITION_FACTOR.in(Meters);
+    talonDriveConfig.CurrentLimits.StatorCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
+
+    talonDriveConfig.MotorOutput.Inverted =
+        invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
     talonDriveConfig.Slot0.kP = Driving.PID.P;
     talonDriveConfig.Slot0.kI = Driving.PID.I;
@@ -74,7 +77,7 @@ public class TalonModule implements ModuleIO {
     turnMotor = new TalonFX(turnPort, "*");
     turnPos = turnMotor.getPosition();
 
-    turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+    // turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
@@ -82,7 +85,7 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.Feedback.RotorToSensorRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.SensorToMechanismRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
@@ -95,12 +98,14 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
     for (int i = 0; i < 5; i++) {
-      StatusCode success = turnMotor.getConfigurator().apply(talonTurnConfig);
+      StatusCode success = driveMotor.getConfigurator().apply(talonDriveConfig);
       if (success.isOK()) break;
     }
 
-    driveMotor.getConfigurator().apply(talonDriveConfig);
-    turnMotor.getConfigurator().apply(talonTurnConfig);
+    for (int i = 0; i < 5; i++) {
+      StatusCode success = turnMotor.getConfigurator().apply(talonTurnConfig);
+      if (success.isOK()) break;
+    }
 
     register(turnMotor);
     register(driveMotor);
@@ -142,7 +147,7 @@ public class TalonModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRadians(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
+        Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
     return lastRotation;
   }
 
@@ -174,7 +179,7 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle));
+    turnMotor.setControl(radiansOut.withPosition(angle).withSlot(0));
   }
 
   @Override
@@ -189,7 +194,7 @@ public class TalonModule implements ModuleIO {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
 
-    setTurnSetpoint(setpoint.angle.getRadians());
+    setTurnSetpoint(setpoint.angle.getRotations());
     this.setpoint = setpoint;
   }
 

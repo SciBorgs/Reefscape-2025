@@ -98,15 +98,14 @@ public final class DriveConstants {
     public static final class Driving {
       public static final Distance CIRCUMFERENCE = Inches.of(4.0 * Math.PI);
 
-      public static final double GEARING = 1 / 5.68;
+      public static final double GEARING = 5.68;
 
       public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
       public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
 
-      public static final Current CURRENT_LIMIT = Amps.of(50);
+      public static final Current CURRENT_LIMIT = Amps.of(60);
 
       public static final class PID {
-
         public static final double P = 3.2;
         public static final double I = 0.0;
         public static final double D = 0.0;
@@ -121,7 +120,7 @@ public final class DriveConstants {
     }
 
     static final class Turning {
-      public static final double GEARING = 1 / 12.1; // 0.4 / (12.1 * 1.3);
+      public static final double GEARING = 12.1; // 0.4 / (12.1 * 1.3);
 
       public static final Angle POSITION_FACTOR = Rotations.of(GEARING);
       public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);

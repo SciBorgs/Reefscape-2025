@@ -11,6 +11,7 @@ import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -22,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -32,16 +32,8 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.led.LEDStrip;
-import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
-
-import com.ctre.phoenix6.SignalLogger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
