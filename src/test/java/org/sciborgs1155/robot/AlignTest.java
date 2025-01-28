@@ -3,12 +3,9 @@ package org.sciborgs1155.robot;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
-import static org.sciborgs1155.lib.UnitTestingUtil.run;
+import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
@@ -88,15 +85,13 @@ public class AlignTest {
   @MethodSource("pathGoals")
   public void pathfindTest(Branch branch) {
     Command testcmd = align.reef(Level.L4, branch);
-    run(testcmd);
-    fastForward(Seconds.of(5));
-    assertTrue(() -> !testcmd.isScheduled());
+    runToCompletion(testcmd);
     assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
     assertEquals(branch.pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));
     assertEquals(
-        branch.pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
         0,
-        Rotation.TOLERANCE.in(Radian) * 2);
+        branch.pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
+        Rotation.TOLERANCE.in(Radian));
   }
 
   private static Stream<Arguments> pathGoals() {

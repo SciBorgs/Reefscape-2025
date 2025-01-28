@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.commands;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -54,9 +53,16 @@ public class Alignment {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return directPathfollow(branch.pose)
-        .alongWith(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
-        .andThen(scoral.outtake().onlyWhile(scoral::beambreak));
+    return (directPathfollow(branch.pose)
+            .andThen(
+                Commands.waitUntil(() -> elevator.atPosition(level.height))
+                    .andThen(
+                        scoral
+                            .outtake()
+                            .until(scoral::beambreak)
+                            .withTimeout(
+                                1)))) // timeout needed because sim beambreak does not change value
+        .deadlineFor(elevator.scoreLevel(level));
   }
 
   /**
@@ -69,8 +75,11 @@ public class Alignment {
    */
   public Command safeReef(Level level, Branch branch) {
     return directPathfollow(branch.pose)
-        .andThen(elevator.scoreLevel(level).until(() -> elevator.atPosition(level.height)))
-        .andThen(scoral.outtake());
+        .andThen(elevator.scoreLevel(level))
+        .until(scoral::beambreak)
+        .withTimeout(1)
+        .deadlineFor(
+            Commands.waitUntil(() -> elevator.atPosition(level.height)).andThen(scoral.outtake()));
   }
 
   /**
@@ -90,18 +99,7 @@ public class Alignment {
    * @return A command to align with the human player station source.
    */
   public Command source() {
-    return directPathfollow(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)))
-        .alongWith(elevator.retract());
-  }
-
-  public Command processor() {
-    return directPathfollow(PROCESSOR);
-    // TODO idk how this would work. research this a bit more
-  }
-
-  public Command cage() {
-    return directPathfollow(nearestCage(drive.pose()));
-    // TODO it should do more. when we have a plan, update this
+    return directPathfollow(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)));
   }
 
   /**
@@ -126,19 +124,10 @@ public class Alignment {
     return path;
   }
 
-  public Command pathfind(PathPlannerPath path) {
-    // PathPlannerPath path = directPathfind(goal);
-    // System.out.println(path.getPoint(1));
-    // System.out.println(path.generateTrajectory(drive.robotRelativeChassisSpeeds(),
-    // drive.heading(), ROBOT_CONFIG).getStates().size());
-    // System.out.println(path.getAllPathPoints().size() + "\n");
-    return AutoBuilder.pathfindThenFollowPath(path, PATH_CONSTRAINTS);
-  }
-
   /**
-   * Follows a given pathplanner path.
+   * Creates a pathplanner path to a goal, and then follows that path.
    *
-   * @param path A pathplanner path.
+   * @param goal The goal pose of the robot at the end of the path.
    * @return A command to follow a path.
    */
   public Command directPathfollow(Pose2d goal) {
@@ -157,7 +146,10 @@ public class Alignment {
                     () -> false,
                     drive)
                 .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-                .andThen(drive.driveTo(goal)),
+                .andThen(
+                    drive.driveTo(
+                        goal)), // pathplanner isnt precise enough so we gotta fix it ourselves
+        // (just adjusts a little bit)
         Set.of(drive));
   }
 }
