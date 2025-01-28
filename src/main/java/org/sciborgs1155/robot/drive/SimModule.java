@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.drive.DriveConstants.TYPE;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,31 +18,14 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 public class SimModule implements ModuleIO {
   private final DCMotorSim drive =
-      switch (TYPE) {
-        case SPARK ->
-            new DCMotorSim(
-                LinearSystemId.createDCMotorSystem(Driving.FF.SPARK.V, Driving.FF.SPARK.A),
-                DCMotor.getNeoVortex(1));
-        case TALON ->
-            new DCMotorSim(
-                LinearSystemId.createDCMotorSystem(Driving.FF.TALON.V, Driving.FF.TALON.A),
-                DCMotor.getKrakenX60(1));
-      };
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(Driving.FF.V, Driving.FF.A), DCMotor.getKrakenX60(1));
 
   private final PIDController driveFeedback =
-      switch (TYPE) {
-        case SPARK ->
-            new PIDController(Driving.PID.SPARK.P, Driving.PID.SPARK.I, Driving.PID.SPARK.D);
-        case TALON ->
-            new PIDController(Driving.PID.TALON.P, Driving.PID.TALON.I, Driving.PID.TALON.D);
-      };
+      new PIDController(Driving.PID.P, Driving.PID.I, Driving.PID.D);
+
   private final SimpleMotorFeedforward driveFF =
-      switch (TYPE) {
-        case SPARK ->
-            new SimpleMotorFeedforward(Driving.FF.SPARK.S, Driving.FF.SPARK.V, Driving.FF.SPARK.A);
-        case TALON ->
-            new SimpleMotorFeedforward(Driving.FF.TALON.S, Driving.FF.TALON.V, Driving.FF.TALON.A);
-      };
+      new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
   private final DCMotorSim turn =
       new DCMotorSim(

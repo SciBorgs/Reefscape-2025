@@ -138,12 +138,34 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         case SPARK ->
             new Drive(
                 new NavXGyro(),
-                new SparkModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS.get(0), "FL"),
-                new SparkModule(
-                    FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS.get(1), "FR"),
-                new SparkModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS.get(2), "RL"),
-                new SparkModule(
-                    REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS.get(3), "RR"));
+                new TalonModule(
+                    FRONT_LEFT_DRIVE,
+                    FRONT_LEFT_TURNING,
+                    FRONT_LEFT_CANCODER,
+                    ANGULAR_OFFSETS.get(0),
+                    "FL",
+                    false),
+                new TalonModule(
+                    FRONT_RIGHT_DRIVE,
+                    FRONT_RIGHT_TURNING,
+                    FRONT_RIGHT_CANCODER,
+                    ANGULAR_OFFSETS.get(1),
+                    "FR",
+                    false),
+                new TalonModule(
+                    REAR_LEFT_DRIVE,
+                    REAR_LEFT_TURNING,
+                    REAR_LEFT_CANCODER,
+                    ANGULAR_OFFSETS.get(2),
+                    "RL",
+                    false),
+                new TalonModule(
+                    REAR_RIGHT_DRIVE,
+                    REAR_RIGHT_TURNING,
+                    REAR_RIGHT_CANCODER,
+                    ANGULAR_OFFSETS.get(3),
+                    "RR",
+                    false));
       };
     } else {
       return new Drive(

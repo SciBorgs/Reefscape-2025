@@ -56,8 +56,7 @@ public class TalonModule implements ModuleIO {
     driveMotor = new TalonFX(drivePort, "*");
     drivePos = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();
-    driveFF =
-        new SimpleMotorFeedforward(Driving.FF.TALON.S, Driving.FF.TALON.V, Driving.FF.TALON.A);
+    driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
     drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
     driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
@@ -68,9 +67,9 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Feedback.SensorToMechanismRatio = Driving.POSITION_FACTOR.in(Meters);
     talonDriveConfig.CurrentLimits.SupplyCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
 
-    talonDriveConfig.Slot0.kP = Driving.PID.TALON.P;
-    talonDriveConfig.Slot0.kI = Driving.PID.TALON.I;
-    talonDriveConfig.Slot0.kD = Driving.PID.TALON.D;
+    talonDriveConfig.Slot0.kP = Driving.PID.P;
+    talonDriveConfig.Slot0.kI = Driving.PID.I;
+    talonDriveConfig.Slot0.kD = Driving.PID.D;
 
     turnMotor = new TalonFX(turnPort, "*");
     turnPos = turnMotor.getPosition();

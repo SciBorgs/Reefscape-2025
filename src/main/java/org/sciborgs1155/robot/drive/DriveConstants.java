@@ -117,31 +117,17 @@ public final class DriveConstants {
       public static final Current CURRENT_LIMIT = Amps.of(50);
 
       public static final class PID {
-        public static final class SPARK {
-          public static final double P = 0.04;
-          public static final double I = 0.0;
-          public static final double D = 0.0;
-        }
 
-        public static final class TALON {
-          public static final double P = 3.2;
-          public static final double I = 0.0;
-          public static final double D = 0.0;
-        }
+        public static final double P = 3.2;
+        public static final double I = 0.0;
+        public static final double D = 0.0;
       }
 
       public static final class FF {
-        public static final class SPARK {
-          public static final double S = 0.2; // 0.088468;
-          public static final double V = 2.131; // 2.1314;
-          public static final double A = 0.38; // 0.33291;
-        }
 
-        public static final class TALON {
-          public static final double S = 0.088468;
-          public static final double V = 2.1314;
-          public static final double A = 0.33291;
-        }
+        public static final double S = 0.088468;
+        public static final double V = 2.1314;
+        public static final double A = 0.33291;
       }
     }
 
