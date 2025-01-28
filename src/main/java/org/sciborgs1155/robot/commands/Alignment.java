@@ -60,8 +60,7 @@ public class Alignment {
                     .andThen(
                         scoral
                             .outtake()
-                            .withTimeout(
-                                1)))) // timeout needed because no sim beambreak
+                            .withTimeout(1)))) // timeout needed because no sim beambreak
         .deadlineFor(elevator.scoreLevel(level));
   }
 
