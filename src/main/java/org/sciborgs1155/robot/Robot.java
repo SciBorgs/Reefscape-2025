@@ -41,6 +41,8 @@ import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
+import com.ctre.phoenix6.SignalLogger;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -56,12 +58,12 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
-  private final Arm arm = Arm.create();
-  private final Coroller coroller = Coroller.create();
-  private final LEDStrip led = new LEDStrip();
-  private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.create();
+  // private final Vision vision = Vision.create();
+  // private final Arm arm = Arm.create();
+  // private final Coroller coroller = Coroller.create();
+  // private final LEDStrip led = new LEDStrip();
+  // private final Elevator elevator = Elevator.create();
+  // private final Scoral scoral = Scoral.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -73,12 +75,17 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
+    configureLog();
+  }
+
+  /** Configures basic behavior for different periods during the game. */
+  private void configureLog() {
+    SignalLogger.setPath("./logs/");
   }
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem
-    // interaction
+    // TODO: Add configs for all additional libraries, components, intersubsystem interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
@@ -88,32 +95,33 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    FaultLogger.register(pdh);
+    // FaultLogger.register(pdh);
+    // FaultLogger.register(canivore);
 
     // Configure pose estimation updates every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
     if (isReal()) {
-      URCL.start();
+      URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    // operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    // operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    // operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    // operator.y().onTrue(elevator.scoreLevel(Level.L4));
 
-    InputStream x = InputStream.of(driver::getLeftX).negate();
-    InputStream y = InputStream.of(driver::getLeftY).negate();
+    InputStream x = InputStream.of(driver::getLeftX).log("raw x");
+    InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
@@ -144,13 +152,11 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
-    led.setDefaultCommand(led.scrolling());
 
-    autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
-    autonomous().whileTrue(led.autos());
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
-
+    driver.a().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
     driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()
@@ -159,6 +165,10 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
     // TODO: Add any additional bindings.
+    driver
+        .a()
+        .onTrue(Commands.runOnce(SignalLogger::start))
+        .onFalse(Commands.runOnce(SignalLogger::stop));
   }
 
   /**
@@ -183,11 +193,7 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(
-            drive.systemsCheck(),
-            elevator.goToTest(Level.L1.height),
-            Test.fromCommand(scoral.outtake().withTimeout(2)))
-        .withName("Test Mechanisms");
+    return Test.toCommand(drive.systemsCheck()).withName("Test Mechanisms");
   }
 
   @Override

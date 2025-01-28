@@ -103,7 +103,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public static Drive create() {
     if (Robot.isReal()) {
-
       return new Drive(
           new ReduxGyro(),
           new TalonModule(
