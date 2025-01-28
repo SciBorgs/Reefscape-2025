@@ -23,7 +23,7 @@ public class Scoraling {
         .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
-  /** intakes from the human player station */
+  /** Intakes from the human player station */
   public Command hpsIntake() {
     return elevator
         .retract()
@@ -33,7 +33,7 @@ public class Scoraling {
   }
 
   /**
-   * scores a coral at the given level, assuming you are already at the correct branch
+   * Scores a coral at the given level, assuming you are already at the correct branch
    *
    * @param level the level the scoral scores in
    */
@@ -41,7 +41,7 @@ public class Scoraling {
     return elevator.scoreLevel(level).andThen(scoral.outtake()).withName("scoraling");
   }
 
-  /** grabs the algae from the level given (goes above the level) ONLY L2 and L3 */
+  /** Grabs the algae from above the level given; ONLY L2 and L3 are allowed */
   public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
@@ -50,12 +50,12 @@ public class Scoraling {
         .withName("cleanAlgae");
   }
 
-  /** halts both the hopper and the scoral */
+  /** Halts both the hopper and the scoral */
   public Command stop() {
     return hopper.stop().alongWith(scoral.stop()).withName("stopping");
   }
 
-  /** runs the hps + scoral rollers forward (intaking) */
+  /** Runs the hps + scoral rollers forward (intaking) */
   public Command runRollers() {
     return hopper.intake().alongWith(scoral.outtake()).withName("runningRollers");
   }

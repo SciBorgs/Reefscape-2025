@@ -23,10 +23,16 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final Beambreak beambreak;
   public final Trigger beambreakTrigger;
 
+  /**
+   * creates a Scoral based on if it is simulated or real hardware
+   */
   public static Scoral create() {
     return Robot.isReal() ? new Scoral(realMotor(), Beambreak.real(BEAMBREAK)) : none();
   }
 
+  /**
+   * creates a Scoral without hardware or simulation
+   */
   public static Scoral none() {
     return new Scoral(SimpleMotor.none(), Beambreak.none());
   }
