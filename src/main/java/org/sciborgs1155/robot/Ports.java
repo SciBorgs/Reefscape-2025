@@ -20,6 +20,12 @@ public final class Ports {
     public static final int REAR_RIGHT_TURNING = 17;
   }
 
+  public static final class GroundIntake {
+    public static final int ARM_MOTOR = 18;
+    public static final int ROLLER_MOTOR = 19;
+    public static final int CANCODER = 2; // TODO change i think
+  }
+
   public static final class Elevator {
     public static final int LEADER = -1;
     public static final int FOLLOWER = -1;
@@ -35,8 +41,7 @@ public final class Ports {
   }
 
   public static final class Hopper {
-    public static final int LEFT_MOTOR = -1;
-    public static final int RIGHT_MOTOR = -1;
+    public static final int MOTOR = -1;
     public static final int BEAMBREAK = -1;
   }
 }
