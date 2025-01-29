@@ -16,21 +16,31 @@ public class Dashboard {
   private static NetworkTable base;
   private static NetworkTableEntry entryTargetBranch;
   private static NetworkTableEntry entryTargetLevel;
+  private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryRobotTick;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
   public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
+  public static Trigger processorTrigger;
 
   /** Sets up the dashboard. */
   public static void configure() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
+
     entryTargetBranch = base.getEntry("branch");
     entryTargetBranch.setString("");
+
     entryTargetLevel = base.getEntry("level");
     entryTargetLevel.setInteger(0);
+
+    entryProcessor = base.getEntry("processor");
+    entryProcessor.setBoolean(false);
+    processorTrigger = new Trigger(() -> entryProcessor.getBoolean(false));
+
     entryRobotTick = base.getEntry("robotTick");
     entryRobotTick.setInteger(0);
     tick = 0;
+
     entryBlueAlliance = base.getEntry("blueAlliance");
     entryBlueAlliance.setBoolean(Constants.alliance() == Alliance.Blue);
 
