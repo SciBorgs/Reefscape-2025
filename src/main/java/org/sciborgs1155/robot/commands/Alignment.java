@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -152,4 +154,9 @@ public class Alignment {
         // (just adjusts a little bit)
         Set.of(drive));
   }
+
+  public Command pathfind(Pose2d goal) {
+    return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.);
+  }
+
 }
