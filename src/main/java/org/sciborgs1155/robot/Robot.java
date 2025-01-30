@@ -4,16 +4,12 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
-import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -65,12 +61,12 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
+  private final Arm arm = Arm.create();
+  private final Coroller coroller = Coroller.create();
   private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
   private final Hopper hopper = Hopper.create();
-  private final Arm arm = Arm.create();
-  private final Coroller coroller = Coroller.create();
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
   private final Corolling corolling = new Corolling(arm, coroller);
 
@@ -88,7 +84,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem interaction
+    // TODO: Add configs for all additional libraries, components, intersubsystem
+    // interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
