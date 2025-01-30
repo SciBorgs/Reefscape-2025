@@ -46,6 +46,8 @@ import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
+import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.commands.Corolling;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -69,6 +71,8 @@ public class Robot extends CommandRobot implements Logged {
   private final Hopper hopper = Hopper.create();
   private final Arm arm = Arm.create();
   private final Coroller coroller = Coroller.create();
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
+  private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -115,37 +119,22 @@ public class Robot extends CommandRobot implements Logged {
   private void configureBindings() {
     operator
         .povDown()
-        .onTrue(
-            elevator
-                .scoreLevel(Level.L1)
-                .until(() -> elevator.atGoal())
-                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+        .onTrue(scoraling.scoral(Level.L1));
     operator
         .povLeft()
         .onTrue(
-            elevator
-                .scoreLevel(Level.L2)
-                .until(() -> elevator.atGoal())
-                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+            scoraling.scoral(Level.L2));
     operator
         .povRight()
-        .onTrue(
-            elevator
-                .scoreLevel(Level.L3)
-                .until(() -> elevator.atGoal())
-                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+        .onTrue(scoraling.scoral(Level.L3));
     operator
         .povUp()
-        .onTrue(
-            elevator
-                .scoreLevel(Level.L4)
-                .until(() -> elevator.atGoal())
-                .andThen(scoral.outtake().until(() -> scoral.beambreak())));
+        .onTrue(scoraling.scoral(Level.L4));
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
-    operator.rightBumper().onTrue(arm.goTo(TROUGH_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
-    operator.rightTrigger().onTrue(arm.goTo(INTAKE_ANGLE).alongWith(coroller.intake()));
-    operator.a().onTrue(arm.goTo(PROCESSOR_OUTTAKE_ANGLE).alongWith(coroller.outtake()));
+    operator.rightBumper().onTrue(corolling.trough());
+    operator.rightTrigger().onTrue(corolling.intake());
+    operator.a().onTrue(corolling.processor());
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
