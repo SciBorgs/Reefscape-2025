@@ -168,6 +168,10 @@ public class Robot extends CommandRobot implements Logged {
     // TODO: Add any additional bindings.
 
     driver.a().onTrue(align.pathfind(Branch.A.pose));
+    driver.b().onTrue(align.pathfind(Branch.B.pose));
+    driver.x().onTrue(align.pathfind(Branch.G.pose));
+    driver.y().onTrue(align.pathfind(Branch.J.pose));
+
   }
 
   /**

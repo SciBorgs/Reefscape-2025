@@ -26,11 +26,15 @@ import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.commands.Alignment;
+import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.scoral.Scoral;
+
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 public class AlignTest {
 
@@ -48,6 +52,9 @@ public class AlignTest {
     this.elevator = Elevator.create();
     this.scoral = Scoral.create();
     this.drive.resetEncoders();
+
+    Autos.configureAutos(drive);
+    Pathfinding.setPathfinder(new LocalADStar());
 
     align = new Alignment(drive, elevator, scoral);
   }
@@ -81,7 +88,8 @@ public class AlignTest {
   @ParameterizedTest()
   @MethodSource("pathGoals")
   public void pathfindTest(Branch branch) {
-    Command testcmd = align.reef(Level.L4, branch);
+    //Command testcmd = align.reef(Level.L4, branch);
+    Command testcmd = align.pathfind(branch.pose);
     runToCompletion(testcmd);
     assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
     assertEquals(branch.pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));

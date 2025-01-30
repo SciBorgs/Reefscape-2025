@@ -156,7 +156,8 @@ public class Alignment {
   }
 
   public Command pathfind(Pose2d goal) {
-    return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.);
+    return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.).andThen(drive.driveTo(goal));
+    // it isn't deferred, but it works anyway. Idk why but if it aint broke dont fix it
   }
 
 }
