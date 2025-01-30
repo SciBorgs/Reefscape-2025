@@ -171,7 +171,6 @@ public class Robot extends CommandRobot implements Logged {
     driver.b().onTrue(align.pathfind(Branch.B.pose));
     driver.x().onTrue(align.pathfind(Branch.G.pose));
     driver.y().onTrue(align.pathfind(Branch.J.pose));
-
   }
 
   /**

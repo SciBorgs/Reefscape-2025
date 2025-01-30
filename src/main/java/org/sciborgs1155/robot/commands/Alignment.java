@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -159,5 +158,4 @@ public class Alignment {
     return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.).andThen(drive.driveTo(goal));
     // it isn't deferred, but it works anyway. Idk why but if it aint broke dont fix it
   }
-
 }
