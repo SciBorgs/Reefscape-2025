@@ -6,9 +6,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -35,6 +33,8 @@ import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
+import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -42,8 +42,6 @@ import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
-import org.sciborgs1155.robot.commands.Scoraling;
-import org.sciborgs1155.robot.commands.Corolling;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -114,19 +112,10 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator
-        .povDown()
-        .onTrue(scoraling.scoral(Level.L1));
-    operator
-        .povLeft()
-        .onTrue(
-            scoraling.scoral(Level.L2));
-    operator
-        .povRight()
-        .onTrue(scoraling.scoral(Level.L3));
-    operator
-        .povUp()
-        .onTrue(scoraling.scoral(Level.L4));
+    operator.povDown().onTrue(scoraling.scoral(Level.L1));
+    operator.povLeft().onTrue(scoraling.scoral(Level.L2));
+    operator.povRight().onTrue(scoraling.scoral(Level.L3));
+    operator.povUp().onTrue(scoraling.scoral(Level.L4));
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
     operator.rightBumper().onTrue(corolling.trough());
