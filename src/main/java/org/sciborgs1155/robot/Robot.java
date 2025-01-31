@@ -4,13 +4,25 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.Field.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.C;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.F;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.I;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.L;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.L1;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.L2;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.L3;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.L4;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -33,6 +45,7 @@ import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard.Levels;
 import org.sciborgs1155.robot.drive.Drive;
 
 /**
@@ -163,6 +176,16 @@ public class Robot extends CommandRobot implements Logged {
         .a()
         .onTrue(Commands.runOnce(SignalLogger::start))
         .onFalse(Commands.runOnce(SignalLogger::stop));
+
+    F.trigger.whileTrue(drive.driveTo(drive.pose().plus(new Transform2d(1, 1, new Rotation2d(6.28)))));
+    I.trigger.whileTrue(drive.driveTo(drive.pose().plus(new Transform2d(-1, 1, new Rotation2d(-6.28)))));
+    L.trigger.whileTrue(drive.driveTo(drive.pose().plus(new Transform2d(-1, -1, new Rotation2d(6.28)))));
+    C.trigger.whileTrue(drive.driveTo(drive.pose().plus(new Transform2d(1, -1, new Rotation2d(-6.28)))));
+
+    L1.trigger.onTrue(Commands.run(() -> speedMultiplier = 1, drive));
+    L2.trigger.onTrue(Commands.run(() -> speedMultiplier = 0.75, drive));
+    L3.trigger.onTrue(Commands.run(() -> speedMultiplier = 0.5, drive));
+    L4.trigger.onTrue(Commands.run(() -> speedMultiplier = 0.25, drive));
   }
 
   /**
