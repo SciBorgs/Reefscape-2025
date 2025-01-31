@@ -72,7 +72,7 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureLog() {
-    SignalLogger.setPath("./logs/");
+    // SignalLogger.setPath("./logs/");
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -148,7 +148,6 @@ public class Robot extends CommandRobot implements Logged {
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
-    driver.a().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
     driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()

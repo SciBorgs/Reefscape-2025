@@ -118,7 +118,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               FRONT_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(1),
               "FR",
-              false),
+              true),
           new TalonModule(
               REAR_LEFT_DRIVE,
               REAR_LEFT_TURNING,
@@ -132,7 +132,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               REAR_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(3),
               "RR",
-              false));
+              true));
 
     } else {
       return new Drive(
@@ -283,7 +283,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     vy.getAsDouble(),
                     vOmega.getAsDouble(),
                     heading().plus(allianceRotation())),
-                ControlMode.OPEN_LOOP_VELOCITY));
+                DRIVE_MODE));
   }
 
   /**

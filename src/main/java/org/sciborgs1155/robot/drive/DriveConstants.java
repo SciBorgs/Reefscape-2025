@@ -112,18 +112,16 @@ public final class DriveConstants {
       }
 
       public static final class FF {
-
-        public static final double S = 0.088468;
-        public static final double V = 2.1314;
-        public static final double A = 0.33291;
+        public static final double S = 0; // .088468;
+        public static final double V = 2; // 2.1314;
+        public static final double A = 0; // .33291;
       }
     }
 
     static final class Turning {
       public static final double GEARING = 12.1; // 0.4 / (12.1 * 1.3);
 
-      public static final Angle POSITION_FACTOR = Rotations.of(GEARING);
-      public static final AngularVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
+      public static final double POSITION_FACTOR = GEARING / (2 * Math.PI);
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 

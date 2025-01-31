@@ -85,7 +85,7 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.Feedback.SensorToMechanismRatio = 1 / Turning.POSITION_FACTOR.in(Radians);
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR;
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
