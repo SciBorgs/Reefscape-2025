@@ -74,7 +74,7 @@ public class Constants {
       }
     }
 
-    /** Offset to add to the level to be at algae's height */
+    /** Offset added to a level's height in order to to be at the algae's height */
     public static final Distance algaeOffset = Meters.of(0);
   }
 }

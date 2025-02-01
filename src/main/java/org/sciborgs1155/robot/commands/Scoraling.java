@@ -17,8 +17,10 @@ public class Scoraling {
     this.scoral = scoral;
     this.elevator = elevator;
 
-    // will stop the intaking if it reaches the desired state (between the hps and scoral
-    // beambreaks)
+    /*
+    Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
+    beambreaks.
+    */
     hopper
         .beambreakTrigger
         .negate()
@@ -26,7 +28,7 @@ public class Scoraling {
         .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
-  /** A command which intakes from the human player station */
+  /** A command which intakes from the human player station. */
   public Command hpsIntake() {
     return elevator
         .retract()
@@ -37,7 +39,7 @@ public class Scoraling {
 
   /**
    * A command which scores a coral at the given level, assuming you are already at the correct
-   * branch
+   * branch.
    *
    * @param level the level the scoral scores in
    */
@@ -49,7 +51,7 @@ public class Scoraling {
   }
 
   /**
-   * A command which grabs the algae from above the level given; only L2 and L3 are allowed
+   * A command which grabs the algae from above the level given; only L2 and L3 are allowed.
    *
    * @param level the level to score above
    */
@@ -61,12 +63,12 @@ public class Scoraling {
         .withName("cleanAlgae");
   }
 
-  /** A command which halts both the hopper and the scoral */
+  /** A command which halts both the hopper and the scoral. */
   public Command stop() {
     return hopper.stop().alongWith(scoral.stop()).withName("stopping");
   }
 
-  /** A command which runs the hps + scoral rollers forward (intaking) */
+  /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollers() {
     return hopper.intake().alongWith(scoral.outtake()).withName("runningRollers");
   }

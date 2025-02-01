@@ -18,17 +18,17 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
   private final Beambreak beambreak;
   public final Trigger beambreakTrigger;
 
-  /** creates a Hopper based on whether it is simulated or real hardware */
+  /** Creates a Hopper based on whether it is utilizing hardware. */
   public static Hopper create() {
     return Robot.isReal() ? new Hopper(realMotor(), Beambreak.real(BEAMBREAK)) : none();
   }
 
-  /** creates a hopper sans hardware or simulation */
+  /** Creates a hopper sans hardware or simulation. */
   public static Hopper none() {
     return new Hopper(SimpleMotor.none(), Beambreak.none());
   }
 
-  /** generates a simple motor with the appropriate configurations as real hardware */
+  /** Generates a simple motor with the appropriate configurations as real hardware. */
   private static SimpleMotor realMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 

@@ -105,12 +105,16 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return goTo(level.height.in(Meters));
   }
 
-  /** Goes to an offset height above the level given to clean algae ONLY L2 and L3! */
+  /**
+   * Goes to an offset height above the level given in order to clean algae; ONLY L2 and L3!
+   *
+   * @param level An enum that should be either L2 or L3
+   */
   public Command clean(Level level) {
     if (level == Level.L1 || level == Level.L4) {
       FaultLogger.report(
-          "Algae level fault",
-          "an invalid level has been passed to the clean command, L1 or L4",
+          "Algae level",
+          "An invalid level has been passed to the clean command; L1 or L4",
           FaultType.WARNING);
       return retract();
     }
