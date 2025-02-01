@@ -23,16 +23,17 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final Beambreak beambreak;
   public final Trigger beambreakTrigger;
 
-  /** creates a Scoral based on if it is simulated or real hardware */
+  /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {
     return Robot.isReal() ? new Scoral(realMotor(), Beambreak.real(BEAMBREAK)) : none();
   }
 
-  /** creates a Scoral without hardware or simulation */
+  /** Creates a Scoral sans hardware or simulation. */
   public static Scoral none() {
     return new Scoral(SimpleMotor.none(), Beambreak.none());
   }
 
+  /** Creates a SimpleMotor with the appropriate configurations for a Scoral with hardware. */
   private static SimpleMotor realMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
