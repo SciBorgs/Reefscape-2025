@@ -79,6 +79,7 @@ dependencies {
     // Junit testing
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.+'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.x.x'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5+'
 
     // Monologue
