@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -26,6 +25,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Robot;
 
 public class Vision implements Logged {
@@ -36,20 +36,20 @@ public class Vision implements Logged {
   private final PhotonCamera[] cameras;
   private final PhotonPoseEstimator[] estimators;
   private final PhotonCameraSim[] simCameras;
-  private final ArrayList<PhotonPipelineResult> changes;
+  private final PhotonPipelineResult[] lastResults;
 
   private VisionSystemSim visionSim;
 
   /** A factory to create new vision classes with our two configured cameras. */
   public static Vision create() {
-    return new Vision(BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA, FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA);
+    return new Vision(BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }
 
   public Vision(CameraConfig... configs) {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
-    changes = new ArrayList<>();
+    lastResults = new PhotonPipelineResult[configs.length];
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
@@ -62,6 +62,7 @@ public class Vision implements Logged {
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
       cameras[i] = camera;
       estimators[i] = estimator;
+      lastResults[i] = new PhotonPipelineResult();
 
       FaultLogger.register(camera);
     }
@@ -99,15 +100,17 @@ public class Vision implements Logged {
   public PoseEstimate[] estimatedGlobalPoses() {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
-      var unread = cameras[i].getAllUnreadResults();
+      var unreadChanges = cameras[i].getAllUnreadResults();
       Optional<EstimatedRobotPose> estimate = Optional.empty();
-      changes.clear();
 
-      for (int j = 0; j < unread.size(); j++) {
-        var change = unread.get(j);
-        changes.add(change);
+      int unreadLength = unreadChanges.size();
+
+      // feeds latest result for visualization; multiple different pos breaks getSeenTags()
+      lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
+
+      for (int j = 0; j < unreadLength; j++) {
+        var change = unreadChanges.get(j);
         estimate = estimators[i].update(change);
-
         log("estimates present " + i, estimate.isPresent());
         estimate
             .filter(
@@ -133,7 +136,7 @@ public class Vision implements Logged {
    */
   @Log.NT
   public Pose3d[] getSeenTags() {
-    return Arrays.stream(changes.toArray(PhotonPipelineResult[]::new))
+    return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
