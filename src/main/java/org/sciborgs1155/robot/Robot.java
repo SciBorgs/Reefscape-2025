@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -35,6 +36,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -103,11 +105,11 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().toggleOnTrue(elevator.manualElevator(operator::getLeftY));
-    // operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    // operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    // operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    // operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    // operator.a().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY).negate()));//.alongWith(led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator.a().whileTrue(elevator.scoreLevel(Level.L1));
+    operator.b().whileTrue(elevator.scoreLevel(Level.L2));
+    operator.x().whileTrue(elevator.scoreLevel(Level.L3));
+    operator.y().whileTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
@@ -142,7 +144,8 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
-    led.setDefaultCommand(led.scrolling());
+    led.setDefaultCommand(
+        led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
     autonomous().whileTrue(led.autos());

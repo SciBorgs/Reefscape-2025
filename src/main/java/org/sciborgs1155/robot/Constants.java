@@ -62,9 +62,9 @@ public class Constants {
     }
 
     public enum Level {
-      L1(Meters.of(.3)),
-      L2(Meters.of(.7)),
-      L3(Meters.of(1)),
+      L1(Meters.of(0.3)),
+      L2(Meters.of(0.7)),
+      L3(Meters.of(1.0)),
       L4(Meters.of(1.5));
 
       public final Distance height;

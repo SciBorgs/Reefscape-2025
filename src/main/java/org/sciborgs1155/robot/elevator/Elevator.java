@@ -75,23 +75,29 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     pid.reset(hardware.position());
     pid.setGoal(MIN_EXTENSION.in(Meters));
 
-    // setDefaultCommand(retract());
+    setDefaultCommand(retract());
 
     sysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(4),
+                Volts.of(2),
                 null,
                 (state) -> SignalLogger.writeString("elevator state", state.toString())),
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
     SmartDashboard.putData(
-        "elevator quasistatic forward", sysIdRoutine.quasistatic(Direction.kForward));
+        "elevator quasistatic forward",
+        sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
     SmartDashboard.putData(
-        "elevator quasistatic backward", sysIdRoutine.quasistatic(Direction.kReverse));
-    SmartDashboard.putData("elevator dynamic forward", sysIdRoutine.dynamic(Direction.kForward));
-    SmartDashboard.putData("elevator dynamic backward", sysIdRoutine.dynamic(Direction.kReverse));
+        "elevator quasistatic backward",
+        sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
+    SmartDashboard.putData(
+        "elevator dynamic forward",
+        sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
+    SmartDashboard.putData(
+        "elevator dynamic backward",
+        sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
   }
 
   /**
