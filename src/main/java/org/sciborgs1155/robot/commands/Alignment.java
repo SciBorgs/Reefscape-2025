@@ -55,7 +55,7 @@ public class Alignment {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return (directPathfollow(branch.pose)
+    return (pathfind(branch.pose)
             .andThen(
                 Commands.waitUntil(() -> elevator.atPosition(level.height.in(Meters)))
                     .andThen(
@@ -74,7 +74,7 @@ public class Alignment {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return directPathfollow(branch.pose)
+    return pathfind(branch.pose)
         .andThen(elevator.scoreLevel(level))
         .until(scoral::beambreak)
         .withTimeout(1)
@@ -100,7 +100,7 @@ public class Alignment {
    * @return A command to align with the human player station source.
    */
   public Command source() {
-    return directPathfollow(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)));
+    return pathfind(drive.pose().nearest(List.of(LEFT_SOURCE, RIGHT_SOURCE)));
   }
 
   /**
@@ -154,8 +154,15 @@ public class Alignment {
         Set.of(drive));
   }
 
+  /**
+   * Pathfinds the drivetrain around obstacles to an input Pose2d, finishing with an end velocity of
+   * 0.
+   *
+   * @param goal The goal end pose of the pathfinding.
+   * @return A Command to pathfind around obstacles to a goal pose.
+   */
   public Command pathfind(Pose2d goal) {
     return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.).andThen(drive.driveTo(goal));
-    // it isn't deferred, but it works anyway. Idk why but if it aint broke dont fix it
+    // driveTo is used to slightly adjust since pathfindToPose is not precise enough.
   }
 }

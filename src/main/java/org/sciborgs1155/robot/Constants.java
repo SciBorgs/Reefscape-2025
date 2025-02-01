@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static org.sciborgs1155.robot.Constants.Field.Branch.poseList;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.SIDE_LENGTH;
@@ -16,6 +17,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.sciborgs1155.robot.drive.DriveConstants;
@@ -148,7 +150,7 @@ public class Constants {
        * @return A list of all branch poses.
        */
       public static List<Pose2d> poseList() {
-        return List.of(Branch.values()).stream().map(b -> b.pose).collect(Collectors.toList());
+        return Arrays.stream(Branch.values()).map(b -> b.pose).collect(Collectors.toList());
       }
 
       /**
@@ -173,12 +175,10 @@ public class Constants {
        * @return The nearest branch to a pose.
        */
       public static Branch nearest(Pose2d pose) {
-        for (int i = 0; i < values().length; i++) {
-          if (Branch.values()[i].pose == pose.nearest(poseList())) {
-            return Branch.values()[i];
-          }
-        }
-        return L;
+        return Arrays.stream(Branch.values())
+            .filter(branch -> branch.pose == pose.nearest(poseList()))
+            .findFirst()
+            .orElse(A);
       }
     }
 
@@ -200,14 +200,10 @@ public class Constants {
        * @return The nearest cage to the pose.
        */
       public static Cage nearest(Pose2d pose) {
-        for (int i = 0; i < values().length; i++) {
-          if (Cage.values()[i].pose
-              == pose.nearest(
-                  List.of(values()).stream().map(b -> b.pose).collect(Collectors.toList()))) {
-            return Cage.values()[i];
-          }
-        }
-        return LEFT;
+        return Arrays.stream(Cage.values())
+            .filter((cage) -> cage.pose == pose.nearest(poseList()))
+            .findFirst()
+            .orElse(LEFT);
       }
     }
 
