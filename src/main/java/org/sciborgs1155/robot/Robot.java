@@ -103,7 +103,7 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().whileTrue(elevator.manualElevator(operator::getLeftY));
+    operator.a().toggleOnTrue(elevator.manualElevator(operator::getLeftY));
     // operator.a().onTrue(elevator.scoreLevel(Level.L1));
     // operator.b().onTrue(elevator.scoreLevel(Level.L2));
     // operator.x().onTrue(elevator.scoreLevel(Level.L3));

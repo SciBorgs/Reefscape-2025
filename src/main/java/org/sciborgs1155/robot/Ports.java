@@ -27,8 +27,8 @@ public final class Ports {
   }
 
   public static final class Elevator {
-    public static final int LEADER = -1;
-    public static final int FOLLOWER = -1;
+    public static final int FRONT_LEADER = 14;
+    public static final int BACK_FOLLOWER = 13;
   }
 
   public static final class Scoral {

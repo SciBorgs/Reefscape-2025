@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -28,6 +29,7 @@ import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
@@ -44,6 +46,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
 
   private final SysIdRoutine sysIdRoutine;
+
+  private DoubleEntry p = Tuning.entry("/elevator/kP", kP);
+  private DoubleEntry i = Tuning.entry("/elevator/kI", kI);
+  private DoubleEntry d = Tuning.entry("/elevator/kD", kD);
 
   @Log.NT
   private final ProfiledPIDController pid =
@@ -69,7 +75,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     pid.reset(hardware.position());
     pid.setGoal(MIN_EXTENSION.in(Meters));
 
-    setDefaultCommand(retract());
+    // setDefaultCommand(retract());
 
     sysIdRoutine =
         new SysIdRoutine(
@@ -189,6 +195,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+
+    pid.setP(p.get());
+    pid.setI(i.get());
+    pid.setD(d.get());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

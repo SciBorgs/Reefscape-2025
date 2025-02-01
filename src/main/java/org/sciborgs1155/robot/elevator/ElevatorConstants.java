@@ -14,18 +14,18 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 
 public class ElevatorConstants {
-  public static final double kP = 10;
+  public static final double kP = 1;
   public static final double kI = 0;
-  public static final double kD = 10;
-  public static final double kS = .1;
-  public static final double kG = 1;
-  public static final double kV = 1;
+  public static final double kD = 0;
+  public static final double kS = 0;
+  public static final double kG = 0;
+  public static final double kV = 0;
   public static final double kA = 0;
 
   public static final Distance POSITION_TOLERANCE = Meters.of(.15);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
-  public static final Distance MAX_EXTENSION = Meters.of(0.711);
+  public static final Distance MAX_EXTENSION = Meters.of(1.4);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(1);
