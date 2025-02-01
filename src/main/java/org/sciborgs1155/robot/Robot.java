@@ -1,14 +1,35 @@
 package org.sciborgs1155.robot;
 
+import java.util.Set;
+
+import org.littletonrobotics.urcl.URCL;
+import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import static org.sciborgs1155.robot.Constants.DEADBAND;
+import org.sciborgs1155.robot.Constants.Field.Level;
+import static org.sciborgs1155.robot.Constants.PERIOD;
+import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
+import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.coroller.Coroller;
+import org.sciborgs1155.robot.drive.Drive;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDStrip;
+import org.sciborgs1155.robot.scoral.Scoral;
+import org.sciborgs1155.robot.vision.Vision;
+
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.*;
-import static org.sciborgs1155.robot.Constants.Field.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -20,28 +41,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Set;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
-import org.littletonrobotics.urcl.URCL;
-import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Level;
-import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Corolling;
-import org.sciborgs1155.robot.commands.Scoraling;
-import org.sciborgs1155.robot.coroller.Coroller;
-import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.hopper.Hopper;
-import org.sciborgs1155.robot.led.LEDStrip;
-import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -65,11 +69,12 @@ public class Robot extends CommandRobot implements Logged {
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
   private final Hopper hopper = Hopper.create();
-  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
-  private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
+  private final Corolling corolling = new Corolling(arm, coroller);
+
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -112,17 +117,25 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+    
+    //scoral commands
     operator.povDown().onTrue(scoraling.scoral(Level.L1));
     operator.povLeft().onTrue(scoraling.scoral(Level.L2));
     operator.povRight().onTrue(scoraling.scoral(Level.L3));
     operator.povUp().onTrue(scoraling.scoral(Level.L4));
+
+    //corolling commands
+    //climb
     operator.leftBumper().onTrue(arm.climbSetup());
     operator.leftTrigger().onTrue(arm.climbExecute());
+    //trough
     operator.rightBumper().onTrue(corolling.trough());
+    //ground intake
     operator.rightTrigger().onTrue(corolling.intake());
+    //processor
     operator.a().onTrue(corolling.processor());
 
-    // x and y are switched: we use joystick Y axis to control field x motion
+    // x and y are switched: we use joystick y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
     InputStream y = InputStream.of(driver::getLeftX).negate();
 
@@ -169,7 +182,7 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    driver.leftTrigger().onTrue(hopper.intake().alongWith(scoral.intake()));
+    driver.leftTrigger().onTrue(scoraling.hpsIntake());
   }
 
   /**
