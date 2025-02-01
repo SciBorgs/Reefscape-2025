@@ -33,11 +33,11 @@ public final class DriveConstants {
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
 
   // Distance between centers of right and left wheels on robot
-  public static final Distance TRACK_WIDTH = Meters.of(0.5715);
+  public static final Distance TRACK_WIDTH = Meters.of(0.5931); // .5884 //.5931
   // Distance between front and back wheels on robot
-  public static final Distance WHEEL_BASE = Meters.of(0.5715);
+  public static final Distance WHEEL_BASE = Meters.of(0.59077); // .59077
   // The radius of any swerve wheel
-  public static final Distance WHEEL_RADIUS = Inches.of(1.5);
+  public static final Distance WHEEL_RADIUS = Inches.of(2); // 4/00 dia, 2.00 rad
   // Distance from the center to any wheel of the robot
   public static final Distance RADIUS = TRACK_WIDTH.div(2).times(Math.sqrt(2));
   // Coefficient of friction between the drive wheel and the carpet.

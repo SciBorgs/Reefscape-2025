@@ -30,11 +30,12 @@ public class ElevatorConstants {
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(1);
 
-  public static final Mass WEIGHT = Kilograms.of(20);
+  public static final Mass WEIGHT = Kilograms.of(20); //
   public static final Distance DRUM_RADIUS = Meters.of(.1);
   public static final double GEARING = 20 / 1;
-  public static final Distance SPROCKET_RADIUS = Inches.of(1);
-  public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
+  public static final Distance SPROCKET_RADIUS = Inches.of(0.8785); // .8785
+  public static final Distance SPROCKET_CIRCUMFRENCE =
+      SPROCKET_RADIUS.times(2 * Math.PI); // .944 * 2pi
   // Input to Output; "values greater than one represent a reduction"
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
