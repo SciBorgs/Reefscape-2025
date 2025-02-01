@@ -69,7 +69,9 @@ public class ScoralingTest {
   @ParameterizedTest
   @MethodSource("levels")
   public void algaeCleanTest(Level level) {
-    if (level == Level.L1 || level == Level.L4) {}
+    if (level == Level.L1 || level == Level.L4) {
+      return;
+    }
     run(scoraling.cleanAlgae(level));
     fastForward();
     assertEquals(

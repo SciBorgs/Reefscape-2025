@@ -42,6 +42,8 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     this.motor = motor;
     this.beambreak = beambreak;
     this.beambreakTrigger = new Trigger(beambreak::get);
+
+    setDefaultCommand(stop());
   }
 
   /**

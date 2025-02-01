@@ -18,7 +18,7 @@ import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
-  private final SimpleMotor hardware;
+  private final SimpleMotor motor;
 
   private final Beambreak beambreak;
   public final Trigger beambreakTrigger;
@@ -43,25 +43,27 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(ROLLER), config);
   }
 
-  public Scoral(SimpleMotor hardware, Beambreak beambreak) {
-    this.hardware = hardware;
+  public Scoral(SimpleMotor motor, Beambreak beambreak) {
+    this.motor = motor;
     this.beambreak = beambreak;
     beambreakTrigger = new Trigger(beambreak::get);
+
+    setDefaultCommand(stop());
   }
 
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command outtake() {
-    return run(() -> hardware.set(POWER)).withName("outtake");
+    return run(() -> motor.set(POWER)).withName("outtake");
   }
 
   /** Runs the motor to move a coral into the scoral. */
   public Command intake() {
-    return run(() -> hardware.set(POWER)).withName("intake");
+    return run(() -> motor.set(POWER)).withName("intake");
   }
 
   /** Stops the motor */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("stop");
+    return run(() -> motor.set(0)).withName("stop");
   }
 
   /** Returns the value of the beambreak, which is false when the beam is broken. */
@@ -77,6 +79,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    hardware.close();
+    motor.close();
   }
 }

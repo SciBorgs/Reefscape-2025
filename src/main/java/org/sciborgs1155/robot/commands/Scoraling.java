@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.hopper.Hopper;
@@ -29,7 +30,7 @@ public class Scoraling {
   public Command hpsIntake() {
     return elevator
         .retract()
-        .andThen(runRollers())
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
         .onlyIf(scoral.beambreakTrigger)
         .withName("intakingHPS");
   }
@@ -41,7 +42,10 @@ public class Scoraling {
    * @param level the level the scoral scores in
    */
   public Command scoral(Level level) {
-    return elevator.scoreLevel(level).andThen(scoral.outtake()).withName("scoraling");
+    return elevator
+        .scoreLevel(level)
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.outtake()))
+        .withName("scoraling");
   }
 
   /**
@@ -52,7 +56,7 @@ public class Scoraling {
   public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
-        .andThen(scoral.intake())
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.intake()))
         .onlyIf(scoral.beambreakTrigger)
         .withName("cleanAlgae");
   }
