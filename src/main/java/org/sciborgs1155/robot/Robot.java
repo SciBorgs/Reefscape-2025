@@ -9,6 +9,8 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
+import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -32,8 +34,11 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
@@ -80,6 +85,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
+    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -101,15 +107,26 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
+
+    addPeriodic(
+        () -> {
+          Dashboard.info.get("closestBranch").setString(drive.closestBranch());
+          Dashboard.tick();
+        },
+        PERIOD.in(Seconds));
+    // addPeriodic(() -> , PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    // operator.a().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY).negate()));//.alongWith(led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator.a().whileTrue(elevator.scoreLevel(Level.L1));
-    operator.b().whileTrue(elevator.scoreLevel(Level.L2));
-    operator.x().whileTrue(elevator.scoreLevel(Level.L3));
-    operator.y().whileTrue(elevator.scoreLevel(Level.L4));
+    operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
+    L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
+    L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
+    L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
