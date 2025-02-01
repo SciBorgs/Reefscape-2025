@@ -2,23 +2,23 @@ package org.sciborgs1155.robot.elevator;
 
 public interface ElevatorIO extends AutoCloseable {
   /**
-   * Sets the voltage for the elevator motor.
+   * Sets elevator voltage.
    *
-   * @param voltage The voltage to set.
+   * @param voltage Voltage inputted to gearbox.
    */
   public void setVoltage(double voltage);
 
   /**
-   * Gets the current position of the elevator.
+   * Returns height of the elevator.
    *
-   * @return The current position.
+   * @return The encoder value in meters.
    */
   public double position();
 
   /**
-   * Gets the current velocity of the elevator.
+   * Returns the velocity of the elevator.
    *
-   * @return The current velocity.
+   * @return The encoder value in meters per second.
    */
   public double velocity();
 }

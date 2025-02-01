@@ -1,20 +1,36 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.lib.FaultLogger.register;
 import static org.sciborgs1155.robot.Ports.Elevator.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.sciborgs1155.lib.TalonUtils;
 
 public class RealElevator implements ElevatorIO {
-  // idk how many there are
-  private final TalonFX lead, follower;
+  private final TalonFX leader = new TalonFX(LEADER);
+  private final TalonFX follower = new TalonFX(FOLLOWER);
 
   public RealElevator() {
-    lead = new TalonFX(LEADER);
-    follower = new TalonFX(FOLLOWER);
+    TalonFXConfiguration talonConfig = new TalonFXConfiguration();
 
-    follower.setControl(new Follower(LEADER, false));
+    follower.setControl(new Follower(LEADER, true));
+
+    talonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
+    talonConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
+
+    leader.getConfigurator().apply(talonConfig);
+    follower.getConfigurator().apply(talonConfig);
+
+    TalonUtils.addMotor(leader);
+    TalonUtils.addMotor(follower);
+    register(leader);
+    register(follower);
   }
 
   @Override
@@ -24,7 +40,7 @@ public class RealElevator implements ElevatorIO {
    * @param voltage The voltage to set.
    */
   public void setVoltage(double voltage) {
-    lead.setVoltage(voltage);
+    leader.setVoltage(voltage);
   }
 
   @Override
@@ -34,7 +50,7 @@ public class RealElevator implements ElevatorIO {
    * @return The current position.
    */
   public double position() {
-    return lead.getPosition().getValueAsDouble();
+    return leader.getPosition().getValueAsDouble();
   }
 
   @Override
@@ -44,7 +60,7 @@ public class RealElevator implements ElevatorIO {
    * @return The current velocity.
    */
   public double velocity() {
-    return lead.getVelocity().getValueAsDouble();
+    return leader.getVelocity().getValueAsDouble();
   }
 
   @Override
@@ -54,7 +70,7 @@ public class RealElevator implements ElevatorIO {
    * @throws Exception if an error occurs.
    */
   public void close() throws Exception {
-    lead.close();
+    leader.close();
     follower.close();
   }
 }
