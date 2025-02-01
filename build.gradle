@@ -60,7 +60,7 @@ dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
-    implementation 'org.junit.jupiter:junit-jupiter-api:5.+'
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
@@ -77,10 +77,9 @@ dependencies {
     simulationRelease wpi.sim.enableRelease()
 
     // Junit testing
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.+'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.x.x'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5+'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
 
     // Monologue
     implementation 'com.github.shueja:Monologue:+'
