@@ -60,18 +60,5 @@ public class Constants {
           && pose.getY() > 0
           && pose.getY() < Field.WIDTH.in(Meters));
     }
-
-    public enum Level {
-      L1(Meters.of(.3)),
-      L2(Meters.of(.7)),
-      L3(Meters.of(1)),
-      L4(Meters.of(1.5));
-
-      public final Distance height;
-
-      Level(Distance height) {
-        this.height = height;
-      }
-    }
   }
 }

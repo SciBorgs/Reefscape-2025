@@ -24,7 +24,6 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
@@ -110,7 +109,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.height.in(Meters));
+    return goTo(level.extension.in(Meters));
   }
 
   /**

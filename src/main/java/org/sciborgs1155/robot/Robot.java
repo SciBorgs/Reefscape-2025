@@ -37,6 +37,7 @@ import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -187,7 +188,7 @@ public class Robot extends CommandRobot implements Logged {
   public Command systemsCheck() {
     return Test.toCommand(
             drive.systemsCheck(),
-            elevator.goToTest(Level.L1.height),
+            elevator.goToTest(Level.L1.extension),
             Test.fromCommand(scoral.outtake().withTimeout(2)))
         .withName("Test Mechanisms");
   }
