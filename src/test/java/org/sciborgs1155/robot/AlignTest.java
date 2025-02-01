@@ -80,7 +80,7 @@ public class AlignTest {
 
   @ParameterizedTest()
   @MethodSource("pathGoals")
-  public void pathfindTest(Branch branch) {
+  public void pathingTest(Branch branch) {
     Command testcmd = align.reef(Level.L4, branch);
     runToCompletion(testcmd);
     assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
