@@ -35,7 +35,9 @@ public class ElevatorConstants {
   public static final double GEARING = 20 / 1;
   public static final Distance SPROCKET_RADIUS = Inches.of(1);
   public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
+
   // Input to Output; "values greater than one represent a reduction"
+  /** conversion factor in METERS PER ROTATION */
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
   public static final Current CURRENT_LIMIT = Amps.of(50);
