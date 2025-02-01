@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
+import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.StatusCode;
@@ -53,7 +54,7 @@ public class TalonModule implements ModuleIO {
       Rotation2d angularOffset,
       String name,
       boolean invert) {
-    driveMotor = new TalonFX(drivePort, "*");
+    driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
     drivePos = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
@@ -74,7 +75,7 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Slot0.kI = Driving.PID.I;
     talonDriveConfig.Slot0.kD = Driving.PID.D;
 
-    turnMotor = new TalonFX(turnPort, "*");
+    turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     turnPos = turnMotor.getPosition();
 
     // turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
@@ -202,7 +203,7 @@ public class TalonModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {
     setpoint.angle = angle;
     setDriveVoltage(voltage);
-    setTurnSetpoint(angle.getRadians());
+    setTurnSetpoint(angle.getRotations());
   }
 
   @Override
