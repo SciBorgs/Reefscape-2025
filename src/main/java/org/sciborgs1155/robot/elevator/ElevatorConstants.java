@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
 
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -24,16 +25,15 @@ public class ElevatorConstants {
 
   public static final Distance POSITION_TOLERANCE = Meters.of(.15);
 
-  public static final Distance MIN_HEIGHT = Meters.of(.2);
-  public static final Distance MAX_HEIGHT = Meters.of(2);
+  public static final Distance MIN_EXTENSION = Meters.of(0);
+  public static final Distance MAX_EXTENSION = Meters.of(0.711);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(1);
 
-  public static final Mass WEIGHT = Kilograms.of(20);
-  public static final Distance DRUM_RADIUS = Meters.of(.1);
-  public static final double GEARING = 20 / 1;
-  public static final Distance SPROCKET_RADIUS = Inches.of(1);
+  public static final Mass WEIGHT = Pounds.of(6.142);
+  public static final double GEARING = 9.375;
+  public static final Distance SPROCKET_RADIUS = Inches.of(1.7565 / 2);
   public static final Distance SPROCKET_CIRCUMFRENCE = SPROCKET_RADIUS.times(2 * Math.PI);
 
   // Input to Output; "values greater than one represent a reduction"
