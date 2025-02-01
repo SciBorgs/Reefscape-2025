@@ -103,10 +103,11 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    operator.a().whileTrue(elevator.manualElevator(operator::getLeftY));
+    // operator.a().onTrue(elevator.scoreLevel(Level.L1));
+    // operator.b().onTrue(elevator.scoreLevel(Level.L2));
+    // operator.x().onTrue(elevator.scoreLevel(Level.L3));
+    // operator.y().onTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();

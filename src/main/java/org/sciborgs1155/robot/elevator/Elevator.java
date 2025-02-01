@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
@@ -19,11 +20,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
 
@@ -102,14 +107,27 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return goTo(level.height.in(Meters));
   }
 
+  public Command manualElevator(InputStream input) {
+    return goTo(input
+            .scale(MAX_VELOCITY.in(MetersPerSecond))
+            .scale(Constants.PERIOD.in(Seconds))
+            .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
+            .add(this::position))
+        .withName("manual elevator");
+  }
+
   /**
    * Drives elevator to the desired height, within its physical boundaries.
    *
    * @param height Desired height in meters.
    * @return A command which drives the elevator to the desired height.
    */
+  public Command goTo(DoubleSupplier height) {
+    return run(() -> update(height.getAsDouble()));
+  }
+
   public Command goTo(double height) {
-    return run(() -> update(height));
+    return goTo(() -> height);
   }
 
   /**
@@ -171,6 +189,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+
+    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   /**
