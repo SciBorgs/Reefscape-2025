@@ -123,10 +123,10 @@ public class Robot extends CommandRobot implements Logged {
     operator.b().onTrue(elevator.scoreLevel(Level.L2));
     operator.x().onTrue(elevator.scoreLevel(Level.L3));
     operator.y().onTrue(elevator.scoreLevel(Level.L4));
-    L1.trigger.onTrue(elevator.scoreLevel(Level.L1));
-    L2.trigger.onTrue(elevator.scoreLevel(Level.L2));
-    L3.trigger.onTrue(elevator.scoreLevel(Level.L3));
-    L4.trigger.onTrue(elevator.scoreLevel(Level.L4));
+    L1.trigger.whileTrue(elevator.scoreLevel(Level.L1));
+    L2.trigger.whileTrue(elevator.scoreLevel(Level.L2));
+    L3.trigger.whileTrue(elevator.scoreLevel(Level.L3));
+    L4.trigger.whileTrue(elevator.scoreLevel(Level.L4));
 
     // x and y are switched: we use joystick Y axis to control field x motion
     InputStream x = InputStream.of(driver::getLeftY).negate();
