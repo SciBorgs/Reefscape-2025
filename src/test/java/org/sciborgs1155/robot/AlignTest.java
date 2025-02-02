@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
-import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
 
 import com.pathplanner.lib.pathfinding.LocalADStar;
