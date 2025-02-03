@@ -14,12 +14,12 @@ public class SimElevator implements ElevatorIO {
   private final ElevatorSim elevator =
       new ElevatorSim(
           LinearSystemId.createElevatorSystem(
-              DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), DRUM_RADIUS.in(Meters), GEARING),
+              DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), SPROCKET_RADIUS.in(Meters), GEARING),
           DCMotor.getKrakenX60(2),
-          MIN_HEIGHT.in(Meters),
-          MAX_HEIGHT.in(Meters),
+          MIN_EXTENSION.in(Meters),
+          MAX_EXTENSION.in(Meters),
           true,
-          MIN_HEIGHT.in(Meters));
+          MIN_EXTENSION.in(Meters));
   ;
 
   public SimElevator() {

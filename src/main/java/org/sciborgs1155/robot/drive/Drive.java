@@ -50,6 +50,8 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -431,6 +433,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
+  }
+
+  public String closestBranch() {
+    if (pose().getX() < 3) {
+      return "A";
+    } else {
+      return "B";
+    }
   }
 
   /**

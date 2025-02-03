@@ -24,7 +24,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public final Trigger beambreakTrigger = new Trigger(() -> beambreak());
 
   public static Scoral create() {
-    return new Scoral(Robot.isReal() ? realMotor() : Scoral.none());
+    return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
   }
 
   private static SimpleMotor realMotor() {
@@ -37,8 +37,8 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(ROLLER), config);
   }
 
-  public static SimpleMotor none() {
-    return SimpleMotor.none();
+  public static Scoral none() {
+    return new Scoral(SimpleMotor.none());
   }
 
   public Scoral(SimpleMotor hardware) {

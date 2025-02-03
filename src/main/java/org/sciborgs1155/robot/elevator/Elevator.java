@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -19,11 +21,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
 
@@ -39,6 +46,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
 
   private final SysIdRoutine sysIdRoutine;
+
+  private DoubleEntry p = Tuning.entry("/elevator/kP", kP);
+  private DoubleEntry i = Tuning.entry("/elevator/kI", kI);
+  private DoubleEntry d = Tuning.entry("/elevator/kD", kD);
 
   @Log.NT
   private final ProfiledPIDController pid =
@@ -62,7 +73,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
     pid.setTolerance(POSITION_TOLERANCE.in(Meters));
     pid.reset(hardware.position());
-    pid.setGoal(MIN_HEIGHT.in(Meters));
+    pid.setGoal(MIN_EXTENSION.in(Meters));
 
     setDefaultCommand(retract());
 
@@ -70,17 +81,23 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(4),
+                Volts.of(2),
                 null,
                 (state) -> SignalLogger.writeString("elevator state", state.toString())),
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
     SmartDashboard.putData(
-        "pivot quasistatic forward", sysIdRoutine.quasistatic(Direction.kForward));
+        "elevator quasistatic forward",
+        sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
     SmartDashboard.putData(
-        "pivot quasistatic backward", sysIdRoutine.quasistatic(Direction.kReverse));
-    SmartDashboard.putData("pivot dynamic forward", sysIdRoutine.dynamic(Direction.kForward));
-    SmartDashboard.putData("pivot dynamic backward", sysIdRoutine.dynamic(Direction.kReverse));
+        "elevator quasistatic backward",
+        sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
+    SmartDashboard.putData(
+        "elevator dynamic forward",
+        sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
+    SmartDashboard.putData(
+        "elevator dynamic backward",
+        sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
   }
 
   /**
@@ -89,7 +106,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to its minimum height.
    */
   public Command retract() {
-    return goTo(MIN_HEIGHT.in(Meters));
+    return goTo(MIN_EXTENSION.in(Meters));
   }
 
   /**
@@ -102,14 +119,27 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return goTo(level.height.in(Meters));
   }
 
+  public Command manualElevator(InputStream input) {
+    return goTo(input
+            .scale(MAX_VELOCITY.in(MetersPerSecond))
+            .scale(Constants.PERIOD.in(Seconds))
+            .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
+            .add(this::position))
+        .withName("manual elevator");
+  }
+
   /**
    * Drives elevator to the desired height, within its physical boundaries.
    *
    * @param height Desired height in meters.
    * @return A command which drives the elevator to the desired height.
    */
+  public Command goTo(DoubleSupplier height) {
+    return run(() -> update(height.getAsDouble()));
+  }
+
   public Command goTo(double height) {
-    return run(() -> update(height));
+    return goTo(() -> height);
   }
 
   /**
@@ -158,7 +188,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
-    position = MathUtil.clamp(position, MIN_HEIGHT.in(Meters), MAX_HEIGHT.in(Meters));
+    position = MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
 
     double lastVelocity = pid.getSetpoint().velocity;
     double feedback = pid.calculate(hardware.position(), position);
@@ -171,6 +201,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+
+    pid.setP(p.get());
+    pid.setI(i.get());
+    pid.setD(d.get());
+
+    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   /**
