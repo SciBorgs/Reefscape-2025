@@ -35,7 +35,7 @@ public class TalonModule implements ModuleIO {
   private final StatusSignal<Angle> turnPos;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
-  private final PositionVoltage radiansOut = new PositionVoltage(0);
+  private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -86,7 +86,7 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR;
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.GEARING;
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
@@ -108,8 +108,8 @@ public class TalonModule implements ModuleIO {
       if (success.isOK()) break;
     }
 
-    register(turnMotor);
     register(driveMotor);
+    register(turnMotor);
 
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
@@ -179,8 +179,8 @@ public class TalonModule implements ModuleIO {
   }
 
   @Override
-  public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle).withSlot(0));
+  public void setTurnSetpoint(Rotation2d angle) {
+    turnMotor.setControl(rotationsIn.withPosition(angle.getRotations()).withSlot(0));
   }
 
   @Override
@@ -195,7 +195,7 @@ public class TalonModule implements ModuleIO {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
 
-    setTurnSetpoint(setpoint.angle.getRotations());
+    setTurnSetpoint(setpoint.angle);
     this.setpoint = setpoint;
   }
 
@@ -203,7 +203,7 @@ public class TalonModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {
     setpoint.angle = angle;
     setDriveVoltage(voltage);
-    setTurnSetpoint(angle.getRotations());
+    setTurnSetpoint(angle);
   }
 
   @Override

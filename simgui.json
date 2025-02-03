@@ -1,50 +1,15 @@
 {
-  "HALProvider": {
-    "Addressable LEDs": {
-      "0": {
-        "columns": 64
-      },
-      "window": {
-        "visible": true
-      }
-    },
-    "Other Devices": {
-      "window": {
-        "visible": false
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
-<<<<<<< HEAD
-      "/Robot/arm/armCanvas": "Mechanism2d",
-      "/Robot/arm/fb": "ProfiledPIDController",
-=======
->>>>>>> main
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
-      "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
-      "/Robot/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
-      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
-<<<<<<< HEAD
-=======
-      "/SmartDashboard/drive dynamic backward": "Command",
-      "/SmartDashboard/drive dynamic forward": "Command",
-      "/SmartDashboard/drive quasistatic backward": "Command",
-      "/SmartDashboard/drive quasistatic forward": "Command",
-      "/SmartDashboard/pivot dynamic backward": "Command",
-      "/SmartDashboard/pivot dynamic forward": "Command",
-      "/SmartDashboard/pivot quasistatic backward": "Command",
-      "/SmartDashboard/pivot quasistatic forward": "Command",
->>>>>>> main
       "/SmartDashboard/rotation dynamic backward": "Command",
       "/SmartDashboard/rotation dynamic forward": "Command",
       "/SmartDashboard/rotation quasistatic backward": "Command",
@@ -52,186 +17,10 @@
       "/SmartDashboard/translation dynamic backward": "Command",
       "/SmartDashboard/translation dynamic forward": "Command",
       "/SmartDashboard/translation quasistatic backward": "Command",
-      "/SmartDashboard/translation quasistatic forward": "Command",
-      "/SmartDashboard/turn dynamic backward": "Command",
-      "/SmartDashboard/turn dynamic forward": "Command",
-      "/SmartDashboard/turn quasistatic backward": "Command",
-      "/SmartDashboard/turn quasistatic forward": "Command"
-    },
-    "windows": {
-      "/Robot/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/drive/field2d": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "module- FL": {
-          "style": "Line"
-        },
-        "module- RR": {
-          "style": "Line"
-        },
-        "module-FR": {
-          "style": "Line"
-        },
-        "module-RL": {
-          "style": "Line"
-        },
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/elevator/measurement/mech": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/elevator/setpoint/mech": {
-        "window": {
-          "visible": true
-        }
-      }
-    }
-  },
-  "NetworkTables": {
-    "Retained Values": {
-      "open": false
-    },
-    "transitory": {
-      "Robot": {
-        "drive": {
-          "Pose2d##v_/Robot/drive/getPose": {
-            "Rotation2d##v_rotation": {
-              "open": true
-            },
-            "open": true
-          },
-          "Pose2d##v_/Robot/drive/pose": {
-            "Rotation2d##v_rotation": {
-              "open": true
-            },
-            "Translation2d##v_translation": {
-              "open": true
-            },
-            "open": true
-          },
-          "SwerveModulePosition[]##v_/Robot/drive/getModulePositions": {
-            "SwerveModulePosition##v_[1]": {
-              "Rotation2d##v_angle": {
-                "open": true
-              }
-            }
-          },
-          "SwerveModuleState[]##v_/Robot/drive/getModuleSetpoints": {
-            "SwerveModuleState##v_[0]": {
-              "Rotation2d##v_angle": {
-                "open": true
-              }
-            },
-            "SwerveModuleState##v_[1]": {
-              "open": true
-            },
-            "SwerveModuleState##v_[2]": {
-              "Rotation2d##v_angle": {
-                "open": true
-              },
-              "open": true
-            },
-            "SwerveModuleState##v_[3]": {
-              "Rotation2d##v_angle": {
-                "open": true
-              },
-              "open": true
-            },
-            "open": true
-          },
-          "SwerveModuleState[]##v_/Robot/drive/getModuleStates": {
-            "SwerveModuleState##v_[0]": {
-              "Rotation2d##v_angle": {
-                "open": true
-              },
-              "open": true
-            },
-            "open": true
-          },
-          "frontRight": {
-            "SwerveModulePosition##v_/Robot/drive/frontRight/position": {
-              "Rotation2d##v_angle": {
-                "open": true
-              },
-              "open": true
-            },
-            "SwerveModuleState##v_/Robot/drive/frontRight/state": {
-              "Rotation2d##v_angle": {
-                "open": true
-              },
-              "open": true
-            },
-            "open": true
-          },
-          "open": true
-        },
-        "vision": {
-          "open": true
-        }
-      },
-      "Shuffleboard": {
-        "open": true
-      },
-      "SmartDashboard": {
-        "open": true
-      }
+      "/SmartDashboard/translation quasistatic forward": "Command"
     }
   },
   "NetworkTables Info": {
     "visible": true
-  },
-  "Plot": {
-    "Plot <0>": {
-      "plots": [
-        {
-          "backgroundColor": [
-            0.0,
-            0.0,
-            0.0,
-            0.8500000238418579
-          ],
-<<<<<<< HEAD
-          "height": 0,
-=======
-          "height": 405,
->>>>>>> main
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/Robot/elevator/positionSetpoint"
-            },
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/Robot/elevator/position"
-            }
-          ]
-        }
-      ],
-      "window": {
-        "name": "Elevator"
-      }
-    }
   }
 }

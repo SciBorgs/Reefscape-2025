@@ -104,8 +104,8 @@ public class SimModule implements ModuleIO {
   }
 
   @Override
-  public void setTurnSetpoint(double setpoint) {
-    setTurnVoltage(turnFeedback.calculate(rotation().getRadians(), setpoint));
+  public void setTurnSetpoint(Rotation2d setpoint) {
+    setTurnVoltage(turnFeedback.calculate(rotation().getRadians(), setpoint.getRadians()));
   }
 
   @Override
@@ -121,7 +121,7 @@ public class SimModule implements ModuleIO {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
 
-    setTurnSetpoint(setpoint.angle.getRadians());
+    setTurnSetpoint(setpoint.angle);
     this.setpoint = setpoint;
   }
 

@@ -133,7 +133,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               ANGULAR_OFFSETS.get(3),
               "RR",
               true));
-
     } else {
       return new Drive(
           new NoGyro(),
