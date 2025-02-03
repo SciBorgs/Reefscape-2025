@@ -125,7 +125,7 @@ public class TalonModule implements ModuleIO {
     return name;
   }
 
-  public double update() {
+  public void update() {
     driveVelocity = driveMotor.getVelocity().getValueAsDouble();
   }
 
