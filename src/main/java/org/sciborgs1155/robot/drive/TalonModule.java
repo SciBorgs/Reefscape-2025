@@ -31,11 +31,11 @@ public class TalonModule implements ModuleIO {
   private final TalonFX turnMotor; // Kraken X60
 
   private final StatusSignal<Angle> drivePos;
-  private final StatusSignal<AngularVelocity> driveVelocity;
+  private double driveVelocity;
   private final StatusSignal<Angle> turnPos;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
-  private final PositionVoltage radiansOut = new PositionVoltage(0);
+  private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -56,10 +56,10 @@ public class TalonModule implements ModuleIO {
       boolean invert) {
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
     drivePos = driveMotor.getPosition();
-    driveVelocity = driveMotor.getVelocity();
+    driveVelocity = driveMotor.getVelocity().getValueAsDouble();
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
-    // drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+    drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
     // driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
@@ -78,7 +78,7 @@ public class TalonModule implements ModuleIO {
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     turnPos = turnMotor.getPosition();
 
-    // turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
+    turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
@@ -86,7 +86,7 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.POSITION_FACTOR;
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.GEARING;
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 
@@ -108,8 +108,8 @@ public class TalonModule implements ModuleIO {
       if (success.isOK()) break;
     }
 
-    register(turnMotor);
     register(driveMotor);
+    register(turnMotor);
 
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
@@ -124,6 +124,8 @@ public class TalonModule implements ModuleIO {
   public String name() {
     return name;
   }
+
+  public double update() {}
 
   @Override
   public void setDriveVoltage(double voltage) {
@@ -141,8 +143,9 @@ public class TalonModule implements ModuleIO {
   }
 
   @Override
+  @Log
   public double driveVelocity() {
-    return driveVelocity.getValueAsDouble();
+    return driveVelocity;
   }
 
   @Override
@@ -179,8 +182,8 @@ public class TalonModule implements ModuleIO {
   }
 
   @Override
-  public void setTurnSetpoint(double angle) {
-    turnMotor.setControl(radiansOut.withPosition(angle).withSlot(0));
+  public void setTurnSetpoint(Rotation2d angle) {
+    turnMotor.setControl(rotationsIn.withPosition(angle.getRotations()).withSlot(0));
   }
 
   @Override
@@ -195,7 +198,7 @@ public class TalonModule implements ModuleIO {
       setDriveSetpoint(setpoint.speedMetersPerSecond);
     }
 
-    setTurnSetpoint(setpoint.angle.getRotations());
+    setTurnSetpoint(setpoint.angle);
     this.setpoint = setpoint;
   }
 
@@ -203,7 +206,7 @@ public class TalonModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {
     setpoint.angle = angle;
     setDriveVoltage(voltage);
-    setTurnSetpoint(angle.getRotations());
+    setTurnSetpoint(angle);
   }
 
   @Override

@@ -135,7 +135,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               ANGULAR_OFFSETS.get(3),
               "RR",
               true));
-
     } else {
       return new Drive(
           new NoGyro(),
@@ -476,6 +475,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
     }
+    modules.get(0);
 
     log(
         "turning target",

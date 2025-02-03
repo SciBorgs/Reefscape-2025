@@ -123,10 +123,10 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
+    operator.a().whileTrue(elevator.scoreLevel(Level.L1));
+    operator.b().whileTrue(elevator.scoreLevel(Level.L2));
+    operator.x().whileTrue(elevator.scoreLevel(Level.L3));
+    operator.y().whileTrue(elevator.scoreLevel(Level.L4));
 
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();

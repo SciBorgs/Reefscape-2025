@@ -119,9 +119,7 @@ public final class DriveConstants {
     }
 
     static final class Turning {
-      public static final double GEARING = 12.1; // 0.4 / (12.1 * 1.3);
-
-      public static final double POSITION_FACTOR = GEARING / (2 * Math.PI);
+      public static final double GEARING = 1; // 0.4 / (12.1 * 1.3);
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
