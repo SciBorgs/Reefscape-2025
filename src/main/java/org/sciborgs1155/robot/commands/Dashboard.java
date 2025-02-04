@@ -19,6 +19,7 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetBranch;
   private static NetworkTableEntry entryTargetLevel;
   private static NetworkTableEntry entryProcessor;
+  private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryRobotTick;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
@@ -41,6 +42,9 @@ public class Dashboard {
     entryProcessor = base.getEntry("processor");
     entryProcessor.setBoolean(false);
     processorTrigger = new Trigger(() -> entryProcessor.getBoolean(false));
+
+    entryTargetAlgae = base.getEntry("algae");
+    entryTargetAlgae.setInteger(-1);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -114,7 +118,17 @@ public class Dashboard {
    * @return a Trigger for that level
    */
   private static Trigger setTriggerLevel(int level) {
-    return new Trigger(() -> (level == entryTargetLevel.getInteger(0)));
+    return new Trigger(() -> (level == entryTargetLevel.getInteger(-1)));
+  }
+
+  /**
+   * Returns a Trigger, given a reef algae.
+   *
+   * @param side the side of the reef, with AB as 0
+   * @return a Trigger for that algae
+   */
+  private static Trigger setTriggerAlgae(int side) {
+    return new Trigger(() -> (side == entryTargetAlgae.getInteger(-1)));
   }
 
   /** An enum for each branch of the alliance's reef. */
@@ -154,6 +168,24 @@ public class Dashboard {
     private Levels(int level) {
       this.level = level;
       this.trigger = setTriggerLevel(level);
+    }
+  }
+
+  /** An enum for each algae of the alliance's reef. */
+  public static enum Algae {
+    AB(0),
+    CD(1),
+    EF(2),
+    GH(3),
+    IJ(4),
+    KL(5);
+
+    public final int algae;
+    public final Trigger trigger;
+
+    private Algae(int algae) {
+      this.algae = algae;
+      this.trigger = setTriggerAlgae(algae);
     }
   }
 }
