@@ -60,5 +60,8 @@ public class Constants {
           && pose.getY() > 0
           && pose.getY() < Field.WIDTH.in(Meters));
     }
+
+    /** Offset added to a level's height in order to to be at the algae's height */
+    public static final Distance algaeOffset = Meters.of(0);
   }
 }

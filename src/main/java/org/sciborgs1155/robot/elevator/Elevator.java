@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.robot.Constants.Field.algaeOffset;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -23,6 +24,8 @@ import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
@@ -86,11 +89,17 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
     SmartDashboard.putData(
-        "pivot quasistatic forward", sysIdRoutine.quasistatic(Direction.kForward));
+        "pivot quasistatic forward",
+        sysIdRoutine.quasistatic(Direction.kForward).withName("pivot quasistatic forward"));
     SmartDashboard.putData(
-        "pivot quasistatic backward", sysIdRoutine.quasistatic(Direction.kReverse));
-    SmartDashboard.putData("pivot dynamic forward", sysIdRoutine.dynamic(Direction.kForward));
-    SmartDashboard.putData("pivot dynamic backward", sysIdRoutine.dynamic(Direction.kReverse));
+        "pivot quasistatic backward",
+        sysIdRoutine.quasistatic(Direction.kReverse).withName("pivot quasistatic backward"));
+    SmartDashboard.putData(
+        "pivot dynamic forward",
+        sysIdRoutine.dynamic(Direction.kForward).withName("pivot dynamic forward"));
+    SmartDashboard.putData(
+        "pivot dynamic backward",
+        sysIdRoutine.dynamic(Direction.kReverse).withName("pivot dynamic backward"));
   }
 
   /**
@@ -110,6 +119,23 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command scoreLevel(Level level) {
     return goTo(level.extension.in(Meters));
+  }
+
+  /**
+   * Goes to an offset height above the level given in order to clean algae; ONLY L2 and L3!
+   *
+   * @param level An enum that should be either L2 or L3
+   */
+  public Command clean(Level level) {
+    if (level == Level.L1 || level == Level.L4) {
+      FaultLogger.report(
+          "Algae level",
+          "An invalid level has been passed to the clean command; L1 or L4",
+          FaultType.WARNING);
+      return retract();
+    }
+
+    return goTo(level.extension.plus(algaeOffset).in(Meters));
   }
 
   /**
