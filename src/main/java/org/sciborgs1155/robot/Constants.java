@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.Field.Branch.poseList;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
+import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
 import static org.sciborgs1155.robot.Constants.Robot.SIDE_LENGTH;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -67,6 +68,8 @@ public class Constants {
 
     public static final Distance SIDE_LENGTH = Inches.of(28);
     // TODO add bumper length to this
+
+    public static final Distance BUMPER_LENGTH = Inches.of(28+3+3); // TODO NOT A FINAL VALUE
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
@@ -103,21 +106,23 @@ public class Constants {
       }
     }
 
+    public static final Distance REEF_MIN_RADIUS = Centimeters.of(166/2);
+
     // The center of the blue alliance reef hexagon
     public static final Translation2d CENTER_REEF =
-        new Translation2d(Inches.of(93.5 / 2).plus(Feet.of(12)), WIDTH.div(2));
+        new Translation2d(Feet.of(12).plus(REEF_MIN_RADIUS), WIDTH.div(2));
 
     // The field robot poses for blue alliance's reef branches A and B. Both are the farthest to the
     // blue
     // alliance side, and B is counter-clockwise of A.
     public static final Pose2d REEF_BRANCH_A =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(Inches.of(93.5 / 2).plus(SIDE_LENGTH)),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2).plus(Inches.of(3)/* extra tolerance */))),
             CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
     public static final Pose2d REEF_BRANCH_B =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(Inches.of(93.5 / 2).plus(SIDE_LENGTH)),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2).plus(Inches.of(3)/* extra tolerance */))),
             CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
 
@@ -165,7 +170,7 @@ public class Constants {
             input
                 .getTranslation()
                 .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(-60).times(times)),
-            Rotation2d.fromDegrees(60).times(times));
+            Rotation2d.fromDegrees(-60*times));
       }
 
       /**
