@@ -100,9 +100,6 @@ public final class DriveConstants {
 
       public static final double GEARING = 5.68;
 
-      public static final Distance POSITION_FACTOR = CIRCUMFERENCE.times(GEARING);
-      public static final LinearVelocity VELOCITY_FACTOR = POSITION_FACTOR.per(Minute);
-
       public static final Current CURRENT_LIMIT = Amps.of(60);
 
       public static final class PID {

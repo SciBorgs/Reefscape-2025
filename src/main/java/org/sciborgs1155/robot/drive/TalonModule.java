@@ -19,7 +19,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -30,8 +29,6 @@ public class TalonModule implements ModuleIO {
   private final TalonFX driveMotor; // Kraken X60
   private final TalonFX turnMotor; // Kraken X60
 
-  private final StatusSignal<Angle> drivePos;
-  private double driveVelocity;
   private final StatusSignal<Angle> turnPos;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
@@ -55,17 +52,15 @@ public class TalonModule implements ModuleIO {
       String name,
       boolean invert) {
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
-    drivePos = driveMotor.getPosition();
-    driveVelocity = driveMotor.getVelocity().getValueAsDouble();
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
-    drivePos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
     // driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
 
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonDriveConfig.Feedback.SensorToMechanismRatio = 1 / Driving.POSITION_FACTOR.in(Meters);
+    talonDriveConfig.Feedback.SensorToMechanismRatio =
+        Driving.GEARING / Driving.CIRCUMFERENCE.in(Meters);
     talonDriveConfig.CurrentLimits.StatorCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
 
     talonDriveConfig.MotorOutput.Inverted =
@@ -125,10 +120,6 @@ public class TalonModule implements ModuleIO {
     return name;
   }
 
-  public void updateDriveVelocity() {
-    driveVelocity = driveMotor.getVelocity().getValueAsDouble();
-  }
-
   @Override
   public void setDriveVoltage(double voltage) {
     driveMotor.setVoltage(voltage);
@@ -141,13 +132,13 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public double drivePosition() {
-    return drivePos.getValueAsDouble();
+    return driveMotor.getPosition().getValueAsDouble();
   }
 
   @Override
   @Log
   public double driveVelocity() {
-    return driveVelocity;
+    return driveMotor.getVelocity().getValueAsDouble();
   }
 
   @Override

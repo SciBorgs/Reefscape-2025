@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -33,16 +32,10 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
-import org.sciborgs1155.robot.led.LEDStrip;
-import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -52,6 +45,7 @@ import org.sciborgs1155.robot.vision.Vision;
  */
 public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
+
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
@@ -59,10 +53,10 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = new Vision();
-  private final LEDStrip led = new LEDStrip();
-  private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.none();
+  // private final Vision vision = new Vision();
+  // private final LEDStrip led = new LEDStrip();
+  // private final Elevator elevator = Elevator.create();
+  // private final Scoral scoral = Scoral.none();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -123,10 +117,10 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().whileTrue(elevator.scoreLevel(Level.L1));
-    operator.b().whileTrue(elevator.scoreLevel(Level.L2));
-    operator.x().whileTrue(elevator.scoreLevel(Level.L3));
-    operator.y().whileTrue(elevator.scoreLevel(Level.L4));
+    // operator.a().whileTrue(elevator.scoreLevel(Level.L1));
+    // operator.b().whileTrue(elevator.scoreLevel(Level.L2));
+    // operator.x().whileTrue(elevator.scoreLevel(Level.L3));
+    // operator.y().whileTrue(elevator.scoreLevel(Level.L4));
 
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
@@ -160,8 +154,8 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
-    led.setDefaultCommand(led.rainbow());
-        // led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
+    // led.setDefaultCommand(led.rainbow());
+    // led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 

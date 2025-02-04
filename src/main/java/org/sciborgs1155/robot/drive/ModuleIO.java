@@ -98,8 +98,6 @@ public interface ModuleIO extends Logged, AutoCloseable {
    */
   void updateSetpoint(SwerveModuleState setpoint, ControlMode mode);
 
-  void updateDriveVelocity();
-
   /**
    * Updates the drive voltage and turn angle.
    *
