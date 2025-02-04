@@ -64,4 +64,7 @@ public class NoModule implements ModuleIO {
 
   @Override
   public void close() {}
+
+  @Override
+  public void updateDriveVelocity() {}
 }

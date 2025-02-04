@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -470,12 +471,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     // update our simulated field poses
     field2d.setRobotPose(pose());
 
+    
+
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
+      module.updateDriveVelocity();
     }
-    modules.get(0);
 
     log(
         "turning target",

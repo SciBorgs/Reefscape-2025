@@ -137,4 +137,10 @@ public class SimModule implements ModuleIO {
 
   @Override
   public void close() {}
+
+  @Override
+  public void updateDriveVelocity() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'updateDriveVelocity'");
+  }
 }
