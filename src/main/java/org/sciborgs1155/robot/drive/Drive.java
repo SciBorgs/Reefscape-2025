@@ -65,7 +65,6 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
