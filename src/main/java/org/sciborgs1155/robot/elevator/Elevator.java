@@ -79,11 +79,17 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
     SmartDashboard.putData(
-        "pivot quasistatic forward", sysIdRoutine.quasistatic(Direction.kForward).withName("pivot quasistatic forward"));
+        "pivot quasistatic forward",
+        sysIdRoutine.quasistatic(Direction.kForward).withName("pivot quasistatic forward"));
     SmartDashboard.putData(
-        "pivot quasistatic backward", sysIdRoutine.quasistatic(Direction.kReverse).withName("pivot quasistatic backward"));
-    SmartDashboard.putData("pivot dynamic forward", sysIdRoutine.dynamic(Direction.kForward).withName("pivot dynamic forward"));
-    SmartDashboard.putData("pivot dynamic backward", sysIdRoutine.dynamic(Direction.kReverse).withName("pivot dynamic backward"));
+        "pivot quasistatic backward",
+        sysIdRoutine.quasistatic(Direction.kReverse).withName("pivot quasistatic backward"));
+    SmartDashboard.putData(
+        "pivot dynamic forward",
+        sysIdRoutine.dynamic(Direction.kForward).withName("pivot dynamic forward"));
+    SmartDashboard.putData(
+        "pivot dynamic backward",
+        sysIdRoutine.dynamic(Direction.kReverse).withName("pivot dynamic backward"));
   }
 
   /**
