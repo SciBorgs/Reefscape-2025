@@ -340,13 +340,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * Sets the states of each swerve module using target speeds that the drivetrain will work to
    * reach.
    *
-   * @param speeds The speeds the drivetrain will run at.
+   * @param speeds The robot relative speeds the drivetrain will run at.
    * @param mode The control loop used to achieve those speeds.
    */
   public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
+    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
         kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(speeds, Constants.PERIOD.in(Seconds))),
+            ChassisSpeeds.discretize(
+                kinematics.toChassisSpeeds(states), Constants.PERIOD.in(Seconds))),
         mode);
   }
 
@@ -360,8 +363,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     if (desiredStates.length != modules.size()) {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
-
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED.in(MetersPerSecond));
 
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).updateSetpoint(desiredStates[i], mode);
@@ -474,7 +475,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       var module = modules.get(i);
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
-      module.updateDriveVelocity();
     }
 
     log(
