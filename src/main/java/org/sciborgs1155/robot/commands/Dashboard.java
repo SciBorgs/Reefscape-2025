@@ -3,10 +3,12 @@ package org.sciborgs1155.robot.commands;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Robot;
 
 /**
  * Dashboard listens to NetworkTable information from the Reefscape-2025-Dashboard, which can be
@@ -20,6 +22,8 @@ public class Dashboard {
   private static NetworkTableEntry entryRobotTick;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
+  private static NetworkTableEntry entryMatch;
+  private static NetworkTableEntry entryMatchTime;
   public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
   public static Trigger processorTrigger;
 
@@ -27,6 +31,7 @@ public class Dashboard {
   public static void configure() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
 
+    // Scoring
     entryTargetBranch = base.getEntry("branch");
     entryTargetBranch.setString("");
 
@@ -37,12 +42,39 @@ public class Dashboard {
     entryProcessor.setBoolean(false);
     processorTrigger = new Trigger(() -> entryProcessor.getBoolean(false));
 
+    // Status
     entryRobotTick = base.getEntry("robotTick");
     entryRobotTick.setInteger(0);
     tick = 0;
 
+    // Match
     entryBlueAlliance = base.getEntry("blueAlliance");
     entryBlueAlliance.setBoolean(Constants.alliance() == Alliance.Blue);
+
+    entryMatch = base.getEntry("match");
+    entryMatchTime = base.getEntry("matchTime");
+    if (Robot.isReal()) {
+
+      String temp = "";
+      switch (DriverStation.getMatchType()) {
+        case None:
+          temp = "M";
+        case Elimination:
+          temp = "E";
+        case Practice:
+          temp = "P";
+        case Qualification:
+          temp = "Q";
+        default:
+          temp = "M";
+      }
+      entryMatch.setString(
+          "@ " + DriverStation.getEventName() + " / " + temp + DriverStation.getMatchNumber());
+      entryMatchTime.setDouble(DriverStation.getMatchTime());
+    } else {
+      entryMatch.setString("@ Sim / M0");
+      entryMatchTime.setDouble(0);
+    }
 
     // info setup
     transmit("closestBranch");
@@ -52,6 +84,7 @@ public class Dashboard {
   public static void tick() {
     tick += 1;
     entryRobotTick.setInteger(tick);
+    entryMatchTime.setDouble(Robot.isReal() ? DriverStation.getMatchTime() : 0);
   }
 
   /**
