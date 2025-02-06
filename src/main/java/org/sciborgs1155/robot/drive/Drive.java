@@ -16,7 +16,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,6 +48,10 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.BetterOdometry;
+import org.sciborgs1155.lib.BetterPoseEstimator;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -74,7 +77,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final SwerveDrivePoseEstimator odometry;
+  private final BetterPoseEstimator<SwerveModuleState[]> odometry;
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -178,11 +181,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     odometry =
-        new SwerveDrivePoseEstimator(
+        new BetterPoseEstimator<SwerveModuleState[]>(
             kinematics,
-            gyro.rotation2d(),
-            modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new BetterOdometry(
+                this::moduleStates,
+                () -> Robot.isReal() ? gyro.rotation2d() : simRotation,
+                STARTING_POSE.getTranslation()),
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            VecBuilder.fill(0.9, 0.9, 0.9));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -241,7 +247,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(gyro.rotation2d(), modulePositions(), pose);
+    odometry.resetPose(pose);
   }
 
   /**
@@ -436,8 +442,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
-    odometry.update(Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions());
-
+    odometry.update();
     // update our simulated field poses
     field2d.setRobotPose(pose());
 

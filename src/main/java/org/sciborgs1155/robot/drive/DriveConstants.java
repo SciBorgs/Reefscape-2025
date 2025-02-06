@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -83,6 +84,9 @@ public final class DriveConstants {
           Rotation2d.fromRadians(Math.PI), // rear left
           Rotation2d.fromRadians(Math.PI / 2) // rear right
           );
+
+  public static final Pose2d STARTING_POSE =
+      new Pose2d(); // TODO I DON'T KNOW WHAT THIS IS!!!!!!!!!!!!!!!!
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 

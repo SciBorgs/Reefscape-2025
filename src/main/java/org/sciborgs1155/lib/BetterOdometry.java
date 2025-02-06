@@ -5,28 +5,32 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 
-import java.util.function.Supplier;
-
-import com.ctre.phoenix6.swerve.jni.SwerveJNI.ModuleState;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import java.util.function.Supplier;
 
 public class BetterOdometry {
 
   private Translation2d fieldPosition;
-  private ModuleState[] prevStates;
-  private final Supplier<ModuleState[]> modules;
+  private SwerveModuleState[] prevStates;
+  private final Supplier<SwerveModuleState[]> modules;
   private final Supplier<Rotation2d> heading;
 
   /**
    * Creates a new arc odometry calculator.
+   *
    * @param modules The supplier of the modules' states.
    * @param heading The supplier for the field-relative heading of the robot.
    * @param start The starting field-relative position for the robot.
    */
-  public BetterOdometry(Supplier<ModuleState[]> modules, Supplier<Rotation2d> heading, Translation2d start) {
+  public BetterOdometry(
+      Supplier<SwerveModuleState[]> modules, Supplier<Rotation2d> heading, Translation2d start) {
+    prevStates = modules.get(); // to prevent a null pointer exception
+
     fieldPosition = start;
     this.modules = modules;
     this.heading = heading;
@@ -34,20 +38,22 @@ public class BetterOdometry {
 
   /**
    * Resets the field position of the odometry to a given position.
+   *
    * @param pos The field-relative position to reset to.
    */
-  public void resetOdometry(Translation2d pos) {
-    fieldPosition = pos;
+  public void resetOdometry(Pose2d pose) {
+    fieldPosition = pose.getTranslation();
   }
 
   /**
-   * Uses two tangential velocities of an arc to find the secant length of one module, representing the module's diplacement.
-   * 
+   * Uses two tangential velocities of an arc to find the secant length of one module, representing
+   * the module's diplacement.
+   *
    * @param v0 The starting velocity vector of the module, (at t0).
    * @param v1 The ending velocity vector of the module (at t1).
    * @return The calculated translation vector from where it is at t0 to where it is at t1.
    */
-  private static Translation2d moduleDisplacement(Translation2d v0, Translation2d v1) {
+  public static Translation2d moduleDisplacement(Translation2d v0, Translation2d v1) {
     // Angle between the two velocities
     Angle theta = v1.getAngle().minus(v0.getAngle()).getMeasure();
 
@@ -72,17 +78,17 @@ public class BetterOdometry {
 
   /**
    * Takes the robot-relative velocity of the module.
-   * 
+   *
    * @param state The input module state.
    * @return The robot-relative velocity of the module.
    */
-  private static Translation2d stateToVelocity(ModuleState state) {
-    return new Translation2d(state.speed, Rotation2d.fromRadians(state.angle));
+  private static Translation2d stateToVelocity(SwerveModuleState state) {
+    return new Translation2d(state.speedMetersPerSecond, state.angle);
   }
 
   /**
    * Averages the displacements of all of the motors to find the robot relative displacement.
-   * 
+   *
    * @return The robot relative displacement.
    */
   public Translation2d robotRelativeDisplacement() {
@@ -97,8 +103,9 @@ public class BetterOdometry {
   }
 
   /**
-   * Rotates the robot relative displacement by the robot's heading, then adds it to the robot's position on the field.
-   * 
+   * Rotates the robot relative displacement by the robot's heading, then adds it to the robot's
+   * position on the field.
+   *
    * @return The robot's field relative position.
    */
   public Translation2d fieldRelativePosition() {
@@ -116,7 +123,7 @@ public class BetterOdometry {
   /**
    * @return The estimated position of the robot.
    */
-  public Translation2d getPosition() {
-    return fieldPosition;
+  public Pose2d getPose() {
+    return new Pose2d(fieldPosition, heading.get());
   }
 }
