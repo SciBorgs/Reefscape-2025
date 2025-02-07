@@ -1,25 +1,25 @@
 package org.sciborgs1155.robot;
 
-import org.junit.jupiter.api.AfterEach;
+import static edu.wpi.first.units.Units.Radians;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.arm.ArmConstants;
 import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE;
 import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.arm.ArmConstants;
 import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.coroller.Coroller;
-
-import static edu.wpi.first.units.Units.Radians;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class CorollingTest {
   Arm arm;

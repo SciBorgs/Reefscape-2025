@@ -1,14 +1,14 @@
 package org.sciborgs1155.robot.commands;
 
-import org.sciborgs1155.robot.arm.Arm;
+import static edu.wpi.first.units.Units.Radians;
 import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
-import org.sciborgs1155.robot.coroller.Coroller;
 
-import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.coroller.Coroller;
 
 public class Corolling {
 
