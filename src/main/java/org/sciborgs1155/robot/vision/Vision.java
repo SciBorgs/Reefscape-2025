@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
@@ -26,6 +25,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Robot;
 
 public class Vision implements Logged {
@@ -42,7 +42,7 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our two configured cameras. */
   public static Vision create() {
-    return new Vision(BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA, FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA);
+    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }
 
   public Vision(CameraConfig... configs) {
@@ -100,41 +100,31 @@ public class Vision implements Logged {
   public PoseEstimate[] estimatedGlobalPoses() {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
-      var unread = cameras[i].getAllUnreadResults();
-      PhotonPipelineResult result;
-      if (unread.size() > 1) {
-        // gets the latest result if there are multiple unread results
-        int maxIndex = 0;
-        double max = 0;
-        int unreadLength = unread.size();
-        for (int ie = 0; ie < unreadLength; ie++) {
-          double temp = unread.get(ie).getTimestampSeconds();
-          if (temp > max) {
-            max = temp;
-            maxIndex = ie;
-          }
-        }
-        result = unread.get(maxIndex);
-        lastResults[i] = result;
-      } else if (unread.size() == 1) {
-        result = unread.get(0);
-        lastResults[i] = result;
-      } else {
-        result = lastResults[i];
+      var unreadChanges = cameras[i].getAllUnreadResults();
+      Optional<EstimatedRobotPose> estimate = Optional.empty();
+
+      int unreadLength = unreadChanges.size();
+
+      // feeds latest result for visualization; multiple different pos breaks getSeenTags()
+      lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
+
+      for (int j = 0; j < unreadLength; j++) {
+        var change = unreadChanges.get(j);
+        estimate = estimators[i].update(change);
+        log("estimates present " + i, estimate.isPresent());
+        estimate
+            .filter(
+                f ->
+                    Field.inField(f.estimatedPose)
+                        && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                        && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                        && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+            .ifPresent(
+                e ->
+                    estimates.add(
+                        new PoseEstimate(
+                            e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
       }
-      var estimate = estimators[i].update(result);
-      log("estimates present " + i, estimate.isPresent());
-      estimate
-          .filter(
-              f ->
-                  Field.inField(f.estimatedPose)
-                      && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                      && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                      && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
-          .ifPresent(
-              e ->
-                  estimates.add(
-                      new PoseEstimate(e, estimationStdDevs(e.estimatedPose.toPose2d(), result))));
     }
     return estimates.toArray(PoseEstimate[]::new);
   }
@@ -181,7 +171,7 @@ public class Vision implements Logged {
     avgDist /= numTags;
     avgWeight /= numTags;
 
-    // Decrease std devs if multiple targets are visibleX
+    // Decrease std devs if multiple targets are visible
     if (numTags > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
     // Increase std devs based on (average) distance
     if (numTags == 1 && avgDist > 4)
