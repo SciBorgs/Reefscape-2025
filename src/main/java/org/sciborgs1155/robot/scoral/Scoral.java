@@ -20,8 +20,8 @@ import org.sciborgs1155.robot.Robot;
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor hardware;
 
-  private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
-  public final Trigger beambreakTrigger = new Trigger(() -> beambreak());
+  // private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
+  // public final Trigger beambreakTrigger = new Trigger(() -> beambreak());
 
   public static Scoral create() {
     return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
@@ -43,6 +43,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   public Scoral(SimpleMotor hardware) {
     this.hardware = hardware;
+    setDefaultCommand(run(() -> hardware.set(0)));
   }
 
   /**
@@ -50,19 +51,19 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
    * broken.
    */
   public Command outtake() {
-    return run(() -> hardware.set(POWER)).until(() -> beambreak()).withName("outtake");
+    return run(() -> hardware.set(-POWER)).withName("outtake");
   }
 
   /** Runs the motor to move a coral into the scoral. Ends when the beam is broken. */
   public Command intake() {
-    return run(() -> hardware.set(POWER)).until(() -> !beambreak()).withName("intake");
+    return run(() -> hardware.set(POWER)).withName("intake");
   }
 
   /** Returns the value of the beambreak, which is false when the beam is broken. */
-  @Log.NT
-  public boolean beambreak() {
-    return beambreak.get();
-  }
+  // @Log.NT
+  // public boolean beambreak() {
+  //   return beambreak.get();
+  // }
 
   @Override
   public void periodic() {

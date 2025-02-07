@@ -75,8 +75,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     pid.reset(hardware.position());
     pid.setGoal(MIN_EXTENSION.in(Meters));
 
-    setDefaultCommand(retract());
-
     sysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -106,7 +104,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to its minimum height.
    */
   public Command retract() {
-    return goTo(MIN_EXTENSION.in(Meters));
+    return goTo(MIN_EXTENSION.in(Meters)).withName("retracting");
   }
 
   /**
@@ -116,15 +114,16 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.height.in(Meters));
+    return goTo(level.height.in(Meters)).withName("scoring");
   }
 
   public Command manualElevator(InputStream input) {
     return goTo(input
             .scale(MAX_VELOCITY.in(MetersPerSecond))
+            .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
             .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
-            .add(this::position))
+            .add(() -> pid.getGoal().position))
         .withName("manual elevator");
   }
 
@@ -135,7 +134,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to the desired height.
    */
   public Command goTo(DoubleSupplier height) {
-    return run(() -> update(height.getAsDouble()));
+    return run(() -> update(height.getAsDouble())).finallyDo(() -> hardware.setVoltage(0));
   }
 
   public Command goTo(double height) {
@@ -177,6 +176,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Whether or not the elevator is at its desired state.
    */
+  @Log.NT
   public boolean atGoal() {
     return pid.atGoal();
   }

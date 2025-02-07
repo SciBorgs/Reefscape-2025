@@ -36,6 +36,8 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.scoral.Scoral;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,8 +57,8 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   // private final Vision vision = new Vision();
   // private final LEDStrip led = new LEDStrip();
-  // private final Elevator elevator = Elevator.create();
-  // private final Scoral scoral = Scoral.none();
+  private final Elevator elevator = Elevator.create();
+  private final Scoral scoral = Scoral.create();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -117,11 +119,6 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    // operator.a().whileTrue(elevator.scoreLevel(Level.L1));
-    // operator.b().whileTrue(elevator.scoreLevel(Level.L2));
-    // operator.x().whileTrue(elevator.scoreLevel(Level.L3));
-    // operator.y().whileTrue(elevator.scoreLevel(Level.L4));
-
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
@@ -174,6 +171,18 @@ public class Robot extends CommandRobot implements Logged {
         .a()
         .onTrue(Commands.runOnce(SignalLogger::start))
         .onFalse(Commands.runOnce(SignalLogger::stop));
+
+    operator.leftBumper().whileTrue(scoral.intake());
+    operator.rightBumper().whileTrue(scoral.outtake());
+    // operator.a().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.a().onTrue(elevator.retract());
+
+    operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
+    operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
+    operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
+    operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+
   }
 
   /**
