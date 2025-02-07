@@ -11,6 +11,8 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
 import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.L1_POWER;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.SCORE_POWER;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -37,6 +39,7 @@ import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.SimElevator;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 /**
@@ -172,16 +175,20 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(SignalLogger::start))
         .onFalse(Commands.runOnce(SignalLogger::stop));
 
-    operator.leftBumper().whileTrue(scoral.intake());
+    operator.rightTrigger().whileTrue(scoral.intake(L1_POWER));
+    operator.leftBumper().whileTrue(scoral.intake(SCORE_POWER));
     operator.rightBumper().whileTrue(scoral.outtake());
-    // operator.a().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    
     operator.a().onTrue(elevator.retract());
-
+    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE).alongWith(scoral.outtake()));
+    
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
 
+    elevator.setDefaultCommand(elevator.retract());
 
   }
 

@@ -64,12 +64,12 @@ public class Constants {
 
     public enum Level {
       L1(Meters.of(0.3)),
-      L2(Meters.of(0.423)),
+      L2(Meters.of(0.427)),
       L3(Meters.of(0.809)),
-      L4(Meters.of(1.414)),
+      L4(Meters.of(1.42)),
 
-      L3_ALGAE(Meters.of(0.85))
-      // L2_ALGAE(Meters.of(0.821))
+      L3_ALGAE(Meters.of(0.68286)),
+      L2_ALGAE(Meters.of(0.821))
       ;
 
       public final Distance height;

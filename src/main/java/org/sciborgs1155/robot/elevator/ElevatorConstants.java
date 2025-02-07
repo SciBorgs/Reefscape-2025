@@ -18,14 +18,14 @@ public class ElevatorConstants {
   public static final double kI = 0;
   public static final double kD = 0;
   public static final double kS = 0.071465;
-  public static final double kG = 0.083107;
+  public static final double kG = 0.088107;
   public static final double kV = 3.7759;
   public static final double kA = 0.078693;
 
   public static final Distance POSITION_TOLERANCE = Meters.of(0.005);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
-  public static final Distance MAX_EXTENSION = Meters.of(1.448);
+  public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);
