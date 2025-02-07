@@ -78,7 +78,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Odometry and pose estimation
   private final BetterPoseEstimator odometry;
-  private final BetterOdometry bodometry;
+  private final BetterOdometry bodometry; // haha thats a funny name
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;

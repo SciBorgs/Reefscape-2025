@@ -1,6 +1,7 @@
 package org.sciborgs1155.lib;
 
 import static edu.wpi.first.units.Units.Seconds;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.STARTING_POSE;
 
@@ -34,6 +35,8 @@ public class OdometryTest {
 
     Translation2d secant = BetterOdometry.moduleDisplacement(v0, v1);
 
-    assert (secant.getNorm() < (v0.getNorm() + v1.getNorm()) * PERIOD.in(Seconds));
+    assertTrue(secant.getNorm() < (v0.getNorm() + v1.getNorm()) * PERIOD.in(Seconds));
+    assertTrue(secant.getNorm() < Math.hypot(v0.getNorm(), v1.getNorm()) * PERIOD.in(Seconds));
+
   }
 }
