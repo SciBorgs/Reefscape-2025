@@ -77,7 +77,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final BetterPoseEstimator<SwerveModuleState[]> odometry;
+  private final BetterPoseEstimator odometry;
+  private final BetterOdometry bodometry;
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -180,15 +181,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 this,
                 "rotation"));
 
+    bodometry =
+        new BetterOdometry(
+            this::moduleStates,
+            () -> Robot.isReal() ? gyro.rotation2d() : simRotation,
+            STARTING_POSE.getTranslation());
+
     odometry =
-        new BetterPoseEstimator<SwerveModuleState[]>(
-            kinematics,
-            new BetterOdometry(
-                this::moduleStates,
-                () -> Robot.isReal() ? gyro.rotation2d() : simRotation,
-                STARTING_POSE.getTranslation()),
-            VecBuilder.fill(0.1, 0.1, 0.1),
-            VecBuilder.fill(0.9, 0.9, 0.9));
+        new BetterPoseEstimator(
+            bodometry, VecBuilder.fill(0.1, 0.1, 0.1), VecBuilder.fill(0.9, 0.9, 0.9));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);

@@ -14,7 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
-import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -37,7 +36,7 @@ import java.util.TreeMap;
  *
  * @param <T> Wheel positions type.
  */
-public class BetterPoseEstimator<T> {
+public class BetterPoseEstimator {
   private final BetterOdometry m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
@@ -67,7 +66,6 @@ public class BetterPoseEstimator<T> {
    */
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public BetterPoseEstimator(
-      Kinematics<T, ?> kinematics,
       BetterOdometry odometry,
       Matrix<N3, N1> stateStdDevs,
       Matrix<N3, N1> visionMeasurementStdDevs) {
@@ -118,7 +116,7 @@ public class BetterPoseEstimator<T> {
    * @param wheelPositions The current encoder readings.
    * @param poseMeters The position on the field that your robot is at.
    */
-  public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d poseMeters) {
+  public void resetPosition(Rotation2d gyroAngle, Pose2d poseMeters) {
     // Reset state estimate and error covariance
     m_odometry.resetOdometry(new Pose2d(poseMeters.getTranslation(), gyroAngle));
     m_odometryPoseBuffer.clear();

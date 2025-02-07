@@ -1,7 +1,5 @@
 package org.sciborgs1155.lib;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 
@@ -9,8 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import java.util.function.Supplier;
 
 public class BetterOdometry {
@@ -55,25 +51,18 @@ public class BetterOdometry {
    */
   public static Translation2d moduleDisplacement(Translation2d v0, Translation2d v1) {
     // Angle between the two velocities
-    Angle theta = v1.getAngle().minus(v0.getAngle()).getMeasure();
+    Rotation2d theta = v1.getAngle().minus(v0.getAngle());
 
-    if (theta.in(Radians) == 0) {
+    if (theta.getRadians() == 0) {
       // just making sure we dont divide by 0
       return v0.times(PERIOD.in(Seconds));
     }
 
-    // Radius of the arc
-    Distance radius =
-        Meters.of(
-            2
-                * PERIOD.in(Seconds)
-                * (v0.getNorm() + 0.5 * (v1.getNorm() - v0.getNorm()))
-                / theta.in(Radians));
-
     // Secant length formula, then rotate it by the average angle between the two velocities
     return new Translation2d(
-        radius.times(2 * Math.sin(theta.div(2).in(Radians))).in(Meters),
-        (v0.getAngle().plus(v1.getAngle())).div(2));
+      (PERIOD.in(Seconds) * (v0.getNorm() + v1.getNorm()) / theta.getRadians())
+          * Math.sin(theta.getRadians() / 2),
+      (v0.getAngle().plus(v1.getAngle())).div(2));
   }
 
   /**
@@ -92,7 +81,7 @@ public class BetterOdometry {
    * @return The robot relative displacement.
    */
   public Translation2d robotRelativeDisplacement() {
-    Translation2d avg = new Translation2d();
+    Translation2d avg = new Translation2d(0, 0);
     for (int i = 0; i < 4; i++) {
       avg =
           avg.plus(
