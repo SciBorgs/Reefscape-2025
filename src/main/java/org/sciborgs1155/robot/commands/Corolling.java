@@ -1,12 +1,14 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Radians;
-import static org.sciborgs1155.robot.arm.ArmConstants.*;
+import org.sciborgs1155.robot.arm.Arm;
+import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
+import org.sciborgs1155.robot.coroller.Coroller;
 
+import static edu.wpi.first.units.Units.Radians;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.coroller.Coroller;
 
 public class Corolling {
 
@@ -23,10 +25,10 @@ public class Corolling {
    *
    * @return A command for ground intaking.
    */
-  public Command intake() {
-    return arm.goTo(INTAKE_ANGLE)
+  public Command intake(Angle IntakeAngle) {
+    return arm.goTo(IntakeAngle)
         .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radians)))
+            Commands.waitUntil(() -> arm.atPosition(IntakeAngle.in(Radians)))
                 .andThen(roller.intake().asProxy().withTimeout(1)))
         .withName("ground intake");
   }

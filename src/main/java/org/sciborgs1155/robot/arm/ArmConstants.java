@@ -1,13 +1,12 @@
 package org.sciborgs1155.robot.arm;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -25,10 +24,11 @@ public class ArmConstants {
   public static final double kA = 0;
   public static final double kG = 0;
 
-  public static final Angle INTAKE_ANGLE = Radians.of(-Math.PI / 4);
   public static final Angle HP_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
   public static final Angle PROCESSOR_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
   public static final Angle TROUGH_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
+  public static final Angle CORAL_INTAKE = Radians.of(Math.PI * 1 / 4);
+  public static final Angle ALGAE_INTAKE = Radians.of(Math.PI * 3 / 8);
 
   public static final Angle STARTING_ANGLE = Radians.of(Math.PI / 2);
   public static final Angle DEFAULT_ANGLE = Radians.of(Math.PI * 5 / 8);
