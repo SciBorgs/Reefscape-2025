@@ -27,14 +27,24 @@ import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
+
+  /**
+   * Method to create a new elevator.
+   *
+   * @return Real or Sim elevator based on Robot.isReal().
+   */
   public static Elevator create() {
     return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
   }
 
+  /**
+   * Method to create a no elevator.
+   *
+   * @return No elevator object.
+   */
   public static Elevator none() {
     return new Elevator(new NoElevator());
   }
@@ -108,7 +118,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.height.in(Meters));
+    return goTo(level.extension.in(Meters));
   }
 
   /**
@@ -125,7 +135,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
       return retract();
     }
 
-    return goTo(level.height.plus(algaeOffset).in(Meters));
+    return goTo(level.extension.plus(algaeOffset).in(Meters));
   }
 
   /**
@@ -142,6 +152,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return Position of the elevator in meters.
    */
   @Log.NT
+  /**
+   * Method to get the positon of the elevator.
+   *
+   * @return Position of the elevator.
+   */
   public double position() {
     return hardware.position();
   }
@@ -150,6 +165,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return Velocity of the elevator in meters per second.
    */
   @Log.NT
+  /**
+   * Method to get the velocity of the elevator.
+   *
+   * @return Velocity of the elevator.
+   */
   public double velocity() {
     return hardware.velocity();
   }
@@ -158,6 +178,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return Desired position of the elevator in meters
    */
   @Log.NT
+  /**
+   * Method to get the setpoint of the ProfiledPID.
+   *
+   * @return Position of the ProfiledPID.
+   */
   public double positionSetpoint() {
     return pid.getSetpoint().position;
   }
@@ -194,6 +219,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Override
+  /**
+   * This method will be called periodically and is used to update the setpoint and measurement
+   * lengths.
+   */
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());

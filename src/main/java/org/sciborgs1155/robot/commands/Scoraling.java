@@ -2,8 +2,8 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.scoral.Scoral;
 

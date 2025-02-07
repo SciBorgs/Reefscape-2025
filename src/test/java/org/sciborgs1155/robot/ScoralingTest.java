@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.scoral.Scoral;
 
@@ -60,7 +60,7 @@ public class ScoralingTest {
     run(scoraling.scoral(level));
     fastForward();
     assertEquals(
-        level.height.in(Meters),
+        level.extension.in(Meters),
         elevator.position(),
         ElevatorConstants.POSITION_TOLERANCE.in(Meters));
     assertTrue(scoral.getCurrentCommand().getName() == "scoraling");
@@ -75,7 +75,7 @@ public class ScoralingTest {
     run(scoraling.cleanAlgae(level));
     fastForward();
     assertEquals(
-        level.height.plus(algaeOffset).in(Meters),
+        level.extension.plus(algaeOffset).in(Meters),
         elevator.position(),
         ElevatorConstants.POSITION_TOLERANCE.in(Meters));
     assertTrue(scoral.getCurrentCommand().getName() == "cleanAlgae");
