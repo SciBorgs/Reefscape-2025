@@ -51,18 +51,24 @@ public class BetterOdometry {
    */
   public static Translation2d moduleDisplacement(Translation2d v0, Translation2d v1) {
     // Angle between the two velocities
+
+    // in case either is the zero vector (getting the angle wouldn't work)
+    if (v0.getNorm() == 0 || v1.getNorm() == 0) {
+      return (v1.plus(v0)).times(0.5).times(PERIOD.in(Seconds));
+    }
+
     Rotation2d theta = v1.getAngle().minus(v0.getAngle());
 
     if (theta.getRadians() == 0) {
       // just making sure we dont divide by 0
-      return v0.times(PERIOD.in(Seconds));
+      return ((v0.plus(v1)).div(2)).times(PERIOD.in(Seconds));
     }
 
     // Secant length formula, then rotate it by the average angle between the two velocities
     return new Translation2d(
-      (PERIOD.in(Seconds) * (v0.getNorm() + v1.getNorm()) / theta.getRadians())
-          * Math.sin(theta.getRadians() / 2),
-      (v0.getAngle().plus(v1.getAngle())).div(2));
+        (PERIOD.in(Seconds) * (v0.plus(v1).getNorm()) / theta.getRadians())
+            * Math.sin(theta.getRadians() / 2),
+        (v0.getAngle().plus(v1.getAngle())).div(2));
   }
 
   /**
