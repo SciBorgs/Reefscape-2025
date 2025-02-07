@@ -39,4 +39,18 @@ public class ElevatorConstants {
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
   public static final Current CURRENT_LIMIT = Amps.of(50);
+
+  public enum Level {
+    L1(Meters.of(.3)),
+    L2(Meters.of(.7)),
+    L3(Meters.of(1)),
+    L4(Meters.of(1.5));
+
+    /** This value is empirically determined */
+    public final Distance extension;
+
+    Level(Distance extension) {
+      this.extension = extension;
+    }
+  }
 }

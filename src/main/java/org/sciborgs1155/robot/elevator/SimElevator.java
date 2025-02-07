@@ -27,21 +27,41 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
+  /**
+   * Sets the voltage for the elevator motor.
+   *
+   * @param voltage The voltage to set.
+   */
   public void setVoltage(double voltage) {
     elevator.setInputVoltage(voltage);
     elevator.update(Constants.PERIOD.in(Seconds));
   }
 
   @Override
+  /**
+   * Gets the current position of the elevator.
+   *
+   * @return The current position.
+   */
   public double position() {
     return elevator.getPositionMeters();
   }
 
+  /**
+   * Gets the current velocity of the elevator.
+   *
+   * @return The current velocity.
+   */
   @Override
   public double velocity() {
     return elevator.getVelocityMetersPerSecond();
   }
 
+  /**
+   * Closes the elevator. This implementation does nothing.
+   *
+   * @throws Exception if an error occurs.
+   */
   @Override
   public void close() throws Exception {}
 }

@@ -61,17 +61,7 @@ public class Constants {
           && pose.getY() < Field.WIDTH.in(Meters));
     }
 
-    public enum Level {
-      L1(Meters.of(.3)),
-      L2(Meters.of(.7)),
-      L3(Meters.of(1)),
-      L4(Meters.of(1.5));
-
-      public final Distance height;
-
-      Level(Distance height) {
-        this.height = height;
-      }
-    }
+    /** Offset added to a level's height in order to to be at the algae's height */
+    public static final Distance algaeOffset = Meters.of(0);
   }
 }
