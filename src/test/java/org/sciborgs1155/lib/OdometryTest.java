@@ -2,6 +2,7 @@ package org.sciborgs1155.lib;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.sciborgs1155.lib.UnitTestingUtil.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.STARTING_POSE;
 
@@ -10,14 +11,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import java.util.Random;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.drive.Drive;
-import static org.sciborgs1155.lib.UnitTestingUtil.*;
 
 public class OdometryTest {
   Random rand = new Random();
@@ -60,9 +59,7 @@ public class OdometryTest {
   }
 
   private static Stream<Arguments> driveInputs() {
-    return Stream.of(Arguments.of(1, 1),
-    Arguments.of(-1, 1),
-    Arguments.of(-1, -1),
-    Arguments.of(1,-1));
+    return Stream.of(
+        Arguments.of(1, 1), Arguments.of(-1, 1), Arguments.of(-1, -1), Arguments.of(1, -1));
   }
 }

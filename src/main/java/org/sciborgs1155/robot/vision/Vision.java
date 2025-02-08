@@ -73,17 +73,17 @@ public class Vision implements Logged {
 
       for (int i = 0; i < cameras.length; i++) {
         var prop = new SimCameraProperties();
-        prop.setCalibration(WIDTH, HEIGHT, FOV);
-        prop.setCalibError(0.15, 0.05);
-        prop.setFPS(45);
-        prop.setAvgLatencyMs(12);
-        prop.setLatencyStdDevMs(3.5);
+        // prop.setCalibration(WIDTH, HEIGHT, FOV);
+        // prop.setCalibError(0.15, 0.05);
+        // prop.setFPS(45);
+        // prop.setAvgLatencyMs(12);
+        // prop.setLatencyStdDevMs(3.5);
 
         PhotonCameraSim cameraSim = new PhotonCameraSim(cameras[i], prop);
-        cameraSim.setMaxSightRange(5);
-        cameraSim.enableRawStream(true);
-        cameraSim.enableProcessedStream(true);
-        cameraSim.enableDrawWireframe(true);
+        // cameraSim.setMaxSightRange(5);
+        // cameraSim.enableRawStream(true);
+        // cameraSim.enableProcessedStream(true);
+        // cameraSim.enableDrawWireframe(true);
 
         visionSim.addCamera(cameraSim, configs[i].robotToCam());
         simCameras[i] = cameraSim;
@@ -106,7 +106,7 @@ public class Vision implements Logged {
       int unreadLength = unreadChanges.size();
 
       // feeds latest result for visualization; multiple different pos breaks getSeenTags()
-      lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
+      // lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
 
       for (int j = 0; j < unreadLength; j++) {
         var change = unreadChanges.get(j);

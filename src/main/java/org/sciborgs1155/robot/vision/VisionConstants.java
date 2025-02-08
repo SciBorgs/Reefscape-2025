@@ -1,5 +1,9 @@
 package org.sciborgs1155.robot.vision;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static java.lang.Math.PI;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -17,15 +21,41 @@ public class VisionConstants {
 
   /** TODO: Create cameras with updated constants; be sure to add in {@link Vision#create} */
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
+
+  // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.
   public static final CameraConfig BACK_LEFT_CAMERA =
-      new CameraConfig("back left", new Transform3d(1, 1, 1, new Rotation3d()));
+      new CameraConfig(
+          "back left",
+          new Transform3d(
+              Inches.of(-12.101091).in(Meters),
+              Inches.of(13.3687655).in(Meters),
+              Inches.of(-8.8799715).in(Meters),
+              new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
 
   public static final CameraConfig BACK_RIGHT_CAMERA =
-      new CameraConfig("back right", new Transform3d(1, 1, 1, new Rotation3d()));
+      new CameraConfig(
+          "back right",
+          new Transform3d(
+              Inches.of(-12.101091).in(Meters),
+              Inches.of(-13.3687655).in(Meters),
+              Inches.of(-8.8799715).in(Meters),
+              new Rotation3d(0, -PI * 13 / 36, -PI * 11 / 18)));
   public static final CameraConfig FRONT_LEFT_CAMERA =
-      new CameraConfig("front left", new Transform3d(1, 1, 1, new Rotation3d()));
+      new CameraConfig(
+          "front left",
+          new Transform3d(
+              Inches.of(13.525813).in(Meters),
+              Inches.of(10.7835795).in(Meters),
+              Inches.of(-8.334).in(Meters),
+              new Rotation3d(0, 0, -PI / 6)));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
-      new CameraConfig("front right", new Transform3d(1, 1, 1, new Rotation3d()));
+      new CameraConfig(
+          "front right",
+          new Transform3d(
+              Inches.of(13.525813).in(Meters),
+              Inches.of(-10.7835795).in(Meters),
+              Inches.of(-8.334).in(Meters),
+              new Rotation3d(0, 0, PI / 6)));
 
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
