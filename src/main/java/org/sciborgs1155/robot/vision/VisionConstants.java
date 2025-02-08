@@ -20,7 +20,6 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
-
   // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.
   public static final CameraConfig BACK_LEFT_CAMERA =
       new CameraConfig(

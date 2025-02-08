@@ -38,11 +38,12 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
+  private final ElevatorIO hardware;
+
+  private final SysIdRoutine sysIdRoutine;
 
   /**
-   * Method to create a new elevator.
-   *
-   * @return Real or Sim elevator based on Robot.isReal().
+   * @return Real or Sim elevator based on {@link Robot.isReal()}.
    */
   public static Elevator create() {
     return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
@@ -57,13 +58,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  private final ElevatorIO hardware;
-
-  private final SysIdRoutine sysIdRoutine;
-
-  private DoubleEntry p = Tuning.entry("/elevator/kP", kP);
-  private DoubleEntry i = Tuning.entry("/elevator/kI", kI);
-  private DoubleEntry d = Tuning.entry("/elevator/kD", kD);
+  private final DoubleEntry p = Tuning.entry("/elevator/kP", kP);
+  private final DoubleEntry i = Tuning.entry("/elevator/kI", kI);
+  private final DoubleEntry d = Tuning.entry("/elevator/kD", kD);
 
   @Log.NT
   private final ProfiledPIDController pid =
@@ -128,7 +125,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.extension.in(Meters));
+    return goTo(level.extension.in(Meters)).withName("scoring");
   }
 
   /**
@@ -140,12 +137,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     if (level == Level.L1 || level == Level.L4) {
       FaultLogger.report(
           "Algae level",
-          "An invalid level has been passed to the clean command; L1 or L4",
+          "An invalid level (L1, L4) has been passed to the clean command",
           FaultType.WARNING);
       return retract();
     }
 
-    return goTo(level.extension.plus(algaeOffset).in(Meters)).withName("scoring");
+    return goTo(level.extension.plus(algaeOffset).in(Meters)).withName("cleaning");
   }
 
   public Command manualElevator(InputStream input) {
@@ -266,7 +263,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    *     goal.
    */
   public Test goToTest(Distance testHeight) {
-    Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(3);
+    Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(9);
     Set<Assertion> assertions =
         Set.of(
             eAssert(
