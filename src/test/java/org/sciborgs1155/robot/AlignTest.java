@@ -47,6 +47,7 @@ public class AlignTest {
     elevator = Elevator.create();
     scoral = Scoral.create();
     drive.resetEncoders();
+    drive.resetOdometry(new Pose2d());
 
     // Configure pathfinding libraries
     LocalADStar pathfinder = new LocalADStar();
@@ -58,7 +59,7 @@ public class AlignTest {
 
   @AfterEach
   public void destroy() throws Exception {
-    reset();
+    reset(drive, elevator, scoral);
   }
 
   @RepeatedTest(5)
