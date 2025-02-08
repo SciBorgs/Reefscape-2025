@@ -12,7 +12,6 @@ import static org.sciborgs1155.robot.commands.Dashboard.Branches.*;
 import static org.sciborgs1155.robot.commands.Dashboard.Levels.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.L1_POWER;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.SCORE_POWER;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -39,6 +38,7 @@ import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
@@ -98,7 +98,7 @@ public class Robot extends CommandRobot implements Logged {
 
     RobotController.setBrownoutVoltage(6.0);
 
-    if (isReal()) { 
+    if (isReal()) {
       URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
@@ -166,14 +166,14 @@ public class Robot extends CommandRobot implements Logged {
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
-    operator.rightTrigger().whileTrue(scoral.intake(L1_POWER));
-    operator.leftBumper().whileTrue(scoral.intake(SCORE_POWER));
-    operator.rightBumper().whileTrue(scoral.outtake());
+    operator.rightTrigger().whileTrue(scoral.go(L1_POWER));
+    operator.leftBumper().whileTrue(scoral.score());
+    operator.rightBumper().whileTrue(scoral.algae());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
 
     operator.a().onTrue(elevator.retract());
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
-    operator.x().whileTrue(elevator.scoreLevel(Level.L2_ALGAE).alongWith(scoral.outtake()));
+    operator.x().whileTrue(elevator.scoreLevel(Level.L2_ALGAE).alongWith(scoral.algae()));
     operator.y().whileTrue(elevator.highFive());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
@@ -206,7 +206,11 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   public Command systemsCheck() {
-    return Test.toCommand(drive.systemsCheck()).withName("Test Mechanisms");
+    return Test.toCommand(
+            drive.systemsCheck(),
+            elevator.goToTest(Level.L1.extension),
+            Test.fromCommand(scoral.algae().withTimeout(2)))
+        .withName("Test Mechanisms");
   }
 
   @Override

@@ -22,6 +22,11 @@ public class ElevatorVisualizer implements Logged {
             new MechanismLigament2d("elevator", MIN_EXTENSION.in(Meters) * 10, 90, 3, color));
   }
 
+  /**
+   * Sets the length of the elevator visualization.
+   *
+   * @param length The length to set.
+   */
   public void setLength(double length) {
     elevator.setLength(length * 10);
   }

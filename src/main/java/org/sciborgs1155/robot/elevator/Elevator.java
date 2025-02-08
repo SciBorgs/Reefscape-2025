@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.algaeOffset;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
@@ -28,18 +29,30 @@ import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
+
+  /**
+   * Method to create a new elevator.
+   *
+   * @return Real or Sim elevator based on Robot.isReal().
+   */
   public static Elevator create() {
     return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
   }
 
+  /**
+   * Method to create a no elevator.
+   *
+   * @return No elevator object.
+   */
   public static Elevator none() {
     return new Elevator(new NoElevator());
   }
@@ -115,7 +128,24 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to one of the 4 levels.
    */
   public Command scoreLevel(Level level) {
-    return goTo(level.height.in(Meters)).withName("scoring");
+    return goTo(level.extension.in(Meters));
+  }
+
+  /**
+   * Goes to an offset height above the level given in order to clean algae; ONLY L2 and L3!
+   *
+   * @param level An enum that should be either L2 or L3
+   */
+  public Command clean(Level level) {
+    if (level == Level.L1 || level == Level.L4) {
+      FaultLogger.report(
+          "Algae level",
+          "An invalid level has been passed to the clean command; L1 or L4",
+          FaultType.WARNING);
+      return retract();
+    }
+
+    return goTo(level.extension.plus(algaeOffset).in(Meters)).withName("scoring");
   }
 
   public Command manualElevator(InputStream input) {
@@ -212,6 +242,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Override
+  /**
+   * This method will be called periodically and is used to update the setpoint and measurement
+   * lengths.
+   */
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
