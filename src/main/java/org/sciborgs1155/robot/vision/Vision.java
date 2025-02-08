@@ -40,7 +40,7 @@ public class Vision implements Logged {
 
   private VisionSystemSim visionSim;
 
-  /** A factory to create new vision classes with our two configured cameras. */
+  /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
     return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }

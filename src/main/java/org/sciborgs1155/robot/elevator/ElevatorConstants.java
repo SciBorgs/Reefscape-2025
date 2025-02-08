@@ -2,27 +2,30 @@ package org.sciborgs1155.robot.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
   public static final double kP = 5;
   public static final double kI = 0;
-  public static final double kD = 0;
-  public static final double kS = 0.071465;
-  public static final double kG = 0.088107;
-  public static final double kV = 3.7759;
-  public static final double kA = 0.078693;
+  public static final double kD = 0.3;
+  public static final double kS = 0.036188;
+  public static final double kG = 0.1997;
+  public static final double kV = 3.9333;
+  public static final double kA = 0.045317;
 
-  public static final Distance POSITION_TOLERANCE = Meters.of(0.005);
+  public static final Distance POSITION_TOLERANCE = Meters.of(0.01);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
@@ -40,4 +43,10 @@ public class ElevatorConstants {
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
   public static final Current CURRENT_LIMIT = Amps.of(50);
+
+  // Don't worry about this :)
+  public static final Time WAIT_TIME = Seconds.of(.3);
+  public static final Distance RAY_HIGH = Meter.of(1.086);
+  public static final Distance RAY_MIDDLE = Meter.of(0.628);
+  public static final Distance RAY_LOW = Meter.of(0.25);
 }

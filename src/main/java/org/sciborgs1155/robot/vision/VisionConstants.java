@@ -19,7 +19,6 @@ public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-  /** TODO: Create cameras with updated constants; be sure to add in {@link Vision#create} */
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
 
   // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.
@@ -31,7 +30,6 @@ public class VisionConstants {
               Inches.of(13.3687655).in(Meters),
               Inches.of(-8.8799715).in(Meters),
               new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
-
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
@@ -59,8 +57,8 @@ public class VisionConstants {
 
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
-  public static final int HEIGHT = 800;
-  public static final Rotation2d FOV = Rotation2d.fromDegrees(70);
+  public static final int HEIGHT = 720;
+  public static final Rotation2d FOV = Rotation2d.fromDegrees(55);
 
   public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(1.5, 1.5, 7);
   public static final Matrix<N3, N1> MULTIPLE_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 4);

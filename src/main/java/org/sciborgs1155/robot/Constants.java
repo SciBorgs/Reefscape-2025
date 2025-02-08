@@ -68,9 +68,9 @@ public class Constants {
       L3(Meters.of(0.809)),
       L4(Meters.of(1.42)),
 
+      // temporary
       L3_ALGAE(Meters.of(0.68286)),
-      L2_ALGAE(Meters.of(0.821))
-      ;
+      L2_ALGAE(Meters.of(0));
 
       public final Distance height;
 

@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -119,6 +120,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   public Command manualElevator(InputStream input) {
     return goTo(input
+            .deadband(.15, 1)
             .scale(MAX_VELOCITY.in(MetersPerSecond))
             .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
@@ -139,6 +141,18 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   public Command goTo(double height) {
     return goTo(() -> height);
+  }
+
+  /**
+   * @return A very safe and serious command....
+   */
+  public Command highFive() {
+    return goTo(() -> RAY_HIGH.in(Meters))
+        .until(() -> atGoal())
+        .andThen(Commands.waitSeconds(WAIT_TIME.in(Seconds)))
+        .andThen(goTo(() -> RAY_LOW.in(Meters)).until(() -> atGoal()))
+        .andThen(Commands.waitSeconds(WAIT_TIME.in(Seconds)))
+        .andThen(goTo(RAY_MIDDLE.in(Meters)));
   }
 
   /**

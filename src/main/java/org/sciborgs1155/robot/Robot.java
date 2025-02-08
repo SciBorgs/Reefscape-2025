@@ -39,8 +39,8 @@ import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.SimElevator;
 import org.sciborgs1155.robot.scoral.Scoral;
+import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -58,7 +58,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  // private final Vision vision = new Vision();
+  private final Vision vision = new Vision();
   // private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
@@ -77,13 +77,10 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   /** Configures basic behavior for different periods during the game. */
-  private void configureLog() {
-    // SignalLogger.setPath("./logs/");
-  }
+  private void configureLog() {}
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
@@ -94,11 +91,10 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    // FaultLogger.register(pdh);
-    // FaultLogger.register(canivore);
+    FaultLogger.register(pdh);
 
     // Configure pose estimation updates every tick
-    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -108,7 +104,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(
@@ -155,7 +151,7 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
     // led.setDefaultCommand(led.rainbow());
-    // led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
+    // led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
@@ -169,27 +165,23 @@ public class Robot extends CommandRobot implements Logged {
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
-    // TODO: Add any additional bindings.
-    driver
-        .a()
-        .onTrue(Commands.runOnce(SignalLogger::start))
-        .onFalse(Commands.runOnce(SignalLogger::stop));
 
     operator.rightTrigger().whileTrue(scoral.intake(L1_POWER));
     operator.leftBumper().whileTrue(scoral.intake(SCORE_POWER));
     operator.rightBumper().whileTrue(scoral.outtake());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
-    
+
     operator.a().onTrue(elevator.retract());
-    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE).alongWith(scoral.outtake()));
-    
+    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
+    operator.x().whileTrue(elevator.scoreLevel(Level.L2_ALGAE).alongWith(scoral.outtake()));
+    operator.y().whileTrue(elevator.highFive());
+
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
 
     elevator.setDefaultCommand(elevator.retract());
-
   }
 
   /**
