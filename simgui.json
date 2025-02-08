@@ -47,10 +47,19 @@
     "transitory": {
       "Robot": {
         "drive": {
+          "ChassisSpeeds##v_/Robot/drive/robotRelativeChassisSpeeds": {
+            "open": true
+          },
           "Pose2d##v_/Robot/drive/pose": {
+            "Rotation2d##v_rotation": {
+              "open": true
+            },
             "Translation2d##v_translation": {
               "open": true
             },
+            "open": true
+          },
+          "SwerveModulePosition[]##v_/Robot/drive/modulePositions": {
             "open": true
           },
           "open": true
