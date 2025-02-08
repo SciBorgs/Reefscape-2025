@@ -296,9 +296,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           double addition = translationController.calculate(perpDisplacement.norm(), 0);
           Vector<N2> result = driverVel.plus(perpDisplacement.unit().times(addition));
 
-          return Math.acos(driverVel.unit().dot(robotToTarget.unit())) < ASSISTED_DRIVING_THRESHOLD
-              ? drive(() -> result.get(0), () -> result.get(1), heading)
-              : drive(vx, vy, heading);
+          return /*Math.acos(driverVel.unit().dot(robotToTarget.unit())) < ASSISTED_DRIVING_THRESHOLD*/
+              /*?*/ drive(() -> result.get(0), () -> result.get(1), heading);
+              /* : drive(vx, vy, heading);*/
         },
         Set.of(this));
   }

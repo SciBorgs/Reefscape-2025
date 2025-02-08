@@ -11,6 +11,8 @@ import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -145,7 +147,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega));
+    drive.setDefaultCommand(drive.assistedDrive(x::getAsDouble, y::getAsDouble, () -> new Rotation2d(omega.getAsDouble()), new Translation2d(5, 5)));
     led.setDefaultCommand(led.scrolling());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
