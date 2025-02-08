@@ -31,6 +31,12 @@
                 "data": {
                   "name": "retract"
                 }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
               }
             ]
           }
@@ -87,6 +93,12 @@
                 "data": {
                   "name": "retract"
                 }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
               }
             ]
           }
@@ -142,6 +154,12 @@
                 "type": "named",
                 "data": {
                   "name": "retract"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
                 }
               }
             ]

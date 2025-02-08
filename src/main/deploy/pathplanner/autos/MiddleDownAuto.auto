@@ -11,9 +11,34 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "score L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "score L4"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "retract"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
           }
         },
         {
@@ -23,9 +48,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "intake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
           }
         },
         {
@@ -35,9 +73,34 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "score L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "score L4"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "retract"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
           }
         },
         {
@@ -47,9 +110,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "intake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
           }
         },
         {
@@ -59,9 +135,34 @@
           }
         },
         {
-          "type": "named",
+          "type": "sequential",
           "data": {
-            "name": "score L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "score L4"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.5
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "retract"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 1.0
+                }
+              }
+            ]
           }
         }
       ]

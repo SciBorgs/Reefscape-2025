@@ -35,7 +35,7 @@ public class Scoraling {
   }
 
   public Command retract() {
-    //elevator retracts
+    // elevator retracts
 
     return elevator.retract();
   }
