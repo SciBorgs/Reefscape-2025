@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
@@ -61,8 +60,8 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   /** An alernating pattern of yellow and green that is scrolled through. */
   public Command scrolling() {
     return set(
-      alternatingColor(Color.kYellow, 6, Color.kGreen, 10)
-                    .scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), LED_SPACING));
+        alternatingColor(Color.kYellow, 6, Color.kGreen, 10)
+            .scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), LED_SPACING));
   }
 
   /** A breathing gradient that matches the alliance colors. */
