@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
@@ -17,15 +18,16 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 5;
+  public static final double kP = 10;
   public static final double kI = 0;
   public static final double kD = 0.3;
+
   public static final double kS = 0.036188;
   public static final double kG = 0.1997;
   public static final double kV = 3.9333;
   public static final double kA = 0.045317;
 
-  public static final Distance POSITION_TOLERANCE = Meters.of(0.01);
+  public static final Distance POSITION_TOLERANCE = Centimeters.of(1.5);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
@@ -49,4 +51,24 @@ public class ElevatorConstants {
   public static final Distance RAY_HIGH = Meter.of(1.086);
   public static final Distance RAY_MIDDLE = Meter.of(0.628);
   public static final Distance RAY_LOW = Meter.of(0.25);
+
+  public enum Level {
+    L1(Meters.of(0.3)),
+    L2(Meters.of(0.427)),
+    L3(Meters.of(0.809)),
+    L4(Meters.of(1.42)),
+
+    // temporary
+    L3_ALGAE(Meters.of(0.68286)),
+    L2_ALGAE(Meters.of(0));
+
+    public final Distance extension;
+
+    Level(Distance extension) {
+      this.extension = extension;
+    }
+  }
+
+  /** Offset added to a level's height in order to to be at the algae's height */
+  public static final Distance algaeOffset = Meters.of(0);
 }

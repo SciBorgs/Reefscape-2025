@@ -9,23 +9,31 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
-import monologue.Logged;
 import monologue.Annotations.Log;
-
+import monologue.Logged;
+import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
-  private final SimpleMotor hardware;
+  private final SimpleMotor motor;
 
-  // private final DigitalInput beambreak = new DigitalInput(BEAMBREAK);
-  // public final Trigger beambreakTrigger = new Trigger(() -> beambreak());
+  private final Beambreak beambreak;
+  public final Trigger beambreakTrigger;
 
+  /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {
-    return new Scoral(Robot.isReal() ? realMotor() : SimpleMotor.none());
+    return Robot.isReal() ? new Scoral(realMotor(), Beambreak.real(BEAMBREAK)) : none();
   }
 
+  /** Creates a Scoral sans hardware or simulation. */
+  public static Scoral none() {
+    return new Scoral(SimpleMotor.none(), Beambreak.none());
+  }
+
+  /** Creates a SimpleMotor with the appropriate configurations for a Scoral with hardware. */
   private static SimpleMotor realMotor() {
     TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -36,33 +44,38 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(ROLLER), config);
   }
 
-  public static Scoral none() {
-    return new Scoral(SimpleMotor.none());
+  public Scoral(SimpleMotor motor, Beambreak beambreak) {
+    this.motor = motor;
+    this.beambreak = beambreak;
+    beambreakTrigger = new Trigger(beambreak::get);
+
+    setDefaultCommand(stop());
   }
 
-  public Scoral(SimpleMotor hardware) {
-    this.hardware = hardware;
-    setDefaultCommand(run(() -> hardware.set(0)));
+  /** Runs the motor to move a coral into the scoral. */
+  public Command go(double power) {
+    return run(() -> motor.set(power)).withName("intake");
   }
 
-  /**
-   * Runs the motor to move a coral out of the scoral outwards. Ends when the beam is no longer
-   * broken.
-   */
-  public Command outtake() {
-    return run(() -> hardware.set(-SCORE_POWER)).withName("outtake");
+  /** Runs the motor to move a coral out of the scoral outwards. */
+  public Command score() {
+    return go(SCORE_POWER).withName("outtake");
   }
 
-  /** Runs the motor to move a coral into the scoral. Ends when the beam is broken. */
-  public Command intake(double power) {
-    return run(() -> hardware.set(power)).withName("intake");
+  public Command algae() {
+    return go(-SCORE_POWER).withName("algaeing");
+  }
+
+  /** Stops the motor */
+  public Command stop() {
+    return go(0).withName("stop");
   }
 
   /** Returns the value of the beambreak, which is false when the beam is broken. */
-  // @Log.NT
-  // public boolean beambreak() {
-  //   return beambreak.get();
-  // }
+  @Log.NT
+  public boolean beambreak() {
+    return beambreak.get();
+  }
 
   @Override
   public void periodic() {
@@ -71,6 +84,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    hardware.close();
+    motor.close();
   }
 }
