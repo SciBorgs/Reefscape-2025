@@ -51,8 +51,8 @@ public class Constants {
 
   // Origin at corner of blue alliance side of field
   public static class Field {
-    public static final Distance LENGTH = Inches.of(651.223);
-    public static final Distance WIDTH = Inches.of(323.277);
+    public static final Distance LENGTH = Centimeters.of(1755);
+    public static final Distance WIDTH = Centimeters.of(805);
 
     /** Returns whether the provided position is within the boundaries of the field. */
     public static boolean inField(Pose3d pose) {

@@ -58,7 +58,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = new Vision();
+  private final Vision vision = Vision.create();
   // private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
@@ -98,7 +98,7 @@ public class Robot extends CommandRobot implements Logged {
 
     RobotController.setBrownoutVoltage(6.0);
 
-    if (isReal()) {
+    if (isReal()) { 
       URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
