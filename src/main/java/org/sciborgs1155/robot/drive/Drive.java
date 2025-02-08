@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -282,6 +284,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             vy,
             () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()))
         .beforeStarting(rotationController::reset);
+  }
+
+  public Command assistedDrive(
+      DoubleSupplier vx, DoubleSupplier vy, Supplier<Rotation2d> heading, Translation2d target) {
+    return Commands.defer(
+        () -> {
+          Vector<N2> driverVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+          Vector<N2> robotToTarget = target.minus(pose().getTranslation()).toVector();
+          Vector<N2> perpDisplacement = robotToTarget.minus(robotToTarget.projection(driverVel));
+          double addition = translationController.calculate(perpDisplacement.norm(), 0);
+          Vector<N2> result = driverVel.plus(perpDisplacement.unit().times(addition));
+
+          return Math.acos(driverVel.unit().dot(robotToTarget.unit())) < ASSISTED_DRIVING_THRESHOLD
+              ? drive(() -> result.get(0), () -> result.get(1), heading)
+              : drive(vx, vy, heading);
+        },
+        Set.of(this));
   }
 
   /**
