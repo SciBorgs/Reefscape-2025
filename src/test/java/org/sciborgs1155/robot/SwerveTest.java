@@ -1,17 +1,22 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.Test.runUnitTest;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.NoGyro;
 import org.sciborgs1155.robot.drive.SimModule;
@@ -105,5 +110,34 @@ public class SwerveTest {
 
     assertEquals(deltaX, pose.getX(), DELTA * 2);
     assertEquals(deltaY, pose.getY(), DELTA * 2);
+  }
+
+  @RepeatedTest(5)
+  public void assistedDrivingTest() {
+    Pose2d target =
+        new Pose2d(
+            Math.random() * 10 + 2,
+            Math.random() * 10 + 2,
+            Rotation2d.fromRotations(Math.random()));
+    Rotation2d offset =
+        Rotation2d.fromRotations(
+            DriveConstants.ASSISTED_DRIVING_THRESHOLD.in(Rotations) * 2 * Math.random()
+                - DriveConstants.ASSISTED_DRIVING_THRESHOLD.in(Rotations));
+    Translation2d input =
+        target.getTranslation().rotateBy(offset).div(target.getTranslation().getNorm());
+
+    System.out.println(target.toString());
+    System.out.println(input.toString());
+
+    run(
+        drive
+            .assistedDrive(input::getX, input::getY, () -> 0, target)
+            .until(() -> drive.pose().relativeTo(target).getTranslation().getNorm() < 0.1));
+    fastForward();
+    assertTrue(
+        offset.getSin() > 0
+            == drive.pose().getTranslation().getAngle().getSin()
+                > target.getTranslation().getAngle().getSin());
+    assertTrue(target.getRotation().getSin() > 0 == drive.heading().getSin() > 0);
   }
 }
