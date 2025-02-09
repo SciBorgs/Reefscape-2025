@@ -35,8 +35,13 @@ public final class DriveConstants {
   // TODO: Change central drivetrain constants as needed.
 
   // The angle between the velocity and the displacement from a target, above which the robot will
-  // not use assisted driving to the target.
-  public static final double ASSISTED_DRIVING_THRESHOLD = Math.PI / 4;
+  // not use assisted driving to the target. (the driver must be driving in the general direction of
+  // the assisted driving target.)
+  public static final Angle ASSISTED_DRIVING_THRESHOLD = Radians.of(Math.PI / 6);
+
+  // The input of the joystick beyond which the assisted driving will not control the rotation of
+  // the swerve.
+  public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
 
   // The type of module on the chassis
   public static final ModuleType TYPE = ModuleType.SPARK;
