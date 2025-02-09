@@ -287,16 +287,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /**
    * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
-   * Also adds a little extra velocity to move the robot to a certain desired position if the driver
-   * is already attempting to move in that general direction. This command does not assist in
-   * controlling the rotation of the robot.
+   * Also adds a little extra translational velocity to move the robot to a certain desired position
+   * if the driver is already attempting to move in that general direction. This command does not
+   * assist in controlling the rotation of the robot.
    *
    * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
    *     alliance side).
    * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
    *     side).
    * @param vOmega A supplier for the angular velocity of the robot.
-   * @param target The target field-relative position for the robot, as a {@link Translation2d}
+   * @param target The target field-relative position for the robot, as a {@link Translation2d}.
    * @return The assisted driving command.
    */
   public Command assistedDrive(
@@ -331,16 +331,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /**
    * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
-   * Also adds a little extra velocity to move the robot to a certain desired position if the driver
-   * is already attempting to move in that general direction, and if the driver is not currently
-   * attempting to rotate the robot, this command will automatically rotate the robot.
+   * Also adds a little translational velocity to move the robot to a certain desired position if
+   * the driver is already attempting to move in that general direction. If the driver is not
+   * currently attempting to rotate the robot, this command will also automatically rotate the robot
+   * to a desired heading.
    *
    * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
    *     alliance side).
    * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
    *     side).
    * @param vOmega A supplier for the angular velocity of the robot.
-   * @param target The target field-relative position for the robot, as a {@link Pose2d}
+   * @param target The target field-relative position for the robot, as a {@link Pose2d}.
    * @return The assisted driving command.
    */
   public Command assistedDrive(
