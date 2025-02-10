@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine sysIdRoutine;
 
   /**
-   * @return Real or Sim elevator based on {@link #Robot.isReal()}.
+   * @return Creates a Real or Sim elevator based on {@link Robot#isReal()}.
    */
   public static Elevator create() {
     return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
