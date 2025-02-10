@@ -2,8 +2,8 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.scoral.Scoral;
 
@@ -16,37 +16,65 @@ public class Scoraling {
     this.hopper = hopper;
     this.scoral = scoral;
     this.elevator = elevator;
+
+    /*
+    Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
+    beambreaks.
+    */
+    hopper
+        .beambreakTrigger
+        .negate()
+        .or(scoral.beambreakTrigger)
+        .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
+  /** A command which intakes from the human player station. */
   public Command hpsIntake() {
-    // elevator goes to default position with retract
-    // andThen -> hopper and scoral outtakes (since outtakaing will intake this way) until the
-    // scoral beambreak is false OR the hps beambreak is true
-    // onlyIf -> scoral beambreak is true (don't have a coral)
-
-    return hopper.intake();
+    return elevator
+        .retract()
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
+        .onlyIf(scoral.beambreakTrigger)
+        .withName("intakingHPS");
   }
 
-  public Command scoral(Level level) {
-    // elevator goes to the level selected
-    // andThen -> scoral outtakes until its beambreak is true
-
-    return elevator.scoreLevel(level);
-  }
-
+  /** A command that retracts the elevator. */
   public Command retract() {
-    // elevator retracts
-
-    return elevator.retract();
+    return elevator.retract().withName("retractElevator");
   }
 
-  public Command grabAlgae(double algaeLevel) {
-    // will make a constant or something for the algae heights needed
+  /**
+   * A command which scores a coral at the given level, assuming you are already at the correct
+   * branch.
+   *
+   * @param level the level the scoral scores in
+   */
+  public Command scoral(Level level) {
+    return elevator
+        .scoreLevel(level)
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .withName("scoraling");
+  }
 
-    // elevator goes to the algae height
-    // andThen -> intake with scoral
-    // onlyIf -> scoral beambreak is true (don't have a coral)
+  /**
+   * A command which grabs the algae from above the level given; only L2 and L3 are allowed.
+   *
+   * @param level the level to score above
+   */
+  public Command cleanAlgae(Level level) {
+    return elevator
+        .clean(level)
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .onlyIf(scoral.beambreakTrigger)
+        .withName("cleanAlgae");
+  }
 
-    return Commands.idle(scoral, elevator);
+  /** A command which halts both the hopper and the scoral. */
+  public Command stop() {
+    return hopper.stop().alongWith(scoral.stop()).withName("stopping");
+  }
+
+  /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
+  public Command runRollers() {
+    return hopper.intake().alongWith(scoral.score()).withName("runningRollers");
   }
 }

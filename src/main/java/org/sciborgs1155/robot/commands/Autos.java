@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.Robot.*;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -29,6 +28,7 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.*;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.*;
 
 public class Autos {

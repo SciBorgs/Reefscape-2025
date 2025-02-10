@@ -1,6 +1,9 @@
 {
   "NetworkTables": {
     "transitory": {
+      "Faults": {
+        "open": true
+      },
       "Robot": {
         "drive": {
           "frontRight": {
@@ -30,7 +33,10 @@
             "open": true
           }
         },
-        "open": true
+        "open": true,
+        "vision": {
+          "open": true
+        }
       }
     },
     "types": {
@@ -49,12 +55,20 @@
       "/Robot/drive/rearRight/turnFeedback": "PIDController",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
+      "/Robot/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/elevator/pid": "ProfiledPIDController",
+      "/Robot/elevator/setpoint/mech": "Mechanism2d",
+      "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/drive dynamic backward": "Command",
       "/SmartDashboard/drive dynamic forward": "Command",
       "/SmartDashboard/drive quasistatic backward": "Command",
       "/SmartDashboard/drive quasistatic forward": "Command",
+      "/SmartDashboard/elevator dynamic backward": "Command",
+      "/SmartDashboard/elevator dynamic forward": "Command",
+      "/SmartDashboard/elevator quasistatic backward": "Command",
+      "/SmartDashboard/elevator quasistatic forward": "Command",
       "/SmartDashboard/rotation dynamic backward": "Command",
       "/SmartDashboard/rotation dynamic forward": "Command",
       "/SmartDashboard/rotation quasistatic backward": "Command",
@@ -70,6 +84,9 @@
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
     "visible": true
   },
   "NetworkTables Settings": {
