@@ -1,16 +1,16 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.robot.Constants.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -32,11 +31,10 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
@@ -50,6 +48,7 @@ import org.sciborgs1155.robot.vision.Vision;
  */
 public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
+
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
@@ -58,11 +57,10 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
-  private final Arm arm = Arm.create();
-  private final Coroller coroller = Coroller.create();
-  private final LEDStrip led = new LEDStrip();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
+
+  private final LEDStrip led = new LEDStrip();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -78,8 +76,6 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // TODO: Add configs for all additional libraries, components, intersubsystem
-    // interaction
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
@@ -97,7 +93,7 @@ public class Robot extends CommandRobot implements Logged {
     RobotController.setBrownoutVoltage(6.0);
 
     if (isReal()) {
-      URCL.start();
+      URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
     } else {
@@ -108,14 +104,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().onTrue(elevator.scoreLevel(Level.L1));
-    operator.b().onTrue(elevator.scoreLevel(Level.L2));
-    operator.x().onTrue(elevator.scoreLevel(Level.L3));
-    operator.y().onTrue(elevator.scoreLevel(Level.L4));
-
-    // x and y are switched: we use joystick Y axis to control field x motion
-    InputStream x = InputStream.of(driver::getLeftY).negate();
-    InputStream y = InputStream.of(driver::getLeftX).negate();
+    InputStream x = InputStream.of(driver::getLeftX).log("raw x");
+    InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
@@ -146,13 +136,13 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
-    led.setDefaultCommand(led.scrolling());
+    elevator.setDefaultCommand(elevator.retract());
+    led.setDefaultCommand(led.rainbow());
+    led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
 
-    autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
-    autonomous().whileTrue(led.autos());
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
-
     driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()
@@ -160,8 +150,21 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    // TODO: Add any additional bindings.
+    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
+    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
+    operator.leftBumper().whileTrue(scoral.score());
+    operator.rightBumper().whileTrue(scoral.algae());
+
+    operator.a().onTrue(elevator.retract());
+    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.y().whileTrue(elevator.highFive());
+
+    operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
+    operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
+    operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
+    operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
   }
 
   /**
@@ -189,7 +192,7 @@ public class Robot extends CommandRobot implements Logged {
     return Test.toCommand(
             drive.systemsCheck(),
             elevator.goToTest(Level.L1.extension),
-            Test.fromCommand(scoral.outtake().withTimeout(2)))
+            Test.fromCommand(scoral.algae().withTimeout(2)))
         .withName("Test Mechanisms");
   }
 

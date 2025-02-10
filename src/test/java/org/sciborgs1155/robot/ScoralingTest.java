@@ -4,8 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
-import static org.sciborgs1155.robot.Constants.Field.algaeOffset;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_HEIGHT;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +46,7 @@ public class ScoralingTest {
     run(scoraling.hpsIntake());
     fastForward();
     assertEquals(
-        MIN_HEIGHT.in(Meters),
+        MIN_EXTENSION.in(Meters),
         elevator.position(),
         ElevatorConstants.POSITION_TOLERANCE.in(Meters));
     assertTrue(hopper.getCurrentCommand().getName() == "intakingHPS");
@@ -75,7 +74,7 @@ public class ScoralingTest {
     run(scoraling.cleanAlgae(level));
     fastForward();
     assertEquals(
-        level.extension.plus(algaeOffset).in(Meters),
+        level.extension.in(Meters),
         elevator.position(),
         ElevatorConstants.POSITION_TOLERANCE.in(Meters));
     assertTrue(scoral.getCurrentCommand().getName() == "cleanAlgae");
