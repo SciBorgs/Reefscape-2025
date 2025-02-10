@@ -163,7 +163,6 @@ public class Robot extends CommandRobot implements Logged {
 
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
-    operator.x().whileTrue(elevator.scoreLevel(Level.L2_ALGAE).alongWith(scoral.algae()));
     operator.y().whileTrue(elevator.highFive());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));

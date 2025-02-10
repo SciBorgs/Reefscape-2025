@@ -222,14 +222,15 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
-    if (!Double.isNaN(position)) {
-      position = MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
-      double lastVelocity = pid.getSetpoint().velocity;
-      double feedback = pid.calculate(hardware.position(), position);
-      double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
+    position =
+        Double.isNaN(position)
+            ? MIN_EXTENSION.in(Meters)
+            : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
+    double lastVelocity = pid.getSetpoint().velocity;
+    double feedback = pid.calculate(hardware.position(), position);
+    double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
-      hardware.setVoltage(feedforward + feedback);
-    }
+    hardware.setVoltage(feedforward + feedback);
   }
 
   @Override
