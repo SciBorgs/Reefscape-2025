@@ -1,6 +1,7 @@
 package org.sciborgs1155.lib;
 
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.revrobotics.REVLibError;
@@ -320,6 +321,34 @@ public final class FaultLogger {
         "Photon Camera [" + camera.getName() + "]",
         "disconnected",
         FaultType.ERROR);
+  }
+
+  /**
+   * Registers fault suppliers for a cancoder.
+   *
+   * @param camera The camera to manage.
+   */
+  public static void register(CANcoder cancoder) {
+    register(
+        () -> cancoder.getFault_BadMagnet().getValue(),
+        "CANcoder [" + cancoder.getDeviceID() + "]",
+        "bad magnet",
+        FaultType.ERROR);
+    register(
+        () -> cancoder.getFault_BootDuringEnable().getValue(),
+        "CANcoder [" + cancoder.getDeviceID() + "]",
+        "boot during enable",
+        FaultType.WARNING);
+    register(
+        () -> cancoder.getFault_Hardware().getValue(),
+        "CANcoder [" + cancoder.getDeviceID() + "]",
+        "hardware fault",
+        FaultType.WARNING);
+    register(
+        () -> cancoder.getFault_Undervoltage().getValue(),
+        "CANcoder [" + cancoder.getDeviceID() + "]",
+        "under voltage",
+        FaultType.WARNING);
   }
 
   /**

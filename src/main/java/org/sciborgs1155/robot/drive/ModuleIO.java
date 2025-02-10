@@ -86,7 +86,7 @@ public interface ModuleIO extends Logged, AutoCloseable {
    *
    * @param angle The angle setpoint.
    */
-  void setTurnSetpoint(double angle);
+  void setTurnSetpoint(Rotation2d angle);
 
   /**
    * Updates controllers based on an optimized desired state and actuates the module accordingly.
