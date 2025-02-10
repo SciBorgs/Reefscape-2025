@@ -347,10 +347,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     }
   }
 
-  // forward acceleration
-  // acc limit = maxaccel * (1 - (vel/maxvel))
-  // find current acc.
-  // if over limit, scale down
+
   public Translation2d forwardAccelLimiting(DoubleSupplier vx, DoubleSupplier vy){
     Translation2d currVel = new Translation2d(fieldRelativeChassisSpeeds().vxMetersPerSecond, fieldRelativeChassisSpeeds().vyMetersPerSecond);
     Translation2d desiredVel = new Translation2d(vx.getAsDouble(), vy.getAsDouble());
@@ -367,6 +364,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // relative acceleration
 
   // skid acceleration
+  public Translation2d maxSkidAcceleration(DoubleSupplier vx, DoubleSupplier vy){
+    double currVel = Math.sqrt((fieldRelativeChassisSpeeds().vxMetersPerSecond * fieldRelativeChassisSpeeds().vxMetersPerSecond) + (fieldRelativeChassisSpeeds().vyMetersPerSecond * fieldRelativeChassisSpeeds().vyMetersPerSecond));
+    double desiredVel = Math.sqrt((vx.getAsDouble() * vx.getAsDouble()) + (vy.getAsDouble() * vy.getAsDouble()));
+
+    double desiredAccel = Math.sqrt((currVel * currVel) + (desiredVel * desiredVel));
+
+    return new Translation2d();
+  }
 
   /**
    * Command factory that automatically path-follows, in a straight line, to a position on the
