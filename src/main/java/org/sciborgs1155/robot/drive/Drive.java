@@ -40,6 +40,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -78,6 +80,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
+  private SwerveModulePosition[] lastPositions;
+  public static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;

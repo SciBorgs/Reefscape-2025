@@ -1,12 +1,18 @@
 package org.sciborgs1155.robot.drive;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
+import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
+
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.DoubleSupplier;
+import org.sciborgs1155.robot.Constants;
 
 /**
  * A class for faster Talon Odometry using a faster thread.
@@ -19,6 +25,7 @@ public class TalonOdometryThread extends Thread {
   private final List<DoubleSupplier> otherSignals = new ArrayList<>();
   private final List<Queue<Double>> otherQueues = new ArrayList<>();
   private final List<Queue<Double>> timestampQueues = new ArrayList<>();
+  private static boolean isCANFD = new CANBus("*").isNetworkFD();
 
   private static TalonOdometryThread instance = null;
 
@@ -36,7 +43,7 @@ public class TalonOdometryThread extends Thread {
 
   public Queue<Double> registerSignal(StatusSignal<Double> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    // Drive.lock.writeLock().lock();
+    Drive.lock.writeLock().lock();
     try {
       BaseStatusSignal[] newSignals = new BaseStatusSignal[talonSignals.length + 1];
       System.arraycopy(talonSignals, 0, newSignals, 0, talonSignals.length);
@@ -44,36 +51,74 @@ public class TalonOdometryThread extends Thread {
       talonSignals = newSignals;
       talonQueues.add(queue);
     } finally {
-      // Drive.lock.writeLock().unlock();
+      Drive.lock.writeLock().unlock();
     }
     return queue;
   }
 
   public Queue<Double> registerSignal(DoubleSupplier signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    // Drive.lock.writeLock().lock();
+    Drive.lock.writeLock().lock();
     try {
       otherSignals.add(signal);
       otherQueues.add(queue);
     } finally {
-      // Drive.lock.writeLock().unlock();
+      Drive.lock.writeLock().unlock();
     }
     return queue;
   }
 
   public Queue<Double> makeTimestampQueue() {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    // Drive.lock.writeLock().lock();
+    Drive.lock.writeLock().lock();
     try {
       timestampQueues.add(queue);
     } finally {
-      // Drive.lock.writeLock().lock();
+      Drive.lock.writeLock().lock();
     }
     return queue;
   }
 
   @Override
   public void run() {
-    // TODO write
+    while (true) {
+      try {
+        if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {
+          BaseStatusSignal.waitForAll(2.0 * Constants.ODOMETRY_PERIOD.in(Seconds), talonSignals);
+        } else {
+          Thread.sleep(Math.round(ODOMETRY_PERIOD.in(Milliseconds)));
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      Drive.lock.writeLock().lock();
+
+      try {
+        double timestamp =
+            talonSignals[0].getTimestamp().getTime(); // should all be measured together
+
+        double totalLatency = 0.0;
+        for (BaseStatusSignal signal : talonSignals) {
+          totalLatency += signal.getTimestamp().getLatency();
+        }
+        if (talonSignals.length > 0) {
+          timestamp -= totalLatency / talonSignals.length;
+        }
+
+        // add updates to queues
+        for (int i = 0; i < talonSignals.length; i++) {
+          talonQueues.get(i).offer(talonSignals[i].getValueAsDouble());
+        }
+        for (int i = 0; i < otherSignals.size(); i++) {
+          otherQueues.get(i).offer(otherSignals.get(i).getAsDouble());
+        }
+        for (int i = 0; i < timestampQueues.size(); i++) {
+          timestampQueues.get(i).offer(timestamp);
+        }
+      } finally {
+        Drive.lock.writeLock().unlock();
+      }
+    }
   }
 }
