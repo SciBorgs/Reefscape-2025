@@ -33,14 +33,14 @@ public final class DriveConstants {
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
 
   // Distance between centers of right and left wheels on robot
-  public static final Distance TRACK_WIDTH = Meters.of(0.5931); // .5884 //.5931
+  public static final Distance TRACK_WIDTH = Meters.of(0.5931);
   // Distance between front and back wheels on robot
-  public static final Distance WHEEL_BASE = Meters.of(0.59077); // .59077
+  public static final Distance WHEEL_BASE = Meters.of(0.59077);
   // The radius of any swerve wheel
-  public static final Distance WHEEL_RADIUS = Inches.of(2); // 4/00 dia, 2.00 rad
+  public static final Distance WHEEL_RADIUS = Inches.of(2);
   // Distance from the center to any wheel of the robot
   public static final Distance RADIUS = TRACK_WIDTH.div(2).times(Math.sqrt(2));
-  // Coefficient of friction between the drive wheel and the carpet.
+  // Coefficient of friction between the drive wheel and the carpet
   public static final double WHEEL_COF = 1.0;
   // Robot width with bumpers
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
@@ -117,7 +117,7 @@ public final class DriveConstants {
 
     static final class Turning {
       public static final double GEARING = 12.1;
-      public static final double CANCODER_GEARING = 1; // 0.4 / (12.1 * 1.3);
+      public static final double CANCODER_GEARING = 1;
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
