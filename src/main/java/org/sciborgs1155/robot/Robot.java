@@ -149,8 +149,8 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.x().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(5,5, Rotation2d.kZero)));
-    driver.y().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(10,5, Rotation2d.kPi)));
+    driver.x().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(5, 5, Rotation2d.kZero)));
+    driver.y().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(10, 5, Rotation2d.kPi)));
 
     led.setDefaultCommand(led.scrolling());
 

@@ -1,9 +1,6 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,9 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
-import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.drive.NoGyro;
 import org.sciborgs1155.robot.drive.SimModule;
@@ -46,7 +41,6 @@ public class SwerveTest {
     rearRight = new SimModule("RR");
     gyro = new NoGyro();
     drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
-    drive.resetEncoders();
   }
 
   @AfterEach
@@ -126,22 +120,32 @@ public class SwerveTest {
         //     Rotation2d.fromRotations(Math.random()));
         new Pose2d(5, 5, Rotation2d.k180deg);
 
-
-    Rotation2d offset = 
-        Rotation2d.fromRadians(/*Math.random() * 0.2 - 0.1*/ -0.05);
+    Rotation2d offset = Rotation2d.fromRadians(/*Math.random() * 0.2 - 0.1*/ -0.05);
     Translation2d input =
         (target.getTranslation().rotateBy(offset)).div(target.getTranslation().getNorm());
 
     runToCompletion(
         drive
-            .assistedDrive(input::getX, input::getY, () -> 0, target).until(() -> target.getTranslation().minus(drive.pose().getTranslation()).getNorm() < Translation.TOLERANCE.in(Meters)).withTimeout(Seconds.of(20)));
-    fastForward(Seconds.of(1));
+            .assistedDrive(input::getX, input::getY, () -> 0, target)
+            .until(
+                () ->
+                    target.getTranslation().minus(drive.pose().getTranslation()).getNorm()
+                        < Translation.TOLERANCE.in(Meters))
+            .withTimeout(Seconds.of(20)));
 
-    Translation2d velocities = new Translation2d(drive.fieldRelativeChassisSpeeds().vxMetersPerSecond, drive.fieldRelativeChassisSpeeds().vyMetersPerSecond);
+    Translation2d velocities =
+        new Translation2d(
+            drive.fieldRelativeChassisSpeeds().vxMetersPerSecond,
+            drive.fieldRelativeChassisSpeeds().vyMetersPerSecond);
+
+    System.out.println("velocities: " + velocities);
+
+    System.out.println(offset.getDegrees());
+    System.out.println(velocities.getAngle());
+    System.out.println(input.getAngle());
 
     assertTrue(offset.getSin() > 0 == velocities.getAngle().minus(input.getAngle()).getSin() > 0);
-    
-    assertEquals(drive.pose().getRotation().getSin(), target.getRotation().getSin(), 0.05);
 
+    assertEquals(drive.pose().getRotation().getSin(), target.getRotation().getSin(), 0.05);
   }
 }
