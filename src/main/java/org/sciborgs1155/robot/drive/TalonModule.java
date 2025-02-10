@@ -108,7 +108,6 @@ public class TalonModule implements ModuleIO {
     register(turnMotor);
     register(encoder);
 
-
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
 

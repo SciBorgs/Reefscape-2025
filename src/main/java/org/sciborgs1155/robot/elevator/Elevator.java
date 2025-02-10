@@ -13,7 +13,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -32,7 +31,6 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
@@ -224,12 +222,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
-    if (!Double.isNaN(position)){
+    if (!Double.isNaN(position)) {
       position = MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
       double lastVelocity = pid.getSetpoint().velocity;
       double feedback = pid.calculate(hardware.position(), position);
       double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
-  
+
       hardware.setVoltage(feedforward + feedback);
     }
   }
@@ -242,7 +240,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
-    
+
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
