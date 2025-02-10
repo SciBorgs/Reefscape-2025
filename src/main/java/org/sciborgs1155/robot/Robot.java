@@ -11,6 +11,8 @@ import static org.sciborgs1155.robot.Constants.Field.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -146,6 +148,9 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
+
+    driver.x().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(5,5, Rotation2d.kZero)));
+    driver.y().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(10,5, Rotation2d.kPi)));
 
     led.setDefaultCommand(led.scrolling());
 

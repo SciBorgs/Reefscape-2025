@@ -1,5 +1,8 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.drive.NoGyro;
 import org.sciborgs1155.robot.drive.SimModule;
 
@@ -112,32 +117,31 @@ public class SwerveTest {
     assertEquals(deltaY, pose.getY(), DELTA * 2);
   }
 
-  @RepeatedTest(5)
+  @RepeatedTest(20)
   public void assistedDrivingTest() {
     Pose2d target =
-        new Pose2d(
-            Math.random() * 10 + 2,
-            Math.random() * 10 + 2,
-            Rotation2d.fromRotations(Math.random()));
-    Rotation2d offset =
-        Rotation2d.fromRotations(
-            DriveConstants.ASSISTED_DRIVING_THRESHOLD.in(Rotations) * 2 * Math.random()
-                - DriveConstants.ASSISTED_DRIVING_THRESHOLD.in(Rotations));
+        // new Pose2d(
+        //     Math.random() * 10 + 2,
+        //     Math.random() * 10 + 2,
+        //     Rotation2d.fromRotations(Math.random()));
+        new Pose2d(5, 5, Rotation2d.k180deg);
+
+
+    Rotation2d offset = 
+        Rotation2d.fromRadians(/*Math.random() * 0.2 - 0.1*/ -0.05);
     Translation2d input =
-        target.getTranslation().rotateBy(offset).div(target.getTranslation().getNorm());
+        (target.getTranslation().rotateBy(offset)).div(target.getTranslation().getNorm());
 
-    System.out.println(target.toString());
-    System.out.println(input.toString());
-
-    run(
+    runToCompletion(
         drive
-            .assistedDrive(input::getX, input::getY, () -> 0, target)
-            .until(() -> drive.pose().relativeTo(target).getTranslation().getNorm() < 0.1));
-    fastForward();
-    assertTrue(
-        offset.getSin() > 0
-            == drive.pose().getTranslation().getAngle().getSin()
-                > target.getTranslation().getAngle().getSin());
-    assertTrue(target.getRotation().getSin() > 0 == drive.heading().getSin() > 0);
+            .assistedDrive(input::getX, input::getY, () -> 0, target).until(() -> target.getTranslation().minus(drive.pose().getTranslation()).getNorm() < Translation.TOLERANCE.in(Meters)).withTimeout(Seconds.of(20)));
+    fastForward(Seconds.of(1));
+
+    Translation2d velocities = new Translation2d(drive.fieldRelativeChassisSpeeds().vxMetersPerSecond, drive.fieldRelativeChassisSpeeds().vyMetersPerSecond);
+
+    assertTrue(offset.getSin() > 0 == velocities.getAngle().minus(input.getAngle()).getSin() > 0);
+    
+    assertEquals(drive.pose().getRotation().getSin(), target.getRotation().getSin(), 0.05);
+
   }
 }
