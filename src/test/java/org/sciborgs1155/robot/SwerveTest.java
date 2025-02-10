@@ -8,7 +8,6 @@ import static org.sciborgs1155.lib.UnitTestingUtil.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -100,15 +99,17 @@ public class SwerveTest {
 
     String name = "test run " + Math.floor(Math.random() * 1000);
 
-    Command c = drive.run(
-      () ->
-          drive.setChassisSpeeds(
-              ChassisSpeeds.fromRobotRelativeSpeeds(
-                  xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
-              ControlMode.CLOSED_LOOP_VELOCITY)).withName(name);
+    Command c =
+        drive
+            .run(
+                () ->
+                    drive.setChassisSpeeds(
+                        ChassisSpeeds.fromRobotRelativeSpeeds(
+                            xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
+                        ControlMode.CLOSED_LOOP_VELOCITY))
+            .withName(name);
 
-    run(
-        c);
+    run(c);
 
     fastForward(Seconds.of(deltaT));
 
