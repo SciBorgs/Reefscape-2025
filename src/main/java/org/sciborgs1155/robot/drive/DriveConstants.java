@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Time;
 import java.util.List;
 
 /**
- * Constants for our 2025 REEFSCAPE drivetrain. All fields in this file should be updated for the
+ * Constants for our 2025 Swerve X2t drivetrain. All fields in this file should be updated for the
  * current robot configuration!
  */
 public final class DriveConstants {
@@ -116,7 +116,8 @@ public final class DriveConstants {
     }
 
     static final class Turning {
-      public static final double GEARING = 1; // 0.4 / (12.1 * 1.3);
+      public static final double GEARING = 12.1;
+      public static final double CANCODER_GEARING = 1; // 0.4 / (12.1 * 1.3);
 
       public static final Current CURRENT_LIMIT = Amps.of(20);
 

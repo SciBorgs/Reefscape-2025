@@ -9,7 +9,6 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.L1_POWER;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -33,7 +32,6 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
@@ -85,7 +83,6 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
-    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -107,13 +104,6 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
-
-    addPeriodic(
-        () -> {
-          Dashboard.info.get("closestBranch").setString(drive.closestBranch());
-          Dashboard.tick();
-        },
-        PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
@@ -168,7 +158,6 @@ public class Robot extends CommandRobot implements Logged {
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
-    operator.rightTrigger().whileTrue(scoral.go(L1_POWER));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
 

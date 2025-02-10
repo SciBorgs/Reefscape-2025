@@ -10,6 +10,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -28,6 +29,7 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 public class TalonModule implements ModuleIO {
   private final TalonFX driveMotor; // Kraken X60
   private final TalonFX turnMotor; // Kraken X60
+  private final CANcoder encoder;
 
   private final StatusSignal<Angle> turnPos;
 
@@ -71,6 +73,7 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Slot0.kD = Driving.PID.D;
 
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
+    encoder = new CANcoder(sensorID, CANIVORE_NAME);
     turnPos = turnMotor.getPosition();
 
     turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
@@ -81,7 +84,7 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
 
-    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.GEARING;
+    talonTurnConfig.Feedback.SensorToMechanismRatio = Turning.CANCODER_GEARING;
     talonTurnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     talonTurnConfig.Feedback.FeedbackRemoteSensorID = sensorID;
 

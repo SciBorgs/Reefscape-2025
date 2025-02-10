@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.algaeOffset;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
@@ -43,7 +42,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine sysIdRoutine;
 
   /**
-   * @return Real or Sim elevator based on {@link Robot.isReal()}.
+   * @return Real or Sim elevator based on {@link #Robot.isReal()}.
    */
   public static Elevator create() {
     return new Elevator(Robot.isReal() ? new RealElevator() : new SimElevator());
@@ -142,7 +141,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
       return retract();
     }
 
-    return goTo(level.extension.plus(algaeOffset).in(Meters)).withName("cleaning");
+    return goTo(level.extension.in(Meters)).withName("cleaning");
   }
 
   public Command manualElevator(InputStream input) {

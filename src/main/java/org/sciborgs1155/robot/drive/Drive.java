@@ -435,14 +435,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
-  public String closestBranch() {
-    if (pose().getX() < 3) {
-      return "A";
-    } else {
-      return "B";
-    }
-  }
-
   /**
    * Updates pose estimate based on vision-provided {@link EstimatedRobotPose}s.
    *

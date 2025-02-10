@@ -67,7 +67,4 @@ public class ElevatorConstants {
       this.extension = extension;
     }
   }
-
-  /** Offset added to a level's height in order to to be at the algae's height */
-  public static final Distance algaeOffset = Meters.of(0);
 }

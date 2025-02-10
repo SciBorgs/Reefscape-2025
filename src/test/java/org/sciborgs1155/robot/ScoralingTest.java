@@ -74,7 +74,7 @@ public class ScoralingTest {
     run(scoraling.cleanAlgae(level));
     fastForward();
     assertEquals(
-        level.extension.plus(algaeOffset).in(Meters),
+        level.extension.in(Meters),
         elevator.position(),
         ElevatorConstants.POSITION_TOLERANCE.in(Meters));
     assertTrue(scoral.getCurrentCommand().getName() == "cleanAlgae");
