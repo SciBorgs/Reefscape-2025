@@ -47,7 +47,7 @@ public class ElevatorConstants {
   public static final Current CURRENT_LIMIT = Amps.of(50);
 
   // Don't worry about this :)
-  public static final Time DELAY = Seconds.of(.3);
+  public static final Time HIGH_FIVE_DELAY = Seconds.of(.3);
   public static final Distance RAY_HIGH = Meter.of(1.086);
   public static final Distance RAY_MIDDLE = Meter.of(0.628);
   public static final Distance RAY_LOW = Meter.of(0.25);

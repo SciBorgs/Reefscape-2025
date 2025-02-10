@@ -169,9 +169,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public Command highFive() {
     return goTo(() -> RAY_HIGH.in(Meters))
         .until(() -> atGoal())
-        .andThen(Commands.waitSeconds(DELAY.in(Seconds)))
+        .andThen(Commands.waitSeconds(HIGH_FIVE_DELAY.in(Seconds)))
         .andThen(goTo(() -> RAY_LOW.in(Meters)).until(() -> atGoal()))
-        .andThen(Commands.waitSeconds(DELAY.in(Seconds)))
+        .andThen(Commands.waitSeconds(HIGH_FIVE_DELAY.in(Seconds)))
         .andThen(goTo(RAY_MIDDLE.in(Meters)));
   }
 
