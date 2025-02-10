@@ -56,8 +56,6 @@ public class TalonModule implements ModuleIO {
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
-    // driveVelocity.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
-
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
 
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -108,6 +106,8 @@ public class TalonModule implements ModuleIO {
 
     register(driveMotor);
     register(turnMotor);
+    register(encoder);
+
 
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);

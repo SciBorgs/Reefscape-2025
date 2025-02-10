@@ -57,10 +57,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  private final DoubleEntry p = Tuning.entry("/elevator/kP", kP);
-  private final DoubleEntry i = Tuning.entry("/elevator/kI", kI);
-  private final DoubleEntry d = Tuning.entry("/elevator/kD", kD);
-
   @Log.NT
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
@@ -175,9 +171,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public Command highFive() {
     return goTo(() -> RAY_HIGH.in(Meters))
         .until(() -> atGoal())
-        .andThen(Commands.waitSeconds(WAIT_TIME.in(Seconds)))
+        .andThen(Commands.waitSeconds(DELAY.in(Seconds)))
         .andThen(goTo(() -> RAY_LOW.in(Meters)).until(() -> atGoal()))
-        .andThen(Commands.waitSeconds(WAIT_TIME.in(Seconds)))
+        .andThen(Commands.waitSeconds(DELAY.in(Seconds)))
         .andThen(goTo(RAY_MIDDLE.in(Meters)));
   }
 
@@ -228,13 +224,14 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
-    position = MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
-
-    double lastVelocity = pid.getSetpoint().velocity;
-    double feedback = pid.calculate(hardware.position(), position);
-    double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
-
-    hardware.setVoltage(feedforward + feedback);
+    if (!Double.isNaN(position)){
+      position = MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
+      double lastVelocity = pid.getSetpoint().velocity;
+      double feedback = pid.calculate(hardware.position(), position);
+      double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
+  
+      hardware.setVoltage(feedforward + feedback);
+    }
   }
 
   @Override
@@ -245,11 +242,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
-
-    pid.setP(p.get());
-    pid.setI(i.get());
-    pid.setD(d.get());
-
+    
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
@@ -262,7 +255,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    *     goal.
    */
   public Test goToTest(Distance testHeight) {
-    Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(9);
+    Command testCommand = goTo(testHeight.in(Meters)).until(this::atGoal).withTimeout(5);
     Set<Assertion> assertions =
         Set.of(
             eAssert(
