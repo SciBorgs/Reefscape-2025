@@ -10,7 +10,6 @@ import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -29,6 +28,7 @@ import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
@@ -56,7 +56,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
+  private final Vision vision = Vision.none();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
@@ -135,7 +135,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega));
+    // drive.setDefaultCommand(drive.drive(x, y, omega));
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.rainbow());
     led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
@@ -150,8 +150,13 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
-    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+    // teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+    // disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+
+    driver
+        .x()
+        .onTrue(Commands.runOnce(TalonUtils::play).andThen(Commands.idle(drive, elevator, scoral)));
+    driver.y().onTrue(Commands.runOnce(TalonUtils::stop));
 
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
@@ -165,6 +170,8 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+    TalonUtils.configureOrchestra("magical-toy-box.chrp");
   }
 
   /**

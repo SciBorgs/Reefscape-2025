@@ -4,12 +4,39 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
+import java.util.List;
+import monologue.Annotations.Log;
+import monologue.Logged;
 
-public class TalonUtils {
+public class TalonUtils implements Logged {
   private static final Orchestra orchestra = new Orchestra();
-  private static final ArrayList<TalonFX> talons = new ArrayList<>(4);
+  @Log.NT private static final ArrayList<TalonFX> talons = new ArrayList<>(11);
+  private static List<String> fileNames =
+      List.of(
+          "baka.chrp",
+          "blue.chrp",
+          "BWomp.chrp",
+          "hopes-and-dreams.chrp",
+          "last-surprise.chrp",
+          "poker-face.chrp",
+          "rick.chrp",
+          "magical-toy-box.chrp");
+
   private static boolean fileLoaded = false;
+
+  private static SendableChooser<Runnable> songChooser = new SendableChooser<>();
+
+  static {
+    for (String fileName : fileNames) {
+      songChooser.addOption(fileName, () -> TalonUtils.loadOrchestraFile(fileName));
+    }
+
+    SmartDashboard.putData("Queued Song", songChooser);
+    songChooser.onChange(chooseSelected -> chooseSelected.run());
+  }
 
   /**
    * Adds motor to the orchestra.
@@ -21,8 +48,8 @@ public class TalonUtils {
   }
 
   /**
-   * Configure all motors to play a selected Chirp (CHRP) file in the deploy directory. Should be
-   * called once after addition of all Talons to TalonUtils.
+   * Configure all motors to play a selected Chirp (CHRP) file on robot boot in the deploy
+   * directory. Should be called once after addition of all Talons to TalonUtils.
    *
    * <p>Use {@code loadOrchestraFile()} after configuration to change the played file.
    *
