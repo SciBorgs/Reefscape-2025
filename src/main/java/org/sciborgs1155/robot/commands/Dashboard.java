@@ -113,4 +113,5 @@ public class Dashboard {
       this.trigger = setTriggerLevel(level);
     }
   }
+
 }

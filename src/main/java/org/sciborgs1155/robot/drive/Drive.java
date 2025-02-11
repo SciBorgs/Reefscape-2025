@@ -26,6 +26,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -258,27 +259,63 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
     return run(() -> {
-      Translation2d currVel =
-        new Translation2d(
-          fieldRelativeChassisSpeeds().vxMetersPerSecond,
-          fieldRelativeChassisSpeeds().vyMetersPerSecond);
+        Translation2d currentVel = new Translation2d(
+            fieldRelativeChassisSpeeds().vxMetersPerSecond,
+            fieldRelativeChassisSpeeds().vyMetersPerSecond
+        );
+        Translation2d desiredVel = new Translation2d(
+            vx.getAsDouble(),
+            vy.getAsDouble()
+        );
 
-      Translation2d desiredVel = new Translation2d(vx.getAsDouble(), vy.getAsDouble());
+        // Calculate acceleration as (desired - current)/dt
+        Translation2d wantedAccel = desiredVel.minus(currentVel).div(Constants.PERIOD.in(Seconds));
+        
+        // Apply all acceleration limits
+        Translation2d limitedAccel = accLimits(wantedAccel);
+        
+        // Calculate new velocity: current + at
+        desiredVel = currentVel.plus(limitedAccel.times(Constants.PERIOD.in(Seconds)));
 
-      Translation2d accel = (desiredVel.minus(currVel)).div(SENSOR_PERIOD.in(Seconds));
-      
-      desiredVel = currVel.plus(accel.times(SENSOR_PERIOD.in(Seconds)));
+        setChassisSpeeds(
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                desiredVel.getX(),
+                desiredVel.getY(),
+                vOmega.getAsDouble(),
+                heading().plus(allianceRotation())),
+            ControlMode.OPEN_LOOP_VELOCITY);
+          });
+          }
 
-            setChassisSpeeds(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    desiredVel.getX(),
-                    desiredVel.getY(),
-                    vOmega.getAsDouble(),
-                    heading().plus(allianceRotation())),
-                ControlMode.OPEN_LOOP_VELOCITY);
-              });
-  }
+          private Translation2d accLimits(Translation2d wantedAccel) {
+            Translation2d currentVel = new Translation2d(
+            fieldRelativeChassisSpeeds().vxMetersPerSecond,
+            fieldRelativeChassisSpeeds().vyMetersPerSecond
+            );
 
+            double currentSpeed = currentVel.getNorm();
+            double forwardLimit = MAX_ACCEL.in(MetersPerSecondPerSecond) * 
+            (1 - currentSpeed / MAX_SPEED.in(MetersPerSecond));
+
+            // Project wantedAccel onto currentVel to find the component along the current velocity
+            double accelAlongCurrentVel = wantedAccel.toVector().dot(currentVel.toVector()) / currentSpeed;
+
+            // Limit the component along the current velocity
+            if (accelAlongCurrentVel > forwardLimit) {
+            accelAlongCurrentVel = forwardLimit;
+            }
+
+            // If starting (speed is zero), apply full acceleration
+            if (currentSpeed == 0) {
+            return wantedAccel;
+            }
+
+            // Calculate the new acceleration vector
+            Translation2d limitedAccel = currentVel.times(accelAlongCurrentVel / currentSpeed);
+            Translation2d remainingAccel = wantedAccel.minus(limitedAccel);
+
+            return limitedAccel.plus(remainingAccel);
+          }
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
    *
@@ -358,25 +395,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).updateSetpoint(desiredStates[i], mode);
     }
-  }
-
-  public Translation2d accelLimits(Translation2d accel, Translation2d vel) {
-
-    double forwardAccelLimit =
-        MAX_ACCEL
-            .times(1 - (vel.div(MAX_SPEED.in(MetersPerSecond))).getNorm())
-            .in(MetersPerSecondPerSecond);
-
-    if(accel.getNorm() > forwardAccelLimit) {
-      double scale = forwardAccelLimit / accel.getNorm();
-      accel = accel.times(scale);
-    }
-    if(accel.getNorm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)) {
-      double scale = MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond) / accel.getNorm();
-      accel = accel.times(scale);
-    }
-
-    return accel;
   }
 
   /**
