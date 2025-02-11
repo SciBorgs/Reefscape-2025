@@ -371,13 +371,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         vx,
         vy,
         () ->
-            Math.abs(vOmega.getAsDouble()) < ASSISTED_ROTATING_THRESHOLD
-                    && Math.abs(target.getRotation().getRadians() - heading().getRadians())
+            Math.abs(target.getRotation().getRadians() - heading().getRadians())
                         > Rotation.TOLERANCE.in(Radians)
                 ? rotationController.calculate(
                     heading().getRadians(), target.getRotation().getRadians())
                 : vOmega.getAsDouble(),
-        target.getTranslation());
+        target.getTranslation()).until(() -> vOmega.getAsDouble() > ASSISTED_ROTATING_THRESHOLD).andThen(assistedDrive(vx, vy, vOmega, target.getTranslation()));
   }
 
   /**
