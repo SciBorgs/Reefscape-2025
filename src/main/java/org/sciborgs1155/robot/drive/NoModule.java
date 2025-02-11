@@ -54,7 +54,7 @@ public class NoModule implements ModuleIO {
   public void setDriveSetpoint(double velocity) {}
 
   @Override
-  public void setTurnSetpoint(double angle) {}
+  public void setTurnSetpoint(Rotation2d angle) {}
 
   @Override
   public void updateSetpoint(SwerveModuleState setpoint, ControlMode mode) {}

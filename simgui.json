@@ -4,8 +4,11 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+<<<<<<< HEAD
       "/Robot/arm/armCanvas": "Mechanism2d",
       "/Robot/arm/fb": "ProfiledPIDController",
+=======
+>>>>>>> main
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
@@ -16,10 +19,17 @@
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
+<<<<<<< HEAD
       "/SmartDashboard/pivot dynamic backward": "Command",
       "/SmartDashboard/pivot dynamic forward": "Command",
       "/SmartDashboard/pivot quasistatic backward": "Command",
       "/SmartDashboard/pivot quasistatic forward": "Command",
+=======
+      "/SmartDashboard/elevator dynamic backward": "Command",
+      "/SmartDashboard/elevator dynamic forward": "Command",
+      "/SmartDashboard/elevator quasistatic backward": "Command",
+      "/SmartDashboard/elevator quasistatic forward": "Command",
+>>>>>>> main
       "/SmartDashboard/rotation dynamic backward": "Command",
       "/SmartDashboard/rotation dynamic forward": "Command",
       "/SmartDashboard/rotation quasistatic backward": "Command",
@@ -45,6 +55,7 @@
   },
   "NetworkTables": {
     "transitory": {
+<<<<<<< HEAD
       "Robot": {
         "drive": {
           "Pose2d##v_/Robot/drive/pose": {
@@ -57,12 +68,67 @@
           "rotationController": {
             "open": true
           }
+=======
+      "Dashboard": {
+        "open": true
+      },
+      "Robot": {
+        "elevator": {
+          "open": true
+>>>>>>> main
         },
         "open": true
       }
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "example client@1": {
+      "open": true
+    },
     "visible": true
+<<<<<<< HEAD
+=======
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 0,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/positionSetpoint"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Elevator"
+      }
+    }
+>>>>>>> main
   }
 }

@@ -12,6 +12,7 @@ import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -50,6 +51,8 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -103,26 +106,36 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public static Drive create() {
     if (Robot.isReal()) {
-      return switch (TYPE) {
-        case TALON ->
-            new Drive(
-                new NavXGyro(),
-                new TalonModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS.get(0), "FL"),
-                new TalonModule(
-                    FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS.get(1), "FR"),
-                new TalonModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS.get(2), "RL"),
-                new TalonModule(
-                    REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS.get(3), "RR"));
-        case SPARK ->
-            new Drive(
-                new NavXGyro(),
-                new SparkModule(FRONT_LEFT_DRIVE, FRONT_LEFT_TURNING, ANGULAR_OFFSETS.get(0), "FL"),
-                new SparkModule(
-                    FRONT_RIGHT_DRIVE, FRONT_RIGHT_TURNING, ANGULAR_OFFSETS.get(1), "FR"),
-                new SparkModule(REAR_LEFT_DRIVE, REAR_LEFT_TURNING, ANGULAR_OFFSETS.get(2), "RL"),
-                new SparkModule(
-                    REAR_RIGHT_DRIVE, REAR_RIGHT_TURNING, ANGULAR_OFFSETS.get(3), "RR"));
-      };
+      return new Drive(
+          new ReduxGyro(),
+          new TalonModule(
+              FRONT_LEFT_DRIVE,
+              FRONT_LEFT_TURNING,
+              FRONT_LEFT_CANCODER,
+              ANGULAR_OFFSETS.get(0),
+              "FL",
+              false),
+          new TalonModule(
+              FRONT_RIGHT_DRIVE,
+              FRONT_RIGHT_TURNING,
+              FRONT_RIGHT_CANCODER,
+              ANGULAR_OFFSETS.get(1),
+              "FR",
+              true),
+          new TalonModule(
+              REAR_LEFT_DRIVE,
+              REAR_LEFT_TURNING,
+              REAR_LEFT_CANCODER,
+              ANGULAR_OFFSETS.get(2),
+              "RL",
+              false),
+          new TalonModule(
+              REAR_RIGHT_DRIVE,
+              REAR_RIGHT_TURNING,
+              REAR_RIGHT_CANCODER,
+              ANGULAR_OFFSETS.get(3),
+              "RR",
+              true));
     } else {
       return new Drive(
           new NoGyro(),
@@ -152,7 +165,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     translationCharacterization =
         new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(
+                null,
+                Volts.of(4),
+                null,
+                (state) -> SignalLogger.writeString("translation state", state.toString())),
             new SysIdRoutine.Mechanism(
                 volts ->
                     modules.forEach(
@@ -162,7 +179,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "translation"));
     rotationalCharacterization =
         new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(
+                null,
+                Volts.of(4),
+                null,
+                (state) -> SignalLogger.writeString("rotation state", state.toString())),
             new SysIdRoutine.Mechanism(
                 volts -> {
                   this.frontLeft.updateInputs(
@@ -264,7 +285,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     vy.getAsDouble(),
                     vOmega.getAsDouble(),
                     heading().plus(allianceRotation())),
-                ControlMode.OPEN_LOOP_VELOCITY));
+                DRIVE_MODE));
   }
 
   /**
@@ -394,13 +415,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * Sets the states of each swerve module using target speeds that the drivetrain will work to
    * reach.
    *
-   * @param speeds The speeds the drivetrain will run at.
+   * @param speeds The robot relative speeds the drivetrain will run at.
    * @param mode The control loop used to achieve those speeds.
    */
   public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
+    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
         kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(speeds, Constants.PERIOD.in(Seconds))),
+            ChassisSpeeds.discretize(
+                kinematics.toChassisSpeeds(states), Constants.PERIOD.in(Seconds))),
         mode);
   }
 
@@ -414,8 +438,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     if (desiredStates.length != modules.size()) {
       throw new IllegalArgumentException("desiredStates must have the same length as modules");
     }
-
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, MAX_SPEED.in(MetersPerSecond));
 
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).updateSetpoint(desiredStates[i], mode);
@@ -563,7 +585,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public Test systemsCheck() {
     ChassisSpeeds speeds = new ChassisSpeeds(1, 1, 0);
     Command testCommand =
-        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY)).withTimeout(0.75);
+        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY)).withTimeout(0.5);
     Function<ModuleIO, TruthAssertion> speedCheck =
         m ->
             tAssert(

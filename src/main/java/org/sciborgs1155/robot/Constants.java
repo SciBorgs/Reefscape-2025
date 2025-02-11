@@ -47,11 +47,12 @@ public class Constants {
           / DriveConstants.MAX_ANGULAR_SPEED.baseUnitMagnitude();
   public static final double SLOW_SPEED_MULTIPLIER = 0.33;
   public static final double FULL_SPEED_MULTIPLIER = 1.0;
+  public static final String CANIVORE_NAME = "drivetrain";
 
   // Origin at corner of blue alliance side of field
   public static class Field {
-    public static final Distance LENGTH = Inches.of(651.223);
-    public static final Distance WIDTH = Inches.of(323.277);
+    public static final Distance LENGTH = Centimeters.of(1755);
+    public static final Distance WIDTH = Centimeters.of(805);
 
     /** Returns whether the provided position is within the boundaries of the field. */
     public static boolean inField(Pose3d pose) {
@@ -60,8 +61,5 @@ public class Constants {
           && pose.getY() > 0
           && pose.getY() < Field.WIDTH.in(Meters));
     }
-
-    /** Offset added to a level's height in order to to be at the algae's height */
-    public static final Distance algaeOffset = Meters.of(0);
   }
 }
