@@ -4,10 +4,9 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -21,7 +20,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
 import java.util.Queue;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
@@ -33,8 +31,6 @@ public class TalonModule implements ModuleIO {
   private final TalonFX driveMotor; // Kraken X60
   private final TalonFX turnMotor; // Kraken X60
   private final CANcoder encoder;
-
-  private final StatusSignal<Angle> turnPos;
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
@@ -63,6 +59,7 @@ public class TalonModule implements ModuleIO {
       Rotation2d angularOffset,
       String name,
       boolean invert) {
+    // drive motor
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
     driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
 
@@ -82,10 +79,8 @@ public class TalonModule implements ModuleIO {
 
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     encoder = new CANcoder(sensorID, CANIVORE_NAME);
-    turnPos = turnMotor.getPosition();
 
-    turnPos.setUpdateFrequency(1 / SENSOR_PERIOD.in(Seconds));
-
+    // turn motor
     TalonFXConfiguration talonTurnConfig = new TalonFXConfiguration();
 
     talonTurnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -113,6 +108,9 @@ public class TalonModule implements ModuleIO {
       StatusCode success = turnMotor.getConfigurator().apply(talonTurnConfig);
       if (success.isOK()) break;
     }
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        1 / ODOMETRY_PERIOD.in(Seconds), driveMotor.getPosition(), turnMotor.getPosition());
 
     register(driveMotor);
     register(turnMotor);

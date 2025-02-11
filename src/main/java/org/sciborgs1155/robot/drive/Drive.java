@@ -206,7 +206,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         new SwerveDrivePoseEstimator(
             kinematics,
             gyro.rotation2d(),
-            modulePositions(),
+            lastPositions,
             new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
 
     for (int i = 0; i < modules.size(); i++) {
@@ -268,7 +268,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(gyro.rotation2d(), modulePositions(), pose);
+    odometry.resetPosition(gyro.rotation2d(), lastPositions, pose);
   }
 
   /**
