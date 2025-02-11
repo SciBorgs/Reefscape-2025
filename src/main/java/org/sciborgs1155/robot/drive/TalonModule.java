@@ -3,11 +3,13 @@ package org.sciborgs1155.robot.drive;
 import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
+import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -35,6 +37,8 @@ public class TalonModule implements ModuleIO {
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
+  private final DutyCycleOut odometryFrequency =
+      new DutyCycleOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -124,12 +128,12 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public void setDriveVoltage(double voltage) {
-    driveMotor.setVoltage(voltage);
+    driveMotor.setControl(odometryFrequency.withOutput(voltage));
   }
 
   @Override
   public void setTurnVoltage(double voltage) {
-    turnMotor.setVoltage(voltage);
+    turnMotor.setControl(odometryFrequency.withOutput(voltage));
   }
 
   @Override
