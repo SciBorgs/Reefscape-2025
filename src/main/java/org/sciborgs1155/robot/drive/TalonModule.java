@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
+import java.util.Queue;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -37,8 +38,13 @@ public class TalonModule implements ModuleIO {
 
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
+
+  private final TalonOdometryThread talonThread;
   private final DutyCycleOut odometryFrequency =
       new DutyCycleOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
+  // private final Queue<Double> position;
+  // private final Queue<Double> rotation;
+  private final Queue<Double> timestamp;
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -114,6 +120,12 @@ public class TalonModule implements ModuleIO {
 
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
+
+    talonThread = TalonOdometryThread.getInstance();
+    talonThread.registerSignal(driveMotor.getPosition());
+    talonThread.registerSignal(turnMotor.getPosition());
+
+    timestamp = talonThread.makeTimestampQueue();
 
     resetEncoders();
 

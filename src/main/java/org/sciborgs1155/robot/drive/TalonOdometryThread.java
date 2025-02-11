@@ -7,6 +7,7 @@ import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import edu.wpi.first.units.measure.Angle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -41,7 +42,7 @@ public class TalonOdometryThread extends Thread {
     super.start();
   }
 
-  public Queue<Double> registerSignal(StatusSignal<Double> signal) {
+  public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     Drive.lock.writeLock().lock();
     try {
