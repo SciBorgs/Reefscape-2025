@@ -49,6 +49,8 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -255,15 +257,26 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @return The driving command.
    */
   public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
-    return run(
-        () ->
+    return run(() -> {
+      Translation2d currVel =
+        new Translation2d(
+          fieldRelativeChassisSpeeds().vxMetersPerSecond,
+          fieldRelativeChassisSpeeds().vyMetersPerSecond);
+
+      Translation2d desiredVel = new Translation2d(vx.getAsDouble(), vy.getAsDouble());
+
+      Translation2d accel = (desiredVel.minus(currVel)).div(SENSOR_PERIOD.in(Seconds));
+      
+      desiredVel = currVel.plus(accel.times(SENSOR_PERIOD.in(Seconds)));
+
             setChassisSpeeds(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                    vx.getAsDouble(),
-                    vy.getAsDouble(),
+                    desiredVel.getX(),
+                    desiredVel.getY(),
                     vOmega.getAsDouble(),
                     heading().plus(allianceRotation())),
-                ControlMode.OPEN_LOOP_VELOCITY));
+                ControlMode.OPEN_LOOP_VELOCITY);
+              });
   }
 
   /**
@@ -347,30 +360,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     }
   }
 
+  public Translation2d accelLimits(Translation2d accel, Translation2d vel) {
 
-  public Translation2d forwardAccelLimiting(DoubleSupplier vx, DoubleSupplier vy){
-    Translation2d currVel = new Translation2d(fieldRelativeChassisSpeeds().vxMetersPerSecond, fieldRelativeChassisSpeeds().vyMetersPerSecond);
-    Translation2d desiredVel = new Translation2d(vx.getAsDouble(), vy.getAsDouble());
+    double forwardAccelLimit =
+        MAX_ACCEL
+            .times(1 - (vel.div(MAX_SPEED.in(MetersPerSecond))).getNorm())
+            .in(MetersPerSecondPerSecond);
 
-    double accel = (currVel.minus(desiredVel)).div(SENSOR_PERIOD.in(Seconds)).getNorm();
-    double accelLimit = MAX_ACCEL.times(1 - (currVel.div(MAX_SPEED.in(MetersPerSecond))).getNorm()).in(MetersPerSecondPerSecond);
-
-    if(accel > accelLimit){
-      currVel =  currVel.times(accelLimit).times(SENSOR_PERIOD.in(Seconds));
+    if(accel.getNorm() > forwardAccelLimit) {
+      double scale = forwardAccelLimit / accel.getNorm();
+      accel = accel.times(scale);
     }
-    return currVel;
-  }
+    if(accel.getNorm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)) {
+      double scale = MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond) / accel.getNorm();
+      accel = accel.times(scale);
+    }
 
-  // relative acceleration
-
-  // skid acceleration
-  public Translation2d maxSkidAcceleration(DoubleSupplier vx, DoubleSupplier vy){
-    double currVel = Math.sqrt((fieldRelativeChassisSpeeds().vxMetersPerSecond * fieldRelativeChassisSpeeds().vxMetersPerSecond) + (fieldRelativeChassisSpeeds().vyMetersPerSecond * fieldRelativeChassisSpeeds().vyMetersPerSecond));
-    double desiredVel = Math.sqrt((vx.getAsDouble() * vx.getAsDouble()) + (vy.getAsDouble() * vy.getAsDouble()));
-
-    double desiredAccel = Math.sqrt((currVel * currVel) + (desiredVel * desiredVel));
-
-    return new Translation2d();
+    return accel;
   }
 
   /**
