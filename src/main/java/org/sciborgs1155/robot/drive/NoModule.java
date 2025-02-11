@@ -63,8 +63,16 @@ public class NoModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {}
 
   @Override
-  public double[][] odometryData() {
+  public double[][] moduleOdometryData() {
     return new double[0][0];
+  }
+
+  public SwerveModulePosition[] odometryData() {
+    return new SwerveModulePosition[0];
+  }
+
+  public double[] timestamps() {
+    return new double[0];
   }
 
   @Override

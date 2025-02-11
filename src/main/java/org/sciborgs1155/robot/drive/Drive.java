@@ -220,6 +220,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
+    TalonOdometryThread.getInstance().start();
+
     SmartDashboard.putData(
         "translation quasistatic forward",
         translationCharacterization.quasistatic(Direction.kForward));
@@ -462,7 +464,27 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
-    odometry.update(Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions());
+    if (Robot.isReal()) {
+      lock.readLock().lock();
+      try {
+        double[] timestamps = modules.get(0).timestamps();
+        // get the positions of all modules at a given timestamp
+        for (int i = 0; i < timestamps.length; i++) {
+          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+          for (int m = 0; m < modules.size(); m++) {
+            modulePositions[m] = modules.get(m).odometryData()[i];
+          }
+          odometry.updateWithTime(
+              timestamps[i], Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions);
+          lastPositions = modulePositions;
+        }
+      } finally {
+        lock.readLock().unlock();
+      }
+    } else {
+      odometry.update(simRotation, modulePositions());
+      lastPositions = modulePositions();
+    }
 
     // update our simulated field poses
     field2d.setRobotPose(pose());

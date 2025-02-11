@@ -221,7 +221,7 @@ public class TalonModule implements ModuleIO {
   }
 
   @Override
-  public double[][] odometryData() {
+  public double[][] moduleOdometryData() {
     Drive.lock.readLock().lock();
     try {
       double[][] data = {
@@ -233,6 +233,21 @@ public class TalonModule implements ModuleIO {
     } finally {
       Drive.lock.readLock().unlock();
     }
+  }
+
+  public SwerveModulePosition[] odometryData() {
+    SwerveModulePosition[] positions = new SwerveModulePosition[10];
+    Drive.lock.readLock().lock();
+    var data = moduleOdometryData();
+    for (int i = 0; i < data.length; i++) {
+      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+    }
+    Drive.lock.readLock().unlock();
+    return positions;
+  }
+
+  public double[] timestamps() {
+    return moduleOdometryData()[2];
   }
 
   @Override
