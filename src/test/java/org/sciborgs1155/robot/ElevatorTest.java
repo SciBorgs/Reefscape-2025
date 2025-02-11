@@ -10,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.elevator.SimElevator;
 
 public class ElevatorTest {
@@ -37,11 +37,11 @@ public class ElevatorTest {
 
   private static Stream<Arguments> providePositionValues() {
     return Stream.of(
-        Arguments.of(ElevatorConstants.MIN_HEIGHT),
-        Arguments.of(Level.L1.height),
-        Arguments.of(Level.L2.height),
-        Arguments.of(Level.L3.height),
-        Arguments.of(Level.L4.height),
-        Arguments.of(ElevatorConstants.MAX_HEIGHT));
+        Arguments.of(ElevatorConstants.MIN_EXTENSION),
+        Arguments.of(Level.L1.extension),
+        Arguments.of(Level.L2.extension),
+        Arguments.of(Level.L3.extension),
+        Arguments.of(Level.L4.extension),
+        Arguments.of(ElevatorConstants.MAX_EXTENSION));
   }
 }

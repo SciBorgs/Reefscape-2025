@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Set;
 import org.sciborgs1155.robot.Constants.Field.Branch;
-import org.sciborgs1155.robot.Constants.Field.Level;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment {
@@ -57,11 +57,9 @@ public class Alignment {
   public Command reef(Level level, Branch branch) {
     return (pathfind(branch.pose)
             .andThen(
-                Commands.waitUntil(() -> elevator.atPosition(level.height.in(Meters)))
+                Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
                     .andThen(
-                        scoral
-                            .outtake()
-                            .withTimeout(1)))) // timeout needed because no sim beambreak
+                        scoral.score().withTimeout(1)))) // timeout needed because no sim beambreak
         .deadlineFor(elevator.scoreLevel(level));
   }
 
@@ -79,8 +77,8 @@ public class Alignment {
         .until(scoral::beambreak)
         .withTimeout(1)
         .deadlineFor(
-            Commands.waitUntil(() -> elevator.atPosition(level.height.in(Meters)))
-                .andThen(scoral.outtake()));
+            Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
+                .andThen(scoral.score()));
   }
 
   /**

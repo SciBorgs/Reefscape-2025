@@ -14,12 +14,12 @@ public class SimElevator implements ElevatorIO {
   private final ElevatorSim elevator =
       new ElevatorSim(
           LinearSystemId.createElevatorSystem(
-              DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), DRUM_RADIUS.in(Meters), GEARING),
+              DCMotor.getKrakenX60(2), WEIGHT.in(Kilograms), SPROCKET_RADIUS.in(Meters), GEARING),
           DCMotor.getKrakenX60(2),
-          MIN_HEIGHT.in(Meters),
-          MAX_HEIGHT.in(Meters),
+          MIN_EXTENSION.in(Meters),
+          MAX_EXTENSION.in(Meters),
           true,
-          MIN_HEIGHT.in(Meters));
+          MIN_EXTENSION.in(Meters));
   ;
 
   public SimElevator() {
@@ -27,21 +27,41 @@ public class SimElevator implements ElevatorIO {
   }
 
   @Override
+  /**
+   * Sets the voltage for the elevator motor.
+   *
+   * @param voltage The voltage to set.
+   */
   public void setVoltage(double voltage) {
     elevator.setInputVoltage(voltage);
     elevator.update(Constants.PERIOD.in(Seconds));
   }
 
   @Override
+  /**
+   * Gets the current position of the elevator.
+   *
+   * @return The current position.
+   */
   public double position() {
     return elevator.getPositionMeters();
   }
 
+  /**
+   * Gets the current velocity of the elevator.
+   *
+   * @return The current velocity.
+   */
   @Override
   public double velocity() {
     return elevator.getVelocityMetersPerSecond();
   }
 
+  /**
+   * Closes the elevator. This implementation does nothing.
+   *
+   * @throws Exception if an error occurs.
+   */
   @Override
   public void close() throws Exception {}
 }
