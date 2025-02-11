@@ -63,5 +63,10 @@ public class NoModule implements ModuleIO {
   public void updateInputs(Rotation2d angle, double voltage) {}
 
   @Override
+  public double[][] odometryData() {
+    return new double[0][0];
+  }
+
+  @Override
   public void close() {}
 }

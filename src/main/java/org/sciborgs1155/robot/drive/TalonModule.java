@@ -42,8 +42,8 @@ public class TalonModule implements ModuleIO {
   private final TalonOdometryThread talonThread;
   private final DutyCycleOut odometryFrequency =
       new DutyCycleOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
-  // private final Queue<Double> position;
-  // private final Queue<Double> rotation;
+  private final Queue<Double> position;
+  private final Queue<Double> rotation;
   private final Queue<Double> timestamp;
 
   private final SimpleMotorFeedforward driveFF;
@@ -122,8 +122,8 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(turnMotor);
 
     talonThread = TalonOdometryThread.getInstance();
-    talonThread.registerSignal(driveMotor.getPosition());
-    talonThread.registerSignal(turnMotor.getPosition());
+    position = talonThread.registerSignal(driveMotor.getPosition());
+    rotation = talonThread.registerSignal(turnMotor.getPosition());
 
     timestamp = talonThread.makeTimestampQueue();
 
@@ -218,6 +218,21 @@ public class TalonModule implements ModuleIO {
     setpoint.angle = angle;
     setDriveVoltage(voltage);
     setTurnSetpoint(angle);
+  }
+
+  @Override
+  public double[][] odometryData() {
+    Drive.lock.readLock().lock();
+    try {
+      double[][] data = {
+        position.stream().mapToDouble((Double d) -> d).toArray(),
+        rotation.stream().mapToDouble((Double d) -> d).toArray(),
+        timestamp.stream().mapToDouble((Double d) -> d).toArray()
+      };
+      return data;
+    } finally {
+      Drive.lock.readLock().unlock();
+    }
   }
 
   @Override

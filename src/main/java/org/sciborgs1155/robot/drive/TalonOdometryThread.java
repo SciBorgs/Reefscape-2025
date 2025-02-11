@@ -26,8 +26,8 @@ public class TalonOdometryThread extends Thread {
   private final List<DoubleSupplier> otherSignals = new ArrayList<>();
   private final List<Queue<Double>> otherQueues = new ArrayList<>();
   private final List<Queue<Double>> timestampQueues = new ArrayList<>();
-  private static boolean isCANFD = new CANBus("*").isNetworkFD();
 
+  private static boolean isCANFD = new CANBus("*").isNetworkFD();
   private static TalonOdometryThread instance = null;
 
   public static TalonOdometryThread getInstance() {
@@ -39,7 +39,9 @@ public class TalonOdometryThread extends Thread {
 
   @Override
   public synchronized void start() {
-    super.start();
+    if (timestampQueues.size() > 0) {
+      super.start();
+    }
   }
 
   public Queue<Double> registerSignal(StatusSignal<Angle> signal) {

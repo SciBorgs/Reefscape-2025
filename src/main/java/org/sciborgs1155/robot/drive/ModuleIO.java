@@ -108,6 +108,8 @@ public interface ModuleIO extends Logged, AutoCloseable {
    */
   void updateInputs(Rotation2d angle, double voltage);
 
+  double[][] odometryData();
+
   @Override
   void close();
 }

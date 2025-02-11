@@ -136,5 +136,10 @@ public class SimModule implements ModuleIO {
   }
 
   @Override
+  public double[][] odometryData() {
+    return new double[][] {};
+  }
+
+  @Override
   public void close() {}
 }
