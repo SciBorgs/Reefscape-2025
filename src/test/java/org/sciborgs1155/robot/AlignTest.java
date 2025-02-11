@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,6 +41,13 @@ public class AlignTest {
   Scoral scoral;
   Alignment align;
 
+  @BeforeAll
+  public static void configure() {
+    // Configure pathfinding libraries
+    LocalADStar pathfinder = new LocalADStar();
+    Pathfinding.setPathfinder(pathfinder);
+  }
+
   @BeforeEach
   public void setup() {
     setupTests();
@@ -47,10 +55,8 @@ public class AlignTest {
     elevator = Elevator.create();
     scoral = Scoral.create();
     drive.resetEncoders();
+    drive.resetOdometry(new Pose2d());
 
-    // Configure pathfinding libraries
-    LocalADStar pathfinder = new LocalADStar();
-    Pathfinding.setPathfinder(pathfinder);
     Autos.configureAutos(drive);
 
     align = new Alignment(drive, elevator, scoral);
@@ -58,7 +64,7 @@ public class AlignTest {
 
   @AfterEach
   public void destroy() throws Exception {
-    reset();
+    reset(drive, elevator, scoral);
   }
 
   @RepeatedTest(5)
@@ -102,7 +108,7 @@ public class AlignTest {
     assertEquals(
         0,
         pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
-        Rotation.TOLERANCE.in(Radian));
+        Rotation.TOLERANCE.in(Radians));
   }
 
   /** Tests whether the non-obstacle-avoiding pathing works correctly. */
@@ -118,7 +124,7 @@ public class AlignTest {
     assertEquals(
         0,
         branch.pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
-        Rotation.TOLERANCE.in(Radian));
+        Rotation.TOLERANCE.in(Radians));
   }
 
   private static Stream<Arguments> pathGoals() {
