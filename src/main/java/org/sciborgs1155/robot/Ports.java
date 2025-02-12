@@ -44,8 +44,8 @@ public final class Ports {
   }
 
   public static final class Elevator {
-    public static final int FRONT_LEADER =
-        name(14, "front elevator"); // TODO update with actual position
+    // TODO update with actual position
+    public static final int FRONT_LEADER = name(14, "front elevator");
     public static final int BACK_FOLLOWER = name(13, "back elevator");
   }
 

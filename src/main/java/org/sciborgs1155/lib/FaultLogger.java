@@ -325,7 +325,7 @@ public final class FaultLogger {
   }
 
   /**
-   * Registers fault suppliers for a cancoder.
+   * Registers fault suppliers for a CANcoder.
    *
    * @param camera The camera to manage.
    */
@@ -334,22 +334,22 @@ public final class FaultLogger {
     register(
         () -> cancoder.getFault_BadMagnet().getValue(),
         "CANcoder [" + nickname + "]",
-        "bad magnet",
+        "The magnet distance is not correct or magnet is missing.",
         FaultType.ERROR);
     register(
         () -> cancoder.getFault_BootDuringEnable().getValue(),
         "CANcoder [" + nickname + "]",
-        "boot during enable",
+        "Device boot while detecting the enable signal.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Hardware().getValue(),
         "CANcoder [" + nickname + "]",
-        "hardware fault",
+        "Hardware fault occurred.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Undervoltage().getValue(),
         "CANcoder [" + nickname + "]",
-        "under voltage",
+        "Device supply voltage dropped to near brownout levels.",
         FaultType.WARNING);
   }
 
