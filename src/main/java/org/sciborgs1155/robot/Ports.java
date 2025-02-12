@@ -20,7 +20,7 @@ public final class Ports {
   }
 
   public static final class Drive {
-    public static final int CANANDGYRO = name(50, "canandgyro");
+    public static final int CANANDGYRO = 50;
     public static final int FRONT_LEFT_DRIVE = name(9, "FL drive");
     public static final int REAR_LEFT_DRIVE = name(12, "RL drive");
     public static final int FRONT_RIGHT_DRIVE = name(11, "FR drive");
