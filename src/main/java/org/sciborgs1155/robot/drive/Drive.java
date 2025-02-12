@@ -280,7 +280,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           System.out.println(currentVel);
           // Apply all acceleration limits
           // Vector<N2 > limitedAccel = forwardAccelLimit(desiredAccel, currentVel, elevatorHeight.getAsDouble());
-          Vector<N2> limitedAccel = skidLimit(desiredAccel, currentVel);
+          Vector<N2> limitedAccel = skidLimit(desiredAccel);
 
           // Calculate new velocity: current + at
           desiredVel = currentVel.plus(limitedAccel.times(SENSOR_PERIOD.in(Seconds)));
@@ -306,6 +306,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     // Limit the component along the current velocity
     if (accelAlongCurrentVel > forwardLimit) {
       accelAlongCurrentVel = forwardLimit;
+    }
       // Calculate parallel component
       Vector<N2> parallelAccel = currentVel.unit().times(accelAlongCurrentVel);
 
@@ -313,21 +314,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       Vector<N2> perpAccel = desiredAccel.minus(parallelAccel);
 
       return parallelAccel.plus(perpAccel);
-    }
 
-
-    if(elevatorHeight > MIN_HEIGHT.in(Meters)){
-      double heightScale = 1 - elevatorHeight / MAX_HEIGHT.in(Meters);
-      return desiredAccel.times(heightScale);
-    }
-
-    return desiredAccel;
   }
 
   public Vector<N2> skidLimit(Vector<N2> desiredAccel){
     if(desiredAccel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)){
-      return desiredAccel.unit().times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
+      Vector<N2> bruh = desiredAccel.div(desiredAccel.norm()).times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));      
+      return bruh;
     }
+    return desiredAccel;
+  }
+
+  public Vector<N2> tiltLimit(Vector<N2> desiredAccel, double elevatorHeight){
+    
+    if(desiredAccel.norm() > 1e-6){
+      double heightScale = 1 - elevatorHeight / MAX_HEIGHT.in(Meters);
+      return desiredAccel.times(heightScale);
+    }
+
     return desiredAccel;
   }
 
