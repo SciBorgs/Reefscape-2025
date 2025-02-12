@@ -59,6 +59,7 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class Drive extends SubsystemBase implements Logged, AutoCloseable {
@@ -257,65 +258,81 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vOmega A supplier for the angular velocity of the robot.
    * @return The driving command.
    */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
-    return run(() -> {
-        Translation2d currentVel = new Translation2d(
+  public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, DoubleSupplier elevatorHeight) {
+    return run(
+      () -> {
+        Vector<N2> currentVel =
+          VecBuilder.fill(
             fieldRelativeChassisSpeeds().vxMetersPerSecond,
-            fieldRelativeChassisSpeeds().vyMetersPerSecond
-        );
-        Translation2d desiredVel = new Translation2d(
-            vx.getAsDouble(),
-            vy.getAsDouble()
-        );
+            fieldRelativeChassisSpeeds().vyMetersPerSecond);
+            
+          Vector<N2> desiredVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+          
+          // Calculate acceleration as (desired - current)/dt
+          Vector<N2> desiredAccel = desiredVel.minus(currentVel).div(SENSOR_PERIOD.in(Seconds));
 
-        // Calculate acceleration as (desired - current)/dt
-        Translation2d wantedAccel = desiredVel.minus(currentVel).div(Constants.PERIOD.in(Seconds));
-        
-        // Apply all acceleration limits
-        Translation2d limitedAccel = accLimits(wantedAccel);
-        
-        // Calculate new velocity: current + at
-        desiredVel = currentVel.plus(limitedAccel.times(Constants.PERIOD.in(Seconds)));
+          System.out.println("test");
+          System.out.println(desiredAccel);
+          System.out.println(currentVel);
+          // Apply all acceleration limits
+          Vector<N2 > limitedAccel = forwardAccelLimit(desiredAccel, currentVel);
+          // Vector<N2> limitedAccel = skidAccelLimiting(desiredAccel);
+          limitedAccel = tiltAccelLimiting(desiredAccel, elevatorHeight.getAsDouble());
 
-        setChassisSpeeds(
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                desiredVel.getX(),
-                desiredVel.getY(),
-                vOmega.getAsDouble(),
-                heading().plus(allianceRotation())),
-            ControlMode.OPEN_LOOP_VELOCITY);
-          });
-          }
+          // vf = vo + at
+          desiredVel = currentVel.plus(limitedAccel.times(SENSOR_PERIOD.in(Seconds)));
 
-          private Translation2d accLimits(Translation2d wantedAccel) {
-            Translation2d currentVel = new Translation2d(
-            fieldRelativeChassisSpeeds().vxMetersPerSecond,
-            fieldRelativeChassisSpeeds().vyMetersPerSecond
-            );
+          setChassisSpeeds( 
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  desiredVel.get(0),
+                  desiredVel.get(1),
+                  vOmega.getAsDouble(),
+                  heading().plus(allianceRotation())),
+              ControlMode.OPEN_LOOP_VELOCITY);
+        });
+  }
 
-            double currentSpeed = currentVel.getNorm();
-            double forwardLimit = MAX_ACCEL.in(MetersPerSecondPerSecond) * 
-            (1 - currentSpeed / MAX_SPEED.in(MetersPerSecond));
+  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
 
-            // Project wantedAccel onto currentVel to find the component along the current velocity
-            double accelAlongCurrentVel = wantedAccel.toVector().dot(currentVel.toVector()) / currentSpeed;
+    double forwardLimit =
+        MAX_ACCEL.in(MetersPerSecondPerSecond)
+            * (1 - (currentVel.norm() / MAX_SPEED.in(MetersPerSecond)));
 
-            // Limit the component along the current velocity
-            if (accelAlongCurrentVel > forwardLimit) {
-            accelAlongCurrentVel = forwardLimit;
-            }
+    // If speed too low, don't limit acceleration
+    if (currentVel.norm() < 0.01) {
+      return desiredAccel;
+    }
 
-            // If starting (speed is zero), apply full acceleration
-            if (currentSpeed == 0) {
-            return wantedAccel;
-            }
+    double accelAlongCurrentVel = desiredAccel.dot(currentVel) / currentVel.norm();
 
-            // Calculate the new acceleration vector
-            Translation2d limitedAccel = currentVel.times(accelAlongCurrentVel / currentSpeed);
-            Translation2d remainingAccel = wantedAccel.minus(limitedAccel);
+    // Limit the component along the current velocity
+    if (accelAlongCurrentVel > forwardLimit) {
+      accelAlongCurrentVel = forwardLimit;
+    }
 
-            return limitedAccel.plus(remainingAccel);
-          }
+    // Calculate parallel component
+    Vector<N2> parallelAccel = currentVel.unit().times(accelAlongCurrentVel);
+
+    // Calculate perpendicular component
+    Vector<N2> perpAccel = desiredAccel.minus(parallelAccel);
+
+    return parallelAccel.plus(perpAccel);
+  }
+
+  public Vector<N2> skidAccelLimiting(Vector<N2> desiredAccel) {
+    if(desiredAccel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)){
+      desiredAccel = desiredAccel.unit().times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
+    }
+    return desiredAccel;
+  }
+
+  public Vector<N2> tiltAccelLimiting(Vector<N2> desiredAccel, double elevatorHeight) {
+    if (desiredAccel.norm() < 0.01) {
+        return desiredAccel;
+    }
+    double heightScale = 1 - elevatorHeight / ElevatorConstants.MAX_HEIGHT.in(Meters);
+    return desiredAccel.times(heightScale);
+  }
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
    *
@@ -326,11 +343,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param heading A supplier for the field relative heading of the robot.
    * @return The driving command.
    */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, Supplier<Rotation2d> heading) {
+  public Command drive(DoubleSupplier vx, DoubleSupplier vy, Supplier<Rotation2d> heading, DoubleSupplier elevatorHeight) {
     return drive(
             vx,
             vy,
-            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()))
+            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()),
+            elevatorHeight
+            )
         .beforeStarting(rotationController::reset);
   }
 
@@ -343,8 +362,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to drive while facing a target.
    */
   public Command driveFacingTarget(
-      DoubleSupplier vx, DoubleSupplier vy, Supplier<Translation2d> translation) {
-    return drive(vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle());
+      DoubleSupplier vx, DoubleSupplier vy, Supplier<Translation2d> translation, DoubleSupplier elevatorHeight) {
+    return drive(vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
   }
 
   @Log.NT

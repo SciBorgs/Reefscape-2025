@@ -137,7 +137,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega));
+    drive.setDefaultCommand(drive.drive(x, y, omega, () -> elevator.position()));
     led.setDefaultCommand(led.scrolling());
 
     autonomous().whileTrue(Commands.defer(autos::getSelected, Set.of(drive)).asProxy());
