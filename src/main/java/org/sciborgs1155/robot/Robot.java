@@ -144,6 +144,7 @@ public class Robot extends CommandRobot implements Logged {
 
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());
+    driver.x().whileTrue(Commands.run(() -> System.out.println(Ports.idToName.get(5))));
     driver
         .leftBumper()
         .or(driver.rightBumper())
