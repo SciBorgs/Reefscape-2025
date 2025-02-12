@@ -31,16 +31,16 @@ public final class Ports {
     public static final int FRONT_RIGHT_TURNING = name(3, "FR turn");
     public static final int REAR_RIGHT_TURNING = name(2, "RR turn");
 
-    public static final int FRONT_LEFT_CANCODER = name(5, "FL cancoder");
-    public static final int REAR_LEFT_CANCODER = name(7, "RL cancoder");
-    public static final int FRONT_RIGHT_CANCODER = name(6, "FR cancoder");
-    public static final int REAR_RIGHT_CANCODER = name(8, "RR cancoder");
+    public static final int FRONT_LEFT_CANCODER = name(5, "FL swerve");
+    public static final int REAR_LEFT_CANCODER = name(7, "RL swerve");
+    public static final int FRONT_RIGHT_CANCODER = name(6, "FR swerve");
+    public static final int REAR_RIGHT_CANCODER = name(8, "RR swerve");
   }
 
   public static final class GroundIntake {
     public static final int ARM_MOTOR = name(18, "ground arm");
     public static final int ROLLER_MOTOR = name(19, "ground roller");
-    public static final int CANCODER = name(20, "ground cancoder"); // TODO change i think
+    public static final int CANCODER = name(20, "ground"); // TODO change i think
   }
 
   public static final class Elevator {
@@ -51,7 +51,7 @@ public final class Ports {
 
   public static final class Scoral {
     public static final int ROLLER = name(15, "scoral roller");
-    public static final int BEAMBREAK = name(23, "scoral beambreak");
+    public static final int BEAMBREAK = 23;
   }
 
   public static final class LEDs {
@@ -60,6 +60,6 @@ public final class Ports {
 
   public static final class Hopper {
     public static final int MOTOR = name(-1, "hopper");
-    public static final int BEAMBREAK = name(-2, "hopper beambreak");
+    public static final int BEAMBREAK = -2;
   }
 }

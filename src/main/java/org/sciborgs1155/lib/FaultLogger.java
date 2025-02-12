@@ -333,22 +333,22 @@ public final class FaultLogger {
     String nickname = Ports.idToName.get(cancoder.getDeviceID());
     register(
         () -> cancoder.getFault_BadMagnet().getValue(),
-        "CANcoder [" + nickname + "]",
+        "CANcoder " + nickname,
         "The magnet distance is not correct or magnet is missing.",
         FaultType.ERROR);
     register(
         () -> cancoder.getFault_BootDuringEnable().getValue(),
-        "CANcoder [" + nickname + "]",
+        "CANcoder " + nickname,
         "Device boot while detecting the enable signal.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Hardware().getValue(),
-        "CANcoder [" + nickname + "]",
+        "CANcoder " + nickname,
         "Hardware fault occurred.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Undervoltage().getValue(),
-        "CANcoder [" + nickname + "]",
+        "CANcoder " + nickname,
         "Device supply voltage dropped to near brownout levels.",
         FaultType.WARNING);
   }
@@ -361,7 +361,7 @@ public final class FaultLogger {
   public static void register(TalonFX talon) {
     register(
         () -> !talon.isConnected(),
-        "Talon" + Ports.idToName.get(talon.getDeviceID()),
+        "Talon " + Ports.idToName.get(talon.getDeviceID()),
         "disconnected",
         FaultType.ERROR);
 
@@ -369,7 +369,7 @@ public final class FaultLogger {
         (f, d) ->
             register(
                 () -> f.getValue(),
-                "Talon" + Ports.idToName.get(talon.getDeviceID()),
+                "Talon " + Ports.idToName.get(talon.getDeviceID()),
                 d,
                 FaultType.ERROR);
 
