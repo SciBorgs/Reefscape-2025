@@ -40,6 +40,7 @@ public class Constants {
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
   }
 
+  public static final boolean MUSIC = true;
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
   public static final double DEADBAND = 0.15;
   public static final double MAX_RATE =

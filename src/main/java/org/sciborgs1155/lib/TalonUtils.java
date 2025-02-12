@@ -3,13 +3,15 @@ package org.sciborgs1155.lib;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.AudioConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.ArrayList;
 import java.util.List;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 
 public class TalonUtils implements Logged {
   private static final Orchestra orchestra = new Orchestra();
@@ -19,11 +21,16 @@ public class TalonUtils implements Logged {
           "baka.chrp",
           "blue.chrp",
           "BWomp.chrp",
+          "gas.chrp",
           "hopes-and-dreams.chrp",
           "last-surprise.chrp",
-          "poker-face.chrp",
+          "magical-toy-box.chrp",
+          "meg.chrp",
           "rick.chrp",
-          "magical-toy-box.chrp");
+          "running.chrp",
+          "slider.chrp",
+          "spidAAAAAA.chrp",
+          "TZK.chrp");
 
   private static boolean fileLoaded = false;
 
@@ -47,22 +54,24 @@ public class TalonUtils implements Logged {
     talons.add(talon);
   }
 
+  public static Command getSelected() {
+    return Commands.runOnce(songChooser.getSelected());
+  }
+
   /**
-   * Configure all motors to play a selected Chirp (CHRP) file on robot boot in the deploy
-   * directory. Should be called once after addition of all Talons to TalonUtils.
+   * Add all motors to the Orchestra. Should be called once after addition of all Talons to
+   * TalonUtils.
    *
-   * <p>Use {@code loadOrchestraFile()} after configuration to change the played file.
+   * <p>Use {@link#loadOrchestraFile()} to change the played file.
    *
-   * @param fileName The path of the file to play.
    * @return Whether loading the file was successful.
    */
-  public static boolean configureOrchestra(String fileName) {
+  public static void configureOrchestra() {
     AudioConfigs audioCfg = new AudioConfigs().withAllowMusicDurDisable(true);
     for (TalonFX talon : talons) {
       talon.getConfigurator().apply(audioCfg);
       orchestra.addInstrument(talon);
     }
-    return loadOrchestraFile(fileName);
   }
 
   /**
@@ -73,10 +82,7 @@ public class TalonUtils implements Logged {
    */
   public static boolean loadOrchestraFile(String fileName) {
     fileLoaded = orchestra.loadMusic(fileName).isOK();
-    if (!fileLoaded) {
-      fileNotFound();
-    }
-
+    if (!fileLoaded) fileNotFound();
     return fileLoaded;
   }
 
@@ -121,8 +127,9 @@ public class TalonUtils implements Logged {
 
   private static void fileNotFound() {
     fileLoaded = false;
-    DriverStation.reportError(
+    FaultLogger.report(
+        "Orchestra",
         "CHRP file not loaded. Check that it is in the deploy directory & includes file extension.",
-        true);
+        FaultType.WARNING);
   }
 }

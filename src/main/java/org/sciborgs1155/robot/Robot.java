@@ -7,9 +7,11 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.MUSIC;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -48,7 +51,6 @@ import org.sciborgs1155.robot.vision.Vision;
  */
 public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
-
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
 
@@ -142,16 +144,28 @@ public class Robot extends CommandRobot implements Logged {
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
+    if (MUSIC) {
+      TalonUtils.configureOrchestra();
+      teleop()
+          .onTrue(
+              Commands.defer(TalonUtils::getSelected, Set.of())
+                  .andThen(
+                      Commands.runOnce(TalonUtils::play)
+                          .andThen(Commands.idle(drive, scoral, elevator))));
+      disabled().onTrue(Commands.runOnce(TalonUtils::stop));
+    } else {
+      teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+      disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+    }
+
     test().whileTrue(systemsCheck());
+
     driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
-
-    // teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
-    // disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
     driver
         .x()
@@ -170,8 +184,6 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
-
-    TalonUtils.configureOrchestra("magical-toy-box.chrp");
   }
 
   /**
