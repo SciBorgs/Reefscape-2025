@@ -11,6 +11,8 @@ import static org.sciborgs1155.lib.Assertion.*;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_HEIGHT;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_HEIGHT;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -48,6 +50,8 @@ import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+
+import org.ejml.dense.block.VectorOps_FDRB;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
@@ -275,64 +279,58 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           System.out.println(desiredAccel);
           System.out.println(currentVel);
           // Apply all acceleration limits
-          Vector<N2 > limitedAccel = forwardAccelLimit(desiredAccel, currentVel);
-          // Vector<N2> limitedAccel = skidAccelLimiting(desiredAccel);
-          limitedAccel = tiltAccelLimiting(desiredAccel, elevatorHeight.getAsDouble());
+          // Vector<N2 > limitedAccel = forwardAccelLimit(desiredAccel, currentVel, elevatorHeight.getAsDouble());
+          Vector<N2> limitedAccel = skidLimit(desiredAccel, currentVel);
 
-          // vf = vo + at
+          // Calculate new velocity: current + at
           desiredVel = currentVel.plus(limitedAccel.times(SENSOR_PERIOD.in(Seconds)));
 
           setChassisSpeeds( 
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  desiredVel.get(0),
-                  desiredVel.get(1),
+                  limitedAccel.get(0),
+                  limitedAccel.get(1),
                   vOmega.getAsDouble(),
                   heading().plus(allianceRotation())),
               ControlMode.OPEN_LOOP_VELOCITY);
         });
   }
 
-  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
+  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel, double elevatorHeight) {
 
     double forwardLimit =
         MAX_ACCEL.in(MetersPerSecondPerSecond)
             * (1 - (currentVel.norm() / MAX_SPEED.in(MetersPerSecond)));
-
-    // If speed too low, don't limit acceleration
-    if (currentVel.norm() < 0.01) {
-      return desiredAccel;
-    }
 
     double accelAlongCurrentVel = desiredAccel.dot(currentVel) / currentVel.norm();
 
     // Limit the component along the current velocity
     if (accelAlongCurrentVel > forwardLimit) {
       accelAlongCurrentVel = forwardLimit;
+      // Calculate parallel component
+      Vector<N2> parallelAccel = currentVel.unit().times(accelAlongCurrentVel);
+
+      // Calculate perpendicular component
+      Vector<N2> perpAccel = desiredAccel.minus(parallelAccel);
+
+      return parallelAccel.plus(perpAccel);
     }
 
-    // Calculate parallel component
-    Vector<N2> parallelAccel = currentVel.unit().times(accelAlongCurrentVel);
 
-    // Calculate perpendicular component
-    Vector<N2> perpAccel = desiredAccel.minus(parallelAccel);
+    if(elevatorHeight > MIN_HEIGHT.in(Meters)){
+      double heightScale = 1 - elevatorHeight / MAX_HEIGHT.in(Meters);
+      return desiredAccel.times(heightScale);
+    }
 
-    return parallelAccel.plus(perpAccel);
+    return desiredAccel;
   }
 
-  public Vector<N2> skidAccelLimiting(Vector<N2> desiredAccel) {
+  public Vector<N2> skidLimit(Vector<N2> desiredAccel){
     if(desiredAccel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)){
-      desiredAccel = desiredAccel.unit().times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
+      return desiredAccel.unit().times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
     }
     return desiredAccel;
   }
 
-  public Vector<N2> tiltAccelLimiting(Vector<N2> desiredAccel, double elevatorHeight) {
-    if (desiredAccel.norm() < 0.01) {
-        return desiredAccel;
-    }
-    double heightScale = 1 - elevatorHeight / ElevatorConstants.MAX_HEIGHT.in(Meters);
-    return desiredAccel.times(heightScale);
-  }
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
    *
