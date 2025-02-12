@@ -60,7 +60,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.none();
   private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.create();
+  private final Scoral scoral = Scoral.none();
 
   private final LEDStrip led = new LEDStrip();
 
@@ -137,7 +137,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    // drive.setDefaultCommand(drive.drive(x, y, omega));
+    drive.setDefaultCommand(drive.drive(x, y, omega));
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.rainbow());
     led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));

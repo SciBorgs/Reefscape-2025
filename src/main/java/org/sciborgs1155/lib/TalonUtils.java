@@ -30,7 +30,10 @@ public class TalonUtils implements Logged {
           "running.chrp",
           "slider.chrp",
           "spidAAAAAA.chrp",
-          "TZK.chrp");
+          "TZK.chrp",
+          "winter-wind.chrp",
+          "fantasie-impromptu.chrp",
+          "winter-windy.chrp");
 
   private static boolean fileLoaded = false;
 
