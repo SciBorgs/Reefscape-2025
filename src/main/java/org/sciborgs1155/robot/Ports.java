@@ -5,14 +5,14 @@ import java.util.Map;
 
 public final class Ports {
   // TODO: Add and change all ports as needed.
-  
+
   public static Map<Integer, String> idToName = new HashMap<>();
+
   private static int name(int port, String nickname) {
     idToName.put(port, nickname);
     System.out.println(port);
     return port;
   }
-  
 
   public static final class OI {
     public static final int OPERATOR = 0;
@@ -44,7 +44,8 @@ public final class Ports {
   }
 
   public static final class Elevator {
-    public static final int FRONT_LEADER = name(14, "front elevator"); // TODO update with actual position
+    public static final int FRONT_LEADER =
+        name(14, "front elevator"); // TODO update with actual position
     public static final int BACK_FOLLOWER = name(13, "back elevator");
   }
 
