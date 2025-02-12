@@ -11,12 +11,18 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.ctre.phoenix6.SignalLogger;
 =======
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 >>>>>>> dcfd82b (Maple test - 1/13/25)
+=======
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+>>>>>>> dcfd82b83441270723575e37775da5945a2881ab
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
