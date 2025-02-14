@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.sciborgs1155.robot.Ports;
 
 /** Utility class for configuration of Spark motor controllers */
 public class SparkUtils {
@@ -40,7 +41,7 @@ public class SparkUtils {
    * @return The name of a spark.
    */
   public static String name(SparkBase spark) {
-    return "Spark [" + spark.getDeviceId() + "]";
+    return "Spark " + Ports.idToName.get(spark.getDeviceId());
   }
 
   /** Represents a type of sensor that can be plugged into the spark */

@@ -1,7 +1,34 @@
 package org.sciborgs1155.robot;
 
+import static java.util.Map.entry;
+
+import java.util.Map;
+
 public final class Ports {
   // TODO: Add and change all ports as needed.
+
+  public static final Map<Integer, String> idToName =
+      Map.ofEntries(
+          entry(Drive.FRONT_LEFT_DRIVE, "FL drive"),
+          entry(Drive.REAR_LEFT_DRIVE, "RL drive"),
+          entry(Drive.FRONT_RIGHT_DRIVE, "FR drive"),
+          entry(Drive.REAR_RIGHT_DRIVE, "RR drive"),
+          entry(Drive.FRONT_LEFT_TURNING, "FL turn"),
+          entry(Drive.REAR_LEFT_TURNING, "RL turn"),
+          entry(Drive.FRONT_RIGHT_TURNING, "FR turn"),
+          entry(Drive.REAR_RIGHT_TURNING, "RR turn"),
+          entry(Drive.FRONT_LEFT_CANCODER, "FL swerve"),
+          entry(Drive.REAR_LEFT_CANCODER, "RL swerve"),
+          entry(Drive.FRONT_RIGHT_CANCODER, "FR swerve"),
+          entry(Drive.REAR_RIGHT_CANCODER, "RR swerve"),
+          entry(GroundIntake.ARM_MOTOR, "ground arm"),
+          entry(GroundIntake.ROLLER_MOTOR, "ground roller"),
+          entry(GroundIntake.CANCODER, "ground intake"),
+          entry(Elevator.FRONT_LEADER, "front elevator"),
+          entry(Elevator.BACK_FOLLOWER, "back elevator"),
+          entry(Scoral.ROLLER, "scoral roller"),
+          entry(Hopper.MOTOR, "hopper"));
+
   public static final class OI {
     public static final int OPERATOR = 0;
     public static final int DRIVER = 1;
@@ -32,6 +59,7 @@ public final class Ports {
   }
 
   public static final class Elevator {
+    // TODO update with actual position
     public static final int FRONT_LEADER = 14;
     public static final int BACK_FOLLOWER = 13;
   }
@@ -47,6 +75,6 @@ public final class Ports {
 
   public static final class Hopper {
     public static final int MOTOR = -1;
-    public static final int BEAMBREAK = -1;
+    public static final int BEAMBREAK = -2;
   }
 }
