@@ -20,6 +20,7 @@ public class UnitTestingUtil {
     DriverStationSim.notifyNewData();
     FaultLogger.clear();
     FaultLogger.unregisterAll();
+    SimHooks.restartTiming();
   }
 
   /**
