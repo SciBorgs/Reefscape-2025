@@ -1,14 +1,15 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Radians;
+import static org.sciborgs1155.robot.Constants.wait;
+import org.sciborgs1155.robot.arm.Arm;
 import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
+import org.sciborgs1155.robot.coroller.Coroller;
 
+import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.coroller.Coroller;
 
 public class Corolling {
 
@@ -25,11 +26,11 @@ public class Corolling {
    *
    * @return A command for ground intaking.
    */
-  public Command intake(Angle IntakeAngle) {
-    return arm.goTo(IntakeAngle)
+  public Command intake(Angle angle) {
+    return arm.goTo(angle)
         .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(IntakeAngle.in(Radians)))
-                .andThen(roller.intake().asProxy().withTimeout(1)))
+            Commands.waitUntil(() -> arm.atPosition(angle.in(Radians)))
+                .andThen(roller.intake().asProxy().withTimeout(wait)))
         .withName("ground intake");
   }
 
@@ -42,7 +43,7 @@ public class Corolling {
     return arm.goTo(PROCESSOR_OUTTAKE_ANGLE)
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.outtake().asProxy().withTimeout(1)))
+                .andThen(roller.outtake().asProxy().withTimeout(wait)))
         .withName("processor");
   }
 
@@ -55,7 +56,7 @@ public class Corolling {
     return arm.goTo(TROUGH_OUTTAKE_ANGLE)
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.outtake().asProxy().withTimeout(1)))
+                .andThen(roller.outtake().asProxy().withTimeout(wait)))
         .withName("trough");
   }
 }
