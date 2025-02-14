@@ -8,10 +8,32 @@ public final class Ports {
 
   public static Map<Integer, String> idToName = new HashMap<>();
 
-  private static int name(int port, String nickname) {
-    idToName.put(port, nickname);
-    System.out.println(port);
-    return port;
+  static {
+    idToName.put(Drive.FRONT_LEFT_DRIVE, "FL drive");
+    idToName.put(Drive.REAR_LEFT_DRIVE, "RL drive");
+    idToName.put(Drive.FRONT_RIGHT_DRIVE, "FR drive");
+    idToName.put(Drive.REAR_RIGHT_DRIVE, "RR drive");
+
+    idToName.put(Drive.FRONT_LEFT_TURNING, "FL turn");
+    idToName.put(Drive.REAR_LEFT_TURNING, "RL turn");
+    idToName.put(Drive.FRONT_RIGHT_TURNING, "FR turn");
+    idToName.put(Drive.REAR_RIGHT_TURNING, "RR turn");
+
+    idToName.put(Drive.FRONT_LEFT_CANCODER, "FL swerve");
+    idToName.put(Drive.REAR_LEFT_CANCODER, "RL swerve");
+    idToName.put(Drive.FRONT_RIGHT_CANCODER, "FR swerve");
+    idToName.put(Drive.REAR_RIGHT_CANCODER, "RR swerve");
+
+    idToName.put(GroundIntake.ARM_MOTOR, "ground arm");
+    idToName.put(GroundIntake.ROLLER_MOTOR, "ground roller");
+    idToName.put(GroundIntake.CANCODER, "ground");
+
+    idToName.put(Elevator.FRONT_LEADER, "front elevator");
+    idToName.put(Elevator.BACK_FOLLOWER, "back elevator");
+
+    idToName.put(Scoral.ROLLER, "scoral roller");
+
+    idToName.put(Hopper.MOTOR, "hopper");
   }
 
   public static final class OI {
@@ -21,36 +43,36 @@ public final class Ports {
 
   public static final class Drive {
     public static final int CANANDGYRO = 50;
-    public static final int FRONT_LEFT_DRIVE = name(9, "FL drive");
-    public static final int REAR_LEFT_DRIVE = name(12, "RL drive");
-    public static final int FRONT_RIGHT_DRIVE = name(11, "FR drive");
-    public static final int REAR_RIGHT_DRIVE = name(10, "RR drive");
+    public static final int FRONT_LEFT_DRIVE = 9;
+    public static final int REAR_LEFT_DRIVE = 12;
+    public static final int FRONT_RIGHT_DRIVE = 11;
+    public static final int REAR_RIGHT_DRIVE = 10;
 
-    public static final int FRONT_LEFT_TURNING = name(4, "FL turn");
-    public static final int REAR_LEFT_TURNING = name(1, "RL turn");
-    public static final int FRONT_RIGHT_TURNING = name(3, "FR turn");
-    public static final int REAR_RIGHT_TURNING = name(2, "RR turn");
+    public static final int FRONT_LEFT_TURNING = 4;
+    public static final int REAR_LEFT_TURNING = 1;
+    public static final int FRONT_RIGHT_TURNING = 3;
+    public static final int REAR_RIGHT_TURNING = 2;
 
-    public static final int FRONT_LEFT_CANCODER = name(5, "FL swerve");
-    public static final int REAR_LEFT_CANCODER = name(7, "RL swerve");
-    public static final int FRONT_RIGHT_CANCODER = name(6, "FR swerve");
-    public static final int REAR_RIGHT_CANCODER = name(8, "RR swerve");
+    public static final int FRONT_LEFT_CANCODER = 5;
+    public static final int REAR_LEFT_CANCODER = 7;
+    public static final int FRONT_RIGHT_CANCODER = 6;
+    public static final int REAR_RIGHT_CANCODER = 8;
   }
 
   public static final class GroundIntake {
-    public static final int ARM_MOTOR = name(18, "ground arm");
-    public static final int ROLLER_MOTOR = name(19, "ground roller");
-    public static final int CANCODER = name(20, "ground"); // TODO change i think
+    public static final int ARM_MOTOR = 18;
+    public static final int ROLLER_MOTOR = 19;
+    public static final int CANCODER = 20; // TODO change i think
   }
 
   public static final class Elevator {
     // TODO update with actual position
-    public static final int FRONT_LEADER = name(14, "front elevator");
-    public static final int BACK_FOLLOWER = name(13, "back elevator");
+    public static final int FRONT_LEADER = 14;
+    public static final int BACK_FOLLOWER = 13;
   }
 
   public static final class Scoral {
-    public static final int ROLLER = name(15, "scoral roller");
+    public static final int ROLLER = 15;
     public static final int BEAMBREAK = 23;
   }
 
@@ -59,7 +81,7 @@ public final class Ports {
   }
 
   public static final class Hopper {
-    public static final int MOTOR = name(-1, "hopper");
+    public static final int MOTOR = -1;
     public static final int BEAMBREAK = -2;
   }
 }
