@@ -31,7 +31,8 @@ public class TalonUtils implements Logged {
           "slider.chrp",
           "spidAAAAAA.chrp",
           "TZK.chrp",
-          "floor-of-lava.chrp");
+          "floor-of-lava.chrp",
+          "prelude-in-g-minor.chrp");
 
   private static boolean fileLoaded = false;
 
