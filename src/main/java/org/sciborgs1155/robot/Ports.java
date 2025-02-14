@@ -1,40 +1,31 @@
 package org.sciborgs1155.robot;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public final class Ports {
   // TODO: Add and change all ports as needed.
 
-  public static Map<Integer, String> idToName = new HashMap<>();
-
-  static {
-    idToName.put(Drive.FRONT_LEFT_DRIVE, "FL drive");
-    idToName.put(Drive.REAR_LEFT_DRIVE, "RL drive");
-    idToName.put(Drive.FRONT_RIGHT_DRIVE, "FR drive");
-    idToName.put(Drive.REAR_RIGHT_DRIVE, "RR drive");
-
-    idToName.put(Drive.FRONT_LEFT_TURNING, "FL turn");
-    idToName.put(Drive.REAR_LEFT_TURNING, "RL turn");
-    idToName.put(Drive.FRONT_RIGHT_TURNING, "FR turn");
-    idToName.put(Drive.REAR_RIGHT_TURNING, "RR turn");
-
-    idToName.put(Drive.FRONT_LEFT_CANCODER, "FL swerve");
-    idToName.put(Drive.REAR_LEFT_CANCODER, "RL swerve");
-    idToName.put(Drive.FRONT_RIGHT_CANCODER, "FR swerve");
-    idToName.put(Drive.REAR_RIGHT_CANCODER, "RR swerve");
-
-    idToName.put(GroundIntake.ARM_MOTOR, "ground arm");
-    idToName.put(GroundIntake.ROLLER_MOTOR, "ground roller");
-    idToName.put(GroundIntake.CANCODER, "ground intake");
-
-    idToName.put(Elevator.FRONT_LEADER, "front elevator");
-    idToName.put(Elevator.BACK_FOLLOWER, "back elevator");
-
-    idToName.put(Scoral.ROLLER, "scoral roller");
-
-    idToName.put(Hopper.MOTOR, "hopper");
-  }
+  public static Map<Integer, String> idToName =
+      Map.ofEntries(
+          Map.entry(Drive.FRONT_LEFT_DRIVE, "FL drive"),
+          Map.entry(Drive.REAR_LEFT_DRIVE, "RL drive"),
+          Map.entry(Drive.FRONT_RIGHT_DRIVE, "FR drive"),
+          Map.entry(Drive.REAR_RIGHT_DRIVE, "RR drive"),
+          Map.entry(Drive.FRONT_LEFT_TURNING, "FL turn"),
+          Map.entry(Drive.REAR_LEFT_TURNING, "RL turn"),
+          Map.entry(Drive.FRONT_RIGHT_TURNING, "FR turn"),
+          Map.entry(Drive.REAR_RIGHT_TURNING, "RR turn"),
+          Map.entry(Drive.FRONT_LEFT_CANCODER, "FL swerve"),
+          Map.entry(Drive.REAR_LEFT_CANCODER, "RL swerve"),
+          Map.entry(Drive.FRONT_RIGHT_CANCODER, "FR swerve"),
+          Map.entry(Drive.REAR_RIGHT_CANCODER, "RR swerve"),
+          Map.entry(GroundIntake.ARM_MOTOR, "ground arm"),
+          Map.entry(GroundIntake.ROLLER_MOTOR, "ground roller"),
+          Map.entry(GroundIntake.CANCODER, "ground intake"),
+          Map.entry(Elevator.FRONT_LEADER, "front elevator"),
+          Map.entry(Elevator.BACK_FOLLOWER, "back elevator"),
+          Map.entry(Scoral.ROLLER, "scoral roller"),
+          Map.entry(Hopper.MOTOR, "hopper"));
 
   public static final class OI {
     public static final int OPERATOR = 0;
