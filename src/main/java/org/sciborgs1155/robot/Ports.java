@@ -26,7 +26,7 @@ public final class Ports {
 
     idToName.put(GroundIntake.ARM_MOTOR, "ground arm");
     idToName.put(GroundIntake.ROLLER_MOTOR, "ground roller");
-    idToName.put(GroundIntake.CANCODER, "ground");
+    idToName.put(GroundIntake.CANCODER, "ground intake");
 
     idToName.put(Elevator.FRONT_LEADER, "front elevator");
     idToName.put(Elevator.BACK_FOLLOWER, "back elevator");
