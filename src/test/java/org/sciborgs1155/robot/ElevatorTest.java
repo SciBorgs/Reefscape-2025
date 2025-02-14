@@ -37,11 +37,11 @@ public class ElevatorTest {
 
   private static Stream<Arguments> providePositionValues() {
     return Stream.of(
-        Arguments.of(MIN_HEIGHT),
+        Arguments.of(MIN_EXTENSION),
         Arguments.of(Level.L1.extension),
         Arguments.of(Level.L2.extension),
         Arguments.of(Level.L3.extension),
         Arguments.of(Level.L4.extension),
-        Arguments.of(MAX_HEIGHT));
+        Arguments.of(MAX_EXTENSION));
   }
 }

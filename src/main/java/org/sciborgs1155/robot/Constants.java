@@ -1,21 +1,21 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
+import org.sciborgs1155.robot.drive.DriveConstants;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import org.sciborgs1155.robot.drive.DriveConstants;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -51,12 +51,13 @@ public class Constants {
           / DriveConstants.MAX_ANGULAR_SPEED.baseUnitMagnitude();
   public static final double SLOW_SPEED_MULTIPLIER = 0.33;
   public static final double FULL_SPEED_MULTIPLIER = 1.0;
+  public static final String CANIVORE_NAME = "drivetrain";
   public static final double wait = 1;
 
   // Origin at corner of blue alliance side of field
   public static class Field {
-    public static final Distance LENGTH = Inches.of(651.223);
-    public static final Distance WIDTH = Inches.of(323.277);
+    public static final Distance LENGTH = Centimeters.of(1755);
+    public static final Distance WIDTH = Centimeters.of(805);
 
     /** Returns whether the provided position is within the boundaries of the field. */
     public static boolean inField(Pose3d pose) {
@@ -65,8 +66,5 @@ public class Constants {
           && pose.getY() > 0
           && pose.getY() < Field.WIDTH.in(Meters));
     }
-
-    /** Offset added to a level's height in order to to be at the algae's height */
-    public static final Distance algaeOffset = Meters.of(0);
   }
 }

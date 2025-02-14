@@ -46,7 +46,7 @@ public class Scoraling {
   public Command scoral(Level level) {
     return elevator
         .scoreLevel(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.outtake()))
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
         .withName("scoraling");
   }
 
@@ -58,7 +58,7 @@ public class Scoraling {
   public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.intake()))
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
         .onlyIf(scoral.beambreakTrigger)
         .withName("cleanAlgae");
   }
@@ -70,6 +70,6 @@ public class Scoraling {
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollers() {
-    return hopper.intake().alongWith(scoral.outtake()).withName("runningRollers");
+    return hopper.intake().alongWith(scoral.score()).withName("runningRollers");
   }
 }
