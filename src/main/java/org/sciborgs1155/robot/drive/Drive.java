@@ -14,6 +14,7 @@ import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -36,6 +37,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -67,6 +69,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
@@ -109,6 +112,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final PIDController rotationController =
       new PIDController(Rotation.P, Rotation.I, Rotation.D);
+
+  private final PIDController xcontrol =
+      new PIDController(
+          ModuleConstants.Driving.PID.P,
+          ModuleConstants.Driving.PID.I,
+          ModuleConstants.Driving.PID.D);
+  private final PIDController ycontrol =
+      new PIDController(
+          ModuleConstants.Driving.PID.P,
+          ModuleConstants.Driving.PID.I,
+          ModuleConstants.Driving.PID.D);
 
   /**
    * A factory to create a new swerve drive based on the type of module used / real or simulation.
@@ -475,6 +489,20 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
+  }
+
+  public void goToSample(SwerveSample smaple) {
+    Vector<N2> displacement = smaple.getPose().minus(pose()).getTranslation().toVector();
+    Vector<N2> result =
+        VecBuilder.fill(smaple.vx, smaple.vy)
+            .plus(
+                displacement.unit().times(translationController.calculate(displacement.norm(), 0)));
+    setChassisSpeeds(
+        new ChassisSpeeds(
+            result.get(0),
+            result.get(1),
+            rotationController.calculate(heading().getRadians(), smaple.heading)),
+        DRIVE_MODE);
   }
 
   /**

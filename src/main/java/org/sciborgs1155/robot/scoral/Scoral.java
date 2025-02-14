@@ -69,8 +69,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   /** Returns the value of the beambreak, which is false when the beam is broken. */
   @Log.NT
   public boolean beambreak() {
-    return false; // TODO dont do this. hi siggy i have no idea how to solve this issue it keeps
-    // giving me errors
+    return beambreak.get();
   }
 
   @Override

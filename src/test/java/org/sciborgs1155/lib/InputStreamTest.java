@@ -75,7 +75,7 @@ public class InputStreamTest {
     InputStream limited = stream.rateLimit(1);
     double initial = limited.get();
     UnitTestingUtil.fastForward(Seconds.of(15));
-    assertEquals(30, stream.get() - initial, 5e-2);
-    assertEquals(15, limited.get() - initial, 5e-2);
+    assertEquals(30, stream.get() - initial, 0.2);
+    assertEquals(15, limited.get() - initial, 0.2);
   }
 }

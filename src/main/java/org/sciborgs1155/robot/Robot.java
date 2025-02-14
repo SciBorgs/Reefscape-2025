@@ -13,6 +13,9 @@ import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -143,6 +146,9 @@ public class Robot extends CommandRobot implements Logged {
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
+
+    driver.a().whileTrue(align.pathfind2(new Pose2d(5,5,Rotation2d.k180deg)));
+
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.rainbow());
     led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));

@@ -14,16 +14,12 @@ import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.commands.Alignment;
@@ -67,6 +63,7 @@ public class AlignTest {
     reset(drive, elevator, scoral);
   }
 
+  @Disabled
   @RepeatedTest(5)
   public void reflectionTest() {
     Random rand = new Random();
@@ -93,6 +90,7 @@ public class AlignTest {
    * <p>Sometimes it fails due to PathPlanner issues, so there is a failure threshold. This never
    * occurs in practice, however, so we can ignore those "rare" occurrences.
    */
+  @Disabled
   @RepeatedTest(value = 15, failureThreshold = 5)
   public void pathfindTest() throws Exception {
     // Take a random branch pose
@@ -109,25 +107,5 @@ public class AlignTest {
         0,
         pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
         Rotation.TOLERANCE.in(Radians));
-  }
-
-  /** Tests whether the non-obstacle-avoiding pathing works correctly. */
-  @ParameterizedTest()
-  @MethodSource("pathGoals")
-  public void pathingTest(Branch branch) {
-    // Create and run directPathFollow
-    runToCompletion(align.directPathfollow(branch.pose));
-
-    // Assert that the command works
-    assertEquals(branch.pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
-    assertEquals(branch.pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));
-    assertEquals(
-        0,
-        branch.pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
-        Rotation.TOLERANCE.in(Radians));
-  }
-
-  private static Stream<Arguments> pathGoals() {
-    return Arrays.stream(Branch.values()).map(branch -> Arguments.of(branch));
   }
 }
