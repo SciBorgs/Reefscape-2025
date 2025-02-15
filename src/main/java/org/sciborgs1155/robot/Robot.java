@@ -9,7 +9,6 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.led.LEDConstants.LED_SEGMENTS;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -61,7 +60,8 @@ public class Robot extends CommandRobot implements Logged {
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
-  private final LEDStrip led = new LEDStrip();
+  private final LEDStrip leftLED = new LEDStrip(0, 59, false);
+  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -138,14 +138,17 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
     elevator.setDefaultCommand(elevator.retract());
-    led.setDefaultCommand(led.update(LED_SEGMENTS));
-    autonomous().onTrue(led.rainbow());
+
+    leftLED.setDefaultCommand(leftLED.rainbow());
+    rightLED.setDefaultCommand(rightLED.rainbow());
+
     teleop()
         .onTrue(
-            led.elevatorLED(
-                () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
-
-    driver.a().onTrue(led.blindLeft());
+            leftLED
+                .elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))
+                .alongWith(
+                    rightLED.elevatorLED(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());
