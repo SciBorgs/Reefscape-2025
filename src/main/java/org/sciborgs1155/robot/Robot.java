@@ -32,10 +32,13 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.DriveCommands;
+import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -56,11 +59,14 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
+  private final Vision vision = new Vision();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
+  private final Hopper hopper = Hopper.create();
 
   private final LEDStrip led = new LEDStrip();
+
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -140,7 +146,9 @@ public class Robot extends CommandRobot implements Logged {
     led.setDefaultCommand(led.rainbow());
     led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    // autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+
+    autonomous().onTrue(DriveCommands.wheelRadiusCharacterization(drive));
 
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());
@@ -159,7 +167,9 @@ public class Robot extends CommandRobot implements Logged {
 
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
-    operator.y().whileTrue(elevator.highFive());
+    // operator.y().whileTrue(elevator.highFive());
+    operator.x().whileTrue(scoraling.hpsIntake());
+    operator.y().whileTrue(hopper.intake());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
