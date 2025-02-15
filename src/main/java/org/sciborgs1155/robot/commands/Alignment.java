@@ -82,8 +82,7 @@ public class Alignment {
                       drive.pose(),
                       drive.fieldRelativeChassisSpeeds(),
                       DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                      true),
-                  goal.getRotation());
+                      true));
             })
         .until(
             () ->
