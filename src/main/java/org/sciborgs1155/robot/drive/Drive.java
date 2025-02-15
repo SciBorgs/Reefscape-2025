@@ -69,7 +69,6 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
-import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
@@ -112,17 +111,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final PIDController rotationController =
       new PIDController(Rotation.P, Rotation.I, Rotation.D);
-
-  private final PIDController xcontrol =
-      new PIDController(
-          ModuleConstants.Driving.PID.P,
-          ModuleConstants.Driving.PID.I,
-          ModuleConstants.Driving.PID.D);
-  private final PIDController ycontrol =
-      new PIDController(
-          ModuleConstants.Driving.PID.P,
-          ModuleConstants.Driving.PID.I,
-          ModuleConstants.Driving.PID.D);
 
   /**
    * A factory to create a new swerve drive based on the type of module used / real or simulation.
@@ -449,6 +437,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             DriveConstants.TRACK_WIDTH),
         () -> false,
         this);
+  }
+
+  /** Returns the position of each module in radians. */
+  public double[] getWheelRadiusCharacterizationPositions() {
+    double[] values = new double[4];
+    for (int i = 0; i < 4; i++) {
+      values[i] = modules.get(i).drivePosition();
+    }
+    return values;
   }
 
   /** Resets all drive encoders to read a position of 0. */
