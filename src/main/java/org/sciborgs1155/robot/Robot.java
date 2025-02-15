@@ -154,7 +154,8 @@ public class Robot extends CommandRobot implements Logged {
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
     driver.a().whileTrue(align.pathfind(A.pose));
-    driver.b().whileTrue(align.pathfind(D.pose));
+    // driver.b().whileTrue(align.pathfind(D.pose));
+    driver.b().onTrue(drive.zeroHeading());
 
     driver.x().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
     driver.y().whileTrue(drive.assistedDrive(x, y, omega, J.pose));
