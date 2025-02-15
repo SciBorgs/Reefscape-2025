@@ -7,6 +7,7 @@ import static org.sciborgs1155.lib.UnitTestingUtil.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -37,6 +38,7 @@ public class SwerveTest {
     gyro = new NoGyro();
     drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
     drive.resetEncoders();
+    drive.resetOdometry(new Pose2d());
   }
 
   @AfterEach
@@ -84,22 +86,34 @@ public class SwerveTest {
   }
 
   @RepeatedTest(5)
-  public void testModuleDistance() {
+  public void testModuleDistance() throws Exception {
+    assertEquals(drive.pose().getX(), 0);
+    assertEquals(drive.pose().getY(), 0);
+    assertEquals(drive.pose().getRotation().getRadians(), 0);
     double xVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
     double yVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
 
     double deltaT = 4;
     double deltaX = xVelocitySetpoint * deltaT;
     double deltaY = yVelocitySetpoint * deltaT;
-    run(
-        drive.run(
-            () ->
-                drive.setChassisSpeeds(
-                    ChassisSpeeds.fromRobotRelativeSpeeds(
-                        xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
-                    ControlMode.CLOSED_LOOP_VELOCITY)));
+
+    String name = "test run " + Math.floor(Math.random() * 1000);
+
+    Command c =
+        drive
+            .run(
+                () ->
+                    drive.setChassisSpeeds(
+                        ChassisSpeeds.fromRobotRelativeSpeeds(
+                            xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
+                        ControlMode.CLOSED_LOOP_VELOCITY))
+            .withName(name);
+
+    run(c);
 
     fastForward(Seconds.of(deltaT));
+
+    assertEquals(drive.getCurrentCommand().getName(), name);
 
     Pose2d pose = drive.pose();
 

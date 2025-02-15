@@ -8,11 +8,21 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.*;
+import static org.sciborgs1155.robot.Constants.Robot.MASS;
+import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,7 +37,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -57,6 +69,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
@@ -99,6 +112,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final PIDController rotationController =
       new PIDController(Rotation.P, Rotation.I, Rotation.D);
+
+  private final PIDController xcontrol =
+      new PIDController(
+          ModuleConstants.Driving.PID.P,
+          ModuleConstants.Driving.PID.I,
+          ModuleConstants.Driving.PID.D);
+  private final PIDController ycontrol =
+      new PIDController(
+          ModuleConstants.Driving.PID.P,
+          ModuleConstants.Driving.PID.I,
+          ModuleConstants.Driving.PID.D);
 
   /**
    * A factory to create a new swerve drive based on the type of module used / real or simulation.
@@ -395,6 +419,38 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         .withName("drive to pose");
   }
 
+  /**
+   * Follows a given pathplanner path.
+   *
+   * @param path A pathplanner path.
+   * @return A command to follow a path.
+   */
+  public Command pathfollow(PathPlannerPath path) {
+    return new FollowPathCommand(
+        path,
+        this::pose,
+        this::robotRelativeChassisSpeeds,
+        (ChassisSpeeds a, DriveFeedforwards b) ->
+            setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+        new PPHolonomicDriveController(
+            new PIDConstants(Translation.P, Translation.I, Translation.D),
+            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+        new RobotConfig(
+            MASS,
+            MOI,
+            new ModuleConfig(
+                WHEEL_RADIUS,
+                MAX_SPEED,
+                WHEEL_COF,
+                DCMotor.getKrakenX60(1),
+                DriveConstants.ModuleConstants.Driving.GEARING,
+                DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+                1),
+            DriveConstants.TRACK_WIDTH),
+        () -> false,
+        this);
+  }
+
   /** Resets all drive encoders to read a position of 0. */
   public void resetEncoders() {
     modules.forEach(ModuleIO::resetEncoders);
@@ -433,6 +489,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
+  }
+
+  public void goToSample(SwerveSample smaple, Rotation2d rotation) {
+    Vector<N2> displacement =
+        VecBuilder.fill(
+            pose().minus(smaple.getPose()).getX(), pose().minus(smaple.getPose()).getY());
+    Vector<N2> result =
+        VecBuilder.fill(smaple.vx, smaple.vy)
+            .plus(
+                displacement.unit().times(translationController.calculate(displacement.norm(), 0)));
+
+    setChassisSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            result.get(0),
+            result.get(1),
+            rotationController.calculate(heading().getRadians(), rotation.getRadians()),
+            heading()),
+        DRIVE_MODE);
   }
 
   /**
