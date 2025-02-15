@@ -32,7 +32,7 @@ public class Scoraling {
   public Command hpsIntake() {
     return elevator
         .retract()
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollersForw()))
         .onlyIf(scoral.beambreakTrigger)
         .withName("intakingHPS");
   }
@@ -69,7 +69,12 @@ public class Scoraling {
   }
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
-  public Command runRollers() {
+  public Command runRollersForw() {
     return hopper.intake().alongWith(scoral.score()).withName("runningRollers");
+  }
+
+    /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
+  public Command runRollersBack() {
+      return hopper.outtake().alongWith(scoral.algae()).withName("runningRollers");
   }
 }

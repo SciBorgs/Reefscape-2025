@@ -187,11 +187,11 @@ public class Robot extends CommandRobot implements Logged {
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.x().whileTrue(scoraling.hpsIntake());
-    operator.y().whileTrue(hopper.intake());
+    operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
-    operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
+    operator.povUp().whileTrue(scoraling.scoral(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
   }
 

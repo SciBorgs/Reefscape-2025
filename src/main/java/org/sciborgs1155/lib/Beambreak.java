@@ -1,6 +1,9 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import monologue.Logged;
+import monologue.Annotations.Log;
+
 import java.util.function.BooleanSupplier;
 
 /**
@@ -8,7 +11,7 @@ import java.util.function.BooleanSupplier;
  * beambreak's state; true for unbroken, false for broken. 2. A runnable that will close all
  * resources as necessary.
  */
-public class Beambreak {
+public class Beambreak implements Logged {
   private final BooleanSupplier beambreak;
   private final Runnable close;
 
@@ -37,6 +40,7 @@ public class Beambreak {
   /**
    * @return the value of the beambreak; true for unbroken, false for broken
    */
+  @Log.NT
   public boolean get() {
     return beambreak.getAsBoolean();
   }
