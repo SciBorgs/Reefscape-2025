@@ -10,7 +10,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,27 +17,25 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.Kinematics;
 import edu.wpi.first.math.kinematics.Odometry;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.DoubleSupplier;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
  * measurements. Robot code should not use this directly- Instead, use the particular type for your
  * drivetrain (e.g., {@link DifferentialDrivePoseEstimator}). It is intended to be a drop-in
  * replacement for {@link Odometry}; in fact, if you never call {@link
- * BetterPoseEstimator#addVisionMeasurement} and only call {@link BetterPoseEstimator#update} then this will
- * behave exactly the same as Odometry.
+ * BetterPoseEstimator#addVisionMeasurement} and only call {@link BetterPoseEstimator#update} then
+ * this will behave exactly the same as Odometry.
  *
  * <p>{@link BetterPoseEstimator#update} should be called every robot loop.
  *
- * <p>{@link BetterPoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if you
- * never call it then this class will behave exactly like regular encoder odometry.
+ * <p>{@link BetterPoseEstimator#addVisionMeasurement} can be called as infrequently as you want; if
+ * you never call it then this class will behave exactly like regular encoder odometry.
  *
  * @param <T> Wheel positions type.
  */
@@ -46,6 +43,9 @@ public class BetterPoseEstimator<T> {
   private final Odometry<T> m_odometry;
   private final Matrix<N3, N1> m_q = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> m_visionK = new Matrix<>(Nat.N3(), Nat.N3());
+
+  private final DoubleSupplier odomFOM;
+  private final DoubleSupplier visionFOM;
 
   private static final double kBufferDuration = 1.5;
   // Maps timestamps to odometry-only pose estimates
@@ -57,89 +57,6 @@ public class BetterPoseEstimator<T> {
   private final NavigableMap<Double, VisionUpdate> m_visionUpdates = new TreeMap<>();
 
   private Pose2d m_poseEstimate;
-
-  /**
- * This class wraps {@link SwerveDriveOdometry Swerve Drive Odometry} to fuse latency-compensated
- * vision measurements with swerve drive encoder distance measurements. It is intended to be a
- * drop-in replacement for {@link SwerveDriveOdometry}.
- *
- * <p>{@link SwerveDrivePoseEstimator#update} should be called every robot loop.
- *
- * <p>{@link SwerveDrivePoseEstimator#addVisionMeasurement} can be called as infrequently as you
- * want; if you never call it, then this class will behave as regular encoder odometry.
- */
-public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition[]> {
-  private final int m_numModules;
-
-  /**
-   * Constructs a SwerveDrivePoseEstimator with default standard deviations for the model and vision
-   * measurements.
-   *
-   * <p>The default standard deviations of the model states are 0.1 meters for x, 0.1 meters for y,
-   * and 0.1 radians for heading. The default standard deviations of the vision measurements are 0.9
-   * meters for x, 0.9 meters for y, and 0.9 radians for heading.
-   *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance measurements and rotations of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
-   */
-  public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
-      Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters) {
-    this(
-        kinematics,
-        gyroAngle,
-        modulePositions,
-        initialPoseMeters,
-        VecBuilder.fill(0.1, 0.1, 0.1),
-        VecBuilder.fill(0.9, 0.9, 0.9));
-  }
-
-  /**
-   * Constructs a SwerveDrivePoseEstimator.
-   *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
-   * @param gyroAngle The current gyro angle.
-   * @param modulePositions The current distance and rotation measurements of the swerve modules.
-   * @param initialPoseMeters The starting pose estimate.
-   * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
-   *     in meters, and heading in radians). Increase these numbers to trust your state estimate
-   *     less.
-   * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x position
-   *     in meters, y position in meters, and heading in radians). Increase these numbers to trust
-   *     the vision pose measurement less.
-   */
-  public SwerveDrivePoseEstimator(
-      SwerveDriveKinematics kinematics,
-      Rotation2d gyroAngle,
-      SwerveModulePosition[] modulePositions,
-      Pose2d initialPoseMeters,
-      Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
-    super(
-        kinematics,
-        new SwerveDriveOdometry(kinematics, gyroAngle, modulePositions, initialPoseMeters),
-        stateStdDevs,
-        visionMeasurementStdDevs);
-
-    m_numModules = modulePositions.length;
-  }
-
-  @Override
-  public Pose2d updateWithTime(
-      double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] wheelPositions) {
-    if (wheelPositions.length != m_numModules) {
-      throw new IllegalArgumentException(
-          "Number of modules is not consistent with number of wheel locations provided in "
-              + "constructor");
-    }
-
-    return super.updateWithTime(currentTimeSeconds, gyroAngle, wheelPositions);
-  }
-}
 
   /**
    * Constructs a PoseEstimator.
@@ -158,8 +75,13 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
       Kinematics<?, T> kinematics,
       Odometry<T> odometry,
       Matrix<N3, N1> stateStdDevs,
-      Matrix<N3, N1> visionMeasurementStdDevs) {
+      Matrix<N3, N1> visionMeasurementStdDevs,
+      DoubleSupplier odomFOM,
+      DoubleSupplier visionFOM) {
     m_odometry = odometry;
+
+    this.odomFOM = odomFOM;
+    this.visionFOM = visionFOM;
 
     m_poseEstimate = m_odometry.getPoseMeters();
 
@@ -330,57 +252,61 @@ public class SwerveDrivePoseEstimator extends PoseEstimator<SwerveModulePosition
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     BetterPoseEstimator#updateWithTime(double,Rotation2d,Object)} then you must use a timestamp with
-   *     an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as {@link
-   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use {@link
-   *     edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the epochs.
+   *     BetterPoseEstimator#updateWithTime(double,Rotation2d,Object)} then you must use a timestamp
+   *     with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same epoch as
+   *     {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you should use
+   *     {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or sync the
+   *     epochs.
    */
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
         || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration
             > timestampSeconds) {
       return;
     }
 
-    // Step 1: Clean up any old entries
     cleanUpVisionUpdates();
 
-    // Step 2: Get the pose measured by odometry at the moment the vision measurement was made.
     var odometrySample = m_odometryPoseBuffer.getSample(timestampSeconds);
-
     if (odometrySample.isEmpty()) {
       return;
     }
 
-    // Step 3: Get the vision-compensated pose estimate at the moment the vision measurement was
-    // made.
     var visionSample = sampleAt(timestampSeconds);
-
     if (visionSample.isEmpty()) {
       return;
     }
 
-    // Step 4: Measure the twist between the old pose estimate and the vision pose.
+    // Retrieve Figure of Merit values
+    double visionFOMvalue = visionFOM.getAsDouble(); // Vision confidence
+    double odometryFOMvalue = odomFOM.getAsDouble(); // Odometry confidence
+
+    // Normalize FOM values to a 0-1 range if necessary
+    visionFOMvalue = Math.max(0, Math.min(visionFOMvalue, 1));
+    odometryFOMvalue = Math.max(0, Math.min(odometryFOMvalue, 1));
+
+    // Compute a dynamic weight for the Kalman gain
+    double totalFOM = visionFOMvalue + odometryFOMvalue;
+    double visionWeight =
+        (totalFOM > 0)
+            ? (visionFOMvalue / totalFOM)
+            : 0.5; // Default to equal trust if both FOMs are zero
+
+    // Compute twist from vision pose
     var twist = visionSample.get().log(visionRobotPoseMeters);
 
-    // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
-    // gain matrix representing how much we trust vision measurements compared to our current pose.
-    var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
+    // Scale the twist correction by the dynamic Kalman gain
+    var dynamicK = m_visionK.times(visionWeight);
+    var k_times_twist = dynamicK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
-    // Step 6: Convert back to Twist2d.
     var scaledTwist =
         new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
-    // Step 7: Calculate and record the vision update.
     var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
     m_visionUpdates.put(timestampSeconds, visionUpdate);
 
-    // Step 8: Remove later vision measurements. (Matches previous behavior)
     m_visionUpdates.tailMap(timestampSeconds, false).entrySet().clear();
 
-    // Step 9: Update latest pose estimate. Since we cleared all updates after this vision update,
-    // it's guaranteed to be the latest vision update.
     m_poseEstimate = visionUpdate.compensate(m_odometry.getPoseMeters());
   }
 

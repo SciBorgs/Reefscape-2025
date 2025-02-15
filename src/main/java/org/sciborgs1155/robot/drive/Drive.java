@@ -17,7 +17,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +51,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.BetterSwerveDrivePoseEstimator;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -77,7 +77,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final SwerveDrivePoseEstimator odometry;
+  private final BetterSwerveDrivePoseEstimator odometry;
+
+  private double odomFOM = 0.5;
+  private double visionFOM = 0.5;
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -199,11 +202,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     odometry =
-        new SwerveDrivePoseEstimator(
+        new BetterSwerveDrivePoseEstimator(
             kinematics,
             gyro.rotation2d(),
             modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+            () -> odomFOM,
+            () -> visionFOM);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
