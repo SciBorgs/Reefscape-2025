@@ -15,14 +15,18 @@ import org.sciborgs1155.robot.Constants;
 public class LEDSegment {
   public final int startLED;
   public final int endLED;
-  public final LEDPattern pattern;
   public final AddressableLEDBuffer buffer;
+  public LEDPattern pattern;
 
   public LEDSegment(int start, int end) {
     startLED = start;
     endLED = end;
     pattern = LEDPattern.kOff;
-    buffer = new AddressableLEDBuffer(end - start);
+    buffer = new AddressableLEDBuffer(end - start + 1);
+  }
+
+  public boolean inRange(int index) {
+    return startLED <= index && index <= endLED;
   }
 
   /** Rainbow LEDs, scrolling at 0.5 m/s. Very cool. */
@@ -73,7 +77,11 @@ public class LEDSegment {
     }
   }
 
-  public void set(LEDPattern pattern) {
+  public void set(LEDPattern newPattern) {
+    pattern = newPattern ;
+  }
+  
+  public void update() {
     pattern.applyTo(buffer);
   }
 

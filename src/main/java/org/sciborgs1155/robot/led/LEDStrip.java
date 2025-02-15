@@ -22,10 +22,23 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     led.start();
   }
 
-  public Command set(LEDPattern pattern) {
+  public Command elevatorLED() {
+    return runOnce(() -> {LEFT_LED_SEGMENT.music(); RIGHT_LED_SEGMENT.rainbow();}).andThen(set(LED_SEGMENTS));
+  }
+
+  public Command test() {
+    return runOnce(() -> {LEFT_LED_SEGMENT.music(); RIGHT_LED_SEGMENT.rainbow();}).andThen(set(LED_SEGMENTS));
+  }
+
+  public Command set(LEDSegment... ledSegments) {
     return run(
         () -> {
-          pattern.applyTo(buffer);
+          for (LEDSegment segment : ledSegments) {
+            segment.update();
+            for (int i = segment.startLED; i <= segment.endLED; i++) {
+              buffer.setLED(i, segment.buffer.getLED(i - segment.startLED));
+            }
+          }
           led.setData(buffer);
         });
   }
