@@ -475,8 +475,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = modules.get(m).odometryData()[i];
           }
-          odometry.updateWithTime(
-              timestamps[i], Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions);
+          odometry.updateWithTime(timestamps[i], gyro.rotation2d(), modulePositions);
           lastPositions = modulePositions;
         }
       } finally {
