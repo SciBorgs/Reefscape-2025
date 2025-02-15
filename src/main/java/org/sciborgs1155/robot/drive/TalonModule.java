@@ -109,8 +109,19 @@ public class TalonModule implements ModuleIO {
       if (success.isOK()) break;
     }
 
+    // reduces update frequency on unnecessary signals
+    // only reset on robot restart and redeploy or calling motor.resetSignalFrequencies()
+    driveMotor.optimizeBusUtilization();
+    turnMotor.optimizeBusUtilization();
+
     BaseStatusSignal.setUpdateFrequencyForAll(
-        1 / ODOMETRY_PERIOD.in(Seconds), driveMotor.getPosition(), turnMotor.getPosition());
+        1 / ODOMETRY_PERIOD.in(Seconds),
+        driveMotor.getPosition(),
+        driveMotor.getVelocity(),
+        driveMotor.getMotorVoltage(),
+        turnMotor.getPosition(),
+        turnMotor.getVelocity(),
+        turnMotor.getMotorVoltage());
 
     register(driveMotor);
     register(turnMotor);
