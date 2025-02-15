@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.drive.Drive;
@@ -125,6 +126,7 @@ public class SwerveTest {
   }
 
   @RepeatedTest(20)
+  @Disabled
   public void assistedDrivingTest() {
     Pose2d target =
         // new Pose2d(

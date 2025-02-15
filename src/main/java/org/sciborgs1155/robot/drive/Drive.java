@@ -215,7 +215,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             kinematics,
             gyro.rotation2d(),
             modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+            new Pose2d(new Translation2d(), Rotation2d.kZero));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);

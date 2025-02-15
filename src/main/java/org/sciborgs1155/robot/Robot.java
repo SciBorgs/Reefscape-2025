@@ -7,14 +7,16 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.Field.Branch.A;
+import static org.sciborgs1155.robot.Constants.Field.Branch.D;
+import static org.sciborgs1155.robot.Constants.Field.Branch.G;
+import static org.sciborgs1155.robot.Constants.Field.Branch.J;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -145,10 +147,11 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.a().whileTrue(align.pathfind(new Pose2d(2, 2, Rotation2d.kZero)));
+    driver.a().whileTrue(align.pathfind(A.pose));
+    driver.b().whileTrue(align.pathfind(D.pose));
 
-    driver.x().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(5, 5, Rotation2d.kZero)));
-    driver.y().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(10, 5, Rotation2d.kPi)));
+    driver.x().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
+    driver.y().whileTrue(drive.assistedDrive(x, y, omega, J.pose));
 
     led.setDefaultCommand(led.scrolling());
     elevator.setDefaultCommand(elevator.retract());
@@ -158,7 +161,7 @@ public class Robot extends CommandRobot implements Logged {
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
-    driver.b().whileTrue(drive.zeroHeading());
+    // driver.b().whileTrue(drive.zeroHeading());
     driver
         .leftBumper()
         .or(driver.rightBumper())
