@@ -8,11 +8,21 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.*;
+import static org.sciborgs1155.robot.Constants.Robot.MASS;
+import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,7 +37,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -203,7 +215,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             kinematics,
             gyro.rotation2d(),
             modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new Pose2d(new Translation2d(), Rotation2d.kZero));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -306,6 +318,81 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
+   * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
+   * Also adds a little extra translational velocity to move the robot to a certain desired position
+   * if the driver is already attempting to move in that general direction. This command does not
+   * assist in controlling the rotation of the robot.
+   *
+   * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+   *     alliance side).
+   * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+   *     side).
+   * @param vOmega A supplier for the angular velocity of the robot.
+   * @param target The target field-relative position for the robot, as a {@link Translation2d}.
+   * @return The assisted driving command.
+   */
+  public Command assistedDrive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Translation2d target) {
+    return run(() -> {
+          Vector<N2> driverVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+          Vector<N2> displacement = pose().getTranslation().minus(target).toVector();
+          Vector<N2> perpDisplacement = displacement.projection(driverVel).minus(displacement);
+          Vector<N2> result =
+              driverVel.plus(
+                  perpDisplacement
+                      .unit()
+                      .times(translationController.calculate(perpDisplacement.norm(), 0)));
+          setChassisSpeeds(
+              Math.acos(driverVel.unit().dot(displacement.unit()))
+                          < ASSISTED_DRIVING_THRESHOLD.in(Radians)
+                      && !Double.isNaN(result.norm())
+                  ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                      result.get(0),
+                      result.get(1),
+                      vOmega.getAsDouble(),
+                      heading().plus(allianceRotation()))
+                  : ChassisSpeeds.fromFieldRelativeSpeeds(
+                      vx.getAsDouble(),
+                      vy.getAsDouble(),
+                      vOmega.getAsDouble(),
+                      heading().plus(allianceRotation())),
+              ControlMode.CLOSED_LOOP_VELOCITY);
+        })
+        .repeatedly();
+  }
+
+  /**
+   * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
+   * Also adds a little translational velocity to move the robot to a certain desired position if
+   * the driver is already attempting to move in that general direction. If the driver is not
+   * currently attempting to rotate the robot, this command will also automatically rotate the robot
+   * to a desired heading.
+   *
+   * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+   *     alliance side).
+   * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+   *     side).
+   * @param vOmega A supplier for the angular velocity of the robot.
+   * @param target The target field-relative position for the robot, as a {@link Pose2d}.
+   * @return The assisted driving command.
+   */
+  public Command assistedDrive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Pose2d target) {
+    return assistedDrive(
+            vx,
+            vy,
+            () ->
+                Math.abs(target.getRotation().getRadians() - heading().getRadians())
+                        > Rotation.TOLERANCE.in(Radians)
+                    ? rotationController.calculate(
+                        heading().getRadians(), target.getRotation().getRadians())
+                    : vOmega.getAsDouble(),
+            target.getTranslation())
+        .until(() -> vOmega.getAsDouble() > ASSISTED_ROTATING_THRESHOLD)
+        .andThen(assistedDrive(vx, vy, vOmega, target.getTranslation()));
+  }
+
+  /**
    * Drives the robot while facing a target pose.
    *
    * @param vx A supplier for the absolute x velocity of the robot.
@@ -395,6 +482,38 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         .withName("drive to pose");
   }
 
+  /**
+   * Follows a given pathplanner path.
+   *
+   * @param path A pathplanner path.
+   * @return A command to follow a path.
+   */
+  public Command pathfollow(PathPlannerPath path) {
+    return new FollowPathCommand(
+        path,
+        this::pose,
+        this::robotRelativeChassisSpeeds,
+        (ChassisSpeeds a, DriveFeedforwards b) ->
+            setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
+        new PPHolonomicDriveController(
+            new PIDConstants(Translation.P, Translation.I, Translation.D),
+            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
+        new RobotConfig(
+            MASS,
+            MOI,
+            new ModuleConfig(
+                WHEEL_RADIUS,
+                MAX_SPEED,
+                WHEEL_COF,
+                DCMotor.getKrakenX60(1),
+                DriveConstants.ModuleConstants.Driving.GEARING,
+                DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+                1),
+            DriveConstants.TRACK_WIDTH),
+        () -> false,
+        this);
+  }
+
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
@@ -442,6 +561,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
+  }
+
+  public void goToSample(SwerveSample smaple, Rotation2d rotation) {
+    Vector<N2> displacement =
+        VecBuilder.fill(
+            pose().minus(smaple.getPose()).getX(), pose().minus(smaple.getPose()).getY());
+    Vector<N2> result =
+        VecBuilder.fill(smaple.vx, smaple.vy)
+            .plus(
+                displacement.unit().times(translationController.calculate(displacement.norm(), 0)));
+
+    setChassisSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            result.get(0),
+            result.get(1),
+            rotationController.calculate(heading().getRadians(), rotation.getRadians()),
+            heading()),
+        DRIVE_MODE);
   }
 
   /**

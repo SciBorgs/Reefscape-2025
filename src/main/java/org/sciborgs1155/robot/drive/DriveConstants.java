@@ -1,10 +1,16 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static org.sciborgs1155.robot.Constants.Robot.MASS;
+import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -25,6 +31,26 @@ public final class DriveConstants {
     CLOSED_LOOP_VELOCITY,
     OPEN_LOOP_VELOCITY;
   }
+
+  /** The type of modules being used. */
+  public static enum ModuleType {
+    TALON, // Kraken X60 Drive, NEO 550 Turn
+    SPARK; // NEO Vortex Drive, NEO 550 Turn
+  }
+
+  // TODO: Change central drivetrain constants as needed.
+
+  // The angle between the velocity and the displacement from a target, above which the robot will
+  // not use assisted driving to the target. (the driver must be driving in the general direction of
+  // the assisted driving target.)
+  public static final Angle ASSISTED_DRIVING_THRESHOLD = Radians.of(Math.PI / 6);
+
+  // The input of the joystick beyond which the assisted driving will not control the rotation of
+  // the swerve.
+  public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
+
+  // The type of module on the chassis
+  public static final ModuleType TYPE = ModuleType.SPARK;
 
   // The control loop used by all of the modules when driving
   public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
@@ -62,6 +88,23 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(2)), // rear left
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
+
+  public static final RobotConfig ROBOT_CONFIG =
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              1 / ModuleConstants.Driving.GEARING,
+              ModuleConstants.Driving.CURRENT_LIMIT,
+              1),
+          MODULE_OFFSET);
+
+  public static final PathConstraints PATH_CONSTRAINTS =
+      new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
