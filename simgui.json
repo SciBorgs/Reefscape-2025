@@ -43,9 +43,21 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "Robot": {
         "drive": {
+          "Pose2d##v_/Robot/drive/pose": {
+            "Rotation2d##v_rotation": {
+              "open": true
+            },
+            "Translation2d##v_translation": {
+              "open": true
+            },
+            "open": true
+          },
           "open": true
         },
         "open": true
