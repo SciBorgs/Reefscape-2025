@@ -9,6 +9,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -98,8 +99,8 @@ public class TalonOdometryThread extends Thread {
       Drive.lock.writeLock().lock();
 
       try {
-        double timestamp =
-            talonSignals[0].getTimestamp().getTime(); // should all be measured together
+        // FPGA returns in microseconds (1000000 microseconds in a second)
+        double timestamp = RobotController.getFPGATime() / 1e6;
 
         double totalLatency = 0.0;
         for (BaseStatusSignal signal : talonSignals) {

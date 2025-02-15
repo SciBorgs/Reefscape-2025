@@ -8,9 +8,9 @@ import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -36,8 +36,8 @@ public class TalonModule implements ModuleIO {
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
   private final TalonOdometryThread talonThread;
-  private final DutyCycleOut odometryFrequency =
-      new DutyCycleOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
+  private final VoltageOut odometryFrequency =
+      new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
   private final Queue<Double> position;
   private final Queue<Double> rotation;
   private final Queue<Double> timestamp;
