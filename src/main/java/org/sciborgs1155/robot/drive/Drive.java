@@ -262,78 +262,122 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vOmega A supplier for the angular velocity of the robot.
    * @return The driving command.
    */
+ /**
+
+  /**
+   * Limits the acceleration in the direction of the current velocity.
+   *
+   * @param desiredAccel The desired acceleration vector.
+   * @param currentVel   The current velocity vector.
+   * @return The forward-limited acceleration vector.
+   */
+  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
+      if (desiredAccel.norm() < 1e-6) {
+          // If there's no current velocity, no forward acceleration limit applies
+          return desiredAccel;
+      }
+
+      double forwardLimit =
+      MAX_ACCEL.in(MetersPerSecondPerSecond)
+          * (1 - (currentVel.norm() / MAX_SPEED.in(MetersPerSecond)));
+
+      // Normalize the current velocity to get the direction vector
+      Vector<N2> currentDir = currentVel.div(currentVel.norm());
+
+      // Project the desired acceleration onto the current velocity direction
+      double forwardComponent = desiredAccel.dot(currentDir);
+      double clampedForward = Math.min(forwardLimit, forwardComponent);
+
+      // Reconstruct the limited acceleration
+      Vector<N2> limitedAccel = currentDir.times(clampedForward);
+
+      // Add the perpendicular component (unchanged)
+      Vector<N2> perpComponent = desiredAccel.minus(currentDir.times(forwardComponent));
+      limitedAccel = limitedAccel.plus(perpComponent);
+
+      return limitedAccel;
+  }
+
+  /**
+   * Limits the acceleration based on the skid constraint (circular region).
+   *
+   * @param desiredAccel The desired acceleration vector.
+   * @param currentVel   The current velocity vector.
+   * @return The skid-limited acceleration vector.
+   */
+  private Vector<N2> skidLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
+      // Calculate the desired velocity after applying the acceleration
+      Vector<N2> desiredVel = currentVel.plus(desiredAccel.times(SENSOR_PERIOD.in(Seconds)));
+
+      // Calculate the vector from current velocity to desired velocity
+      Vector<N2> deltaVel = desiredVel.minus(currentVel);
+
+      // Check if the deltaVel exceeds the skid limit radius
+      if (deltaVel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)) {
+          // Scale the deltaVel to fit within the skid limit circle
+          deltaVel = deltaVel.div(deltaVel.norm()).times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
+      }
+
+      // Reconstruct the limited acceleration
+      Vector<N2> limitedAccel = deltaVel.div(SENSOR_PERIOD.in(Seconds));
+
+      return limitedAccel;
+  }
+
+  /**
+   * Drive command with acceleration limiting.
+   */
   public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, DoubleSupplier elevatorHeight) {
-    return run(
-      () -> {
-        Vector<N2> currentVel =
-          VecBuilder.fill(
-            fieldRelativeChassisSpeeds().vxMetersPerSecond,
-            fieldRelativeChassisSpeeds().vyMetersPerSecond);
-            
+      return run(() -> {
+          // Get current velocity
+          Vector<N2> currentVel = VecBuilder.fill(
+              fieldRelativeChassisSpeeds().vxMetersPerSecond,
+              fieldRelativeChassisSpeeds().vyMetersPerSecond
+          );
+
+          // Get desired velocity
           Vector<N2> desiredVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
-          
-          // Calculate acceleration as (desired - current)/dt
+
+          // Calculate desired acceleration
           Vector<N2> desiredAccel = desiredVel.minus(currentVel).div(SENSOR_PERIOD.in(Seconds));
 
-          System.out.println("test");
-          System.out.println(desiredAccel);
-          System.out.println(currentVel);
-          // Apply all acceleration limits
-          // Vector<N2 > limitedAccel = forwardAccelLimit(desiredAccel, currentVel, elevatorHeight.getAsDouble());
-          Vector<N2> limitedAccel = skidLimit(desiredAccel);
+          // Apply acceleration limits
+          // Vector<N2> limitedAccel = forwardAccelLimit(desiredAccel, currentVel);
 
-          // Calculate new velocity: current + at
+          // limitedAccel = skidLimit(limitedAccel, currentVel);
+
+          Vector<N2> limitedAccel = tiltLimit(desiredAccel, elevatorHeight.getAsDouble());
+
+          // Calculate new velocity
           desiredVel = currentVel.plus(limitedAccel.times(SENSOR_PERIOD.in(Seconds)));
 
-          setChassisSpeeds( 
+          // Set chassis speeds
+          setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  limitedAccel.get(0),
-                  limitedAccel.get(1),
+                  desiredVel.get(0),
+                  desiredVel.get(1),
                   vOmega.getAsDouble(),
-                  heading().plus(allianceRotation())),
-              ControlMode.OPEN_LOOP_VELOCITY);
-        });
-  }
-
-  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel, double elevatorHeight) {
-
-    double forwardLimit =
-        MAX_ACCEL.in(MetersPerSecondPerSecond)
-            * (1 - (currentVel.norm() / MAX_SPEED.in(MetersPerSecond)));
-
-    double accelAlongCurrentVel = desiredAccel.dot(currentVel) / currentVel.norm();
-
-    // Limit the component along the current velocity
-    if (accelAlongCurrentVel > forwardLimit) {
-      accelAlongCurrentVel = forwardLimit;
-    }
-      // Calculate parallel component
-      Vector<N2> parallelAccel = currentVel.unit().times(accelAlongCurrentVel);
-
-      // Calculate perpendicular component
-      Vector<N2> perpAccel = desiredAccel.minus(parallelAccel);
-
-      return parallelAccel.plus(perpAccel);
-
-  }
-
-  public Vector<N2> skidLimit(Vector<N2> desiredAccel){
-    if(desiredAccel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)){
-      Vector<N2> bruh = desiredAccel.div(desiredAccel.norm()).times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));      
-      return bruh;
-    }
-    return desiredAccel;
+                  heading().plus(allianceRotation())
+              ),
+              ControlMode.OPEN_LOOP_VELOCITY
+          );
+      });
   }
 
   public Vector<N2> tiltLimit(Vector<N2> desiredAccel, double elevatorHeight){
     
-    if(desiredAccel.norm() > 1e-6){
-      double heightScale = 1 - elevatorHeight / MAX_HEIGHT.in(Meters);
-      return desiredAccel.times(heightScale);
+    if(desiredAccel.norm() < 1e-6){
+      return desiredAccel;
     }
 
+    if(elevatorHeight > MIN_HEIGHT.in(Meters)){
+      double tiltLimit = MAX_TILT_ACCELERATION.in(MetersPerSecondPerSecond) * (elevatorHeight / MAX_HEIGHT.in(Meters));
+      double bruh = MAX_ACCEL.in(MetersPerSecondPerSecond) - tiltLimit;
+      return desiredAccel.unit().times(bruh);
+    }
     return desiredAccel;
   }
+
 
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
