@@ -215,7 +215,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             kinematics,
             gyro.rotation2d(),
             modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -315,6 +315,81 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             vy,
             () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()))
         .beforeStarting(rotationController::reset);
+  }
+
+  /**
+   * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
+   * Also adds a little extra translational velocity to move the robot to a certain desired position
+   * if the driver is already attempting to move in that general direction. This command does not
+   * assist in controlling the rotation of the robot.
+   *
+   * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+   *     alliance side).
+   * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+   *     side).
+   * @param vOmega A supplier for the angular velocity of the robot.
+   * @param target The target field-relative position for the robot, as a {@link Translation2d}.
+   * @return The assisted driving command.
+   */
+  public Command assistedDrive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Translation2d target) {
+    return run(() -> {
+          Vector<N2> driverVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+          Vector<N2> displacement = pose().getTranslation().minus(target).toVector();
+          Vector<N2> perpDisplacement = displacement.projection(driverVel).minus(displacement);
+          Vector<N2> result =
+              driverVel.plus(
+                  perpDisplacement
+                      .unit()
+                      .times(translationController.calculate(perpDisplacement.norm(), 0)));
+          setChassisSpeeds(
+              Math.acos(driverVel.unit().dot(displacement.unit()))
+                          < ASSISTED_DRIVING_THRESHOLD.in(Radians)
+                      && !Double.isNaN(result.norm())
+                  ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                      result.get(0),
+                      result.get(1),
+                      vOmega.getAsDouble(),
+                      heading().plus(allianceRotation()))
+                  : ChassisSpeeds.fromFieldRelativeSpeeds(
+                      vx.getAsDouble(),
+                      vy.getAsDouble(),
+                      vOmega.getAsDouble(),
+                      heading().plus(allianceRotation())),
+              ControlMode.CLOSED_LOOP_VELOCITY);
+        })
+        .repeatedly();
+  }
+
+  /**
+   * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
+   * Also adds a little translational velocity to move the robot to a certain desired position if
+   * the driver is already attempting to move in that general direction. If the driver is not
+   * currently attempting to rotate the robot, this command will also automatically rotate the robot
+   * to a desired heading.
+   *
+   * @param vx A supplier for the velocity of the robot along the x axis (perpendicular to the
+   *     alliance side).
+   * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
+   *     side).
+   * @param vOmega A supplier for the angular velocity of the robot.
+   * @param target The target field-relative position for the robot, as a {@link Pose2d}.
+   * @return The assisted driving command.
+   */
+  public Command assistedDrive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Pose2d target) {
+    return assistedDrive(
+            vx,
+            vy,
+            () ->
+                Math.abs(target.getRotation().getRadians() - heading().getRadians())
+                        > Rotation.TOLERANCE.in(Radians)
+                    ? rotationController.calculate(
+                        heading().getRadians(), target.getRotation().getRadians())
+                    : vOmega.getAsDouble(),
+            target.getTranslation())
+        .until(() -> vOmega.getAsDouble() > ASSISTED_ROTATING_THRESHOLD)
+        .andThen(assistedDrive(vx, vy, vOmega, target.getTranslation()));
   }
 
   /**

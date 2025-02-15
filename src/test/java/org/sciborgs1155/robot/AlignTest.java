@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
@@ -26,7 +25,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.commands.Alignment;
-import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
@@ -40,11 +38,6 @@ public class AlignTest {
   Scoral scoral;
   Alignment align;
 
-  @BeforeAll
-  public static void configure() {
-    // Configure pathfinding libraries
-  }
-
   @BeforeEach
   public void setup() {
     setupTests();
@@ -53,8 +46,6 @@ public class AlignTest {
     scoral = Scoral.create();
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
-
-    Autos.configureAutos(drive);
 
     align = new Alignment(drive, elevator, scoral);
   }

@@ -8,12 +8,21 @@
     {
       "axisConfig": [
         {
+<<<<<<< HEAD
           "decKey": 68,
           "incKey": 65
         },
         {
           "decKey": 83,
           "incKey": 87
+=======
+          "decKey": 83,
+          "incKey": 87
+        },
+        {
+          "decKey": 65,
+          "incKey": 68
+>>>>>>> assisted-driving
         },
         {
           "decKey": 69,
@@ -95,7 +104,17 @@
     }
   ],
   "robotJoysticks": [
+<<<<<<< HEAD
     {},
+=======
+<<<<<<< HEAD
+    {},
+=======
+    {
+      "guid": "Keyboard1"
+    },
+>>>>>>> main
+>>>>>>> assisted-driving
     {
       "guid": "Keyboard0"
     }

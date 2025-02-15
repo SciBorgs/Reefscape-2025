@@ -41,7 +41,6 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level.*;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -147,8 +146,11 @@ public class Robot extends CommandRobot implements Logged {
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
     driver.a().whileTrue(align.pathfind(new Pose2d(2, 2, Rotation2d.kZero)));
-    driver.x().whileTrue(align.pathfind(new Pose2d(15, 2, Rotation2d.kPi)));
 
+    driver.x().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(5, 5, Rotation2d.kZero)));
+    driver.y().whileTrue(drive.assistedDrive(x, y, omega, new Pose2d(10, 5, Rotation2d.kPi)));
+
+    led.setDefaultCommand(led.scrolling());
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.rainbow());
     led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
