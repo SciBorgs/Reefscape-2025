@@ -13,7 +13,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -35,7 +34,6 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
@@ -148,9 +146,8 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.a().whileTrue(align.pathfind2(new Pose2d(2 ,2 ,Rotation2d.kZero)));
-    driver.x().whileTrue(align.pathfind2(new Pose2d(15,2,Rotation2d.kZero)));
-
+    driver.a().whileTrue(align.pathfind(new Pose2d(2, 2, Rotation2d.kZero)));
+    driver.x().whileTrue(align.pathfind(new Pose2d(15, 2, Rotation2d.kPi)));
 
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.rainbow());

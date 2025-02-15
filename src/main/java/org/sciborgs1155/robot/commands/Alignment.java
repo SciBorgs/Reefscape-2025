@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -68,26 +67,23 @@ public class Alignment {
                 .andThen(scoral.score()));
   }
 
-  /**
-   * Pathfinds the drivetrain around obstacles to an input Pose2d, finishing with an end velocity of
-   * 0.
-   *
-   * @param goal The goal end pose of the pathfinding.
-   * @return A Command to pathfind around obstacles to a goal pose.
-   */
   public Command pathfind(Pose2d goal) {
-    return AutoBuilder.pathfindToPose(goal, PATH_CONSTRAINTS, 0.).andThen(drive.driveTo(goal));
-    // driveTo is used to slightly adjust since pathfindToPose is not precise enough.
-  }
-
-  public Command pathfind2(Pose2d goal) {
-    return drive.run(() -> {
-      planner.setGoal(goal.getTranslation());
-      drive.goToSample(planner.getCmd(
-        drive.pose(),
-        drive.fieldRelativeChassisSpeeds(),
-        DriveConstants.MAX_SPEED.in(MetersPerSecond),
-        true, goal.getRotation()));
-    });
+    return drive
+        .run(
+            () -> {
+              planner.setGoal(goal.getTranslation());
+              drive.goToSample(
+                  planner.getCmd(
+                      drive.pose(),
+                      drive.fieldRelativeChassisSpeeds(),
+                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
+                      true),
+                  goal.getRotation());
+            })
+        .until(
+            () ->
+                drive.pose().relativeTo(goal).getTranslation().getNorm()
+                    < DriveConstants.Translation.TOLERANCE.times(3).in(Meters))
+        .andThen(drive.driveTo(goal));
   }
 }

@@ -2,26 +2,29 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
 
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.Constants.Field;
-import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
@@ -40,8 +43,6 @@ public class AlignTest {
   @BeforeAll
   public static void configure() {
     // Configure pathfinding libraries
-    LocalADStar pathfinder = new LocalADStar();
-    Pathfinding.setPathfinder(pathfinder);
   }
 
   @BeforeEach
@@ -84,21 +85,12 @@ public class AlignTest {
     DriverStationSim.notifyNewData();
   }
 
-  /**
-   * Tests whether the non-obstacle-avoiding pathing works correctly.
-   *
-   * <p>Sometimes it fails due to PathPlanner issues, so there is a failure threshold. This never
-   * occurs in practice, however, so we can ignore those "rare" occurrences.
-   */
-  @Disabled
-  @RepeatedTest(value = 15, failureThreshold = 5)
-  public void pathfindTest() throws Exception {
-    // Take a random branch pose
-    Random rand = new Random();
-    Pose2d pose = Branch.values()[rand.nextInt(Branch.values().length)].pose;
-
+  /** Tests whether the obstacle-avoiding pathing works correctly. */
+  @ParameterizedTest
+  @MethodSource("goals")
+  public void pathfindTest(Pose2d pose) throws Exception {
     // Make and run the pathfinding command
-    runToCompletion(align.pathfind(pose));
+    runToCompletion(align.pathfind(pose).withTimeout(Seconds.of(20)));
 
     // Assert the command works
     assertEquals(pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
@@ -107,5 +99,9 @@ public class AlignTest {
         0,
         pose.getRotation().minus(drive.pose().getRotation()).getRadians(),
         Rotation.TOLERANCE.in(Radians));
+  }
+
+  private static Stream<Arguments> goals() {
+    return Arrays.stream(Constants.Field.Branch.values()).map(v -> Arguments.of(v.pose));
   }
 }
