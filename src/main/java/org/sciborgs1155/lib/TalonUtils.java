@@ -71,9 +71,12 @@ public class TalonUtils implements Logged {
    */
   public static void configureOrchestra() {
     AudioConfigs audioCfg = new AudioConfigs().withAllowMusicDurDisable(true);
+    int i = 0;
     for (TalonFX talon : talons) {
       talon.getConfigurator().apply(audioCfg);
-      orchestra.addInstrument(talon);
+      // assign motors from tracks 1 - 4
+      orchestra.addInstrument(talon, i % 4);
+      i++;
     }
   }
 
