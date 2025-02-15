@@ -395,6 +395,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         .withName("drive to pose");
   }
 
+  /** Returns the position of each module in radians. */
+  public double[] getWheelRadiusCharacterizationPositions() {
+    double[] values = new double[4];
+    for (int i = 0; i < 4; i++) {
+      values[i] = modules.get(i).drivePosition();
+    }
+    return values;
+  }
+
   /** Resets all drive encoders to read a position of 0. */
   public void resetEncoders() {
     modules.forEach(ModuleIO::resetEncoders);
