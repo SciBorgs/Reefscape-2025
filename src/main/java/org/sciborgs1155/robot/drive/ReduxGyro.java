@@ -4,6 +4,7 @@ import static org.sciborgs1155.robot.Ports.Drive.CANANDGYRO;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import org.sciborgs1155.lib.FaultLogger;
 
 /** GyroIO implementation for NavX */
@@ -33,4 +34,14 @@ public class ReduxGyro implements GyroIO {
 
   @Override
   public void close() throws Exception {}
+
+  @Override
+  public Translation2d accelaration() {
+    return new Translation2d(
+        canandgyro.getAccelerationX(),
+        canandgyro.getAccelerationY()); // .rotateBy(canandgyro.getRotation2d());
+
+    // TODO We don't know if this is field relative or robot relative. if field relative add in the
+    // commented code.
+  }
 }

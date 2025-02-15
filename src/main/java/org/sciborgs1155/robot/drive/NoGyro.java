@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.drive;
 
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /** GyroIO implementation for nonexistent gyro */
 public class NoGyro implements GyroIO {
@@ -21,4 +22,9 @@ public class NoGyro implements GyroIO {
 
   @Override
   public void reset() {}
+
+  @Override
+  public Translation2d accelaration() {
+    return new Translation2d();
+  }
 }

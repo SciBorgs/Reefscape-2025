@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.drive;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import org.sciborgs1155.lib.FaultLogger;
 
 /** GyroIO implementation for NavX */
@@ -30,4 +31,9 @@ public class NavXGyro implements GyroIO {
 
   @Override
   public void close() throws Exception {}
+
+  @Override
+  public Translation2d accelaration() {
+    return new Translation2d(ahrs.getWorldLinearAccelX(), ahrs.getWorldLinearAccelY());
+  }
 }
