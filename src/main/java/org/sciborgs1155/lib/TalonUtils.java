@@ -33,7 +33,8 @@ public class TalonUtils implements Logged {
           "TZK.chrp",
           "winter-wind.chrp",
           "fantasie-impromptu.chrp",
-          "winter-windy.chrp");
+          "la-campanella.chrp",
+          "prelude-in-g-minor.chrp");
 
   private static boolean fileLoaded = false;
 
