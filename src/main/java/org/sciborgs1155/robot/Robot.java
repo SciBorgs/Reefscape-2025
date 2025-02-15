@@ -140,11 +140,12 @@ public class Robot extends CommandRobot implements Logged {
     elevator.setDefaultCommand(elevator.retract());
     led.setDefaultCommand(led.update(LED_SEGMENTS));
     autonomous().onTrue(led.rainbow());
-    // teleop().onTrue(led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
-    teleop().onTrue(led.elevatorLED(driver::getLeftX));
-    driver.a().onTrue(Commands.runOnce(() -> led.rainbow()));
+    teleop()
+        .onTrue(
+            led.elevatorLED(
+                () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    driver.a().onTrue(led.blindLeft());
 
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());

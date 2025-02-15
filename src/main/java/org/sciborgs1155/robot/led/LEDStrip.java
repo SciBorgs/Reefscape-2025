@@ -53,6 +53,13 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
         });
   }
 
+  public Command blindLeft() {
+    return runOnce(
+        () -> {
+          LEFT_LED_SEGMENT.rainbow();
+        });
+  }
+
   /** An alernating pattern of yellow and green that is scrolled through. */
   public Command scrolling() {
     return runOnce(

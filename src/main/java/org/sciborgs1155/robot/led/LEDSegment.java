@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.util.function.DoubleSupplier;
 import org.sciborgs1155.robot.Constants;
 
+/**
+ * Represents a section of a LEDStrip, for instance, LEDs 0-59. This allows for multiple or reversed
+ * LEDPatterns to be played on the same LEDStrip.
+ */
 public class LEDSegment {
   public final int startLED;
   public final int endLED;
