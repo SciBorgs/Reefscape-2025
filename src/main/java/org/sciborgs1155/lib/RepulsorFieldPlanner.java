@@ -1,5 +1,7 @@
 package org.sciborgs1155.lib;
 
+// Taken straight from 6995's code. Thanks to 6995 for saving us from PathPlanner spaghetti code!!
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;

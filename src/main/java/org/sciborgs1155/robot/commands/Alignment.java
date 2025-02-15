@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,6 +66,12 @@ public class Alignment {
                 .andThen(scoral.score()));
   }
 
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
   public Command pathfind(Pose2d goal) {
     return drive
         .run(
