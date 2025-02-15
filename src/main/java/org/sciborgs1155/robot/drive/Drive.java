@@ -563,7 +563,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
-  public void goToSample(SwerveSample smaple, Rotation2d rotation) {
+  /**
+   * Drives the robot to a Choreo {@link SwerveSample}.
+   *
+   * @param smaple The SwerveSample to drive the robot to.
+   */
+  public void goToSample(SwerveSample smaple) {
     Vector<N2> displacement =
         VecBuilder.fill(
             pose().minus(smaple.getPose()).getX(), pose().minus(smaple.getPose()).getY());
@@ -576,7 +581,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             result.get(0),
             result.get(1),
-            rotationController.calculate(heading().getRadians(), rotation.getRadians()),
+            rotationController.calculate(heading().getRadians(), smaple.heading),
             heading()),
         DRIVE_MODE);
   }
