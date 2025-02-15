@@ -5,7 +5,6 @@ import static org.sciborgs1155.robot.led.LEDConstants.*;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import monologue.Logged;
@@ -23,11 +22,21 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command elevatorLED() {
-    return runOnce(() -> {LEFT_LED_SEGMENT.music(); RIGHT_LED_SEGMENT.rainbow();}).andThen(set(LED_SEGMENTS));
+    return runOnce(
+            () -> {
+              LEFT_LED_SEGMENT.music();
+              RIGHT_LED_SEGMENT.rainbow();
+            })
+        .andThen(set(LED_SEGMENTS));
   }
 
   public Command test() {
-    return runOnce(() -> {LEFT_LED_SEGMENT.music(); RIGHT_LED_SEGMENT.rainbow();}).andThen(set(LED_SEGMENTS));
+    return runOnce(
+            () -> {
+              LEFT_LED_SEGMENT.music();
+              RIGHT_LED_SEGMENT.rainbow();
+            })
+        .andThen(set(LED_SEGMENTS));
   }
 
   public Command set(LEDSegment... ledSegments) {

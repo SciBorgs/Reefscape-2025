@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -34,7 +33,6 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;

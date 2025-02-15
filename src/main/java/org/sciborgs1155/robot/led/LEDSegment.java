@@ -78,9 +78,9 @@ public class LEDSegment {
   }
 
   public void set(LEDPattern newPattern) {
-    pattern = newPattern ;
+    pattern = newPattern;
   }
-  
+
   public void update() {
     pattern.applyTo(buffer);
   }
