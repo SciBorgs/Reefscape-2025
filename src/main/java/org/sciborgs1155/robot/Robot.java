@@ -150,6 +150,8 @@ public class Robot extends CommandRobot implements Logged {
                     rightLED.elevatorLED(
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
+    driver.a().whileTrue(leftLED.blink());
+
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());
     driver

@@ -90,6 +90,11 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     }
   }
 
+  /** Blinks the LEDStrip white for 0.15 seconds, with a followng 0.15 seconds rest, twice. */
+  public Command blink() {
+    return set(LEDPattern.solid(Color.kWhite).blink(Seconds.of(0.15))).withTimeout(0.6);
+  }
+
   public Command set(LEDPattern pattern) {
     return run(
         () -> {
