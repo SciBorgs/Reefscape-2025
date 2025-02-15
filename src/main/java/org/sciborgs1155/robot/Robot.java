@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -8,6 +9,7 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.led.LEDConstants.LED_SEGMENTS;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -33,6 +35,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
@@ -135,8 +138,11 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
     elevator.setDefaultCommand(elevator.retract());
-    led.setDefaultCommand(led.test());
-    // led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
+    led.setDefaultCommand(led.update(LED_SEGMENTS));
+    autonomous().onTrue(led.rainbow());
+    // teleop().onTrue(led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)));
+    teleop().onTrue(led.elevatorLED(driver::getLeftX));
+    driver.a().onTrue(Commands.runOnce(() -> led.rainbow()));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
