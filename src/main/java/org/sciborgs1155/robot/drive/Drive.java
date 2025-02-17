@@ -351,7 +351,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         VecBuilder.fill(currentFieldSpeeds.vxMetersPerSecond, currentFieldSpeeds.vyMetersPerSecond);
     Vector<N2> desiredVelocity =
         VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-    Vector<N2> accel = desiredVelocity.minus(currentVelocity).div(Constants.PERIOD.in(Seconds));
+    Vector<N2> accel = desiredVelocity.minus(currentVelocity);
     // Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
     Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
     limitedAcceleration = skidAccelerationLimit(limitedAcceleration);
@@ -360,7 +360,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       limitedAcceleration = accel;
     }
     Vector<N2> limitedVelocity =
-        currentVelocity.plus(limitedAcceleration.times(Constants.PERIOD.in(Seconds)));
+        currentVelocity.plus(limitedAcceleration);
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(

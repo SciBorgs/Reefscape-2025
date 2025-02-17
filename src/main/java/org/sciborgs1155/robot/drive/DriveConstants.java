@@ -62,7 +62,7 @@ public final class DriveConstants {
   public static final LinearAcceleration MAX_SKID_ACCEL =
       MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final LinearAcceleration MAX_TILT_ACCEL =
-      MetersPerSecondPerSecond.of(15); // TODO: Tune
+      MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final AngularVelocity MAX_ANGULAR_SPEED =
       RadiansPerSecond.of(MAX_SPEED.in(MetersPerSecond) / RADIUS.in(Meters));
   public static final AngularAcceleration MAX_ANGULAR_ACCEL =
