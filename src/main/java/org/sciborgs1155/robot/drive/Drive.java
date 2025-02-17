@@ -12,6 +12,7 @@ import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_HEIGHT;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_HEIGHT;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -408,11 +409,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @return The adjusted acceleration vector after applying tilt acceleration limits.
    */
   private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight) {
-    if (elevatorHeight <= 0.4) {
+    if (elevatorHeight <= MIN_HEIGHT.in(Meters)) {
       return desiredAccel;
     }
     double limit =
-        MAX_TILT_ACCEL.in(MetersPerSecondPerSecond) * elevatorHeight / MAX_HEIGHT.in(Meters);
+        MAX_TILT_ACCEL.in(MetersPerSecondPerSecond) * (1 - (elevatorHeight / MAX_HEIGHT.in(Meters)));
     return desiredAccel.norm() > limit ? desiredAccel.unit().times(limit) : desiredAccel;
   }
 
