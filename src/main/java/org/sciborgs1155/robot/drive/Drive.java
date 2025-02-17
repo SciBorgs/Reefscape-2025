@@ -360,8 +360,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     if (currentVelocity.norm() < 1e-6) {
       limitedAcceleration = accel;
     }
-    Vector<N2> limitedVelocity =
-        currentVelocity.plus(limitedAcceleration);
+    Vector<N2> limitedVelocity = currentVelocity.plus(limitedAcceleration);
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -413,7 +412,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       return desiredAccel;
     }
     double limit =
-        MAX_TILT_ACCEL.in(MetersPerSecondPerSecond) * (1 - (elevatorHeight / MAX_HEIGHT.in(Meters)));
+        MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
+            * (1 - (elevatorHeight / MAX_HEIGHT.in(Meters)));
     return desiredAccel.norm() > limit ? desiredAccel.unit().times(limit) : desiredAccel;
   }
 
