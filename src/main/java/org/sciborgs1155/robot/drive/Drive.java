@@ -348,9 +348,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             speeds.vyMetersPerSecond);
     Vector<N2> accel = desiredVelocity.minus(currentVelocity).div(Constants.PERIOD.in(Seconds));
     // Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
-    Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel, currentVelocity);
-    limitedAcceleration = skidAccelerationLimit(limitedAcceleration, currentVelocity);
-    
+    Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
+    limitedAcceleration = skidAccelerationLimit(limitedAcceleration);
+    if(currentVelocity.norm() < 1e-6){
+      limitedAcceleration = accel;
+    }
     Vector<N2> limitedVelocity =
         currentVelocity.plus(limitedAcceleration.times(Constants.PERIOD.in(Seconds)));
 
@@ -374,11 +376,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param dt The loop time in seconds.
    * @return The adjusted acceleration vector after applying acceleration limits.
    */
-  private Vector<N2> forwardAccelerationLimit(Vector<N2> desiredAccel, Vector<N2> currVel) {
-
-    if (currVel.norm() < 1e-6) {
-      return desiredAccel;
-    }
+  private Vector<N2> forwardAccelerationLimit(Vector<N2> desiredAccel) {
+    Vector<N2> currVel = VecBuilder.fill(fieldRelativeChassisSpeeds().vxMetersPerSecond, fieldRelativeChassisSpeeds().vyMetersPerSecond);
     double limit =
         MAX_ACCEL.in(MetersPerSecondPerSecond)
             * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
@@ -399,17 +398,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return desiredAccel.unit().times(MAX_ACCEL.in(MetersPerSecondPerSecond) - (MAX_TILT_ACCEL.in(MetersPerSecondPerSecond) * (elevatorHeight/MAX_HEIGHT.in(Meters))));
   }
 
-  private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel, Vector<N2> currentVelocity){ 
-    if(currentVelocity.norm() < 1e-6){
-      return desiredAccel;
-    } 
-
-    if(desiredAccel.norm() > MAX_SKID_ACCEL.in(MetersPerSecondPerSecond)){
-      return desiredAccel.unit().times(MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
-    }
-    
-    // Preserve direction while applying the limit
-    return desiredAccel;
+  private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel){ 
+    return desiredAccel.unit().times(Math.min(desiredAccel.norm(), MAX_SKID_ACCEL.in(MetersPerSecondPerSecond)));
   }
 
   /**
