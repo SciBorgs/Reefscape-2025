@@ -50,8 +50,6 @@ import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
-
-import org.ejml.dense.block.VectorOps_FDRB;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
@@ -63,7 +61,6 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class Drive extends SubsystemBase implements Logged, AutoCloseable {
@@ -262,122 +259,20 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vOmega A supplier for the angular velocity of the robot.
    * @return The driving command.
    */
- /**
-
-  /**
-   * Limits the acceleration in the direction of the current velocity.
-   *
-   * @param desiredAccel The desired acceleration vector.
-   * @param currentVel   The current velocity vector.
-   * @return The forward-limited acceleration vector.
-   */
-  private Vector<N2> forwardAccelLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
-      if (desiredAccel.norm() < 1e-6) {
-          // If there's no current velocity, no forward acceleration limit applies
-          return desiredAccel;
-      }
-
-      double forwardLimit =
-      MAX_ACCEL.in(MetersPerSecondPerSecond)
-          * (1 - (currentVel.norm() / MAX_SPEED.in(MetersPerSecond)));
-
-      // Normalize the current velocity to get the direction vector
-      Vector<N2> currentDir = currentVel.div(currentVel.norm());
-
-      // Project the desired acceleration onto the current velocity direction
-      double forwardComponent = desiredAccel.dot(currentDir);
-      double clampedForward = Math.min(forwardLimit, forwardComponent);
-
-      // Reconstruct the limited acceleration
-      Vector<N2> limitedAccel = currentDir.times(clampedForward);
-
-      // Add the perpendicular component (unchanged)
-      Vector<N2> perpComponent = desiredAccel.minus(currentDir.times(forwardComponent));
-      limitedAccel = limitedAccel.plus(perpComponent);
-
-      return limitedAccel;
-  }
-
-  /**
-   * Limits the acceleration based on the skid constraint (circular region).
-   *
-   * @param desiredAccel The desired acceleration vector.
-   * @param currentVel   The current velocity vector.
-   * @return The skid-limited acceleration vector.
-   */
-  private Vector<N2> skidLimit(Vector<N2> desiredAccel, Vector<N2> currentVel) {
-      // Calculate the desired velocity after applying the acceleration
-      Vector<N2> desiredVel = currentVel.plus(desiredAccel.times(SENSOR_PERIOD.in(Seconds)));
-
-      // Calculate the vector from current velocity to desired velocity
-      Vector<N2> deltaVel = desiredVel.minus(currentVel);
-
-      // Check if the deltaVel exceeds the skid limit radius
-      if (deltaVel.norm() > MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond)) {
-          // Scale the deltaVel to fit within the skid limit circle
-          deltaVel = deltaVel.div(deltaVel.norm()).times(MAX_SKID_ACCELERATION.in(MetersPerSecondPerSecond));
-      }
-
-      // Reconstruct the limited acceleration
-      Vector<N2> limitedAccel = deltaVel.div(SENSOR_PERIOD.in(Seconds));
-
-      return limitedAccel;
-  }
-
-  /**
-   * Drive command with acceleration limiting.
-   */
+  /** /** Drive command with acceleration limiting. */
   public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, DoubleSupplier elevatorHeight) {
-      return run(() -> {
-          // Get current velocity
-          Vector<N2> currentVel = VecBuilder.fill(
-              fieldRelativeChassisSpeeds().vxMetersPerSecond,
-              fieldRelativeChassisSpeeds().vyMetersPerSecond
-          );
-
-          // Get desired velocity
-          Vector<N2> desiredVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
-
-          // Calculate desired acceleration
-          Vector<N2> desiredAccel = desiredVel.minus(currentVel).div(SENSOR_PERIOD.in(Seconds));
-
-          // Apply acceleration limits
-          // Vector<N2> limitedAccel = forwardAccelLimit(desiredAccel, currentVel);
-
-          // limitedAccel = skidLimit(limitedAccel, currentVel);
-
-          Vector<N2> limitedAccel = tiltLimit(desiredAccel, elevatorHeight.getAsDouble());
-
-          // Calculate new velocity
-          desiredVel = currentVel.plus(limitedAccel.times(SENSOR_PERIOD.in(Seconds)));
-
+    return run(
+        () -> {
           // Set chassis speeds
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  desiredVel.get(0),
-                  desiredVel.get(1),
+                  vx.getAsDouble(),
+                  vy.getAsDouble(),
                   vOmega.getAsDouble(),
-                  heading().plus(allianceRotation())
-              ),
-              ControlMode.OPEN_LOOP_VELOCITY
-          );
-      });
+                  heading().plus(allianceRotation())),
+              ControlMode.OPEN_LOOP_VELOCITY, elevatorHeight);
+        });
   }
-
-  public Vector<N2> tiltLimit(Vector<N2> desiredAccel, double elevatorHeight){
-    
-    if(desiredAccel.norm() < 1e-6){
-      return desiredAccel;
-    }
-
-    if(elevatorHeight > MIN_HEIGHT.in(Meters)){
-      double tiltLimit = MAX_TILT_ACCELERATION.in(MetersPerSecondPerSecond) * (elevatorHeight / MAX_HEIGHT.in(Meters));
-      double bruh = MAX_ACCEL.in(MetersPerSecondPerSecond) - tiltLimit;
-      return desiredAccel.unit().times(bruh);
-    }
-    return desiredAccel;
-  }
-
 
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
@@ -389,13 +284,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param heading A supplier for the field relative heading of the robot.
    * @return The driving command.
    */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, Supplier<Rotation2d> heading, DoubleSupplier elevatorHeight) {
+  public Command drive(
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      Supplier<Rotation2d> heading,
+      DoubleSupplier elevatorHeight) {
     return drive(
             vx,
             vy,
-            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()),
-            elevatorHeight
-            )
+            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()), elevatorHeight)
         .beforeStarting(rotationController::reset);
   }
 
@@ -408,8 +305,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command to drive while facing a target.
    */
   public Command driveFacingTarget(
-      DoubleSupplier vx, DoubleSupplier vy, Supplier<Translation2d> translation, DoubleSupplier elevatorHeight) {
-    return drive(vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      Supplier<Translation2d> translation,
+      DoubleSupplier elevatorHeight) {
+    return drive(
+        vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
   }
 
   @Log.NT
@@ -437,11 +338,78 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param speeds The speeds the drivetrain will run at.
    * @param mode The control loop used to achieve those speeds.
    */
-  public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
+  public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode, DoubleSupplier elevatorHeight) {
+    ChassisSpeeds currentFieldSpeeds = fieldRelativeChassisSpeeds();
+    Vector<N2> currentVelocity =
+        VecBuilder.fill(currentFieldSpeeds.vxMetersPerSecond, currentFieldSpeeds.vyMetersPerSecond);
+    Vector<N2> desiredVelocity =
+        VecBuilder.fill(
+            speeds.vxMetersPerSecond,
+            speeds.vyMetersPerSecond);
+    Vector<N2> accel = desiredVelocity.minus(currentVelocity).div(Constants.PERIOD.in(Seconds));
+    // Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
+    Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel, currentVelocity);
+    limitedAcceleration = skidAccelerationLimit(limitedAcceleration, currentVelocity);
+    
+    Vector<N2> limitedVelocity =
+        currentVelocity.plus(limitedAcceleration.times(Constants.PERIOD.in(Seconds)));
+
+      // a = vf-vi/t -> vf = a*t + vi
+    ChassisSpeeds newSpeeds =
+        new ChassisSpeeds(
+            limitedVelocity.get(0), limitedVelocity.get(1), speeds.omegaRadiansPerSecond);
     setModuleStates(
         kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(speeds, Constants.PERIOD.in(Seconds))),
+            ChassisSpeeds.discretize(newSpeeds, Constants.PERIOD.in(Seconds))),
         mode);
+  }
+
+  /**
+   * Applies forward acceleration limiting to the desired acceleration based on the current
+   * velocity.
+   *
+   * @param currentVelocity The current field-relative velocity vector.
+   * @param desiredVelocity The desired field-relative velocity vector.
+   * @param maxAccel The maximum allowed acceleration (m/s²).
+   * @param dt The loop time in seconds.
+   * @return The adjusted acceleration vector after applying acceleration limits.
+   */
+  private Vector<N2> forwardAccelerationLimit(Vector<N2> desiredAccel, Vector<N2> currVel) {
+
+    if (currVel.norm() < 1e-6) {
+      return desiredAccel;
+    }
+    double limit =
+        MAX_ACCEL.in(MetersPerSecondPerSecond)
+            * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
+    Vector<N2> proj = desiredAccel.projection(currVel);
+    if (proj.norm() > limit) {
+      Vector<N2> parl = proj.unit().times(limit);
+      Vector<N2> perp = desiredAccel.minus(parl);
+      return parl.plus(perp);
+    }
+    return desiredAccel;
+  }
+
+  private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight){
+    if(elevatorHeight < 0.2){
+      return desiredAccel;
+    }
+
+    return desiredAccel.unit().times(MAX_ACCEL.in(MetersPerSecondPerSecond) - (MAX_TILT_ACCEL.in(MetersPerSecondPerSecond) * (elevatorHeight/MAX_HEIGHT.in(Meters))));
+  }
+
+  private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel, Vector<N2> currentVelocity){ 
+    if(currentVelocity.norm() < 1e-6){
+      return desiredAccel;
+    } 
+
+    if(desiredAccel.norm() > MAX_SKID_ACCEL.in(MetersPerSecondPerSecond)){
+      return desiredAccel.unit().times(MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
+    }
+    
+    // Preserve direction while applying the limit
+    return desiredAccel;
   }
 
   /**
@@ -482,7 +450,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           setChassisSpeeds(
               new ChassisSpeeds(
                   velocities.get(0), velocities.get(1), velocities.get(2) / RADIUS.in(Meters)),
-              ControlMode.CLOSED_LOOP_VELOCITY);
+              ControlMode.CLOSED_LOOP_VELOCITY, () -> 0);
         })
         .until(translationController::atGoal)
         .withName("drive to pose");
@@ -579,7 +547,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Stops the drivetrain. */
   public Command stop() {
-    return runOnce(() -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY));
+    return runOnce(() -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY, () -> 0));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement. */
@@ -603,7 +571,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public Test systemsCheck() {
     ChassisSpeeds speeds = new ChassisSpeeds(1, 1, 0);
     Command testCommand =
-        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY)).withTimeout(0.75);
+        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY, () -> 0)).withTimeout(0.75);
     Function<ModuleIO, TruthAssertion> speedCheck =
         m ->
             tAssert(
