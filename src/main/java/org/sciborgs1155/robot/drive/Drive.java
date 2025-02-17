@@ -401,20 +401,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /**
    * Applies tilt acceleration limiting based on the height of the elevator. The higher the
-   * elevator, the more the acceleration is limited to prevent tipping. The desired field-relative
-   * acceleration vector.
-   *
+   * elevator, the more the acceleration is limited to prevent tipping. 
+   * 
+   * @param desiredAccel The desired field-relative acceleration vector.
    * @param elevatorHeight The current height of the elevator.
    * @return The adjusted acceleration vector after applying tilt acceleration limits.
    */
   private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight) {
-    if (elevatorHeight <= MIN_HEIGHT.in(Meters)) {
-      return desiredAccel;
-    }
     double limit =
         MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
             * (1 - (elevatorHeight / MAX_HEIGHT.in(Meters)));
-    return desiredAccel.norm() > limit ? desiredAccel.unit().times(limit) : desiredAccel;
+    return desiredAccel.norm() > limit && elevatorHeight > MIN_HEIGHT.in(Meters) ? desiredAccel.unit().times(limit) : desiredAccel;
   }
 
   /**
