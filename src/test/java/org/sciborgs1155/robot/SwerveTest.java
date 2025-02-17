@@ -58,7 +58,8 @@ public class SwerveTest {
             () ->
                 drive.setChassisSpeeds(
                     new ChassisSpeeds(xVelocitySetpoint, yVelocitySetpoint, 0),
-                    ControlMode.CLOSED_LOOP_VELOCITY, () -> 0)));
+                    ControlMode.CLOSED_LOOP_VELOCITY,
+                    () -> 0)));
     run(drive.drive(() -> xVelocitySetpoint, () -> yVelocitySetpoint, drive::heading, () -> 0));
     fastForward(500);
 
@@ -76,7 +77,8 @@ public class SwerveTest {
             () ->
                 drive.setChassisSpeeds(
                     new ChassisSpeeds(0, 0, omegaRadiansPerSecond),
-                    ControlMode.CLOSED_LOOP_VELOCITY, () -> 0)));
+                    ControlMode.CLOSED_LOOP_VELOCITY,
+                    () -> 0)));
     fastForward();
 
     ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
@@ -97,7 +99,8 @@ public class SwerveTest {
                 drive.setChassisSpeeds(
                     ChassisSpeeds.fromRobotRelativeSpeeds(
                         xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
-                    ControlMode.CLOSED_LOOP_VELOCITY, () -> 0)));
+                    ControlMode.CLOSED_LOOP_VELOCITY,
+                    () -> 0)));
 
     fastForward(Seconds.of(deltaT));
 
