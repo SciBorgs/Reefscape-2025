@@ -81,6 +81,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
   private SwerveModulePosition[] lastPositions;
+  private Rotation2d lastHeading;
   public static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
   @Log.NT private final Field2d field2d = new Field2d();
@@ -166,6 +167,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     modules = List.of(this.frontLeft, this.frontRight, this.rearLeft, this.rearRight);
     modules2d = new FieldObject2d[modules.size()];
     lastPositions = modulePositions();
+    lastHeading = heading();
 
     translationCharacterization =
         new SysIdRoutine(
@@ -206,7 +208,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     odometry =
         new SwerveDrivePoseEstimator(
             kinematics,
-            gyro.rotation2d(),
+            lastHeading,
             lastPositions,
             new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
 
@@ -269,7 +271,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(gyro.rotation2d(), lastPositions, pose);
+    odometry.resetPosition(lastHeading, lastPositions, pose);
   }
 
   /**
@@ -338,7 +340,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public boolean isFacing(Translation2d target) {
     return Math.abs(
-            gyro.rotation2d().getRadians()
+            lastHeading.getRadians()
                 - target.minus(pose().getTranslation()).getAngle().getRadians())
         < rotationController.getErrorTolerance();
   }
@@ -475,8 +477,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = modules.get(m).odometryData()[i];
           }
-          odometry.updateWithTime(timestamps[i], gyro.rotation2d(), modulePositions);
+          odometry.updateWithTime(timestamps[i], new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i])), modulePositions);
           lastPositions = modulePositions;
+          lastHeading = new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i]));
         }
       } finally {
         lock.readLock().unlock();

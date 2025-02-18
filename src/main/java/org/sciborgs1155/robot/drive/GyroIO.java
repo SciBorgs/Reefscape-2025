@@ -19,6 +19,9 @@ public interface GyroIO extends AutoCloseable {
   /** Returns the heading of the robot as a Rotation3d. */
   Rotation3d rotation3d();
 
+  /** Returns the list of headings for the last tick, from a faster thread. [[headings], [timestamps]]*/
+  double[][] odometryData();
+
   /** Resets heading to 0 */
   void reset();
 }
