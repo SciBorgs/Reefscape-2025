@@ -616,26 +616,52 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
-    if (Robot.isReal()) {
-      lock.readLock().lock();
-      try {
-        double[] timestamps = modules.get(0).timestamps();
-        // get the positions of all modules at a given timestamp
-        for (int i = 0; i < timestamps.length; i++) {
-          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-          for (int m = 0; m < modules.size(); m++) {
-            modulePositions[m] = modules.get(m).odometryData()[i];
-          }
-          odometry.updateWithTime(timestamps[i], gyro.rotation2d(), modulePositions);
-          lastPositions = modulePositions;
-        }
-      } finally {
-        lock.readLock().unlock();
-      }
-    } else {
-      odometry.update(simRotation, modulePositions());
-      lastPositions = modulePositions();
-    }
+    // if (Robot.isReal()) {
+    //   lock.readLock().lock();
+    //   try {
+    //     double[] timestamps = modules.get(0).timestamps();
+    //     // get the positions of all modules at a given timestamp
+    //     log("timestamps length", timestamps.length);
+    //     log("pos", modules.get(0).odometryData()[0]);
+    //     for (int i = 0; i < timestamps.length; i++) {
+    //       // SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+    //       SwerveModulePosition[] modulePositions = {
+    //         new SwerveModulePosition(),
+    //         new SwerveModulePosition(),
+    //         new SwerveModulePosition(),
+    //         new SwerveModulePosition()
+    //       };
+    //       log("modeulfes size legtsnh", modules.size());
+    //       try {
+    //         for (int m = 0; m < modules.size(); m++) {
+    //           modulePositions[m] = modules.get(m).odometryData()[i];
+    //         }
+    //       } catch (Exception e) {
+    //         e.printStackTrace();
+    //       }
+    //       odometry.updateWithTime(timestamps[i], gyro.rotation2d(), modulePositions);
+    //       lastPositions = modulePositions;
+    //     }
+    //   } finally {
+    //     lock.readLock().unlock();
+    //   }
+    // } else {
+    // odometry.update(simRotation, modulePositions());
+    // lastPositions = modulePositions();
+    // }
+
+    // update our simulated field poses
+    // field2d.setRobotPose(pose());
+
+    // for (int i = 0; i < modules2d.length; i++) {
+    //   var module = modules.get(i);
+    //   var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
+    //   modules2d[i].setPose(pose().transformBy(transform));
+    // }
+
+    // update our heading in reality / sim
+    odometry.update(Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions());
+    lastPositions = modulePositions();
 
     // update our simulated field poses
     field2d.setRobotPose(pose());

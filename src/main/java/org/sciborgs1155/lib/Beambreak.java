@@ -1,10 +1,9 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import monologue.Logged;
-import monologue.Annotations.Log;
-
 import java.util.function.BooleanSupplier;
+import monologue.Annotations.Log;
+import monologue.Logged;
 
 /**
  * A beambreak wrapper that contains two main elements: 1. A BooleanSupplier detailing the

@@ -6,11 +6,9 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static org.sciborgs1155.lib.UnitTestingUtil.run;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.Field.Branch.A;
-import static org.sciborgs1155.robot.Constants.Field.Branch.D;
-import static org.sciborgs1155.robot.Constants.Field.Branch.G;
-import static org.sciborgs1155.robot.Constants.Field.Branch.J;
+import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
@@ -153,12 +151,12 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.a().whileTrue(align.pathfind(A.pose));
+    driver.a().whileTrue(align.pathfind(H.pose));
     // driver.b().whileTrue(align.pathfind(D.pose));
     driver.b().onTrue(drive.zeroHeading());
 
-    driver.x().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
-    driver.y().whileTrue(drive.assistedDrive(x, y, omega, J.pose));
+    driver.x().whileTrue(drive.assistedDrive(x, y, omega, H.pose));
+    driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
 
     led.setDefaultCommand(led.scrolling());
     elevator.setDefaultCommand(elevator.retract());
@@ -187,7 +185,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
-    operator.x().whileTrue(scoraling.hpsIntake());
+    operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));

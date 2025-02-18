@@ -25,7 +25,12 @@ public class Scoraling {
         .beambreakTrigger
         .negate()
         .or(scoral.beambreakTrigger)
-        .onFalse(stop().onlyIf(() -> hopper.getCurrentCommand().getName().equals("intakingHPS")));
+        .onFalse(
+            stop()
+                .onlyIf(
+                    () ->
+                        hopper.getCurrentCommand().getName().equals("intakingHPS")
+                            && scoral.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
   /** A command which intakes from the human player station. */
@@ -70,11 +75,11 @@ public class Scoraling {
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollersForw() {
-    return hopper.intake().alongWith(scoral.score()).withName("runningRollers");
+    return hopper.intake().alongWith(scoral.intake()).withName("runningRollers");
   }
 
-    /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
+  /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollersBack() {
-      return hopper.outtake().alongWith(scoral.algae()).withName("runningRollers");
+    return hopper.outtake().alongWith(scoral.algae()).withName("runningRollers");
   }
 }

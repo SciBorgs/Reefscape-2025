@@ -47,6 +47,6 @@ public final class Ports {
 
   public static final class Hopper {
     public static final int MOTOR = 16;
-    public static final int BEAMBREAK = 0;
+    public static final int BEAMBREAK = 3;
   }
 }

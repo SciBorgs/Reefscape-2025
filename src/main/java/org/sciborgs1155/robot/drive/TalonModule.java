@@ -245,7 +245,7 @@ public class TalonModule implements ModuleIO {
   }
 
   public SwerveModulePosition[] odometryData() {
-    SwerveModulePosition[] positions = new SwerveModulePosition[10];
+    SwerveModulePosition[] positions = new SwerveModulePosition[20];
     Drive.lock.readLock().lock();
     var data = moduleOdometryData();
     for (int i = 0; i < data.length; i++) {

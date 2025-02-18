@@ -78,7 +78,7 @@ public class TalonOdometryThread extends Thread {
     try {
       timestampQueues.add(queue);
     } finally {
-      Drive.lock.writeLock().lock();
+      Drive.lock.writeLock().unlock();
     }
     return queue;
   }
