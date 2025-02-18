@@ -39,8 +39,9 @@ public class Scoraling {
             .retract()
             .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollersForw()))
             .withDeadline(Commands.waitSeconds(1))
-            .andThen(runRollersBack().withDeadline(Commands.waitSeconds(0.2)).andThen(hpsIntake()))
-            .onlyIf(hopper.beambreakTrigger.negate()))
+            .andThen(
+                (runRollersBack().withDeadline(Commands.waitSeconds(0.2)).andThen(hpsIntake()))
+                    .onlyIf(hopper.beambreakTrigger.negate())))
         .onlyWhile(scoral.beambreakTrigger)
         .withName("intakingHPS");
   }
