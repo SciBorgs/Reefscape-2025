@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
-import static org.sciborgs1155.lib.UnitTestingUtil.run;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
@@ -64,7 +63,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = new Vision();
+  private final Vision vision = new Vision(); // TODO: add vision back
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
   private final Hopper hopper = Hopper.create();
@@ -118,12 +117,12 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    InputStream x = InputStream.of(driver::getLeftX).log("raw x");
-    InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
+    InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
+    InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
-        InputStream.hypot(x, y)
+        InputStream.hypot(raw_x, raw_y)
             .log("Robot/raw joystick")
             .scale(() -> speedMultiplier)
             .clamp(1.0)
@@ -132,11 +131,15 @@ public class Robot extends CommandRobot implements Logged {
             .log("Robot/processed joystick")
             .scale(MAX_SPEED.in(MetersPerSecond));
 
-    InputStream theta = InputStream.atan(x, y);
+    InputStream theta = InputStream.atan(raw_x, raw_y);
 
     // Split x and y components of translation input
-    x = r.scale(theta.map(Math::cos)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
-    y = r.scale(theta.map(Math::sin)); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+    InputStream x =
+        r.scale(theta.map(Math::cos))
+            .log("final x"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+    InputStream y =
+        r.scale(theta.map(Math::sin))
+            .log("final y"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
 
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =

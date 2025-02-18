@@ -215,25 +215,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 this,
                 "rotation"));
 
+    gyro.reset();
     odometry =
         new SwerveDrivePoseEstimator(
             kinematics,
-            gyro.rotation2d(),
+            new Rotation2d(),
             lastPositions,
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
       modules2d[i] = field2d.getObject("module-" + module.name());
     }
 
-    gyro.reset();
-
     translationController.setTolerance(Translation.TOLERANCE.in(Meters));
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
-    TalonOdometryThread.getInstance().start();
+    // TalonOdometryThread.getInstance().start();
 
     SmartDashboard.putData(
         "translation quasistatic forward",

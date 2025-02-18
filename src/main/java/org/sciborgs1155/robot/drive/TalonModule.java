@@ -35,12 +35,12 @@ public class TalonModule implements ModuleIO {
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
-  private final TalonOdometryThread talonThread;
-  private final VoltageOut odometryFrequency =
-      new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
-  private final Queue<Double> position;
-  private final Queue<Double> rotation;
-  private final Queue<Double> timestamp;
+  // private final TalonOdometryThread talonThread;
+  // private final VoltageOut odometryFrequency =
+  //     new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
+  // private final Queue<Double> position;
+  // private final Queue<Double> rotation;
+  // private final Queue<Double> timestamp;
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -130,11 +130,11 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
 
-    talonThread = TalonOdometryThread.getInstance();
-    position = talonThread.registerSignal(driveMotor.getPosition());
-    rotation = talonThread.registerSignal(turnMotor.getPosition());
+    // talonThread = TalonOdometryThread.getInstance();
+    // position = talonThread.registerSignal(driveMotor.getPosition());
+    // rotation = talonThread.registerSignal(turnMotor.getPosition());
 
-    timestamp = talonThread.makeTimestampQueue();
+    // timestamp = talonThread.makeTimestampQueue();
 
     resetEncoders();
 
@@ -231,17 +231,18 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public double[][] moduleOdometryData() {
-    Drive.lock.readLock().lock();
-    try {
-      double[][] data = {
-        position.stream().mapToDouble((Double d) -> d).toArray(),
-        rotation.stream().mapToDouble((Double d) -> d).toArray(),
-        timestamp.stream().mapToDouble((Double d) -> d).toArray()
-      };
-      return data;
-    } finally {
-      Drive.lock.readLock().unlock();
-    }
+    // Drive.lock.readLock().lock();
+    // try {
+    //   double[][] data = {
+    //     position.stream().mapToDouble((Double d) -> d).toArray(),
+    //     rotation.stream().mapToDouble((Double d) -> d).toArray(),
+    //     timestamp.stream().mapToDouble((Double d) -> d).toArray()
+    //   };
+    //   return data;
+    // } finally {
+    //   Drive.lock.readLock().unlock();
+    // }
+    return new double[0][0];
   }
 
   public SwerveModulePosition[] odometryData() {

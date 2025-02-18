@@ -53,7 +53,7 @@ public final class DriveConstants {
   public static final ModuleType TYPE = ModuleType.SPARK;
 
   // The control loop used by all of the modules when driving
-  public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
+  public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;
 
   // Rate at which sensors update periodicially
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
