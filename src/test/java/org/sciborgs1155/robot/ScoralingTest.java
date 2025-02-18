@@ -44,7 +44,6 @@ public class ScoralingTest {
   @Test
   public void hpsIntakeTest() {
     run(scoraling.hpsIntake());
-    fastForward();
     assertEquals(
         MIN_EXTENSION.in(Meters),
         elevator.position(),
