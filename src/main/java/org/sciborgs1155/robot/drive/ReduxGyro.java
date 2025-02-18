@@ -4,13 +4,10 @@ import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
 import static org.sciborgs1155.robot.Ports.Drive.CANANDGYRO;
 
-import java.util.Queue;
-
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import java.util.Queue;
 import org.sciborgs1155.lib.FaultLogger;
 
 /** GyroIO implementation for NavX */
@@ -21,7 +18,10 @@ public class ReduxGyro implements GyroIO {
   private final Queue<Double> timestamp;
 
   public ReduxGyro() {
-    CanandgyroSettings settings = new CanandgyroSettings().setAngularPositionFramePeriod(ODOMETRY_PERIOD.in(Seconds)).setAngularVelocityFramePeriod(ODOMETRY_PERIOD.in(Seconds));
+    CanandgyroSettings settings =
+        new CanandgyroSettings()
+            .setAngularPositionFramePeriod(ODOMETRY_PERIOD.in(Seconds))
+            .setAngularVelocityFramePeriod(ODOMETRY_PERIOD.in(Seconds));
     canandgyro.setSettings(settings, 0.25, 5);
     canandgyro.setYaw(0.0, 0.1);
     canandgyro.clearStickyFaults();
@@ -43,7 +43,7 @@ public class ReduxGyro implements GyroIO {
   public Rotation3d rotation3d() {
     return canandgyro.getRotation3d();
   }
-  
+
   @Override
   public double[][] odometryData() {
     Drive.lock.readLock().lock();

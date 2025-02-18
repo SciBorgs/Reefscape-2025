@@ -35,6 +35,4 @@ public class NavXGyro implements GyroIO {
 
   @Override
   public void close() throws Exception {}
-
-
 }

@@ -477,7 +477,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = modules.get(m).odometryData()[i];
           }
-          odometry.updateWithTime(timestamps[i], new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i])), modulePositions);
+          odometry.updateWithTime(
+              timestamps[i],
+              new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i])),
+              modulePositions);
           lastPositions = modulePositions;
           lastHeading = new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i]));
         }
