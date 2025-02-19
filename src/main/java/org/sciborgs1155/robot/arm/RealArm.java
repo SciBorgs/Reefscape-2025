@@ -22,31 +22,30 @@ import org.sciborgs1155.lib.TalonUtils;
 public class RealArm implements ArmIO {
   /** Controls arm orientation. */
   private final TalonFX leader;
+
   private final TalonFX follower;
 
-
-  private TalonFXConfiguration leaderConfig;
-  private TalonFXConfiguration followerConfig;
+  private TalonFXConfiguration config;
 
   public RealArm() {
     leader = new TalonFX(ARM_LEADER);
     follower = new TalonFX(ARM_FOLLOWER);
 
+    follower.setControl(new Follower(ARM_LEADER, false));
+
     // Resetting configuration
-    leaderConfig = new TalonFXConfiguration();
+    config = new TalonFXConfiguration();
 
-    leaderConfig.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
-    leaderConfig.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
-    leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    leaderConfig.Feedback.SensorToMechanismRatio = GEARING;
+    config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
+    config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Feedback.SensorToMechanismRatio = GEARING;
 
-    leaderConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    leaderConfig.Feedback.FeedbackRemoteSensorID = CANCODER;
+    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    config.Feedback.FeedbackRemoteSensorID = CANCODER;
 
-    leader.getConfigurator().apply(leaderConfig);
-    follower.setControl(new Follower(ARM_FOLLOWER, false));
-
-    
+    leader.getConfigurator().apply(config);
+    follower.getConfigurator().apply(config);
 
     FaultLogger.register(leader);
     TalonUtils.addMotor(leader);
@@ -74,8 +73,8 @@ public class RealArm implements ArmIO {
 
   @Override
   public void setCurrentLimit(Current limit) {
-    leaderConfig.CurrentLimits.SupplyCurrentLimit = limit.in(Amps);
-    leader.getConfigurator().apply(leaderConfig);
+    config.CurrentLimits.SupplyCurrentLimit = limit.in(Amps);
+    leader.getConfigurator().apply(config);
   }
 
   @Override
