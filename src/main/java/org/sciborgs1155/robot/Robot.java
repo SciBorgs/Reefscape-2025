@@ -9,6 +9,7 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -33,11 +35,14 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.RobotType;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.DriveCommands;
 import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
@@ -62,11 +67,40 @@ public class Robot extends CommandRobot implements Logged {
   private final PowerDistribution pdh = new PowerDistribution();
 
   // SUBSYSTEMS
-  private final Drive drive = Drive.create();
-  private final Vision vision = new Vision(); // TODO: add vision back
-  private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.create();
-  private final Hopper hopper = Hopper.create();
+  private final Drive drive =
+      Set.of(RobotType.FULL, RobotType.SCORALING, RobotType.COROLLING, RobotType.CHASSIS)
+              .contains(ROBOT_TYPE)
+          ? Drive.create()
+          : Drive.none();
+
+  private final Vision vision =
+      Set.of(RobotType.FULL, RobotType.SCORALING, RobotType.COROLLING, RobotType.CHASSIS)
+              .contains(ROBOT_TYPE)
+          ? Vision.create()
+          : new Vision();
+
+  private final Elevator elevator =
+      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
+          ? Elevator.create()
+          : Elevator.none();
+
+  private final Scoral scoral =
+      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
+          ? Scoral.create()
+          : Scoral.none();
+
+  private final Hopper hopper =
+      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
+          ? Hopper.create()
+          : Hopper.none();
+
+  private final Coroller coroller =
+      Set.of(RobotType.FULL, RobotType.COROLLING).contains(ROBOT_TYPE)
+          ? Coroller.create()
+          : Coroller.none();
+
+  private final Arm arm =
+      Set.of(RobotType.FULL, RobotType.COROLLING).contains(ROBOT_TYPE) ? Arm.create() : Arm.none();
 
   private final LEDStrip led = new LEDStrip();
 

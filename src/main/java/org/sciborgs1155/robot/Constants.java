@@ -43,6 +43,14 @@ public class Constants {
     return Rotation2d.fromRotations(alliance() == Alliance.Blue ? 0 : 0.5);
   }
 
+  public static enum RobotType {
+    FULL,
+    CHASSIS,
+    NONE,
+    COROLLING,
+    SCORALING
+  }
+
   /**
    * Returns the reflection of a pose about the center of the field, effectively swapping alliances.
    *
@@ -59,6 +67,8 @@ public class Constants {
                     new Translation2d(LENGTH.div(2), WIDTH.div(2)), Rotation2d.fromRotations(0.5)),
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
+
+  public static RobotType ROBOT_TYPE = RobotType.FULL;
 
   /** Describes physical properites of the robot. */
   public static class Robot {
