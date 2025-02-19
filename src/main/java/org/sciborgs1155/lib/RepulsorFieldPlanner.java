@@ -16,13 +16,15 @@ import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import monologue.Annotations.Log;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
 @Logged
-public class RepulsorFieldPlanner {
+public class RepulsorFieldPlanner implements monologue.Logged {
 
   abstract static class Obstacle {
     double strength = 1.0;
@@ -156,8 +158,9 @@ public class RepulsorFieldPlanner {
           new VerticalObstacle(FIELD_LENGTH, 0.5, false));
 
   private List<Obstacle> fixedObstacles = new ArrayList<>();
-  private Optional<Translation2d> goalOpt = Optional.empty();
+  @Log.NT private Optional<Translation2d> goalOpt = Optional.empty();
 
+  @Log.NT
   public Pose2d goal() {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }

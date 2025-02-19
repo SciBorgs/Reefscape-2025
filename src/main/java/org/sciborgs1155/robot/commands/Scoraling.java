@@ -51,8 +51,8 @@ public class Scoraling implements Logged {
         .andThen(
             elevator
                 .retract()
-                .alongWith(Commands.waitUntil(elevator::atGoal))
-                .andThen(runRollers().repeatedly())
+                .alongWith(Commands.waitUntil(elevator::atGoal)
+                .andThen(runRollers().repeatedly()))
                 .until(() -> stop)
                 .finallyDo(() -> stop = false))
         .withName("intakingHPS");

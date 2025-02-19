@@ -6,6 +6,9 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import monologue.Logged;
+import monologue.Annotations.IgnoreLogged;
+
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.Drive;
@@ -14,9 +17,14 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Alignment {
+public class Alignment implements Logged {
+  @IgnoreLogged
   private Drive drive;
+  
+  @IgnoreLogged
   private Elevator elevator;
+
+  @IgnoreLogged
   private Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();

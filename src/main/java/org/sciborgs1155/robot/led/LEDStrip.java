@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
@@ -116,6 +118,11 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     };
   }
 
+  @Override
+  public void periodic() {
+    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+  }
+  
   @Override
   public void close() throws Exception {
     led.close();
