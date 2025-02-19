@@ -64,6 +64,7 @@ public class Vision implements Logged {
       estimators[i] = estimator;
       lastResults[i] = new PhotonPipelineResult();
 
+      log(configs[i].name + " transform", configs[i].robotToCam);
       FaultLogger.register(camera);
     }
 

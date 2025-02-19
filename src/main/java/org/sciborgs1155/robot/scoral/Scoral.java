@@ -41,7 +41,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(ROLLER), config);
+    return SimpleMotor.talon(new TalonFX(ROLLER, "rio"), config);
   }
 
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
