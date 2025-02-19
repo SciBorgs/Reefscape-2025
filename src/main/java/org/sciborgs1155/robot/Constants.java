@@ -157,6 +157,11 @@ public class Constants {
         this.pose = allianceReflect(pose);
       }
 
+      public Pose2d backPose() {
+        Translation2d diff = pose.getTranslation().minus(CENTER_REEF);
+        return new Pose2d(pose.getTranslation().plus(diff.div(diff.getNorm()).times(0.4)), pose.getRotation());
+      }
+
       /**
        * @return A list of all branch poses.
        */

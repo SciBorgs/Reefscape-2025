@@ -46,7 +46,7 @@ public class Alignment {
             .andThen(
                 Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
                     .andThen(scoral.score())))
-        .deadlineFor(elevator.scoreLevel(level));
+        .deadlineFor(elevator.scoreLevel(level)).andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
   }
 
   /**
