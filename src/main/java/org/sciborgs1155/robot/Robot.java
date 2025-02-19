@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -36,7 +35,6 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.RobotType;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
@@ -68,39 +66,46 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive =
-      Set.of(RobotType.FULL, RobotType.SCORALING, RobotType.COROLLING, RobotType.CHASSIS)
-              .contains(ROBOT_TYPE)
-          ? Drive.create()
-          : Drive.none();
+      switch (ROBOT_TYPE) {
+        case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
+        default -> Drive.none();
+      };
 
   private final Vision vision =
-      Set.of(RobotType.FULL, RobotType.SCORALING, RobotType.COROLLING, RobotType.CHASSIS)
-              .contains(ROBOT_TYPE)
-          ? Vision.create()
-          : new Vision();
+      switch (ROBOT_TYPE) {
+        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+        default -> new Vision();
+      };
 
   private final Elevator elevator =
-      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
-          ? Elevator.create()
-          : Elevator.none();
+      switch (ROBOT_TYPE) {
+        case FULL, SCORALING -> Elevator.create();
+        default -> Elevator.none();
+      };
 
   private final Scoral scoral =
-      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
-          ? Scoral.create()
-          : Scoral.none();
+      switch (ROBOT_TYPE) {
+        case FULL, SCORALING -> Scoral.create();
+        default -> Scoral.none();
+      };
 
   private final Hopper hopper =
-      Set.of(RobotType.FULL, RobotType.SCORALING).contains(ROBOT_TYPE)
-          ? Hopper.create()
-          : Hopper.none();
+      switch (ROBOT_TYPE) {
+        case FULL, SCORALING -> Hopper.create();
+        default -> Hopper.none();
+      };
 
   private final Coroller coroller =
-      Set.of(RobotType.FULL, RobotType.COROLLING).contains(ROBOT_TYPE)
-          ? Coroller.create()
-          : Coroller.none();
+      switch (ROBOT_TYPE) {
+        case FULL, COROLLING -> Coroller.create();
+        default -> Coroller.none();
+      };
 
   private final Arm arm =
-      Set.of(RobotType.FULL, RobotType.COROLLING).contains(ROBOT_TYPE) ? Arm.create() : Arm.none();
+      switch (ROBOT_TYPE) {
+        case FULL, COROLLING -> Arm.create();
+        default -> Arm.none();
+      };
 
   private final LEDStrip leftLED = new LEDStrip(0, 59, false);
   private final LEDStrip rightLED = new LEDStrip(60, 119, true);
