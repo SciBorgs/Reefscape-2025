@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.Set;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
@@ -35,14 +36,14 @@ public class Scoraling {
 
   /** A command which intakes from the human player station. */
   public Command hpsIntake() {
-    return (elevator
-            .retract()
-            .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollersForw()))
-            .withDeadline(Commands.waitSeconds(1))
-            .andThen(
-                (runRollersBack().withDeadline(Commands.waitSeconds(0.2)).andThen(hpsIntake()))
-                    .onlyIf(hopper.beambreakTrigger.negate())))
-        .onlyWhile(scoral.beambreakTrigger)
+    return Commands.defer(
+            () ->
+                elevator
+                    .retract()
+                    .alongWith(Commands.waitUntil(elevator::atGoal))
+                    .andThen(runRollers())
+                    .onlyWhile(scoral.beambreakTrigger),
+            Set.of(scoral, elevator, hopper))
         .withName("intakingHPS");
   }
 
@@ -77,9 +78,19 @@ public class Scoraling {
     return hopper.stop().alongWith(scoral.stop()).withName("stopping");
   }
 
-  /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
-  public Command runRollersForw() {
-    return hopper.intake().alongWith(scoral.intake()).withName("runningRollers");
+  /**
+   * A command which runs the hps + scoral rollers forward (generally as a form of intaking), then
+   * runs them back and forth until
+   */
+  public Command runRollers() {
+    return hopper
+        .intake()
+        .alongWith(scoral.intake())
+        .withTimeout(1)
+        .andThen(
+            (runRollersBack().withTimeout(0.2).andThen(runRollers()))
+                .onlyIf(hopper.beambreakTrigger.negate()))
+        .withName("runningRollers");
   }
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */

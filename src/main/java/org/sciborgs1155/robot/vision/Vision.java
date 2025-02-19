@@ -64,6 +64,7 @@ public class Vision implements Logged {
       estimators[i] = estimator;
       lastResults[i] = new PhotonPipelineResult();
 
+      log(configs[i].name + " transform", configs[i].robotToCam);
       FaultLogger.register(camera);
     }
 
@@ -142,6 +143,16 @@ public class Vision implements Logged {
         .map(TAG_LAYOUT::getTagPose)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
+  }
+
+  @Log.NT
+  public Transform3d[] getCameraTransforms() {
+    return new Transform3d[] {
+      FRONT_LEFT_CAMERA.robotToCam(),
+      FRONT_RIGHT_CAMERA.robotToCam(),
+      BACK_LEFT_CAMERA.robotToCam(),
+      BACK_RIGHT_CAMERA.robotToCam()
+    };
   }
 
   /**

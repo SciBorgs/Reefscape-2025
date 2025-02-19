@@ -30,7 +30,6 @@ public class ReduxGyro implements GyroIO {
   @Override
   public void reset() {
 
-    
     canandgyro.setYaw(0);
   }
 
