@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -102,7 +103,8 @@ public class Robot extends CommandRobot implements Logged {
   private final Arm arm =
       Set.of(RobotType.FULL, RobotType.COROLLING).contains(ROBOT_TYPE) ? Arm.create() : Arm.none();
 
-  private final LEDStrip led = new LEDStrip();
+  private final LEDStrip leftLED = new LEDStrip(0, 59, false);
+  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
 
@@ -195,14 +197,20 @@ public class Robot extends CommandRobot implements Logged {
     driver.x().whileTrue(drive.assistedDrive(x, y, omega, H.pose));
     driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
 
-    led.setDefaultCommand(led.scrolling());
     elevator.setDefaultCommand(elevator.retract());
-    led.setDefaultCommand(led.rainbow());
-    led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
 
-    // autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    leftLED.setDefaultCommand(leftLED.rainbow());
+    rightLED.setDefaultCommand(rightLED.rainbow());
 
-    autonomous().onTrue(DriveCommands.wheelRadiusCharacterization(drive));
+    teleop()
+        .onTrue(
+            leftLED
+                .elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))
+                .alongWith(
+                    rightLED.elevatorLED(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
     test().whileTrue(systemsCheck());
     // driver.b().whileTrue(drive.zeroHeading());
@@ -229,6 +237,11 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().whileTrue(scoraling.scoral(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+    driver.povUp().onTrue(leftLED.rainbow());
+    driver.povDown().onTrue(leftLED.music());
+    driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
+    driver.povRight().onTrue(rightLED.scrolling());
   }
 
   /**
