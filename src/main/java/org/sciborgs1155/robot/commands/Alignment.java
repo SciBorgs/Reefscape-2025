@@ -50,7 +50,7 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return (pathfind(branch.pose)
+    return (pathfind(branch.withLevel(level))
             .andThen(
                 Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
                     .andThen(scoral.score())))
