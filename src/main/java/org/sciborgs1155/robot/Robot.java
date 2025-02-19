@@ -107,8 +107,9 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
-  private final LEDStrip leftLED = new LEDStrip(0, 59, false);
-  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
+  private final LEDStrip leftLED = new LEDStrip(0, 54, false);
+  private final LEDStrip middleLED = new LEDStrip(55, 64, true);
+  private final LEDStrip rightLED = new LEDStrip(65, 119, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
@@ -210,6 +211,7 @@ public class Robot extends CommandRobot implements Logged {
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
     leftLED.setDefaultCommand(leftLED.music());
+    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.music());
 
     teleop()
