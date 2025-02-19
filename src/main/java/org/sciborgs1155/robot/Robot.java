@@ -41,7 +41,6 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.DriveCommands;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
@@ -106,7 +105,7 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip leftLED = new LEDStrip(0, 59, false);
   private final LEDStrip rightLED = new LEDStrip(60, 119, true);
 
-  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -199,8 +198,10 @@ public class Robot extends CommandRobot implements Logged {
 
     elevator.setDefaultCommand(elevator.retract());
 
-    leftLED.setDefaultCommand(leftLED.rainbow());
-    rightLED.setDefaultCommand(rightLED.rainbow());
+    // leftLED.setDefaultCommand(leftLED.rainbow());
+    // rightLED.setDefaultCommand(rightLED.rainbow());
+    leftLED.setDefaultCommand(leftLED.music());
+    rightLED.setDefaultCommand(rightLED.music());
 
     teleop()
         .onTrue(
@@ -230,7 +231,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
-    operator.x().onTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
+    operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().onTrue(elevator.scoreLevel(Level.L1));

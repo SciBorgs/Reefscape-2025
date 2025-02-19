@@ -18,6 +18,7 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class ScoralingTest {
@@ -25,6 +26,8 @@ public class ScoralingTest {
   Hopper hopper;
   Elevator elevator;
   Scoraling scoraling;
+  LEDStrip leftLED;
+  LEDStrip rightLED;
 
   @BeforeEach
   public void setup() {
@@ -32,8 +35,10 @@ public class ScoralingTest {
     scoral = Scoral.create();
     elevator = Elevator.create();
     hopper = Hopper.create();
+    leftLED = new LEDStrip(0, 59, false);
+    rightLED = new LEDStrip(60, 119, true);
 
-    scoraling = new Scoraling(hopper, scoral, elevator);
+    scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
   }
 
   @AfterEach
