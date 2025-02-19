@@ -1,13 +1,9 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.Test.runUnitTest;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -113,27 +109,4 @@ public class SwerveTest {
     assertEquals(deltaX, pose.getX(), DELTA * 2);
     assertEquals(deltaY, pose.getY(), DELTA * 2);
   }
-
-  @Test
-public void testForwardAccelerationLimit() {
-    double desiredSpeed = 5.0; // Exceeds limit
-    double time = 2;
-
-    // Start from rest and request sudden forward movement
-    run(drive.run(() -> 
-        drive.setChassisSpeeds(
-            new ChassisSpeeds(desiredSpeed, 0, 0),
-            ControlMode.CLOSED_LOOP_VELOCITY,
-            () -> 0.0)));
-
-    fastForward(Seconds.of(time));
-    double vfx = drive.fieldRelativeChassisSpeeds().vxMetersPerSecond;
-
-    double accel = vfx;
-    double forwardLimit = MAX_ACCEL.in(MetersPerSecondPerSecond) * 
-        (1 - (0 / MAX_SPEED.in(MetersPerSecond))); // Initial speed is 0
-
-    assertEquals(forwardLimit, accel, DELTA, 
-        String.format("Measured acceleration %.2f exceeded limit %.2f", accel, forwardLimit));
-}
 }

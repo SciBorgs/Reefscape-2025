@@ -348,15 +348,22 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public void setChassisSpeeds(
       ChassisSpeeds speeds, ControlMode mode, DoubleSupplier elevatorHeight) {
     Vector<N2> currentVelocity =
-        VecBuilder.fill(fieldRelativeChassisSpeeds().vxMetersPerSecond, fieldRelativeChassisSpeeds().vyMetersPerSecond);
-    Vector<N2> accel = VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond).minus(currentVelocity);
+        VecBuilder.fill(
+            fieldRelativeChassisSpeeds().vxMetersPerSecond,
+            fieldRelativeChassisSpeeds().vyMetersPerSecond);
+    Vector<N2> accel =
+        VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond).minus(currentVelocity);
 
-    Vector<N2> limitedVelocity = currentVelocity.plus(currentVelocity.norm() > 1e-6 
-      ? forwardAccelerationLimit(
-        skidAccelerationLimit(
-          tiltAccelerationLimit(skidAccelerationLimit(forwardAccelerationLimit(accel)), elevatorHeight.getAsDouble()))) 
-      : accel);
- 
+    Vector<N2> limitedVelocity =
+        currentVelocity.plus(
+            currentVelocity.norm() > 1e-6
+                ? forwardAccelerationLimit(
+                    skidAccelerationLimit(
+                        tiltAccelerationLimit(
+                            skidAccelerationLimit(forwardAccelerationLimit(accel)),
+                            elevatorHeight.getAsDouble())))
+                : accel);
+
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
             limitedVelocity.get(0), limitedVelocity.get(1), speeds.omegaRadiansPerSecond);
