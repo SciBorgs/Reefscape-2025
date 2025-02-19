@@ -347,21 +347,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public void setChassisSpeeds(
       ChassisSpeeds speeds, ControlMode mode, DoubleSupplier elevatorHeight) {
-    ChassisSpeeds currentFieldSpeeds = fieldRelativeChassisSpeeds();
     Vector<N2> currentVelocity =
-        VecBuilder.fill(currentFieldSpeeds.vxMetersPerSecond, currentFieldSpeeds.vyMetersPerSecond);
-    Vector<N2> desiredVelocity =
-        VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-    Vector<N2> accel = desiredVelocity.minus(currentVelocity);
-    // Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
-    Vector<N2> limitedAcceleration = forwardAccelerationLimit(accel);
-    limitedAcceleration = skidAccelerationLimit(limitedAcceleration);
-    limitedAcceleration = tiltAccelerationLimit(limitedAcceleration, elevatorHeight.getAsDouble());
-    if (currentVelocity.norm() < 1e-6) {
-      limitedAcceleration = accel;
-    }
-    Vector<N2> limitedVelocity = currentVelocity.plus(limitedAcceleration);
+        VecBuilder.fill(fieldRelativeChassisSpeeds().vxMetersPerSecond, fieldRelativeChassisSpeeds().vyMetersPerSecond);
+    Vector<N2> accel = VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond).minus(currentVelocity);
 
+    Vector<N2> limitedVelocity = currentVelocity.plus(currentVelocity.norm() > 1e-6 
+      ? forwardAccelerationLimit(
+        skidAccelerationLimit(
+          tiltAccelerationLimit(skidAccelerationLimit(forwardAccelerationLimit(accel)), elevatorHeight.getAsDouble()))) 
+      : accel);
+ 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
             limitedVelocity.get(0), limitedVelocity.get(1), speeds.omegaRadiansPerSecond);
@@ -401,8 +396,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /**
    * Applies tilt acceleration limiting based on the height of the elevator. The higher the
-   * elevator, the more the acceleration is limited to prevent tipping. 
-   * 
+   * elevator, the more the acceleration is limited to prevent tipping.
+   *
    * @param desiredAccel The desired field-relative acceleration vector.
    * @param elevatorHeight The current height of the elevator.
    * @return The adjusted acceleration vector after applying tilt acceleration limits.
@@ -411,7 +406,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     double limit =
         MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
             * (1 - (elevatorHeight / MAX_HEIGHT.in(Meters)));
-    return desiredAccel.norm() > limit && elevatorHeight > MIN_HEIGHT.in(Meters) ? desiredAccel.unit().times(limit) : desiredAccel;
+    return desiredAccel.norm() > limit && elevatorHeight > MIN_HEIGHT.in(Meters)
+        ? desiredAccel.unit().times(limit)
+        : desiredAccel;
   }
 
   /**
