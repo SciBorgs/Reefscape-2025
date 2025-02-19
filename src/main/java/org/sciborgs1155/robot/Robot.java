@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -60,7 +61,9 @@ public class Robot extends CommandRobot implements Logged {
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
-  private final LEDStrip led = new LEDStrip();
+  private final LEDStrip leftLED = new LEDStrip(0, 54, false);
+  private final LEDStrip middleLED = new LEDStrip(55, 64, true);
+  private final LEDStrip rightLED = new LEDStrip(65, 119, true);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -137,10 +140,18 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
     elevator.setDefaultCommand(elevator.retract());
-    led.setDefaultCommand(led.rainbow());
-    led.elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters));
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    leftLED.setDefaultCommand(leftLED.rainbow());
+    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
+    rightLED.setDefaultCommand(rightLED.rainbow());
+
+    teleop()
+        .onTrue(
+            leftLED
+                .elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))
+                .alongWith(
+                    rightLED.elevatorLED(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
     test().whileTrue(systemsCheck());
     driver.b().whileTrue(drive.zeroHeading());
@@ -165,6 +176,11 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+    driver.povUp().onTrue(leftLED.rainbow());
+    driver.povDown().onTrue(leftLED.music());
+    driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
+    driver.povRight().onTrue(rightLED.scrolling());
   }
 
   /**
