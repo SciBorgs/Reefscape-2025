@@ -79,7 +79,7 @@ public class Constants {
     public static final Distance SIDE_LENGTH = Inches.of(28);
     // TODO add bumper length to this
 
-    public static final Distance BUMPER_LENGTH = Inches.of(28 + 3 + 3); // TODO NOT A FINAL VALUE
+    public static final Distance BUMPER_LENGTH = Inches.of(28 + 3); // TODO NOT A FINAL VALUE
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)

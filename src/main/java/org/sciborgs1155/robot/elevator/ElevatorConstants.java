@@ -22,10 +22,10 @@ public class ElevatorConstants {
   public static final double kI = 0;
   public static final double kD = 0.3;
 
-  public static final double kS = 0.036188;
-  public static final double kG = 0.1997;
-  public static final double kV = 3.9333;
-  public static final double kA = 0.045317;
+  public static final double kS = 0.02908;
+  public static final double kG = 0.20424;
+  public static final double kV = 3.9325;
+  public static final double kA = 0.082782;
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(1.0);
 

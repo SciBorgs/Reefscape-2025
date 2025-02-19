@@ -107,8 +107,9 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
-  private final LEDStrip leftLED = new LEDStrip(0, 59, false);
-  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
+  private final LEDStrip leftLED = new LEDStrip(0, 54, false);
+  private final LEDStrip middleLED = new LEDStrip(55, 64, true);
+  private final LEDStrip rightLED = new LEDStrip(65, 119, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
@@ -194,18 +195,23 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.a().whileTrue(align.pathfind(H.pose));
+    driver.a().whileTrue(align.reef(Level.L3, L));
+    driver.x().whileTrue(align.reef(Level.L4, J));
+    driver.y().whileTrue(align.reef(Level.L4, I));
+
     // driver.b().whileTrue(align.pathfind(D.pose));
+  
     driver.b().onTrue(drive.zeroHeading());
 
-    driver.x().whileTrue(drive.assistedDrive(x, y, omega, H.pose));
-    driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
+    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, L.pose));
+    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
 
-    elevator.setDefaultCommand(elevator.retract());
+    // elevator.setDefaultCommand(elevator.retract());
 
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
     leftLED.setDefaultCommand(leftLED.music());
+    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.music());
 
     teleop()
