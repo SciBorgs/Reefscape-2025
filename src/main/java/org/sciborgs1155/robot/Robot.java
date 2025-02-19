@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -176,8 +177,8 @@ public class Robot extends CommandRobot implements Logged {
 
     driver.povUp().onTrue(leftLED.rainbow());
     driver.povDown().onTrue(leftLED.music());
-    driver.povLeft().onTrue(rightLED.blink());
-    driver.povLeft().onTrue(rightLED.scrolling());
+    driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
+    driver.povRight().onTrue(rightLED.scrolling());
   }
 
   /**
