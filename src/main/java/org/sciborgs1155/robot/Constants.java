@@ -115,20 +115,12 @@ public class Constants {
     // alliance side, and B is counter-clockwise of A.
     public static final Pose2d REEF_BRANCH_A =
         new Pose2d(
-            CENTER_REEF
-                .getMeasureX()
-                .minus(
-                    REEF_MIN_RADIUS.plus(
-                        BUMPER_LENGTH.div(2).plus(Inches.of(3) /* extra tolerance */))),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2))),
             CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
     public static final Pose2d REEF_BRANCH_B =
         new Pose2d(
-            CENTER_REEF
-                .getMeasureX()
-                .minus(
-                    REEF_MIN_RADIUS.plus(
-                        BUMPER_LENGTH.div(2).plus(Inches.of(3) /* extra tolerance */))),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2))),
             CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
 
@@ -155,6 +147,20 @@ public class Constants {
 
       Branch(Pose2d pose) {
         this.pose = allianceReflect(pose);
+      }
+
+      private Translation2d centerDisplacementUnit() {
+        Translation2d diff = pose.getTranslation().minus(CENTER_REEF);
+        return diff.div(diff.getNorm());
+      }
+
+      // public Pose2d withLevel(Level level) {
+
+      // }
+
+      public Pose2d backPose() {
+        return new Pose2d(
+            pose.getTranslation().plus(centerDisplacementUnit().times(0.3)), pose.getRotation());
       }
 
       /**
