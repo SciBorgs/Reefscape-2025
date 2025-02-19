@@ -2,6 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.PrimitiveIterator.OfDouble;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,7 +48,7 @@ public class Alignment {
     return (pathfind(branch.withLevel(level))
             .andThen(
                 Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                    .andThen(scoral.score())))
+                    .andThen(scoral.score().withTimeout(Seconds.of(1)))))
         .deadlineFor(elevator.scoreLevel(level))
         .andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
   }
