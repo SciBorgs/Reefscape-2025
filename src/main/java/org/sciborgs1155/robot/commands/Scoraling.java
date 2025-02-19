@@ -1,13 +1,10 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import monologue.Logged;
 import monologue.Annotations.Log;
-
-import java.util.Set;
+import monologue.Logged;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
@@ -20,12 +17,6 @@ public class Scoraling implements Logged {
   private final Elevator elevator;
   private final LEDStrip leftStrip;
   private final LEDStrip rightStrip;
-  private final Trigger stopHPI;
-
-  @Log.NT
-  public boolean stopHPI() {
-    return stopHPI.getAsBoolean();
-  }
 
   public Scoraling(
       Hopper hopper, Scoral scoral, Elevator elevator, LEDStrip leftStrip, LEDStrip rightStrip) {
@@ -39,33 +30,31 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    stopHPI = hopper
-        .beambreakTrigger
-        .negate()
-        .or(scoral.beambreakTrigger)
-        .onFalse(Commands.runOnce(() -> stop = true));
-            // stop()
-            //     .alongWith(leftStrip.blink(Color.kWhite), rightStrip.blink(Color.kWhite))
-            //     .onlyIf(
-            //         () ->
-            //             hopper.getCurrentCommand().getName().equals("intakingHPS")
-            //                 && scoral.getCurrentCommand().getName().equals("intakingHPS")));
+      hopper
+            .beambreakTrigger
+            .negate()
+            .or(scoral.beambreakTrigger)
+            .onFalse(Commands.runOnce(() -> stop = true));
+    // stop()
+    //     .alongWith(leftStrip.blink(Color.kWhite), rightStrip.blink(Color.kWhite))
+    //     .onlyIf(
+    //         () ->
+    //             hopper.getCurrentCommand().getName().equals("intakingHPS")
+    //                 && scoral.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
-  @Log.NT
-  private boolean stop = false;
+  @Log.NT private boolean stop = false;
 
   /** A command which intakes from the human player station. */
   public Command hpsIntake() {
-    return  Commands.runOnce(() -> stop = false).andThen(
-    
-    elevator
-                    .retract()
-                    .alongWith(
-                        Commands.waitUntil(elevator::atGoal)
-                    .andThen(runRollers()))
-                    .until(() -> stop)
-                    .finallyDo(() -> stop = false) )      
+    return Commands.runOnce(() -> stop = false)
+        .andThen(
+            elevator
+                .retract()
+                .alongWith(Commands.waitUntil(elevator::atGoal))
+                .andThen(runRollers().repeatedly())
+                .until(() -> stop)
+                .finallyDo(() -> stop = false))
         .withName("intakingHPS");
   }
 
@@ -110,7 +99,8 @@ public class Scoraling implements Logged {
         .alongWith(scoral.intake())
         .withTimeout(1)
         .andThen(
-            (runRollersBack().withTimeout(0.2)//.andThen(runRollers())
+            (runRollersBack()
+                .withTimeout(0.2) // .andThen(runRollers())
                 .onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
