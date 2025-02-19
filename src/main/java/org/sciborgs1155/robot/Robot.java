@@ -61,8 +61,9 @@ public class Robot extends CommandRobot implements Logged {
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
-  private final LEDStrip leftLED = new LEDStrip(0, 59, false);
-  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
+  private final LEDStrip leftLED = new LEDStrip(0, 54, false);
+  private final LEDStrip middleLED = new LEDStrip(55, 64, true);
+  private final LEDStrip rightLED = new LEDStrip(65, 119, true);
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
@@ -141,6 +142,7 @@ public class Robot extends CommandRobot implements Logged {
     elevator.setDefaultCommand(elevator.retract());
 
     leftLED.setDefaultCommand(leftLED.rainbow());
+    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.rainbow());
 
     teleop()

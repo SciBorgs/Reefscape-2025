@@ -28,6 +28,14 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   private final AddressableLEDBuffer selfBuffer;
   public LEDPattern pattern;
 
+  /**
+   * Represents a set of LEDs on the full LED strip, which allows for different patterns to run
+   * simultaneously on different regions of the LED strip.
+   *
+   * @param start The starting LED index, inclusive.
+   * @param end The ending LED index, inclusive.
+   * @param invert Whether or not apply the pattern backwards.
+   */
   public LEDStrip(int start, int end, boolean invert) {
     startLED = start;
     endLED = end;
@@ -39,6 +47,11 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
       led.start();
     }
     selfBuffer = new AddressableLEDBuffer(end - start + 1);
+  }
+
+  /** Rainbow LEDs, scrolling at 0.5 m/s. Very cool. */
+  public Command solid(Color color) {
+    return set(LEDPattern.solid(color));
   }
 
   /** Rainbow LEDs, scrolling at 0.5 m/s. Very cool. */
@@ -95,6 +108,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     return set(LEDPattern.solid(color).blink(Seconds.of(0.15))).withTimeout(0.9);
   }
 
+  /** Applies an LEDPattern to the set of LEDs controlled by the LEDStrip. */
   public Command set(LEDPattern pattern) {
     return run(
         () -> {
@@ -106,6 +120,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
         });
   }
 
+  /** Alternates between two colors, for a given length for each. */
   private static LEDPattern alternatingColor(
       Color color1, int color1length, Color color2, int color2length) {
     return (reader, writer) -> {
