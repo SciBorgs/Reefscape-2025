@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -30,11 +29,11 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-      hopper
-            .beambreakTrigger
-            .negate()
-            .or(scoral.beambreakTrigger)
-            .onFalse(Commands.runOnce(() -> stop = true));
+    hopper
+        .beambreakTrigger
+        .negate()
+        .or(scoral.beambreakTrigger)
+        .onFalse(Commands.runOnce(() -> stop = true));
     // stop()
     //     .alongWith(leftStrip.blink(Color.kWhite), rightStrip.blink(Color.kWhite))
     //     .onlyIf(
