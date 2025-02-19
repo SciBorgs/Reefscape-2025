@@ -145,6 +145,16 @@ public class Vision implements Logged {
         .toArray(Pose3d[]::new);
   }
 
+  @Log.NT
+  public Transform3d[] getCameraTransforms() {
+    return new Transform3d[] {
+      FRONT_LEFT_CAMERA.robotToCam(),
+      FRONT_RIGHT_CAMERA.robotToCam(),
+      BACK_LEFT_CAMERA.robotToCam(),
+      BACK_RIGHT_CAMERA.robotToCam()
+    };
+  }
+
   /**
    * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
    * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.

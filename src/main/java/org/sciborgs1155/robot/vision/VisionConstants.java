@@ -25,35 +25,34 @@ public class VisionConstants {
       new CameraConfig(
           "back left",
           new Transform3d(
-              Inches.of(-12.101091).in(Meters),
-              Inches.of(13.3687655).in(Meters),
-              Inches.of(8.8799715).in(Meters),
+              Inches.of(-13.369).in(Meters),
+              Inches.of(12.101).in(Meters),
+              Inches.of(9.63).in(Meters),
               new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
           new Transform3d(
-              Inches.of(-12.101091).in(Meters),
-              Inches.of(-13.3687655).in(Meters),
-              Inches.of(8.8799715).in(Meters),
+              Inches.of(-13.369).in(Meters),
+              Inches.of(-12.101).in(Meters),
+              Inches.of(9.63).in(Meters),
               new Rotation3d(0, -PI * 13 / 36, -PI * 11 / 18)));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
-              Inches.of(13.525813).in(Meters),
-              Inches.of(10.7835795).in(Meters),
-              Inches.of(8.334).in(Meters),
-              new Rotation3d(0, -PI * 1 / 12, -PI / 6)));
+              Inches.of(10.917).in(Meters),
+              Inches.of(13.295).in(Meters),
+              Inches.of(9.438).in(Meters),
+              new Rotation3d(0, -PI / 12, -PI / 6)));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
           new Transform3d(
-              Inches.of(13.525813).in(Meters),
-              Inches.of(-10.7835795).in(Meters),
-              Inches.of(8.334).in(Meters),
-              new Rotation3d(0, 0, PI / 6)));
-
+              Inches.of(10.917).in(Meters),
+              Inches.of(-13.295).in(Meters),
+              Inches.of(9.438).in(Meters),
+              new Rotation3d(0, -PI / 12, PI / 6)));
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
