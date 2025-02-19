@@ -1,6 +1,10 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,6 +52,7 @@ public class Constants {
   public static final double SLOW_SPEED_MULTIPLIER = 0.33;
   public static final double FULL_SPEED_MULTIPLIER = 1.0;
   public static final String CANIVORE_NAME = "drivetrain";
+  public static final double wait = 1;
 
   // Origin at corner of blue alliance side of field
   public static class Field {
