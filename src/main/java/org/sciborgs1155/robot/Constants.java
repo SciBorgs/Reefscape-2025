@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -154,9 +155,14 @@ public class Constants {
         return diff.div(diff.getNorm());
       }
 
-      // public Pose2d withLevel(Level level) {
+      public Pose2d withLevel(Level level) {
+        return switch (level) {
+          case L1, L2, L3 -> pose;
+          case L4 -> new Pose2d(pose.getTranslation().plus(centerDisplacementUnit().times(0.1)), pose.getRotation());
+          default -> pose; //huh????
+        };
 
-      // }
+      }
 
       public Pose2d backPose() {
         return new Pose2d(
