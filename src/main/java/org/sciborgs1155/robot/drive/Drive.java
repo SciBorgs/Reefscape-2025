@@ -484,7 +484,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                   velocities.get(0), velocities.get(1), velocities.get(2) / RADIUS.in(Meters)),
               ControlMode.CLOSED_LOOP_VELOCITY);
         })
-        .until(translationController::atGoal)
+        .until(() -> translationController.atGoal() && rotationController.atSetpoint())
         .withName("drive to pose");
   }
 
