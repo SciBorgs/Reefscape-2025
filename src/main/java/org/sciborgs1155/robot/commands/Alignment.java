@@ -100,6 +100,7 @@ public class Alignment implements Logged {
             () ->
                 drive.pose().relativeTo(goal).getTranslation().getNorm()
                     < DriveConstants.Translation.TOLERANCE.times(3).in(Meters))
-        .andThen(drive.driveTo(goal));
+        .andThen(drive.driveTo(goal))
+        .withName("pathfind");
   }
 }
