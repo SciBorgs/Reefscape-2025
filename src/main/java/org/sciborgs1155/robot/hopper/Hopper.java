@@ -4,14 +4,13 @@ import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Ports.Hopper.*;
 
-import java.util.Optional;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.Optional;
 import monologue.Logged;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
@@ -91,7 +90,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   public void periodic() {
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
-  
+
   @Override
   public void close() throws Exception {
     motor.close();

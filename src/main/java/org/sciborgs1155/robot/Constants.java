@@ -158,10 +158,12 @@ public class Constants {
       public Pose2d withLevel(Level level) {
         return switch (level) {
           case L1, L2, L3 -> pose;
-          case L4 -> new Pose2d(pose.getTranslation().plus(centerDisplacementUnit().times(0.1)), pose.getRotation());
-          default -> pose; //huh????
+          case L4 ->
+              new Pose2d(
+                  pose.getTranslation().plus(centerDisplacementUnit().times(0.1)),
+                  pose.getRotation());
+          default -> pose; // huh????
         };
-
       }
 
       public Pose2d backPose() {

@@ -4,14 +4,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.PrimitiveIterator.OfDouble;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import monologue.Logged;
 import monologue.Annotations.IgnoreLogged;
-
+import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.Drive;
@@ -21,14 +18,11 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment implements Logged {
-  @IgnoreLogged
-  private Drive drive;
-  
-  @IgnoreLogged
-  private Elevator elevator;
+  @IgnoreLogged private Drive drive;
 
-  @IgnoreLogged
-  private Scoral scoral;
+  @IgnoreLogged private Elevator elevator;
+
+  @IgnoreLogged private Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 

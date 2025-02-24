@@ -16,12 +16,11 @@ import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import monologue.Annotations.Log;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import monologue.Annotations.Log;
 
 @Logged
 public class RepulsorFieldPlanner implements monologue.Logged {
