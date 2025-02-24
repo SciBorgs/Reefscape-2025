@@ -28,7 +28,7 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(13).in(Meters),
               Inches.of(9.5).in(Meters),
-              new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
+              new Rotation3d(0, (PI / 12), PI * 11 / 18)));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
@@ -36,7 +36,7 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(-13).in(Meters),
               Inches.of(9.5).in(Meters),
-              new Rotation3d(0, -PI * 13 / 36, -PI * 11 / 18)));
+              new Rotation3d(0, (PI / 12), -PI * 11 / 18)));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
@@ -44,7 +44,7 @@ public class VisionConstants {
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
               Inches.of(9.25).in(Meters),
-              new Rotation3d(0, -PI / 12, -PI / 6)));
+              new Rotation3d(0, PI / 12, -PI / 6)));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",

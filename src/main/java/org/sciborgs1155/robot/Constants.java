@@ -189,8 +189,8 @@ public class Constants {
         return new Pose2d(
             input
                 .getTranslation()
-                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(-60).times(times)),
-            Rotation2d.fromDegrees(-60 * times));
+                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(60).times(times)),
+            Rotation2d.fromDegrees(60 * times));
       }
 
       /**

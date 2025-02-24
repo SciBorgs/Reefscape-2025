@@ -107,9 +107,9 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
-  private final LEDStrip leftLED = new LEDStrip(0, 54, false);
-  private final LEDStrip middleLED = new LEDStrip(55, 64, true);
-  private final LEDStrip rightLED = new LEDStrip(65, 119, true);
+  private final LEDStrip leftLED = new LEDStrip(0, 37, false);
+  private final LEDStrip middleLED = new LEDStrip(38, 59, true);
+  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
@@ -238,6 +238,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
+    operator.rightTrigger().onTrue(middleLED.blink(Color.kWhite));
 
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
