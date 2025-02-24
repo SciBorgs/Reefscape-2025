@@ -1,21 +1,38 @@
 package org.sciborgs1155.robot;
 
+import org.littletonrobotics.urcl.URCL;
+import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import static org.sciborgs1155.robot.Constants.DEADBAND;
+import static org.sciborgs1155.robot.Constants.PERIOD;
+import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
+import static org.sciborgs1155.robot.arm.ArmConstants.ALGAE_INTAKE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE;
+import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
+import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.coroller.Coroller;
+import org.sciborgs1155.robot.drive.Drive;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDStrip;
+import org.sciborgs1155.robot.scoral.Scoral;
+import org.sciborgs1155.robot.vision.Vision;
+
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
-import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.arm.ArmConstants.ALGAE_INTAKE;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
-import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -27,28 +44,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
-import org.littletonrobotics.urcl.URCL;
-import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Corolling;
-import org.sciborgs1155.robot.commands.Scoraling;
-import org.sciborgs1155.robot.coroller.Coroller;
-import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
-import org.sciborgs1155.robot.hopper.Hopper;
-import org.sciborgs1155.robot.led.LEDStrip;
-import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -120,23 +120,23 @@ public class Robot extends CommandRobot implements Logged {
   private void configureBindings() {
 
     // scoral commands
-    operator.povDown().onTrue(scoraling.scoral(Level.L1));
-    operator.povRight().onTrue(scoraling.scoral(Level.L2));
-    operator.povLeft().onTrue(scoraling.scoral(Level.L3));
-    operator.povUp().onTrue(scoraling.scoral(Level.L4));
+    operator.povDown().whileTrue(scoraling.scoral(Level.L1));
+    operator.povRight().whileTrue(scoraling.scoral(Level.L2));
+    operator.povLeft().whileTrue(scoraling.scoral(Level.L3));
+    operator.povUp().whileTrue(scoraling.scoral(Level.L4));
 
     // corolling commands
     // climb
     operator.a().onTrue(corolling.intake(CLIMB_INTAKE_ANGLE));
-    operator.b().onTrue(arm.climbExecute());
+    operator.b().whileTrue(arm.climbExecute());
     // coral
-    operator.rightBumper().onTrue(corolling.trough());
-    operator.rightTrigger().onTrue(corolling.intake(CORAL_INTAKE));
+    operator.rightBumper().whileTrue(corolling.trough());
+    operator.rightTrigger().whileTrue(corolling.intake(CORAL_INTAKE));
     // algae
-    operator.x().onTrue(corolling.intake(ALGAE_INTAKE));
-    operator.y().onTrue(corolling.processor());
-    operator.leftBumper().onTrue(scoraling.cleanAlgae(Level.L2));
-    operator.leftTrigger().onTrue(scoraling.cleanAlgae(Level.L3));
+    operator.x().whileTrue(corolling.intake(ALGAE_INTAKE));
+    operator.y().whileTrue(corolling.processor());
+    operator.leftBumper().whileTrue(scoraling.cleanAlgae(Level.L2));
+    operator.leftTrigger().whileTrue(scoraling.cleanAlgae(Level.L3));
 
     // x and y are switched: we use joystick y axis to control field x motion
 
