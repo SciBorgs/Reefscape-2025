@@ -80,9 +80,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // Odometry and pose estimation
   private final BetterSwerveDrivePoseEstimator odometry;
 
-  private double odomFOM = 0.5;
-  private double visionFOM = 0.5;
-
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
 
@@ -208,8 +205,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             gyro.rotation2d(),
             modulePositions(),
             new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
-            () -> odomFOM,
-            () -> visionFOM);
+            this::odomFOM,
+            this::visionFOM);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -448,6 +445,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             .sorted((a, b) -> a > b ? 1 : -1)
             .collect(Collectors.toList());
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
+  }
+
+  private double visionFOM() { 
+    return 0;
+  }
+
+  private double odomFOM() {
+    return 0;
   }
 
   public boolean isColliding() {
