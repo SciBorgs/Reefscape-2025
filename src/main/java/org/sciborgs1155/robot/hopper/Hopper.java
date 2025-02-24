@@ -1,7 +1,8 @@
 package org.sciborgs1155.robot.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
-import static org.sciborgs1155.robot.Ports.Hopper.*;
+import static org.sciborgs1155.robot.Ports.Hopper.BEAMBREAK;
+import static org.sciborgs1155.robot.Ports.Hopper.MOTOR;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.Robot;
 
 public class Hopper extends SubsystemBase implements AutoCloseable {
@@ -35,7 +37,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = HopperConstants.CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(MOTOR), config);
+    return SimpleMotor.talon(new TalonFX(MOTOR), config, Ports.idToName.get(MOTOR));
   }
 
   public Hopper(SimpleMotor motor, Beambreak beambreak) {

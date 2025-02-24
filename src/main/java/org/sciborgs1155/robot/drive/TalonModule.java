@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.drive;
 
-import static edu.wpi.first.units.Units.*;
-import static org.sciborgs1155.lib.FaultLogger.*;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
+import static org.sciborgs1155.lib.FaultLogger.register;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.drive.DriveConstants.SENSOR_PERIOD;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -22,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
@@ -104,9 +107,9 @@ public class TalonModule implements ModuleIO {
       if (success.isOK()) break;
     }
 
-    register(driveMotor);
-    register(turnMotor);
-    register(encoder);
+    register(driveMotor, Ports.idToName.get(drivePort));
+    register(turnMotor, Ports.idToName.get(turnPort));
+    register(encoder, Ports.idToName.get(sensorID));
 
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);

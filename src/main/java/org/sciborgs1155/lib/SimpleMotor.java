@@ -34,8 +34,8 @@ public class SimpleMotor {
    * @param motor : {@link TalonFX} controller instance with device ID.
    * @param config : {@link TalonFXConfiguration} to apply to the motor.
    */
-  public static SimpleMotor talon(TalonFX motor, TalonFXConfiguration config) {
-    FaultLogger.register(motor);
+  public static SimpleMotor talon(TalonFX motor, TalonFXConfiguration config, String name) {
+    FaultLogger.register(motor, name);
     TalonUtils.addMotor(motor);
     motor.getConfigurator().apply(config);
     return new SimpleMotor(motor::set, motor::close);

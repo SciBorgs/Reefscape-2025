@@ -83,14 +83,14 @@ public class FaultLoggerTest {
   @Test
   void registerSpark() {
     SparkFlex spark = new SparkFlex(10, MotorType.kBrushless);
-    FaultLogger.register(spark);
+    FaultLogger.register(spark, "test");
     spark.close();
   }
 
   @Test
   void registerTalon() {
     TalonFX talon = new TalonFX(10);
-    FaultLogger.register(talon);
+    FaultLogger.register(talon, "test");
     talon.close();
   }
 }

@@ -1,8 +1,11 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
-import static org.sciborgs1155.robot.Ports.Scoral.*;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
+import static org.sciborgs1155.robot.Ports.Scoral.BEAMBREAK;
+import static org.sciborgs1155.robot.Ports.Scoral.ROLLER;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.SCORE_POWER;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.STATOR_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -15,6 +18,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Ports;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
@@ -41,7 +45,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(ROLLER), config);
+    return SimpleMotor.talon(new TalonFX(ROLLER), config, Ports.idToName.get(ROLLER));
   }
 
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
