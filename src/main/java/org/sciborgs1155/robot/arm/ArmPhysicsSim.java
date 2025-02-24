@@ -1,15 +1,13 @@
 package org.sciborgs1155.robot.arm;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.Arena2025Reefscape;
-
 import edu.wpi.first.units.measure.Current;
+import org.ironmaple.simulation.SimulatedArena;
 
-public class ArmPhysicsSim extends SimulatedArena implements ArmIO{
+public class ArmPhysicsSim extends SimulatedArena implements ArmIO {
 
-    public ArmPhysicsSim() {
-        super(null);
-    }
+  public ArmPhysicsSim() {
+    super(null);
+  }
 
   @Override
   public double position() {
@@ -38,16 +36,15 @@ public class ArmPhysicsSim extends SimulatedArena implements ArmIO{
     throw new UnsupportedOperationException("Unimplemented method 'close'");
   }
 
-    @Override
-    public void placeGamePiecesOnField() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'placeGamePiecesOnField'");
-    }
+  @Override
+  public void placeGamePiecesOnField() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'placeGamePiecesOnField'");
+  }
 
-    @Override
-    public void competitionPeriodic() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'competitionPeriodic'");
-    }
-
+  @Override
+  public void competitionPeriodic() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'competitionPeriodic'");
+  }
 }

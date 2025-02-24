@@ -40,22 +40,20 @@ public class Constants {
     public static final Mass MASS = Kilograms.of(25);
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
   }
-  
-  //maple
-  public static final Voltage DFV = Volts.of(10); //Drive friction voltage
-  public static final Voltage SFV = Volts.of(10); //Steer friction voltage
-  public static final Distance WR = Inches.of(12); //Wheel Radius
-  public static final double CWF = 0.1; //Wheel coefficient of friction
-  public static final MomentOfInertia SMOI = KilogramSquareMeters.of(0.2); //Steer moment of inertia
+
+  // maple
+  public static final Voltage DFV = Volts.of(10); // Drive friction voltage
+  public static final Voltage SFV = Volts.of(10); // Steer friction voltage
+  public static final Distance WR = Inches.of(12); // Wheel Radius
+  public static final double CWF = 0.1; // Wheel coefficient of friction
+  public static final MomentOfInertia SMOI =
+      KilogramSquareMeters.of(0.2); // Steer moment of inertia
   public static final double DGR = 12.2; // Drive Gear Ratio
   public static final double SGR = 5.2; // Steer Gear Ratio
-  public static final Distance TLX = Inches.of(1); //Track length in x-direction
-  public static final Distance TLY = Inches.of(1); //Track length in y-direction
-  public static final Distance BLX = Inches.of(1); //Bumper length in x-direction
-  public static final Distance BLY = Inches.of(1); //Bumper length in y-direction
-
-
-
+  public static final Distance TLX = Inches.of(1); // Track length in x-direction
+  public static final Distance TLY = Inches.of(1); // Track length in y-direction
+  public static final Distance BLX = Inches.of(1); // Bumper length in x-direction
+  public static final Distance BLY = Inches.of(1); // Bumper length in y-direction
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
   public static final double DEADBAND = 0.15;
