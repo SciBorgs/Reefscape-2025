@@ -8,9 +8,12 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
+import static org.sciborgs1155.robot.Constants.SIM_DRIVE_CONFIG;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -25,6 +28,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.urcl.URCL;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
@@ -55,6 +60,9 @@ public class Robot extends CommandRobot implements Logged {
   private final PowerDistribution pdh = new PowerDistribution();
 
   // SUBSYSTEMS
+  private final SwerveDriveSimulation simDrive =
+      new SwerveDriveSimulation(
+          SIM_DRIVE_CONFIG, new Pose2d(3, 3, new Rotation2d())); // Start Position
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
@@ -98,7 +106,9 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
+      SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> SimulatedArena.getInstance().simulationPeriodic(), PERIOD.in(Seconds));
     }
   }
 
