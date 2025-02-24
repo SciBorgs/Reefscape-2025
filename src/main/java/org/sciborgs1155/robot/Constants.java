@@ -147,7 +147,7 @@ public class Constants {
       public final Pose2d pose;
 
       Branch(Pose2d pose) {
-        this.pose = allianceReflect(pose);
+        this.pose = pose;
       }
 
       private Translation2d centerDisplacementUnit() {
@@ -158,10 +158,12 @@ public class Constants {
       public Pose2d withLevel(Level level) {
         return switch (level) {
           case L1, L2, L3 -> pose;
-          case L4 -> new Pose2d(pose.getTranslation().plus(centerDisplacementUnit().times(0.1)), pose.getRotation());
-          default -> pose; //huh????
+          case L4 ->
+              new Pose2d(
+                  pose.getTranslation().plus(centerDisplacementUnit().times(0.1)),
+                  pose.getRotation());
+          default -> pose; // huh????
         };
-
       }
 
       public Pose2d backPose() {
@@ -187,8 +189,8 @@ public class Constants {
         return new Pose2d(
             input
                 .getTranslation()
-                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(-60).times(times)),
-            Rotation2d.fromDegrees(-60 * times));
+                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(60).times(times)),
+            Rotation2d.fromDegrees(60 * times));
       }
 
       /**
