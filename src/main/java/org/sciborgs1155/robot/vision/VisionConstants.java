@@ -25,33 +25,33 @@ public class VisionConstants {
       new CameraConfig(
           "back left",
           new Transform3d(
-              Inches.of(-13.369).in(Meters),
-              Inches.of(12.101).in(Meters),
-              Inches.of(9.63).in(Meters),
+              Inches.of(-12).in(Meters),
+              Inches.of(13).in(Meters),
+              Inches.of(9.5).in(Meters),
               new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
           new Transform3d(
-              Inches.of(-13.369).in(Meters),
-              Inches.of(-12.101).in(Meters),
-              Inches.of(9.63).in(Meters),
+              Inches.of(-12).in(Meters),
+              Inches.of(-13).in(Meters),
+              Inches.of(9.5).in(Meters),
               new Rotation3d(0, -PI * 13 / 36, -PI * 11 / 18)));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
-              Inches.of(10.917).in(Meters),
-              Inches.of(13.295).in(Meters),
-              Inches.of(9.438).in(Meters),
+              Inches.of(13).in(Meters),
+              Inches.of(11).in(Meters),
+              Inches.of(9.25).in(Meters),
               new Rotation3d(0, -PI / 12, -PI / 6)));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
           new Transform3d(
-              Inches.of(10.917).in(Meters),
-              Inches.of(-13.295).in(Meters),
-              Inches.of(9.438).in(Meters),
+              Inches.of(13).in(Meters),
+              Inches.of(-11).in(Meters),
+              Inches.of(9.25).in(Meters),
               new Rotation3d(0, -PI / 12, PI / 6)));
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
