@@ -37,6 +37,11 @@ public class Scoraling {
         .withName("intakingHPS");
   }
 
+  /** A command that retracts the elevator. */
+  public Command retract() {
+    return elevator.retract().withName("retractElevator");
+  }
+
   /**
    * A command which scores a coral at the given level, assuming you are already at the correct
    * branch.
