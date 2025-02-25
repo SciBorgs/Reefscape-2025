@@ -20,39 +20,38 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
-  // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.
   public static final CameraConfig BACK_LEFT_CAMERA =
       new CameraConfig(
           "back left",
           new Transform3d(
               Inches.of(-12).in(Meters),
               Inches.of(13).in(Meters),
-              Inches.of(9.5).in(Meters),
-              new Rotation3d(0, (PI / 12), PI * 11 / 18)));
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(160))));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
           new Transform3d(
               Inches.of(-12).in(Meters),
               Inches.of(-13).in(Meters),
-              Inches.of(9.5).in(Meters),
-              new Rotation3d(0, (PI / 12), -PI * 11 / 18)));
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-160))));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
-              Inches.of(9.25).in(Meters),
-              new Rotation3d(0, PI / 12, -PI / 6)));
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0,  Math.toRadians(-15), Math.toRadians(-60))));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
           new Transform3d(
               Inches.of(13).in(Meters),
               Inches.of(-11).in(Meters),
-              Inches.of(9.25).in(Meters),
-              new Rotation3d(0, -PI / 12, PI / 6)));
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(60))));
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
