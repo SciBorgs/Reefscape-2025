@@ -24,7 +24,7 @@ public class NoGyro implements GyroIO {
   public void reset() {}
 
   @Override
-  public Translation2d accelaration() {
+  public Translation2d acceleration() {
     return new Translation2d();
   }
 }

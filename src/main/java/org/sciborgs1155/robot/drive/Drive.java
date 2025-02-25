@@ -29,11 +29,15 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.Arrays;
@@ -60,6 +64,7 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
+import org.sciborgs1155.robot.vision.Vision;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class Drive extends SubsystemBase implements Logged, AutoCloseable {
@@ -86,6 +91,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // Characterization routines
   private final SysIdRoutine translationCharacterization;
   private final SysIdRoutine rotationalCharacterization;
+
+  private Trigger colliding;
+
+  private LinearAcceleration maxAccel;
 
   // Movement automation
   @Log.NT
@@ -238,6 +247,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         rotationalCharacterization.quasistatic(Direction.kReverse));
     SmartDashboard.putData(
         "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+
+    // configure acceleration limiting and change according to conditions
+    maxAccel = MAX_ACCEL;
+    colliding.onTrue(
+        runOnce(() -> maxAccel = MAX_ACCEL.times(3))
+            .andThen(Commands.waitSeconds(4).andThen(() -> maxAccel = MAX_ACCEL))
+            .asProxy());
   }
 
   /**
@@ -447,16 +463,19 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
   }
 
-  private double visionFOM() { 
+  private double visionFOM() {
     return 0;
   }
 
   private double odomFOM() {
-    return 0;
+    return 1
+        - (isSkidding() ? 0.5 : 0) //reduce FOM if skidding
+        - (isColliding() ? 0.3 : 0) //reduce FOM if colliding
+        - (Timer.getMatchTime() < 50 ? 0.2 : 0); //reduce FOM if late in match
   }
 
   public boolean isColliding() {
-    return false;
+    return gyro.acceleration().getNorm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
   /**

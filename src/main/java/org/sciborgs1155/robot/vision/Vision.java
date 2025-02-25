@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
@@ -142,6 +144,12 @@ public class Vision implements Logged {
         .map(TAG_LAYOUT::getTagPose)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
+  }
+
+  public double fom() {
+    //TODO this
+
+    return 0;
   }
 
   /**

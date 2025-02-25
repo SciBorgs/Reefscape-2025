@@ -33,7 +33,7 @@ public class NavXGyro implements GyroIO {
   public void close() throws Exception {}
 
   @Override
-  public Translation2d accelaration() {
+  public Translation2d acceleration() {
     return new Translation2d(ahrs.getWorldLinearAccelX(), ahrs.getWorldLinearAccelY());
   }
 }

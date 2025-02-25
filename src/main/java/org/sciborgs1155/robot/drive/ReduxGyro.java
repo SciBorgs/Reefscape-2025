@@ -36,7 +36,7 @@ public class ReduxGyro implements GyroIO {
   public void close() throws Exception {}
 
   @Override
-  public Translation2d accelaration() {
+  public Translation2d acceleration() {
     return new Translation2d(
         canandgyro.getAccelerationX(),
         canandgyro.getAccelerationY()); // .rotateBy(canandgyro.getRotation2d());

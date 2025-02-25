@@ -24,5 +24,5 @@ public interface GyroIO extends AutoCloseable {
   void reset();
 
   /** Returns the current field-relative linear accelaration of the robot. */
-  Translation2d accelaration();
+  Translation2d acceleration();
 }
