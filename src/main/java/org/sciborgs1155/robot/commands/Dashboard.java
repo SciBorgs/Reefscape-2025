@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
@@ -21,6 +22,7 @@ public class Dashboard {
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryRobotTick;
+  private static NetworkTableEntry entryNewRequest;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
   private static NetworkTableEntry entryMatch;
@@ -50,6 +52,9 @@ public class Dashboard {
     entryRobotTick = base.getEntry("robotTick");
     entryRobotTick.setInteger(0);
     tick = 0;
+
+    entryNewRequest = base.getEntry("newRequest");
+    entryNewRequest.setBoolean(false);
 
     // Match
     entryBlueAlliance = base.getEntry("blueAlliance");
@@ -101,91 +106,23 @@ public class Dashboard {
     info.put(key, entry);
   }
 
-  /**
-   * Returns a Trigger, given a reef branch.
-   *
-   * @param branch the branch for the trigger (A-L)
-   * @return a Trigger for that branch
-   */
-  private static Trigger setTriggerBranch(String branch) {
-    return new Trigger(() -> (branch.equals(entryTargetBranch.getString(""))));
+  public static Trigger action() {
+    return new Trigger(() -> entryNewRequest.getBoolean(false))
+        .onTrue(Commands.run(() -> entryNewRequest.setBoolean(false)));
   }
 
-  /**
-   * Returns a Trigger, given a reef branch level.
-   *
-   * @param level the level for the trigger (1-4)
-   * @return a Trigger for that level
-   */
-  private static Trigger setTriggerLevel(int level) {
-    return new Trigger(() -> (level == entryTargetLevel.getInteger(-1)));
+  /** Returns the branch entry value (Branch A = "A"). Defaults to "". */
+  public static String getBranchEntry() {
+    return entryTargetBranch.getString("");
   }
 
-  /**
-   * Returns a Trigger, given a reef algae.
-   *
-   * @param side the side of the reef, with AB as 0
-   * @return a Trigger for that algae
-   */
-  private static Trigger setTriggerAlgae(int side) {
-    return new Trigger(() -> (side == entryTargetAlgae.getInteger(-1)));
+  /** Returns the level entry value (L1 = 1, etc.). Defaults to -1. */
+  public static int getLevelEntry() {
+    return (int) entryTargetLevel.getInteger(-1);
   }
 
-  /** An enum for each branch of the alliance's reef. */
-  public static enum Branches {
-    A("A"),
-    B("B"),
-    C("C"),
-    D("D"),
-    E("E"),
-    F("F"),
-    G("G"),
-    H("H"),
-    I("I"),
-    J("J"),
-    K("K"),
-    L("L");
-
-    public final String branch;
-    public final Trigger trigger;
-
-    private Branches(String branch) {
-      this.branch = branch;
-      this.trigger = setTriggerBranch(branch);
-    }
-  }
-
-  /** An enum for each level of a branch of the alliance's reef. */
-  public static enum Levels {
-    L1(1),
-    L2(2),
-    L3(3),
-    L4(4);
-
-    public final int level;
-    public final Trigger trigger;
-
-    private Levels(int level) {
-      this.level = level;
-      this.trigger = setTriggerLevel(level);
-    }
-  }
-
-  /** An enum for each algae of the alliance's reef. */
-  public static enum Algae {
-    AB(0),
-    CD(1),
-    EF(2),
-    GH(3),
-    IJ(4),
-    KL(5);
-
-    public final int algae;
-    public final Trigger trigger;
-
-    private Algae(int algae) {
-      this.algae = algae;
-      this.trigger = setTriggerAlgae(algae);
-    }
+  /** Returns the algae entry value (Algae AB = 0, Algae CD = 1, etc.). Defaults to -1. */
+  public static int getAlgaeEntry() {
+    return (int) entryTargetAlgae.getInteger(-1);
   }
 }

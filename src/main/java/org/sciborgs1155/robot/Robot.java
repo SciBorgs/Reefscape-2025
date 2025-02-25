@@ -32,6 +32,7 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
@@ -106,6 +107,9 @@ public class Robot extends CommandRobot implements Logged {
   private void configureBindings() {
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
+
+    Dashboard.configure();
+    addPeriodic(Dashboard::tick, PERIOD.in(Seconds));
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
