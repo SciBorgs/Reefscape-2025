@@ -43,7 +43,7 @@ public class VisionConstants {
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0,  Math.toRadians(-15), Math.toRadians(-60))));
+              new Rotation3d(0,  Math.toRadians(-15), Math.toRadians(-30))));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
@@ -51,7 +51,7 @@ public class VisionConstants {
               Inches.of(13).in(Meters),
               Inches.of(-11).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(60))));
+              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;

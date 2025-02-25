@@ -4,8 +4,9 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.CANCODER_GEARING;
 import static org.sciborgs1155.robot.arm.ArmConstants.GEARING;
-import static org.sciborgs1155.robot.arm.ArmConstants.STRATOR_LIMIT;
+import static org.sciborgs1155.robot.arm.ArmConstants.STATOR_LIMIT;
 import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -36,10 +37,10 @@ public class RealArm implements ArmIO {
     // Resetting configuration
     config = new TalonFXConfiguration();
 
-    config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
+    config.CurrentLimits.StatorCurrentLimit = STATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Feedback.SensorToMechanismRatio = GEARING;
+    config.Feedback.SensorToMechanismRatio = CANCODER_GEARING;
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     config.Feedback.FeedbackRemoteSensorID = CANCODER;

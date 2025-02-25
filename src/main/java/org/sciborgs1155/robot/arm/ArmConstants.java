@@ -36,7 +36,8 @@ public class ArmConstants {
   public static final Angle CLIMB_FINAL_ANGLE = Radians.of(Math.PI * 3 / 4);
 
   public static final DCMotor GEARBOX = DCMotor.getKrakenX60(2);
-  public static final double GEARING = 8.21;
+  public static final double CANCODER_GEARING = 1;
+  public static final double GEARING = 175;
   public static final double MOI = 0.001;
 
   public static final Distance ARM_LENGTH = Centimeters.of(10);
@@ -54,5 +55,5 @@ public class ArmConstants {
 
   public static final Current SUPPLY_LIMIT = Amps.of(60);
   public static final Current CLIMB_LIMIT = Amps.of(120);
-  public static final Current STRATOR_LIMIT = Amps.of(60);
+  public static final Current STATOR_LIMIT = Amps.of(60);
 }

@@ -26,7 +26,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
     return new Coroller(Robot.isReal() ? real() : SimpleMotor.none());
   }
 
-  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
+  /** Creates a new {@link Coroller} with no hardware interface (does nothing). */
   public static Coroller none() {
     return new Coroller(SimpleMotor.none());
   }
@@ -47,17 +47,17 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Makes the roller spin inwards(towards robot). */
   public Command intake() {
-    return run(() -> hardware.set(INTAKE_POWER)).withName("Intaking");
+    return run(() -> hardware.set(INTAKE_POWER)).withName("intake");
   }
 
   /** Makes the roller spin outwards(away from robot). */
   public Command outtake() {
-    return run(() -> hardware.set(OUTTAKE_POWER)).withName("Outtaking");
+    return run(() -> hardware.set(OUTTAKE_POWER)).withName("outtake");
   }
 
   /** Stops the roller motors. */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("Stopping");
+    return run(() -> hardware.set(0)).withName("stop");
   }
 
   @Override
