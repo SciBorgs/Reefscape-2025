@@ -13,6 +13,7 @@ import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
@@ -49,7 +50,15 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     return (pathfind(branch.withLevel(level))
             .andThen(
-                Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
+                Commands.waitUntil(
+                        () ->
+                            elevator.atPosition(level.extension.in(Meters))
+                                && drive
+                                        .pose()
+                                        .getTranslation()
+                                        .minus(branch.withLevel(level).getTranslation())
+                                        .getNorm()
+                                    < Translation.TOLERANCE.in(Meters))
                     .andThen(scoral.score().withTimeout(Seconds.of(1)))))
         .deadlineFor(elevator.scoreLevel(level))
         .andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
@@ -88,13 +97,13 @@ public class Alignment implements Logged {
                       drive.pose(),
                       drive.fieldRelativeChassisSpeeds(),
                       DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                      true));
+                      true),
+                  goal.getRotation());
             })
         .until(
             () ->
-                drive.pose().relativeTo(goal).getTranslation().getNorm()
+                drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
                     < DriveConstants.Translation.TOLERANCE.in(Meters))
-        // .andThen(drive.driveTo(goal))
         .withName("pathfind");
   }
 }
