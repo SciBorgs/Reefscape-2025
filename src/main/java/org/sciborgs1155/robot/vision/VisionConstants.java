@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.vision;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static java.lang.Math.PI;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -43,7 +42,7 @@ public class VisionConstants {
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0,  Math.toRadians(-15), Math.toRadians(-30))));
+              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
