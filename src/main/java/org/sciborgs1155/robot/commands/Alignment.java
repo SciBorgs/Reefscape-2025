@@ -92,9 +92,9 @@ public class Alignment implements Logged {
             })
         .until(
             () ->
-                drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
+                drive.pose().relativeTo(goal).getTranslation().getNorm()
                     < DriveConstants.Translation.TOLERANCE.in(Meters))
-        /* .andThen(drive.driveTo(goal))*/
+        // .andThen(drive.driveTo(goal))
         .withName("pathfind");
   }
 }

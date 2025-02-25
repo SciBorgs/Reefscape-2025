@@ -147,7 +147,7 @@ public class Constants {
       public final Pose2d pose;
 
       Branch(Pose2d pose) {
-        this.pose = allianceReflect(pose);
+        this.pose = pose;
       }
 
       private Translation2d centerDisplacementUnit() {

@@ -20,6 +20,9 @@
       "/Robot/elevator/measurement/mech": "Mechanism2d",
       "/Robot/elevator/pid": "ProfiledPIDController",
       "/Robot/elevator/setpoint/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
+      "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -64,7 +67,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": -30,
+          "height": 285,
           "series": [
             {
               "color": [
@@ -88,7 +91,8 @@
         }
       ],
       "window": {
-        "name": "Elevator"
+        "name": "Elevator",
+        "visible": false
       }
     }
   }
