@@ -24,6 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
+import org.sciborgs1155.robot.Ports;
 
 /**
  * FaultLogger allows for faults to be logged and displayed.
@@ -338,30 +339,31 @@ public final class FaultLogger {
   }
 
   /**
-   * Registers fault suppliers for a cancoder.
+   * Registers fault suppliers for a CANcoder.
    *
    * @param camera The camera to manage.
    */
   public static void register(CANcoder cancoder) {
+    String nickname = Ports.idToName.get(cancoder.getDeviceID());
     register(
         () -> cancoder.getFault_BadMagnet().getValue(),
-        "CANcoder [" + cancoder.getDeviceID() + "]",
-        "bad magnet",
+        "CANcoder " + nickname,
+        "The magnet distance is not correct or magnet is missing.",
         FaultType.ERROR);
     register(
         () -> cancoder.getFault_BootDuringEnable().getValue(),
-        "CANcoder [" + cancoder.getDeviceID() + "]",
-        "boot during enable",
+        "CANcoder " + nickname,
+        "Device boot while detecting the enable signal.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Hardware().getValue(),
-        "CANcoder [" + cancoder.getDeviceID() + "]",
-        "hardware fault",
+        "CANcoder " + nickname,
+        "Hardware fault occurred.",
         FaultType.WARNING);
     register(
         () -> cancoder.getFault_Undervoltage().getValue(),
-        "CANcoder [" + cancoder.getDeviceID() + "]",
-        "under voltage",
+        "CANcoder " + nickname,
+        "Device supply voltage dropped to near brownout levels.",
         FaultType.WARNING);
   }
 
@@ -371,12 +373,19 @@ public final class FaultLogger {
    * @param talon The talon to manage.
    */
   public static void register(TalonFX talon) {
-    int id = talon.getDeviceID();
-
-    register(() -> !talon.isConnected(), "Talon ID: " + id, "disconnected", FaultType.ERROR);
+    register(
+        () -> !talon.isConnected(),
+        "Talon " + Ports.idToName.get(talon.getDeviceID()),
+        "disconnected",
+        FaultType.ERROR);
 
     BiConsumer<StatusSignal<Boolean>, String> regFault =
-        (f, d) -> register(() -> f.getValue(), "Talon ID: " + id, d, FaultType.ERROR);
+        (f, d) ->
+            register(
+                () -> f.getValue(),
+                "Talon " + Ports.idToName.get(talon.getDeviceID()),
+                d,
+                FaultType.ERROR);
 
     // TODO: Remove all the unnecessary faults.
     regFault.accept(talon.getFault_Hardware(), "Hardware fault occurred");

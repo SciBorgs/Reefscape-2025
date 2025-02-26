@@ -1,7 +1,33 @@
 package org.sciborgs1155.robot;
 
+import static java.util.Map.entry;
+
+import java.util.Map;
+
 public final class Ports {
-  // TODO: Add and change all ports as needed.
+  public static final Map<Integer, String> idToName =
+      Map.ofEntries(
+          entry(Drive.FRONT_LEFT_DRIVE, "FL drive"),
+          entry(Drive.REAR_LEFT_DRIVE, "RL drive"),
+          entry(Drive.FRONT_RIGHT_DRIVE, "FR drive"),
+          entry(Drive.REAR_RIGHT_DRIVE, "RR drive"),
+          entry(Drive.FRONT_LEFT_TURNING, "FL turn"),
+          entry(Drive.REAR_LEFT_TURNING, "RL turn"),
+          entry(Drive.FRONT_RIGHT_TURNING, "FR turn"),
+          entry(Drive.REAR_RIGHT_TURNING, "RR turn"),
+          entry(Drive.FRONT_LEFT_CANCODER, "FL cancoder"),
+          entry(Drive.REAR_LEFT_CANCODER, "RL cancoder"),
+          entry(Drive.FRONT_RIGHT_CANCODER, "FR cancoder"),
+          entry(Drive.REAR_RIGHT_CANCODER, "RR cancoder"),
+          entry(GroundIntake.ARM_LEADER, "ground arm leader"),
+          entry(GroundIntake.ARM_FOLLOWER, "ground arm follower"),
+          entry(GroundIntake.ROLLER_MOTOR, "ground roller"),
+          entry(GroundIntake.CANCODER, "ground intake"),
+          entry(Elevator.FRONT_LEADER, "front elevator"),
+          entry(Elevator.BACK_FOLLOWER, "back elevator"),
+          entry(Scoral.ROLLER, "scoral roller"),
+          entry(Hopper.MOTOR, "hopper"));
+
   public static final class OI {
     public static final int OPERATOR = 0;
     public static final int DRIVER = 1;
@@ -27,9 +53,9 @@ public final class Ports {
 
   public static final class GroundIntake {
     public static final int ARM_LEADER = 18;
-    public static final int ROLLER_MOTOR = 19;
-    public static final int CANCODER = 20; // TODO change i think
     public static final int ARM_FOLLOWER = -1;
+    public static final int ROLLER_MOTOR = 19;
+    public static final int CANCODER = 20;
   }
 
   public static final class Elevator {
