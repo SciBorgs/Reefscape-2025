@@ -158,8 +158,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("manual arm");
   }
 
-  
-
   /**
    * A Test which moves the arm towards a goal angle and then asserts that it got there.
    *
