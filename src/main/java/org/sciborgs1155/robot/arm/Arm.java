@@ -2,9 +2,14 @@ package org.sciborgs1155.robot.arm;
 
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -26,11 +31,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
+
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple Arm subsystem used for climbing and intaking coral from the ground. */
@@ -127,12 +136,26 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
+    return goTo(() -> goal.in(Radians));
+  }
+
+  public Command goTo(DoubleSupplier goal){
     return run(() -> {
-          double feedforward = ff.calculate(fb.getSetpoint().position, 0);
-          double feedback = fb.calculate(hardware.position(), goal.in(Radians));
-          hardware.setVoltage(feedback + feedforward);
-        })
-        .withName("Moving Arm To: " + goal.toString() + " radians");
+      double feedforward = ff.calculate(fb.getSetpoint().position, 0);
+      double feedback = fb.calculate(hardware.position(), goal.getAsDouble());
+      hardware.setVoltage(feedback + feedforward);
+    })
+    .withName("Moving Arm To: " + goal.toString() + " radians");
+  }
+
+  public Command manualArm(InputStream input) {
+    return goTo(input
+            .deadband(.15, 1)
+            .scale(MAX_VELOCITY.in(RotationsPerSecond))
+            .scale(Constants.PERIOD.in(Seconds))
+            .rateLimit(MAX_ACCEL.in(RotationsPerSecondPerSecond))
+            .add(() -> fb.getGoal().position))
+        .withName("manual arm");
   }
 
   
