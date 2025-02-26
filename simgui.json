@@ -54,6 +54,28 @@
       }
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Robot": {
+        "open": true,
+        "vision": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "photonvision": {
+        "front right": {
+          "Transform3d##v_/photonvision/front right/targetPose": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   },

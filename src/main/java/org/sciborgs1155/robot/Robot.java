@@ -11,10 +11,20 @@ import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
+
+import java.util.Arrays;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -140,6 +150,11 @@ public class Robot extends CommandRobot implements Logged {
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
+
+    log(FRONT_LEFT_CAMERA.name(), FRONT_LEFT_CAMERA.robotToCam());
+    log(FRONT_RIGHT_CAMERA.name(), FRONT_RIGHT_CAMERA.robotToCam());
+    log(BACK_LEFT_CAMERA.name(), BACK_LEFT_CAMERA.robotToCam());
+    log(BACK_RIGHT_CAMERA.name(), BACK_RIGHT_CAMERA.robotToCam());
 
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));

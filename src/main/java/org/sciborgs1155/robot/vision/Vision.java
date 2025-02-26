@@ -9,6 +9,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +66,6 @@ public class Vision implements Logged {
       estimators[i] = estimator;
       lastResults[i] = new PhotonPipelineResult();
 
-      log(configs[i].name + " transform", configs[i].robotToCam);
       FaultLogger.register(camera);
     }
 
@@ -141,16 +143,6 @@ public class Vision implements Logged {
         .map(TAG_LAYOUT::getTagPose)
         .map(Optional::get)
         .toArray(Pose3d[]::new);
-  }
-
-  @Log.NT
-  public Transform3d[] getCameraTransforms() {
-    return new Transform3d[] {
-      FRONT_LEFT_CAMERA.robotToCam(),
-      FRONT_RIGHT_CAMERA.robotToCam(),
-      BACK_LEFT_CAMERA.robotToCam(),
-      BACK_RIGHT_CAMERA.robotToCam()
-    };
   }
 
   /**
