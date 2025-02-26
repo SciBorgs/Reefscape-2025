@@ -17,7 +17,10 @@ import org.sciborgs1155.robot.vision.Vision.CameraConfig;
 
 public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      AprilTagFieldLayout.loadField(
+          AprilTagFields
+              .k2025ReefscapeWelded); // Team Update 12 says United States reigional uses welded.
+  // https://firstfrc.blob.core.windows.net/frc2025/Manual/TeamUpdates/TeamUpdate12.pdf
 
   // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
   // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.

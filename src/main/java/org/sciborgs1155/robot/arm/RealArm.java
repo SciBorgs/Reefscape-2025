@@ -3,7 +3,8 @@ package org.sciborgs1155.robot.arm;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static org.sciborgs1155.robot.Ports.GroundIntake.*;
+import static org.sciborgs1155.robot.Ports.GroundIntake.ARM_MOTOR;
+import static org.sciborgs1155.robot.Ports.GroundIntake.CANCODER;
 import static org.sciborgs1155.robot.arm.ArmConstants.GEARING;
 import static org.sciborgs1155.robot.arm.ArmConstants.STRATOR_LIMIT;
 import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
@@ -16,6 +17,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Current;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
+import org.sciborgs1155.robot.Ports;
 
 /** {@link ArmIO} class with a {@link SparkMax} motor controller. */
 public class RealArm implements ArmIO {
@@ -40,7 +42,7 @@ public class RealArm implements ArmIO {
 
     motor.getConfigurator().apply(config);
 
-    FaultLogger.register(motor);
+    FaultLogger.register(motor, Ports.idToName.get(ARM_MOTOR));
     TalonUtils.addMotor(motor);
   }
 

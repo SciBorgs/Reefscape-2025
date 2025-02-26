@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.sciborgs1155.robot.Ports;
 
 /** Utility class for configuration of Spark motor controllers */
 public class SparkUtils {
@@ -33,16 +32,6 @@ public class SparkUtils {
   public static final int THROUGHBORE_CPR = 8192;
 
   public static final int MAX_ATTEMPTS = 3;
-
-  /**
-   * Formats the name of a spark with its CAN ID.
-   *
-   * @param spark The spark to find the name of.
-   * @return The name of a spark.
-   */
-  public static String name(SparkBase spark) {
-    return "Spark " + Ports.idToName.get(spark.getDeviceId());
-  }
 
   /** Represents a type of sensor that can be plugged into the spark */
   public static enum Sensor {
@@ -136,8 +125,8 @@ public class SparkUtils {
    * @param value The value to wrap.
    * @return An optional that may contain the value.
    */
-  public static <T> Optional<T> wrapCall(SparkBase spark, T value) {
-    if (FaultLogger.check(spark)) {
+  public static <T> Optional<T> wrapCall(SparkBase spark, String name, T value) {
+    if (FaultLogger.check(spark, name)) {
       return Optional.of(value);
     }
     return Optional.empty();

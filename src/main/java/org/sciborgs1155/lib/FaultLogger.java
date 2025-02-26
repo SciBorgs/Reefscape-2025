@@ -24,7 +24,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
-import org.sciborgs1155.robot.Ports;
 
 /**
  * FaultLogger allows for faults to be logged and displayed.
@@ -181,45 +180,18 @@ public final class FaultLogger {
    *
    * @param spark The Spark Max or Spark Flex to manage.
    */
-  public static void register(SparkBase spark) {
+  public static void register(SparkBase spark, String name) {
+    String fullName = "Spark " + name;
+    register(() -> spark.getFaults().other, fullName, "other strange error", FaultType.ERROR);
+    register(() -> spark.getFaults().motorType, fullName, "motor type error", FaultType.ERROR);
+    register(() -> spark.getFaults().sensor, fullName, "sensor error", FaultType.ERROR);
+    register(() -> spark.getFaults().can, fullName, "CAN error", FaultType.ERROR);
+    register(() -> spark.getFaults().temperature, fullName, "temperature error", FaultType.ERROR);
+    register(() -> spark.getFaults().gateDriver, fullName, "gate driver error", FaultType.ERROR);
+    register(() -> spark.getFaults().escEeprom, fullName, "escEeprom? error", FaultType.ERROR);
+    register(() -> spark.getFaults().firmware, fullName, "firmware error", FaultType.ERROR);
     register(
-        () -> spark.getFaults().other,
-        SparkUtils.name(spark),
-        "other strange error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getFaults().motorType,
-        SparkUtils.name(spark),
-        "motor type error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getFaults().sensor, SparkUtils.name(spark), "sensor error", FaultType.ERROR);
-    register(() -> spark.getFaults().can, SparkUtils.name(spark), "CAN error", FaultType.ERROR);
-    register(
-        () -> spark.getFaults().temperature,
-        SparkUtils.name(spark),
-        "temperature error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getFaults().gateDriver,
-        SparkUtils.name(spark),
-        "gate driver error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getFaults().escEeprom,
-        SparkUtils.name(spark),
-        "escEeprom? error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getFaults().firmware,
-        SparkUtils.name(spark),
-        "firmware error",
-        FaultType.ERROR);
-    register(
-        () -> spark.getMotorTemperature() > 100,
-        SparkUtils.name(spark),
-        "motor above 100°C",
-        FaultType.WARNING);
+        () -> spark.getMotorTemperature() > 100, fullName, "motor above 100°C", FaultType.WARNING);
   }
 
   /**
@@ -329,8 +301,7 @@ public final class FaultLogger {
    *
    * @param camera The camera to manage.
    */
-  public static void register(CANcoder cancoder) {
-    String nickname = Ports.idToName.get(cancoder.getDeviceID());
+  public static void register(CANcoder cancoder, String nickname) {
     register(
         () -> cancoder.getFault_BadMagnet().getValue(),
         "CANcoder " + nickname,
@@ -358,20 +329,11 @@ public final class FaultLogger {
    *
    * @param talon The talon to manage.
    */
-  public static void register(TalonFX talon) {
-    register(
-        () -> !talon.isConnected(),
-        "Talon " + Ports.idToName.get(talon.getDeviceID()),
-        "disconnected",
-        FaultType.ERROR);
+  public static void register(TalonFX talon, String name) {
+    register(() -> !talon.isConnected(), "Talon " + name, "disconnected", FaultType.ERROR);
 
     BiConsumer<StatusSignal<Boolean>, String> regFault =
-        (f, d) ->
-            register(
-                () -> f.getValue(),
-                "Talon " + Ports.idToName.get(talon.getDeviceID()),
-                d,
-                FaultType.ERROR);
+        (f, d) -> register(() -> f.getValue(), "Talon " + name, d, FaultType.ERROR);
 
     // TODO: Remove all the unnecessary faults.
     regFault.accept(talon.getFault_Hardware(), "Hardware fault occurred");
@@ -431,9 +393,9 @@ public final class FaultLogger {
    * @param spark The spark to report REVLibErrors from.
    * @return If the spark is working without errors.
    */
-  public static boolean check(SparkBase spark) {
+  public static boolean check(SparkBase spark, String name) {
     REVLibError error = spark.getLastError();
-    return check(spark, error);
+    return check(spark, name, error);
   }
 
   /**
@@ -445,9 +407,9 @@ public final class FaultLogger {
    * @param error Any REVLibErrors that may be returned from a method for a spark.
    * @return If the spark is working without errors.
    */
-  public static boolean check(SparkBase spark, REVLibError error) {
+  public static boolean check(SparkBase spark, String name, REVLibError error) {
     if (error != REVLibError.kOk) {
-      report(SparkUtils.name(spark), error.name(), FaultType.ERROR);
+      report("Spark " + name, error.name(), FaultType.ERROR);
       return false;
     }
     return true;
