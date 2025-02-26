@@ -106,6 +106,7 @@ public class Dashboard {
     info.put(key, entry);
   }
 
+  /** Returns a trigger for when a new request from the Dashboard is recieved. */
   public static Trigger action() {
     return new Trigger(() -> entryNewRequest.getBoolean(false))
         .onTrue(Commands.run(() -> entryNewRequest.setBoolean(false)));

@@ -80,6 +80,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
+    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -101,15 +102,14 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
+
+    addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
-
-    Dashboard.configure();
-    addPeriodic(Dashboard::tick, PERIOD.in(Seconds));
 
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
