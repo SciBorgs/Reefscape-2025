@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.coroller;
 
 import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -42,7 +43,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
     config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), config);
+    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR, CANIVORE_NAME), config);
   }
 
   /** Makes the roller spin inwards(towards robot). */

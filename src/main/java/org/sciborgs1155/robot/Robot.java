@@ -16,15 +16,9 @@ import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
-import java.util.Arrays;
-
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -234,6 +228,8 @@ public class Robot extends CommandRobot implements Logged {
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.music());
 
+    coroller.setDefaultCommand(coroller.stop());
+
     teleop()
         .onTrue(
             leftLED
@@ -271,8 +267,8 @@ public class Robot extends CommandRobot implements Logged {
     operator.povUp().whileTrue(scoraling.scoral(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
 
-    driver.povUp().onTrue(leftLED.rainbow());
-    driver.povDown().onTrue(leftLED.music());
+    driver.povUp().whileTrue(coroller.intake());
+    driver.povDown().whileTrue(coroller.outtake());
     driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
     driver.povRight().onTrue(rightLED.scrolling());
 

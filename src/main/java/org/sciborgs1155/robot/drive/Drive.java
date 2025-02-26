@@ -265,6 +265,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return odometry.getEstimatedPosition();
   }
 
+  /** Returns a Pose3D of the estimated pose of the robot.*/
+  @Log.NT
+  public Pose3d pose3d() {
+    return new Pose3d(odometry.getEstimatedPosition());
+  }
+
   /**
    * Returns the currently-estimated field-relative yaw of the robot.
    *

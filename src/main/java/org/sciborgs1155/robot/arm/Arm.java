@@ -135,6 +135,8 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("Moving Arm To: " + goal.toString() + " radians");
   }
 
+  
+
   /**
    * A Test which moves the arm towards a goal angle and then asserts that it got there.
    *

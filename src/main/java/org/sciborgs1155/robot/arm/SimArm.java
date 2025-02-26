@@ -14,7 +14,7 @@ public class SimArm implements ArmIO {
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           GEARBOX,
-          GEARING,
+          1 / GEARING,
           MOI,
           ARM_LENGTH.in(Meters),
           MIN_ANGLE.in(Radians),
