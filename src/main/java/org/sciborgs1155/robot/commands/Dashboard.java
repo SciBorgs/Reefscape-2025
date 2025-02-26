@@ -1,5 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
+import static java.util.Map.entry;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -9,7 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 /**
  * Dashboard listens to NetworkTable information from the Reefscape-2025-Dashboard, which can be
@@ -29,6 +33,12 @@ public class Dashboard {
   private static NetworkTableEntry entryMatchTime;
   public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
   public static Trigger processorTrigger;
+
+  private static final Branch[] branches = {
+    Branch.A, Branch.B, Branch.C, Branch.D, Branch.E, Branch.F, Branch.G, Branch.H, Branch.I,
+    Branch.J, Branch.K, Branch.L
+  };
+  private static final Level[] levels = {Level.L1, Level.L2, Level.L3, Level.L4};
 
   /** Sets up the dashboard. */
   public static void configure() {
@@ -112,14 +122,16 @@ public class Dashboard {
         .onTrue(Commands.run(() -> entryNewRequest.setBoolean(false)));
   }
 
-  /** Returns the branch entry value (Branch A = "A"). Defaults to "". */
-  public static String getBranchEntry() {
-    return entryTargetBranch.getString("");
+  /** Returns the Branch that the branch entry is set to. Returns null if not found. */
+  public static Branch getBranchEntry() {
+    int index = (" ABCDEFGHIJKL".indexOf(entryTargetBranch.getString(" ")) - 1);
+    return index == -1 ? null : branches[index];
   }
 
-  /** Returns the level entry value (L1 = 1, etc.). Defaults to -1. */
-  public static int getLevelEntry() {
-    return (int) entryTargetLevel.getInteger(-1);
+  /** Returns the Level that the level entry is set to. Returns null if not found. */
+  public static Level getLevelEntry() {
+    int index = (int) entryTargetLevel.getInteger(-1);
+    return index == -1 ? null : levels[index];
   }
 
   /** Returns the algae entry value (Algae AB = 0, Algae CD = 1, etc.). Defaults to -1. */

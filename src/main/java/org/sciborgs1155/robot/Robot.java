@@ -259,6 +259,8 @@ public class Robot extends CommandRobot implements Logged {
     driver.povDown().onTrue(leftLED.music());
     driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
     driver.povRight().onTrue(rightLED.scrolling());
+
+    // Dashboard.action().onTrue(align.reef());
   }
 
   /**
