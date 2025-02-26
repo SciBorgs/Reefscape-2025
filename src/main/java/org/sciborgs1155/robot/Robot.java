@@ -111,7 +111,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final LEDStrip leftLED = new LEDStrip(0, 37, false);
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
-  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
+  private final LEDStrip rightLED = new LEDStrip(60, 103, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
