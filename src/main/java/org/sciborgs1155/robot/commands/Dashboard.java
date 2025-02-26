@@ -7,7 +7,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
@@ -26,7 +25,8 @@ public class Dashboard {
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryRobotTick;
-  private static NetworkTableEntry entryNewRequest;
+  private static NetworkTableEntry entryIsReal;
+  private static NetworkTableEntry entryRequest;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
   private static NetworkTableEntry entryMatch;
@@ -63,8 +63,11 @@ public class Dashboard {
     entryRobotTick.setInteger(0);
     tick = 0;
 
-    entryNewRequest = base.getEntry("newRequest");
-    entryNewRequest.setBoolean(false);
+    entryIsReal = base.getEntry("isReal");
+    entryIsReal.setBoolean(Robot.isReal());
+
+    entryRequest = base.getEntry("request");
+    entryRequest.setString("");
 
     // Match
     entryBlueAlliance = base.getEntry("blueAlliance");
@@ -116,10 +119,19 @@ public class Dashboard {
     info.put(key, entry);
   }
 
-  /** Returns a trigger for when a new request from the Dashboard is recieved. */
-  public static Trigger action() {
-    return new Trigger(() -> entryNewRequest.getBoolean(false))
-        .onTrue(Commands.run(() -> entryNewRequest.setBoolean(false)));
+  /** Returns a trigger for when a reef request from the Dashboard is recieved. */
+  public static Trigger reef() {
+    return new Trigger(() -> "reef".equals(entryRequest.getString("")));
+  }
+
+  /** Returns a trigger for when an algae request from the Dashboard is recieved. */
+  public static Trigger algae() {
+    return new Trigger(() -> "algae".equals(entryRequest.getString("")));
+  }
+
+  /** Returns a trigger for when a processor request from the Dashboard is recieved. */
+  public static Trigger processor() {
+    return new Trigger(() -> "processor".equals(entryRequest.getString("")));
   }
 
   /** Returns the Branch that the branch entry is set to. Returns null if not found. */
@@ -130,7 +142,7 @@ public class Dashboard {
 
   /** Returns the Level that the level entry is set to. Returns null if not found. */
   public static Level getLevelEntry() {
-    int index = (int) entryTargetLevel.getInteger(-1);
+    int index = (int) entryTargetLevel.getInteger(0) - 1;
     return index == -1 ? null : levels[index];
   }
 

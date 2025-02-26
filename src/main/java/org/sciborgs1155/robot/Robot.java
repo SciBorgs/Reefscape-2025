@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -120,7 +121,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final LEDStrip leftLED = new LEDStrip(0, 37, false);
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
-  private final LEDStrip rightLED = new LEDStrip(60, 119, true);
+  private final LEDStrip rightLED = new LEDStrip(60, 103, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
@@ -275,7 +276,11 @@ public class Robot extends CommandRobot implements Logged {
     driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
     driver.povRight().onTrue(rightLED.scrolling());
 
-    // Dashboard.action().onTrue(align.reef());
+    Dashboard.reef()
+        .whileTrue(
+            Commands.defer(
+                () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
+                Set.of(drive, elevator, scoral)));
   }
 
   /**
