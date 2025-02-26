@@ -142,7 +142,7 @@ public class Dashboard {
 
   /** Returns the Level that the level entry is set to. Returns null if not found. */
   public static Level getLevelEntry() {
-    int index = (int) entryTargetLevel.getInteger(-1);
+    int index = (int) entryTargetLevel.getInteger(0) - 1;
     return index == -1 ? null : levels[index];
   }
 
