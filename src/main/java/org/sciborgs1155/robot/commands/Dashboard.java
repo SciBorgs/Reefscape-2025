@@ -25,6 +25,7 @@ public class Dashboard {
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryRobotTick;
+  private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
@@ -61,6 +62,9 @@ public class Dashboard {
     entryRobotTick = base.getEntry("robotTick");
     entryRobotTick.setInteger(0);
     tick = 0;
+
+    entryIsReal = base.getEntry("isReal");
+    entryIsReal.setBoolean(Robot.isReal());
 
     entryRequest = base.getEntry("request");
     entryRequest.setString("");
@@ -117,17 +121,17 @@ public class Dashboard {
 
   /** Returns a trigger for when a reef request from the Dashboard is recieved. */
   public static Trigger reef() {
-    return new Trigger(() -> entryRequest.getString("") == "reef");
+    return new Trigger(() -> "reef".equals(entryRequest.getString("")));
   }
 
   /** Returns a trigger for when an algae request from the Dashboard is recieved. */
   public static Trigger algae() {
-    return new Trigger(() -> entryRequest.getString("") == "algae");
+    return new Trigger(() -> "algae".equals(entryRequest.getString("")));
   }
 
   /** Returns a trigger for when a processor request from the Dashboard is recieved. */
   public static Trigger processor() {
-    return new Trigger(() -> entryRequest.getString("") == "processor");
+    return new Trigger(() -> "processor".equals(entryRequest.getString("")));
   }
 
   /** Returns the Branch that the branch entry is set to. Returns null if not found. */

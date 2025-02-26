@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -260,7 +261,11 @@ public class Robot extends CommandRobot implements Logged {
     driver.povLeft().onTrue(rightLED.blink(Color.kWhite));
     driver.povRight().onTrue(rightLED.scrolling());
 
-    // Dashboard.action().onTrue(align.reef());
+    Dashboard.reef()
+        .whileTrue(
+            Commands.defer(
+                () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
+                Set.of(drive, elevator, scoral)));
   }
 
   /**
