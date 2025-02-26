@@ -66,6 +66,8 @@ import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -391,7 +393,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 Math.abs(target.getRotation().getRadians() - heading().getRadians())
                         > Rotation.TOLERANCE.in(Radians)
                     ? rotationController.calculate(
-                        heading().getRadians(), target.getRotation().getRadians())
+                        heading().minus(target.getRotation()).getRadians(), 0)
                     : vOmega.getAsDouble(),
             target.getTranslation())
         .until(() -> vOmega.getAsDouble() > ASSISTED_ROTATING_THRESHOLD)
@@ -437,6 +439,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param mode The control loop used to achieve those speeds.
    */
   public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
+    System.out.println(speeds.toString());
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
@@ -577,10 +580,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public void goToSample(SwerveSample smaple, Rotation2d rotation) {
     Vector<N2> displacement =
         pose().getTranslation().minus(smaple.getPose().getTranslation()).toVector();
+
     Vector<N2> result =
         VecBuilder.fill(smaple.vx, smaple.vy)
             .plus(
-                displacement.unit().times(translationController.calculate(displacement.norm(), 0)));
+                displacement.norm() > 1e-4
+                    ? displacement
+                        .unit()
+                        .times(translationController.calculate(displacement.norm(), 0))
+                    : displacement.times(0));
+
+    if (Double.isNaN(result.norm())) {
+      FaultLogger.report(
+          "Alignment interference",
+          "Assisted Drive and Pathfinding are interfering with each other, causing a NaN result speed.\nSpeed defaulted to zero.",
+          FaultType.WARNING);
+      result = VecBuilder.fill(0, 0);
+    }
 
     setChassisSpeeds(
         ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -682,7 +698,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     simRotation =
         simRotation.rotateBy(
             Rotation2d.fromRadians(
-                robotRelativeChassisSpeeds().omegaRadiansPerSecond * Constants.PERIOD.in(Seconds)));
+                !Double.isNaN(robotRelativeChassisSpeeds().omegaRadiansPerSecond)
+                    ? robotRelativeChassisSpeeds().omegaRadiansPerSecond
+                        * Constants.PERIOD.in(Seconds)
+                    : 0));
   }
 
   /** Stops the drivetrain. */

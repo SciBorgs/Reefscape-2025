@@ -6,11 +6,14 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.Constants.Field.Face;
+import org.sciborgs1155.robot.Constants.Field.Face.Side;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
@@ -65,6 +68,18 @@ public class Alignment implements Logged {
   }
 
   /**
+   * Finds the nearest reef face, then pathfinds to the branch with a given side on that face, and
+   * scores on a designated level on that branch.
+   *
+   * @param level The level (L1, L2, L3, L4) being scored on.
+   * @param side The branch side (Left/Right) to score on.
+   * @return A command to score on the nearest reef branch.
+   */
+  public Command nearReef(Level level, Side side) {
+    return reef(level, Face.nearest(drive.pose()).branch(side));
+  }
+
+  /**
    * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
    * level on that branch.
    *
@@ -104,6 +119,7 @@ public class Alignment implements Logged {
             () ->
                 drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
                     < DriveConstants.Translation.TOLERANCE.in(Meters))
-        .withName("pathfind");
+        .withName("pathfind")
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 }

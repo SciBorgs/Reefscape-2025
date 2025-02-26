@@ -1,7 +1,7 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static org.sciborgs1155.robot.Constants.Field.Branch.poseList;
+import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
@@ -125,6 +125,64 @@ public class Constants {
             CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
 
+    // Reef faces
+
+    public static enum Face {
+      AB(A, B),
+      CD(C, D),
+      EF(E, F),
+      GH(G, H),
+      IJ(I, J),
+      KL(K, L);
+
+      public final Branch left;
+      public final Branch right;
+
+      // Side (left or right)
+      public static enum Side {
+        LEFT,
+        RIGHT
+      }
+
+      private Face(Branch left, Branch right) {
+        this.left = left;
+        this.right = right;
+      }
+
+      /**
+       * @return The pose halfway in between the two branches. (The center of the reef face)
+       */
+      public Pose2d pose() {
+        return new Pose2d(
+            left.pose.getTranslation().plus(right.pose.getTranslation()).div(2),
+            left.pose.getRotation());
+      }
+
+      /**
+       * @return A list of the reef face center poses.
+       */
+      private static List<Pose2d> poseList() {
+        return Arrays.stream(Face.values()).map(b -> b.pose()).collect(Collectors.toList());
+      }
+
+      public Branch branch(Side side) {
+        return side == Side.LEFT ? left : right;
+      }
+
+      /**
+       * Returns the nearest face to an input pose.
+       *
+       * @param pose The pose.
+       * @return The nearest face to a pose.
+       */
+      public static Face nearest(Pose2d pose) {
+        return Arrays.stream(Face.values())
+            .filter(face -> face.pose() == pose.nearest(poseList()))
+            .findFirst()
+            .orElse(AB);
+      }
+    }
+
     // Poses for scoraling.
     // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
     // There are two reef branches per side, so the more counter-clockwise one is 1, and the
@@ -146,15 +204,24 @@ public class Constants {
 
       public final Pose2d pose;
 
-      Branch(Pose2d pose) {
+      private Branch(Pose2d pose) {
         this.pose = pose;
       }
 
+      /**
+       * @return The unit vector of the displacement from the center of the reef to the pose.
+       */
       private Translation2d centerDisplacementUnit() {
         Translation2d diff = pose.getTranslation().minus(CENTER_REEF);
         return diff.div(diff.getNorm());
       }
 
+      /**
+       * Moves the pose in or out depending on the level.
+       *
+       * @param level The level that the movement depends on.
+       * @return A new pose moved to account for elevator tilt.
+       */
       public Pose2d withLevel(Level level) {
         return switch (level) {
           case L1, L2, L3 -> pose;
@@ -162,19 +229,23 @@ public class Constants {
               new Pose2d(
                   pose.getTranslation().plus(centerDisplacementUnit().times(0.1)),
                   pose.getRotation());
-          default -> pose; // huh????
+          default -> pose; // hi ;P
         };
       }
 
+      /**
+       * @return The pose, moved slightly away from the reef face such that it is safe to retract
+       *     the elevator.
+       */
       public Pose2d backPose() {
         return new Pose2d(
-            pose.getTranslation().plus(centerDisplacementUnit().times(0.3)), pose.getRotation());
+            pose.getTranslation().plus(centerDisplacementUnit().times(0.5)), pose.getRotation());
       }
 
       /**
        * @return A list of all branch poses.
        */
-      public static List<Pose2d> poseList() {
+      private static List<Pose2d> poseList() {
         return Arrays.stream(Branch.values()).map(b -> b.pose).collect(Collectors.toList());
       }
 
@@ -226,15 +297,29 @@ public class Constants {
        */
       public static Cage nearest(Pose2d pose) {
         return Arrays.stream(Cage.values())
-            .filter((cage) -> cage.pose == pose.nearest(poseList()))
+            .filter(
+                (cage) ->
+                    cage.pose
+                        == pose.nearest(
+                            Arrays.stream(Cage.values())
+                                .map(b -> b.pose)
+                                .collect(Collectors.toList())))
             .findFirst()
             .orElse(LEFT);
       }
     }
 
-    // Not poses of the game element itself, rather the needed pose of the robot to use it.
-    public static final Pose2d LEFT_SOURCE = allianceReflect(new Pose2d());
-    public static final Pose2d RIGHT_SOURCE = allianceReflect(new Pose2d());
+    // THIS IS THE CENTER OF THE SOURCE NOT THE ROBOT POSE AT THE SOURCE
+    public static final Pose2d TOP_SOURCE =
+        new Pose2d(
+            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(291.176),
+            Rotation2d.fromDegrees(90 - 144.011));
+    public static final Pose2d BOTTOM_SOURCE =
+        new Pose2d(
+            Units.inchesToMeters(33.526),
+            Units.inchesToMeters(25.824),
+            Rotation2d.fromDegrees(144.011 - 90));
 
     public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
 
