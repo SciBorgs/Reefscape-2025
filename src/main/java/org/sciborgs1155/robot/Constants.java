@@ -176,7 +176,6 @@ public class Constants {
        * @return The nearest face to a pose.
        */
       public static Face nearest(Pose2d pose) {
-        System.out.println(pose.nearest(Face.poseList()) + "\n");
         Arrays.stream(Face.values()).forEach(a -> System.out.println(a.pose().toString()));
         return Arrays.stream(Face.values())
             .filter(

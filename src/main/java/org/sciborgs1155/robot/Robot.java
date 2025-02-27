@@ -213,7 +213,7 @@ public class Robot extends CommandRobot implements Logged {
     // driver.a().whileTrue(align.reef(Level.L3, A));
     driver.a().whileTrue(align.source());
     driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
-    driver.x().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
+    driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
 
     // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
     // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
