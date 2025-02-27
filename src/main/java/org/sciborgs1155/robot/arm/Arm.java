@@ -114,7 +114,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    return hardware.position();
+    return hardware.position() + Math.PI / 2;
   }
 
   /**

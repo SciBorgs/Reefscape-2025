@@ -73,6 +73,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   public Elevator(ElevatorIO hardware) {
+    // setDefaultCommand(goTo(this::position));
+
     this.hardware = hardware;
 
     pid.setTolerance(POSITION_TOLERANCE.in(Meters));
