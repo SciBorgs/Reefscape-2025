@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Current;
 public class CorollerConstants {
   /** Power from -1 to 1 (negative values indicate reversal of direction). */
   public static final double INTAKE_POWER = 0.85;
+
   public static final double OUTTAKE_POWER = -0.85;
 
   public static final Current STRATOR_LIMIT = Amps.of(40);

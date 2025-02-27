@@ -40,7 +40,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   private static SimpleMotor real() {
     /** Configuration of the motor used in the Coroller. */
     TalonFXConfiguration config = new TalonFXConfiguration();
-    
+
     config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
