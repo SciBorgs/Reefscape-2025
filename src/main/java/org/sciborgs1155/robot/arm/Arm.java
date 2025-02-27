@@ -97,7 +97,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
-    setDefaultCommand(goTo(DEFAULT_ANGLE));
+    // setDefaultCommand(goTo(DEFAULT_ANGLE));
 
     this.sysIdRoutine =
         new SysIdRoutine(

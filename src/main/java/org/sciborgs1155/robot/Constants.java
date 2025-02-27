@@ -69,7 +69,7 @@ public class Constants {
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.COROLLING;
+  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   /** Describes physical properites of the robot. */
   public static class Robot {

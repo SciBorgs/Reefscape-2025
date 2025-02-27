@@ -225,15 +225,11 @@ public class Robot extends CommandRobot implements Logged {
     // driver.x().whileTrue(drive.assistedDrive(x, y, omega, L.pose));
     // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
 
-    // elevator.setDefaultCommand(elevator.retract());
-
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
     leftLED.setDefaultCommand(leftLED.music());
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.music());
-
-    coroller.setDefaultCommand(coroller.stop());
 
     teleop()
         .onTrue(
@@ -262,7 +258,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightTrigger().onTrue(middleLED.blink(Color.kWhite).alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     operator.a().onTrue(elevator.retract());
-    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     operator.y().whileTrue(scoraling.runRollersBack());
