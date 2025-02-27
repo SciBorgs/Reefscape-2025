@@ -208,7 +208,7 @@ public class Constants {
       public final Pose2d pose;
 
       private Branch(Pose2d pose) {
-        this.pose = pose;
+        this.pose = allianceReflect(pose);
       }
 
       /**
@@ -320,7 +320,7 @@ public class Constants {
                       new Translation2d(
                           BUMPER_LENGTH.div(2).in(Meters) + 0.05,
                           Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
-              SOURCE_ROTATION.rotateBy(Rotation2d.k180deg))),
+              SOURCE_ROTATION)),
       RIGHT(
           new Pose2d(
               new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
@@ -328,12 +328,12 @@ public class Constants {
                       new Translation2d(
                           BUMPER_LENGTH.div(2).in(Meters) + 0.05,
                           Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
-              SOURCE_ROTATION.unaryMinus().rotateBy(Rotation2d.k180deg)));
+              SOURCE_ROTATION.unaryMinus()));
 
       public Pose2d pose;
 
       Source(Pose2d pose) {
-        this.pose = pose;
+        this.pose = allianceReflect(pose);
       }
     }
 

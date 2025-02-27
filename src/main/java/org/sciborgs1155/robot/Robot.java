@@ -255,7 +255,12 @@ public class Robot extends CommandRobot implements Logged {
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
-    operator.rightTrigger().onTrue(middleLED.blink(Color.kWhite).alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
+    operator
+        .rightTrigger()
+        .onTrue(
+            middleLED
+                .blink(Color.kWhite)
+                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
@@ -270,7 +275,12 @@ public class Robot extends CommandRobot implements Logged {
 
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
-    driver.povLeft().onTrue(middleLED.blink(Color.kWhite).alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
+    driver
+        .povLeft()
+        .onTrue(
+            middleLED
+                .blink(Color.kWhite)
+                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
     driver.povRight().onTrue(rightLED.scrolling());
 
     Dashboard.reef()

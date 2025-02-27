@@ -55,6 +55,7 @@ public class Alignment implements Logged {
    */
   public Command reef(Level level, Branch branch) {
     return (pathfind(branch.withLevel(level))
+            .andThen(drive.stop())
             .andThen(
                 Commands.waitUntil(
                         () ->
@@ -65,6 +66,7 @@ public class Alignment implements Logged {
                                         .minus(branch.withLevel(level).getTranslation())
                                         .getNorm()
                                     < Translation.TOLERANCE.in(Meters))
+                    .deadlineFor(scoral.run(() -> log("funky", branch.withLevel(level))))
                     .andThen(scoral.score().withTimeout(Seconds.of(1)))))
         .deadlineFor(elevator.scoreLevel(level))
         .andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
