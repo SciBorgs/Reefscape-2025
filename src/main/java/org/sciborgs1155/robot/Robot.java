@@ -35,6 +35,7 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
@@ -194,9 +195,13 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    driver.a().whileTrue(align.reef(Level.L3, A));
-    driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
-    driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
+    // driver.a().whileTrue(align.reef(Level.L3, A));
+    driver.a().whileTrue(align.source());
+    driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
+    driver.x().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
+
+    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
+    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
 
     // driver.b().whileTrue(align.pathfind(D.pose));
 

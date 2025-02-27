@@ -439,7 +439,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param mode The control loop used to achieve those speeds.
    */
   public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
-    System.out.println(speeds.toString());
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(

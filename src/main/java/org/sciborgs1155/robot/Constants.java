@@ -176,8 +176,12 @@ public class Constants {
        * @return The nearest face to a pose.
        */
       public static Face nearest(Pose2d pose) {
+        System.out.println(pose.nearest(Face.poseList()) + "\n");
+        Arrays.stream(Face.values()).forEach(a -> System.out.println(a.pose().toString()));
         return Arrays.stream(Face.values())
-            .filter(face -> face.pose() == pose.nearest(poseList()))
+            .filter(
+                face ->
+                    face.pose().minus(pose.nearest(poseList())).getTranslation().getNorm() < 1e-4)
             .findFirst()
             .orElse(AB);
       }
@@ -309,17 +313,33 @@ public class Constants {
       }
     }
 
-    // THIS IS THE CENTER OF THE SOURCE NOT THE ROBOT POSE AT THE SOURCE
-    public static final Pose2d TOP_SOURCE =
-        new Pose2d(
-            Units.inchesToMeters(33.526),
-            Units.inchesToMeters(291.176),
-            Rotation2d.fromDegrees(90 - 144.011));
-    public static final Pose2d BOTTOM_SOURCE =
-        new Pose2d(
-            Units.inchesToMeters(33.526),
-            Units.inchesToMeters(25.824),
-            Rotation2d.fromDegrees(144.011 - 90));
+    public static enum Source {
+      LEFT(
+          new Pose2d(
+              new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
+                  .plus(
+                      new Translation2d(
+                          BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                          Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
+              SOURCE_ROTATION.rotateBy(Rotation2d.k180deg))),
+      RIGHT(
+          new Pose2d(
+              new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
+                  .plus(
+                      new Translation2d(
+                          BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                          Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
+              SOURCE_ROTATION.unaryMinus().rotateBy(Rotation2d.k180deg)));
+
+      public Pose2d pose;
+
+      Source(Pose2d pose) {
+        this.pose = pose;
+      }
+    }
+
+    // Rotation of the top source (facing into the field)
+    private static final Rotation2d SOURCE_ROTATION = Rotation2d.fromDegrees(90 - 144.011);
 
     public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
 

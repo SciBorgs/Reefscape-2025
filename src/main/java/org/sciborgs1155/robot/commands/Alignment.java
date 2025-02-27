@@ -8,12 +8,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.List;
+import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Constants.Field.Face;
 import org.sciborgs1155.robot.Constants.Field.Face.Side;
+import org.sciborgs1155.robot.Constants.Field.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
@@ -68,6 +71,30 @@ public class Alignment implements Logged {
   }
 
   /**
+   * Pathfinds and aligns to a designated source.
+   *
+   * @param source The source to pathfind to.
+   * @return A command to go to a source.
+   */
+  public Command source(Source source) {
+    return Commands.defer(
+        () -> pathfind(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
+  }
+
+  /**
+   * Pathfinds and aligns to the nearest source.
+   *
+   * @return A command to go to the nearest source.
+   */
+  public Command source() {
+    return Commands.defer(
+        () ->
+            pathfind(drive.pose().nearest(List.of(Source.LEFT.pose, Source.RIGHT.pose)))
+                .alongWith(elevator.retract()),
+        Set.of(drive, elevator));
+  }
+
+  /**
    * Finds the nearest reef face, then pathfinds to the branch with a given side on that face, and
    * scores on a designated level on that branch.
    *
@@ -76,7 +103,9 @@ public class Alignment implements Logged {
    * @return A command to score on the nearest reef branch.
    */
   public Command nearReef(Level level, Side side) {
-    return reef(level, Face.nearest(drive.pose()).branch(side));
+    return Commands.defer(
+        () -> reef(level, Face.nearest(drive.pose()).branch(side)),
+        Set.of(drive, elevator, scoral));
   }
 
   /**
