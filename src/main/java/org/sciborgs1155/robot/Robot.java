@@ -32,6 +32,7 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
@@ -79,6 +80,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
+    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
@@ -100,6 +102,8 @@ public class Robot extends CommandRobot implements Logged {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
+
+    addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
@@ -165,6 +169,8 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+    Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }
 
   /**
