@@ -131,7 +131,8 @@ public class Dashboard {
     return new Trigger(
         () ->
             "reef".equals(entryRequest.getString(""))
-                && (" ABCDEFGHIJKL".indexOf(entryTargetBranch.getString(" ")) - 1) != -1
+                && 0 <= ("ABCDEFGHIJKL".indexOf(entryTargetBranch.getString(" ")))
+                && entryTargetBranch.getString("").length() == 1
                 && 0 <= entryTargetLevel.getInteger(-1)
                 && entryTargetLevel.getInteger(-1) <= 3);
   }
