@@ -1,11 +1,14 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
@@ -21,8 +24,9 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetLevel;
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
+  private static NetworkTableEntry entryTargetElevator;
   private static NetworkTableEntry entryRobotTick;
-  private static NetworkTableEntry entryNewRequest;
+  private static NetworkTableEntry entryRequest;
   private static int tick;
   private static NetworkTableEntry entryBlueAlliance;
   private static NetworkTableEntry entryMatch;
@@ -48,13 +52,16 @@ public class Dashboard {
     entryTargetAlgae = base.getEntry("algae");
     entryTargetAlgae.setInteger(-1);
 
+    entryTargetElevator = base.getEntry("elevator");
+    entryTargetElevator.getDouble(MIN_EXTENSION.in(Meters));
+
     // Status
     entryRobotTick = base.getEntry("robotTick");
     entryRobotTick.setInteger(0);
     tick = 0;
 
-    entryNewRequest = base.getEntry("newRequest");
-    entryNewRequest.setBoolean(false);
+    entryRequest = base.getEntry("newRequest");
+    entryRequest.setBoolean(false);
 
     // Match
     entryBlueAlliance = base.getEntry("blueAlliance");
@@ -106,10 +113,24 @@ public class Dashboard {
     info.put(key, entry);
   }
 
-  /** Returns a trigger for when a new request from the Dashboard is recieved. */
-  public static Trigger action() {
-    return new Trigger(() -> entryNewRequest.getBoolean(false))
-        .onTrue(Commands.run(() -> entryNewRequest.setBoolean(false)));
+  /** Returns a trigger for when a reef request from the Dashboard is recieved. */
+  public static Trigger reef() {
+    return new Trigger(() -> "reef".equals(entryRequest.getString("")));
+  }
+
+  /** Returns a trigger for when an algae request from the Dashboard is recieved. */
+  public static Trigger algae() {
+    return new Trigger(() -> "algae".equals(entryRequest.getString("")));
+  }
+
+  /** Returns a trigger for when a processor request from the Dashboard is recieved. */
+  public static Trigger processor() {
+    return new Trigger(() -> "processor".equals(entryRequest.getString("")));
+  }
+
+  /** Returns a trigger for when an elevator request from the Dashboard is recieved. */
+  public static Trigger elevator() {
+    return new Trigger(() -> "elevator".equals(entryRequest.getString("")));
   }
 
   /** Returns the branch entry value (Branch A = "A"). Defaults to "". */
@@ -125,5 +146,12 @@ public class Dashboard {
   /** Returns the algae entry value (Algae AB = 0, Algae CD = 1, etc.). Defaults to -1. */
   public static int getAlgaeEntry() {
     return (int) entryTargetAlgae.getInteger(-1);
+  }
+
+  /** Returns the elevator height in meters. Defaults to elevator min extension. */
+  public static double getElevatorEntry() {
+    return entryTargetElevator.getDouble(MIN_EXTENSION.in(Meters))
+            * (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters))
+        + MIN_EXTENSION.in(Meters);
   }
 }

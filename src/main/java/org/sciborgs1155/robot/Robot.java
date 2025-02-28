@@ -169,6 +169,8 @@ public class Robot extends CommandRobot implements Logged {
     operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
     operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+
+    Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }
 
   /**
