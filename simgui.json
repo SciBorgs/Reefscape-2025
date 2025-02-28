@@ -54,6 +54,13 @@
       }
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Dashboard": {
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   },
