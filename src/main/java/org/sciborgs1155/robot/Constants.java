@@ -4,19 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.sciborgs1155.robot.Constants.Field.Branch.A;
-import static org.sciborgs1155.robot.Constants.Field.Branch.B;
-import static org.sciborgs1155.robot.Constants.Field.Branch.C;
-import static org.sciborgs1155.robot.Constants.Field.Branch.D;
-import static org.sciborgs1155.robot.Constants.Field.Branch.E;
-import static org.sciborgs1155.robot.Constants.Field.Branch.F;
-import static org.sciborgs1155.robot.Constants.Field.Branch.G;
-import static org.sciborgs1155.robot.Constants.Field.Branch.H;
-import static org.sciborgs1155.robot.Constants.Field.Branch.I;
-import static org.sciborgs1155.robot.Constants.Field.Branch.J;
-import static org.sciborgs1155.robot.Constants.Field.Branch.K;
-import static org.sciborgs1155.robot.Constants.Field.Branch.L;
-import static org.sciborgs1155.robot.Constants.Field.Branch.poseList;
+import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
@@ -28,13 +16,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Feet;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -56,15 +38,16 @@ import monologue.Logged;
 public class Constants implements Logged {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
-  public static Alliance alliance() {
+  private static SendableChooser<Alliance> allianceChooser() {
     SendableChooser<Alliance> chooser = new SendableChooser<>();
     chooser.addOption("Blue", Alliance.Blue);
     chooser.addOption("Red", Alliance.Red);
-    chooser.close();
-    Alliance alliance = chooser.getSelected();
-    SmartDashboard.putData("Alliance", chooser);
-    chooser.close();
-    return alliance;
+    SmartDashboard.putData("AllianceChooser", chooser);
+    return chooser;
+  }
+
+  public static Alliance alliance() {
+    return allianceChooser().getSelected();
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
