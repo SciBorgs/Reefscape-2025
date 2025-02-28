@@ -1,22 +1,18 @@
 {
     "name": "Tangy Bodangy",
     "sourceUrl": "https://cad.onshape.com/documents/b04559219f8d23d2fb47ae04/w/54404f2c4a60c8ce45e3a660/e/0964cb27036073492a7d8e95",
-    "disableSimplification": false,
+    "disableSimplification": true,
     "rotations": [
         {
           "axis": "x",
-          "degrees": 0
-        },
-        {
-            "axis" : "y",
-            "degrees": 0
+          "degrees": 90
         },
         {
           "axis": "z",
-          "degrees": 0
+          "degrees": -90
         }
     ],
-    "position": [0, 0, 0],
+    "position": [-1.6, -0.9, 0.4],
     "cameras": [],
     "components": []
   }
