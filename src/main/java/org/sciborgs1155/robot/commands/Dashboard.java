@@ -127,7 +127,12 @@ public class Dashboard {
 
   /** Returns a trigger for when a reef request from the Dashboard is recieved. */
   public static Trigger reef() {
-    return new Trigger(() -> "reef".equals(entryRequest.getString("")));
+    return new Trigger(
+        () ->
+            "reef".equals(entryRequest.getString(""))
+                && (" ABCDEFGHIJKL".indexOf(entryTargetBranch.getString(" ")) - 1) != -1
+                && 0 <= entryTargetLevel.getInteger(-1)
+                && entryTargetLevel.getInteger(-1) <= 3);
   }
 
   /** Returns a trigger for when an algae request from the Dashboard is recieved. */
