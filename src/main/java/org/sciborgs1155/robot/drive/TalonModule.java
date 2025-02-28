@@ -140,8 +140,8 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(turnMotor);
 
     talonThread = TalonOdometryThread.getInstance();
-    position = talonThread.registerSignal(driveMotor.getPosition());
-    rotation = talonThread.registerSignal(turnMotor.getPosition());
+    position = talonThread.registerSignal(() -> driveMotor.getPosition().getValueAsDouble()); // TODO try this!! it used to by driveMotor.getPosition()
+    rotation = talonThread.registerSignal(() -> turnMotor.getPosition().getValueAsDouble());
 
     timestamp = talonThread.makeTimestampQueue();
 

@@ -51,6 +51,7 @@ public class TalonOdometryThread extends Thread {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     Drive.lock.lock();
     try {
+      // TODO we should see what's happening here
       BaseStatusSignal[] newSignals = new BaseStatusSignal[talonSignals.length + 1];
       System.arraycopy(talonSignals, 0, newSignals, 0, talonSignals.length);
       newSignals[talonSignals.length] = signal;
