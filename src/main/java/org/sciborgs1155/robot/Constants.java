@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
-
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
@@ -18,17 +17,11 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
-
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -43,11 +36,7 @@ public class Constants {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   public static Alliance alliance() {
-    SendableChooser<Alliance> chooser = new SendableChooser();
-    chooser.addOption("Blue", Alliance.Blue);
-    chooser.addOption("Red", Alliance.Red);
-    return chooser.getSelected();
-
+    return DriverStation.getAlliance().orElse(Alliance.Red);
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */

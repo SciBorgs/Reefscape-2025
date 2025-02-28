@@ -169,7 +169,6 @@ public class Alignment implements Logged {
                             drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
                                 < DriveConstants.Translation.TOLERANCE.in(Meters)),
             Set.of(drive))
-        .repeatedly()
         .withName("pathfind")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
