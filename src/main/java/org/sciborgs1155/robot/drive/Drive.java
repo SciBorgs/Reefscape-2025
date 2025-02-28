@@ -235,7 +235,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
-    // TalonOdometryThread.getInstance().start();
+    TalonOdometryThread.getInstance().start();
 
     SmartDashboard.putData(
         "translation quasistatic forward",
