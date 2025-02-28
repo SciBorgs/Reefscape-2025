@@ -96,6 +96,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   private LinearAcceleration maxAccel;
 
+  private double visionFOM;
+
   // Movement automation
   @Log.NT
   private final ProfiledPIDController translationController =
@@ -215,7 +217,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             modulePositions(),
             new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
             this::odomFOM,
-            this::visionFOM);
+            () -> visionFOM);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -454,6 +456,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
+  /**
+   * @return If the robot is skidding.
+   */
   public boolean isSkidding() {
     List<Double> sorted =
         Arrays.stream(moduleStates())
@@ -463,8 +468,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
   }
 
-  private double visionFOM() {
-    return 0;
+  private void updateVisionFOM(double fom) {
+    visionFOM = fom;
   }
 
   private double odomFOM() {
@@ -474,6 +479,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         - (Timer.getMatchTime() < 50 ? 0.2 : 0); //reduce FOM if late in match
   }
 
+  /**
+   * @return If the robot is colliding.
+   */
   public boolean isColliding() {
     return gyro.acceleration().getNorm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
