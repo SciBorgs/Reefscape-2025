@@ -24,6 +24,11 @@ public class NavXGyro implements GyroIO {
   }
 
   @Override
+  public double[][] odometryData() {
+    return new double[2][20];
+  }
+
+  @Override
   public void reset() {
     ahrs.reset();
   }

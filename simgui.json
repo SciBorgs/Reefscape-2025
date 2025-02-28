@@ -74,7 +74,11 @@
             0.0,
             0.8500000238418579
           ],
+<<<<<<< HEAD
           "height": 354,
+=======
+          "height": -30,
+>>>>>>> faster-odometry
           "series": [
             {
               "color": [
