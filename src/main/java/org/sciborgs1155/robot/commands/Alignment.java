@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
+import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
@@ -66,7 +67,7 @@ public class Alignment implements Logged {
                                         .minus(branch.withLevel(level).getTranslation())
                                         .getNorm()
                                     < Translation.TOLERANCE.in(Meters))
-                    .deadlineFor(scoral.run(() -> log("funky", branch.withLevel(level))))
+                    // .deadlineFor(scoral.run(() -> funky = branch.withLevel(level)))
                     .andThen(scoral.score().withTimeout(Seconds.of(1)))))
         .deadlineFor(elevator.scoreLevel(level))
         .andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
@@ -127,6 +128,19 @@ public class Alignment implements Logged {
                 .andThen(scoral.score()));
   }
 
+  @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
+  @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
+  @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
+  @Log.NT public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
+  @Log.NT public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
+  @Log.NT public Pose2d kll = Face.KL.left.withLevel(Level.L4);
+  @Log.NT public Pose2d abr = Face.AB.right.withLevel(Level.L4);
+  @Log.NT public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
+  @Log.NT public Pose2d efr = Face.EF.right.withLevel(Level.L4);
+  @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
+  @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
+  @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
+
   /**
    * Pathfinds around obstacles and drives to a certain pose on the field.
    *
@@ -134,22 +148,28 @@ public class Alignment implements Logged {
    * @return A Command to pathfind to an onfield pose.
    */
   public Command pathfind(Pose2d goal) {
-    return drive
-        .run(
-            () -> {
-              planner.setGoal(goal.getTranslation());
-              drive.goToSample(
-                  planner.getCmd(
-                      drive.pose(),
-                      drive.fieldRelativeChassisSpeeds(),
-                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                      true),
-                  goal.getRotation());
-            })
-        .until(
+    return Commands.defer(
             () ->
-                drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                    < DriveConstants.Translation.TOLERANCE.in(Meters))
+                (drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
+                            > DriveConstants.Translation.TOLERANCE.in(Meters) * 2
+                        ? drive.run(
+                            () -> {
+                              planner.setGoal(goal.getTranslation());
+                              drive.goToSample(
+                                  planner.getCmd(
+                                      drive.pose(),
+                                      drive.fieldRelativeChassisSpeeds(),
+                                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
+                                      true),
+                                  goal.getRotation());
+                            })
+                        : drive.driveTo(goal))
+                    .until(
+                        () ->
+                            drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
+                                < DriveConstants.Translation.TOLERANCE.in(Meters)),
+            Set.of(drive))
+        .repeatedly()
         .withName("pathfind")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }

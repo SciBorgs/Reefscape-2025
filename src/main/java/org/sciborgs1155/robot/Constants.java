@@ -108,8 +108,9 @@ public class Constants {
     public static final Distance REEF_MIN_RADIUS = Centimeters.of(166 / 2);
 
     // The center of the blue alliance reef hexagon
-    public static final Translation2d CENTER_REEF =
-        new Translation2d(Feet.of(12).plus(REEF_MIN_RADIUS), WIDTH.div(2));
+    public static final Pose2d CENTER_REEF =
+        new Pose2d(
+            new Translation2d(Feet.of(12).plus(REEF_MIN_RADIUS), WIDTH.div(2)), Rotation2d.kZero);
 
     // The field robot poses for blue alliance's reef branches A and B. Both are the farthest to the
     // blue
@@ -176,7 +177,6 @@ public class Constants {
        * @return The nearest face to a pose.
        */
       public static Face nearest(Pose2d pose) {
-        Arrays.stream(Face.values()).forEach(a -> System.out.println(a.pose().toString()));
         return Arrays.stream(Face.values())
             .filter(
                 face ->
@@ -215,7 +215,8 @@ public class Constants {
        * @return The unit vector of the displacement from the center of the reef to the pose.
        */
       private Translation2d centerDisplacementUnit() {
-        Translation2d diff = pose.getTranslation().minus(CENTER_REEF);
+        Translation2d diff =
+            pose.getTranslation().minus(allianceReflect(CENTER_REEF).getTranslation());
         return diff.div(diff.getNorm());
       }
 
@@ -248,7 +249,7 @@ public class Constants {
       /**
        * @return A list of all branch poses.
        */
-      private static List<Pose2d> poseList() {
+      public static List<Pose2d> poseList() {
         return Arrays.stream(Branch.values()).map(b -> b.pose).collect(Collectors.toList());
       }
 
@@ -263,7 +264,8 @@ public class Constants {
         return new Pose2d(
             input
                 .getTranslation()
-                .rotateAround(CENTER_REEF, Rotation2d.fromDegrees(60).times(times)),
+                .rotateAround(
+                    CENTER_REEF.getTranslation(), Rotation2d.fromDegrees(60).times(times)),
             Rotation2d.fromDegrees(60 * times));
       }
 

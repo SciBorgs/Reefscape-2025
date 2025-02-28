@@ -55,7 +55,6 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -78,11 +77,11 @@ public class Robot extends CommandRobot implements Logged {
         default -> Drive.none();
       };
 
-  private final Vision vision =
-      switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
-        default -> new Vision();
-      };
+  // private final Vision vision =
+  //     switch (ROBOT_TYPE) {
+  //       case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+  //       default -> new Vision();
+  //     };
 
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
@@ -153,7 +152,7 @@ public class Robot extends CommandRobot implements Logged {
     log(BACK_RIGHT_CAMERA.name(), BACK_RIGHT_CAMERA.robotToCam());
 
     // Configure pose estimation updates from vision every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -165,7 +164,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
