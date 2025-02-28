@@ -30,8 +30,8 @@ public class ReduxGyro implements GyroIO {
     // See https://docs.reduxrobotics.com/canandgyro/programming/normal-operation#party-mode
     canandgyro.setPartyMode(0);
 
-    timestamp = TalonOdometryThread.getInstance().makeTimestampQueue();
     position = TalonOdometryThread.getInstance().registerSignal(canandgyro::getYaw);
+    timestamp = TalonOdometryThread.getInstance().makeTimestampQueue();
   }
 
   @Override
@@ -52,6 +52,8 @@ public class ReduxGyro implements GyroIO {
         position.stream().mapToDouble((Double d) -> d).toArray(),
         timestamp.stream().mapToDouble((Double d) -> d).toArray()
       };
+      position.clear();
+      timestamp.clear();
       return data;
     } finally {
       Drive.lock.unlock();

@@ -480,11 +480,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           modules.get(2).odometryData(),
           modules.get(3).odometryData(),
         };
+        double[][] allGyro = gyro.odometryData();
+        log("gyro vlauesd", allGyro[0]);
+        log("gyro timestamps", allGyro[1]);
         for (int i = 0; i < timestamps.length; i++) {
           // System.out.println(timestamps[i]);
 
           log("num timestamps", timestamps);
-          log("num pos", allPositions[2][1]);
 
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
@@ -499,10 +501,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
           odometry.updateWithTime(
               timestamps[i],
-              new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i])),
+              new Rotation2d(Units.rotationsToRadians(allGyro[0][i])),
               modulePositions);
           lastPositions = modulePositions;
-          lastHeading = new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i]));
+          lastHeading = new Rotation2d(Units.rotationsToRadians(allGyro[0][i]));
         }
       } catch (Exception e) {
         e.printStackTrace();

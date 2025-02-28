@@ -243,12 +243,13 @@ public class TalonModule implements ModuleIO {
     Drive.lock.lock();
     try {
       double[][] data = {
-        rotation.stream().mapToDouble((Double d) -> d).toArray(),
         position.stream().mapToDouble((Double d) -> d).toArray(),
+        rotation.stream().mapToDouble((Double d) -> d).toArray(),
         timestamp.stream().mapToDouble((Double d) -> d).toArray()
       };
-      log("position", data[0]); // no position values are actually queued
-      log("timestamp", data[2]); // timestamp values are queued
+      log("position", data[0]);
+      log("rotation", data[1]);
+      log("timestamp", data[2]);
 
       return data;
     } finally {
@@ -259,10 +260,13 @@ public class TalonModule implements ModuleIO {
   public SwerveModulePosition[] odometryData() {
     SwerveModulePosition[] positions = new SwerveModulePosition[20];
     Drive.lock.lock();
+
     var data = moduleOdometryData();
 
-    for (int i = 0; i < data.length; i++) {
-      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+    log("odometrya dtat 0 length", data[0].length);
+    log("odometrya dtat 1 length", data[1].length);
+    for (int i = 0; i < data[0].length; i++) {
+      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRotations(data[1][i]));
       // positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
     }
 
