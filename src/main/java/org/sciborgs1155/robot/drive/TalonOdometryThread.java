@@ -47,7 +47,7 @@ public class TalonOdometryThread extends Thread {
 
   public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Drive.lock.writeLock().lock();
+    Drive.lock.lock();
     try {
       BaseStatusSignal[] newSignals = new BaseStatusSignal[talonSignals.length + 1];
       System.arraycopy(talonSignals, 0, newSignals, 0, talonSignals.length);
@@ -55,30 +55,30 @@ public class TalonOdometryThread extends Thread {
       talonSignals = newSignals;
       talonQueues.add(queue);
     } finally {
-      Drive.lock.writeLock().unlock();
+      Drive.lock.unlock();
     }
     return queue;
   }
 
   public Queue<Double> registerSignal(DoubleSupplier signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Drive.lock.writeLock().lock();
+    Drive.lock.lock();
     try {
       otherSignals.add(signal);
       otherQueues.add(queue);
     } finally {
-      Drive.lock.writeLock().unlock();
+      Drive.lock.unlock();
     }
     return queue;
   }
 
   public Queue<Double> makeTimestampQueue() {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    Drive.lock.writeLock().lock();
+    Drive.lock.lock();
     try {
       timestampQueues.add(queue);
     } finally {
-      Drive.lock.writeLock().unlock();
+      Drive.lock.unlock();
     }
     return queue;
   }
@@ -88,15 +88,16 @@ public class TalonOdometryThread extends Thread {
     while (true) {
       try {
         if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {
-          BaseStatusSignal.waitForAll(2.0 * ODOMETRY_PERIOD.in(Seconds), talonSignals);
+          BaseStatusSignal.waitForAll(2.0 / ODOMETRY_PERIOD.in(Seconds), talonSignals);
         } else {
           Thread.sleep(Math.round(ODOMETRY_PERIOD.in(Milliseconds)));
+          if (talonSignals.length > 0) BaseStatusSignal.refreshAll(talonSignals);
         }
       } catch (Exception e) {
         e.printStackTrace();
       }
 
-      Drive.lock.writeLock().lock();
+      Drive.lock.lock();
 
       try {
         // FPGA returns in microseconds (1000000 microseconds in a second)
@@ -121,7 +122,7 @@ public class TalonOdometryThread extends Thread {
           timestampQueues.get(i).offer(timestamp);
         }
       } finally {
-        Drive.lock.writeLock().unlock();
+        Drive.lock.unlock();
       }
     }
   }

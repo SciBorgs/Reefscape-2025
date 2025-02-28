@@ -77,6 +77,11 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Slot0.kI = Driving.PID.I;
     talonDriveConfig.Slot0.kD = Driving.PID.D;
 
+    // TODO remove
+    talonDriveConfig.Audio.BeepOnBoot = false;
+    talonDriveConfig.Audio.BeepOnConfig = false;
+
+
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     encoder = new CANcoder(sensorID, CANIVORE_NAME);
 
@@ -96,6 +101,10 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
     talonTurnConfig.Slot0.kD = Turning.PID.D;
+
+    talonTurnConfig.Audio.BeepOnBoot = false;
+    talonTurnConfig.Audio.BeepOnConfig = false;
+
 
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
@@ -231,7 +240,10 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public double[][] moduleOdometryData() {
-    Drive.lock.readLock().lock();
+    Drive.lock.lock();
+    position.clear();
+    rotation.clear();
+    timestamp.clear();
     try {
       double[][] data = {
         position.stream().mapToDouble((Double d) -> d).toArray(),
@@ -240,21 +252,22 @@ public class TalonModule implements ModuleIO {
       };
       return data;
     } finally {
-      Drive.lock.readLock().unlock();
+      Drive.lock.unlock();
     }
   }
 
   public SwerveModulePosition[] odometryData() {
     SwerveModulePosition[] positions = new SwerveModulePosition[20];
-    Drive.lock.readLock().lock();
+    Drive.lock.lock();
     var data = moduleOdometryData();
     for (int i = 0; i < data.length; i++) {
-      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+      // positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+      positions[i] = new SwerveModulePosition(0, Rotation2d.fromDegrees(0));
     }
-    Drive.lock.readLock().unlock();
+    Drive.lock.unlock();
     return positions;
   }
-
+ // TODO THIS IS THE ORIGINAL FASTER-ODOMETRY BRANCH
   public double[] timestamps() {
     return moduleOdometryData()[2];
   }

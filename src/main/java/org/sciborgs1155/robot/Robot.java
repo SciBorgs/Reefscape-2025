@@ -57,8 +57,8 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
   private final Vision vision = Vision.create();
-  private final Elevator elevator = Elevator.create();
-  private final Scoral scoral = Scoral.create();
+  private final Elevator elevator = Elevator.none();
+  private final Scoral scoral = Scoral.none();
 
   private final LEDStrip led = new LEDStrip();
 

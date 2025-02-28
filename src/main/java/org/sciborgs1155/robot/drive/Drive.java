@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -82,7 +83,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final SwerveDrivePoseEstimator odometry;
   private SwerveModulePosition[] lastPositions;
   private Rotation2d lastHeading;
-  public static final ReadWriteLock lock = new ReentrantReadWriteLock();
+  public static final ReentrantLock lock = new ReentrantLock();
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -468,9 +469,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     // update our heading in reality / sim
     if (Robot.isReal()) {
-      lock.readLock().lock();
+      lock.lock();
       try {
-        double[] timestamps = modules.get(0).timestamps();
+        double[] timestamps = modules.get(2).timestamps();
         // get the positions of all modules at a given timestamp
         for (int i = 0; i < timestamps.length; i++) {
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
@@ -485,7 +486,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           lastHeading = new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i]));
         }
       } finally {
-        lock.readLock().unlock();
+        lock.unlock();
       }
     } else {
       odometry.update(simRotation, modulePositions());
