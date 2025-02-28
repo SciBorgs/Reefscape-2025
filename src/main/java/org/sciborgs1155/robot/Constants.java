@@ -36,7 +36,7 @@ public class Constants {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   public static Alliance alliance() {
-    return DriverStation.getAlliance().orElse(Alliance.Blue);
+    return DriverStation.getAlliance().orElse(Alliance.Red);
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
