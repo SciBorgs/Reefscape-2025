@@ -81,7 +81,6 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Audio.BeepOnBoot = false;
     talonDriveConfig.Audio.BeepOnConfig = false;
 
-
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     encoder = new CANcoder(sensorID, CANIVORE_NAME);
 
@@ -104,7 +103,6 @@ public class TalonModule implements ModuleIO {
 
     talonTurnConfig.Audio.BeepOnBoot = false;
     talonTurnConfig.Audio.BeepOnConfig = false;
-
 
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
@@ -140,7 +138,12 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(turnMotor);
 
     talonThread = TalonOdometryThread.getInstance();
-    position = talonThread.registerSignal(() -> driveMotor.getPosition().getValueAsDouble()); // TODO try this!! it used to by driveMotor.getPosition()
+    position =
+        talonThread.registerSignal(
+            () ->
+                driveMotor
+                    .getPosition()
+                    .getValueAsDouble()); // TODO try this!! it used to by driveMotor.getPosition()
     rotation = talonThread.registerSignal(() -> turnMotor.getPosition().getValueAsDouble());
 
     timestamp = talonThread.makeTimestampQueue();

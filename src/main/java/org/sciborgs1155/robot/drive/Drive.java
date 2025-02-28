@@ -40,9 +40,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -472,14 +470,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       lock.lock();
       try {
         double[] timestamps = modules.get(2).timestamps();
-      
-        // get the positions of all modules at a given timestamp [[module0 odometry], [module1 odometry], ...]
-        SwerveModulePosition[][] allPositions = new SwerveModulePosition[][] {
-          modules.get(0).odometryData(),
-          modules.get(1).odometryData(),
-          modules.get(2).odometryData(),
-          modules.get(3).odometryData(),
-        };
+
+        // get the positions of all modules at a given timestamp [[module0 odometry], [module1
+        // odometry], ...]
+        SwerveModulePosition[][] allPositions =
+            new SwerveModulePosition[][] {
+              modules.get(0).odometryData(),
+              modules.get(1).odometryData(),
+              modules.get(2).odometryData(),
+              modules.get(3).odometryData(),
+            };
         double[][] allGyro = gyro.odometryData();
         log("gyro vlauesd", allGyro[0]);
         log("gyro timestamps", allGyro[1]);
