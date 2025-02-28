@@ -1,0 +1,24 @@
+{
+    "name": "2025 Robot",
+    "sourceUrl": "https://cad.onshape.com/documents/b04559219f8d23d2fb47ae04/w/54404f2c4a60c8ce45e3a660/e/0964cb27036073492a7d8e95",
+    "rotations": [
+      {
+        "axis": "x",
+        "degrees": 90
+      },
+      {
+        "axis": "z",
+        "degrees": 90
+      }
+    ],
+    "position": [
+      0,0,0
+    ],
+    "cameras": [],
+      "components": [
+        {
+          "zeroedRotations": [{"axis":"x","degrees":90},{"axis":"z","degrees":180},{"axis":"y","degrees":-4}],
+          "zeroedPosition": [0.45,0.635,-0.125]
+        }
+      ]
+  }

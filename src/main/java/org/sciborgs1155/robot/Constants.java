@@ -52,8 +52,7 @@ public class Constants {
   public static final Voltage SFV = Volts.of(10); // Steer friction voltage
   public static final Distance WR = Inches.of(12); // Wheel Radius
   public static final double CWF = 0.1; // Wheel coefficient of friction
-  public static final MomentOfInertia SMOI =
-      KilogramSquareMeters.of(0.2); // Steer moment of inertia
+  public static final MomentOfInertia SMOI = KilogramSquareMeters.of(4); // Steer moment of inertia
   public static final double DGR = 12.2; // Drive Gear Ratio
   public static final double SGR = 5.2; // Steer Gear Ratio
 
@@ -92,7 +91,7 @@ public class Constants {
                   Volts.of(0.1), // Drive Friction Voltage
                   Volts.of(0.1), // Steer Friction Voltage
                   Inches.of(2), // Wheel Radius
-                  KilogramSquareMeters.of(0.2), // Steer Moment of Inertia
+                  KilogramSquareMeters.of(0.02), // Steer Moment of Inertia
                   1.2 // Wheel Coefficient of Friction
                   ))
           .withTrackLengthTrackWidth(Robot.TRACK_LENGTH, Robot.TRACK_LENGTH)

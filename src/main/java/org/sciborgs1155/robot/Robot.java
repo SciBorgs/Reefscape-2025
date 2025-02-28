@@ -79,11 +79,12 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
+    SimulatedArena.getInstance();
+    SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
   }
 
   @Override
   public void simulationPeriodic() {
-    SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
     SimulatedArena.getInstance().simulationPeriodic();
   }
 
