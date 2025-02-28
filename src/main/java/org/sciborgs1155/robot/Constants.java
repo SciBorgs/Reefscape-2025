@@ -1,34 +1,48 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.sciborgs1155.robot.Constants.Field.Branch.*;
+import static org.sciborgs1155.robot.Constants.Field.Branch.A;
+import static org.sciborgs1155.robot.Constants.Field.Branch.B;
+import static org.sciborgs1155.robot.Constants.Field.Branch.C;
+import static org.sciborgs1155.robot.Constants.Field.Branch.D;
+import static org.sciborgs1155.robot.Constants.Field.Branch.E;
+import static org.sciborgs1155.robot.Constants.Field.Branch.F;
+import static org.sciborgs1155.robot.Constants.Field.Branch.G;
+import static org.sciborgs1155.robot.Constants.Field.Branch.H;
+import static org.sciborgs1155.robot.Constants.Field.Branch.I;
+import static org.sciborgs1155.robot.Constants.Field.Branch.J;
+import static org.sciborgs1155.robot.Constants.Field.Branch.K;
+import static org.sciborgs1155.robot.Constants.Field.Branch.L;
+import static org.sciborgs1155.robot.Constants.Field.Branch.poseList;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
+import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.sciborgs1155.robot.drive.DriveConstants;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
-
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import monologue.Logged;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -39,15 +53,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  *
  * @see Units
  */
-public class Constants {
+public class Constants implements Logged {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   public static Alliance alliance() {
-    SendableChooser<Alliance> chooser = new SendableChooser();
+    SendableChooser<Alliance> chooser = new SendableChooser<>();
     chooser.addOption("Blue", Alliance.Blue);
     chooser.addOption("Red", Alliance.Red);
-    return chooser.getSelected();
-
+    chooser.close();
+    Alliance alliance = chooser.getSelected();
+    SmartDashboard.putData("Alliance", chooser);
+    chooser.close();
+    return alliance;
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
