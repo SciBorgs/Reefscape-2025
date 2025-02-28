@@ -69,8 +69,6 @@ public class Robot extends CommandRobot implements Logged {
   private final Scoral scoral = Scoral.create();
   private final LEDStrip led = new LEDStrip();
 
-  
-
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
 
@@ -82,11 +80,13 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
   }
+
   @Override
   public void simulationPeriodic() {
-      SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
-      SimulatedArena.getInstance().simulationPeriodic();
+    SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
+    SimulatedArena.getInstance().simulationPeriodic();
   }
+
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
