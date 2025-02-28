@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -78,6 +79,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
+  @Log.NT private SwerveModulePosition[] lastPositions;
+  private Rotation2d lastHeading;
+  public static final ReentrantLock lock = new ReentrantLock();
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -161,6 +165,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     modules = List.of(this.frontLeft, this.frontRight, this.rearLeft, this.rearRight);
     modules2d = new FieldObject2d[modules.size()];
+    lastPositions = modulePositions();
+    lastHeading = gyro.rotation2d();
 
     translationCharacterization =
         new SysIdRoutine(
@@ -201,8 +207,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     odometry =
         new SwerveDrivePoseEstimator(
             kinematics,
-            gyro.rotation2d(),
-            modulePositions(),
+            lastHeading,
+            lastPositions,
             new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
 
     for (int i = 0; i < modules.size(); i++) {
@@ -215,6 +221,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     translationController.setTolerance(Translation.TOLERANCE.in(Meters));
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
+
+    TalonOdometryThread.getInstance().start();
 
     SmartDashboard.putData(
         "translation quasistatic forward",
@@ -262,7 +270,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(gyro.rotation2d(), modulePositions(), pose);
+    odometry.resetPosition(lastHeading, lastPositions, pose);
   }
 
   /**
@@ -331,7 +339,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public boolean isFacing(Translation2d target) {
     return Math.abs(
-            gyro.rotation2d().getRadians()
+            lastHeading.getRadians()
                 - target.minus(pose().getTranslation()).getAngle().getRadians())
         < rotationController.getErrorTolerance();
   }
@@ -458,7 +466,55 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
-    odometry.update(Robot.isReal() ? gyro.rotation2d() : simRotation, modulePositions());
+    if (Robot.isReal()) {
+      lock.lock();
+      try {
+        double[] timestamps = modules.get(2).timestamps();
+
+        // get the positions of all modules at a given timestamp [[module0 odometry], [module1
+        // odometry], ...]
+        SwerveModulePosition[][] allPositions =
+            new SwerveModulePosition[][] {
+              modules.get(0).odometryData(),
+              modules.get(1).odometryData(),
+              modules.get(2).odometryData(),
+              modules.get(3).odometryData(),
+            };
+        double[][] allGyro = gyro.odometryData();
+        log("gyro vlauesd", allGyro[0]);
+        log("gyro timestamps", allGyro[1]);
+        for (int i = 0; i < timestamps.length; i++) {
+          // System.out.println(timestamps[i]);
+
+          log("num timestamps", timestamps);
+
+          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+          for (int m = 0; m < modules.size(); m++) {
+            modulePositions[m] = allPositions[m][i];
+          }
+
+          log("asfdka modules", modulePositions);
+          // modulePositions[0] = new SwerveModulePosition();
+          // modulePositions[1] = new SwerveModulePosition();
+          // modulePositions[2] = new SwerveModulePosition();
+          // modulePositions[3] = new SwerveModulePosition();
+
+          odometry.updateWithTime(
+              timestamps[i],
+              new Rotation2d(Units.rotationsToRadians(allGyro[0][i])),
+              modulePositions);
+          lastPositions = modulePositions;
+          lastHeading = new Rotation2d(Units.rotationsToRadians(allGyro[0][i]));
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        lock.unlock();
+      }
+    } else {
+      odometry.update(simRotation, modulePositions());
+      lastPositions = modulePositions();
+    }
 
     // update our simulated field poses
     field2d.setRobotPose(pose());
