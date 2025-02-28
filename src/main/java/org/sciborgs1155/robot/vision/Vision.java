@@ -147,7 +147,7 @@ public class Vision implements Logged {
   }
 
   public double fom() {
-    return getSeenTags().length * 0.25 + 0.5;
+    return getSeenTags().length * 0.5;
 
   }
 
