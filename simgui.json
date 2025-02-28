@@ -24,6 +24,7 @@
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Alliance": "String Chooser",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/elevator dynamic backward": "Command",
@@ -60,9 +61,6 @@
         "open": true
       }
     }
-  },
-  "NetworkTables Info": {
-    "visible": true
   },
   "Plot": {
     "Plot <0>": {
