@@ -287,6 +287,8 @@ public class Robot extends CommandRobot implements Logged {
             Commands.defer(
                 () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
                 Set.of(drive, elevator, scoral)));
+
+    Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }
 
   /**

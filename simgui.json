@@ -54,6 +54,13 @@
       }
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Dashboard": {
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   },
@@ -67,7 +74,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 140,
+          "height": 354,
           "series": [
             {
               "color": [
