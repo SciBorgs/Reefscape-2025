@@ -262,8 +262,8 @@ public class TalonModule implements ModuleIO {
     var data = moduleOdometryData();
 
     for (int i = 0; i < data.length; i++) {
-      // positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
-      positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
+      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+      // positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
     }
 
     position.clear();

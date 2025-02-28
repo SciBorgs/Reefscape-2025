@@ -473,21 +473,29 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       try {
         double[] timestamps = modules.get(2).timestamps();
       
-        // get the positions of all modules at a given timestamp
+        // get the positions of all modules at a given timestamp [[module0 odometry], [module1 odometry], ...]
+        SwerveModulePosition[][] allPositions = new SwerveModulePosition[][] {
+          modules.get(0).odometryData(),
+          modules.get(1).odometryData(),
+          modules.get(2).odometryData(),
+          modules.get(3).odometryData(),
+        };
         for (int i = 0; i < timestamps.length; i++) {
           // System.out.println(timestamps[i]);
 
           log("num timestamps", timestamps);
-          log("num pos", modules.get(2).odometryData()[1]);
+          log("num pos", allPositions[2][1]);
 
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
-            modulePositions[m] = modules.get(m).odometryData()[i];
+            modulePositions[m] = allPositions[m][i];
           }
-          modulePositions[0] = new SwerveModulePosition();
-          modulePositions[1] = new SwerveModulePosition();
-          modulePositions[2] = new SwerveModulePosition();
-          modulePositions[3] = new SwerveModulePosition();
+
+          log("asfdka modules", modulePositions);
+          // modulePositions[0] = new SwerveModulePosition();
+          // modulePositions[1] = new SwerveModulePosition();
+          // modulePositions[2] = new SwerveModulePosition();
+          // modulePositions[3] = new SwerveModulePosition();
 
           odometry.updateWithTime(
               timestamps[i],
