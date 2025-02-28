@@ -10,6 +10,8 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.RobotController;
+import monologue.Logged;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -85,10 +87,15 @@ public class TalonOdometryThread extends Thread {
 
   @Override
   public void run() {
+    // log("num signals", talonSignals.length); // should be 2 signals * 4 modules
+    // log("num phoenix queues", talonQueues.size());
+
+    // log("num other queues", otherQueues.size());
+    // log("num timestamp queues", timestampQueues.size()); // should be 1 * 4 modules + 1 gyro
     while (true) {
       try {
         if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {
-          BaseStatusSignal.waitForAll(2.0 / ODOMETRY_PERIOD.in(Seconds), talonSignals);
+          BaseStatusSignal.waitForAll(2.0 * ODOMETRY_PERIOD.in(Seconds), talonSignals);
         } else {
           Thread.sleep(Math.round(ODOMETRY_PERIOD.in(Milliseconds)));
           if (talonSignals.length > 0) BaseStatusSignal.refreshAll(talonSignals);

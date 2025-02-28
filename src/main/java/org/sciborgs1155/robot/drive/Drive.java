@@ -81,7 +81,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
-  private SwerveModulePosition[] lastPositions;
+  @Log.NT private SwerveModulePosition[] lastPositions;
   private Rotation2d lastHeading;
   public static final ReentrantLock lock = new ReentrantLock();
 
@@ -472,12 +472,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       lock.lock();
       try {
         double[] timestamps = modules.get(2).timestamps();
+      
         // get the positions of all modules at a given timestamp
         for (int i = 0; i < timestamps.length; i++) {
+          System.out.println(timestamps[i]);
+
+          log("num timestamps", timestamps);
+          log("num pos", modules.get(2).odometryData()[1]);
+
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-          for (int m = 0; m < modules.size(); m++) {
-            modulePositions[m] = modules.get(m).odometryData()[i];
-          }
+          // for (int m = 0; m < modules.size(); m++) {
+            // modulePositions[m] = modules.get(m).odometryData()[i];
+          // }
+          modulePositions[0] = new SwerveModulePosition();
+          modulePositions[1] = new SwerveModulePosition();
+          modulePositions[2] = new SwerveModulePosition();
+          modulePositions[3] = new SwerveModulePosition();
+
           odometry.updateWithTime(
               timestamps[i],
               new Rotation2d(Units.rotationsToRadians(gyro.odometryData()[0][i])),

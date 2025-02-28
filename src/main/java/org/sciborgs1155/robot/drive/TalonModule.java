@@ -241,15 +241,15 @@ public class TalonModule implements ModuleIO {
   @Override
   public double[][] moduleOdometryData() {
     Drive.lock.lock();
-    position.clear();
-    rotation.clear();
-    timestamp.clear();
     try {
       double[][] data = {
-        position.stream().mapToDouble((Double d) -> d).toArray(),
         rotation.stream().mapToDouble((Double d) -> d).toArray(),
+        position.stream().mapToDouble((Double d) -> d).toArray(),
         timestamp.stream().mapToDouble((Double d) -> d).toArray()
       };
+      log("position", data[0]); // no position values are actually queued
+      log("timestamp", data[2]); // timestamp values are queued
+
       return data;
     } finally {
       Drive.lock.unlock();
@@ -260,14 +260,21 @@ public class TalonModule implements ModuleIO {
     SwerveModulePosition[] positions = new SwerveModulePosition[20];
     Drive.lock.lock();
     var data = moduleOdometryData();
+
     for (int i = 0; i < data.length; i++) {
       // positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
-      positions[i] = new SwerveModulePosition(0, Rotation2d.fromDegrees(0));
+      positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
     }
+
+    position.clear();
+    rotation.clear();
+    timestamp.clear();
+
     Drive.lock.unlock();
     return positions;
   }
- // TODO THIS IS THE ORIGINAL FASTER-ODOMETRY BRANCH
+
+  @Log.NT
   public double[] timestamps() {
     return moduleOdometryData()[2];
   }
