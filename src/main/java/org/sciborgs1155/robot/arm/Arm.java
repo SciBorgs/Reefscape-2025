@@ -111,6 +111,14 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
+   * @return pose of the arm centered
+   */
+  @Log.NT
+  public Pose3d pose() {
+    return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), 0));
+  }
+
+  /**
    * @param radians The position, in radians.
    * @return True if the arm's position is close enough to a given position, False if it isn't.
    */
