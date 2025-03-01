@@ -12,11 +12,11 @@ import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Scoraling implements Logged {
-  @IgnoreLogged private final Hopper hopper;
-  @IgnoreLogged private final Scoral scoral;
-  @IgnoreLogged private final Elevator elevator;
-  @IgnoreLogged private final LEDStrip leftStrip;
-  @IgnoreLogged private final LEDStrip rightStrip;
+  private final Hopper hopper;
+  private final Scoral scoral;
+  private final Elevator elevator;
+  private final LEDStrip leftStrip;
+  private final LEDStrip rightStrip;
 
   public Scoraling(
       Hopper hopper, Scoral scoral, Elevator elevator, LEDStrip leftStrip, LEDStrip rightStrip) {

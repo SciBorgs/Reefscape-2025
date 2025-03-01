@@ -18,22 +18,22 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 10;
-  public static final double kI = 0;
+  public static final double kP = 3.0;
+  public static final double kI = 0.0;
   public static final double kD = 0.3;
 
-  public static final double kS = 0.02908;
-  public static final double kG = 0.20424;
-  public static final double kV = 3.9325;
-  public static final double kA = 0.082782;
+  public static final double kS = 0.064;
+  public static final double kG = 0.24;
+  public static final double kV = 3.9;
+  public static final double kA = 0.093;
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(2.5); // (1.0);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
-  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);
+  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(3);
+  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(3.5);
 
   public static final Mass WEIGHT = Pounds.of(6.142);
   public static final double GEARING = 9.375;
@@ -44,7 +44,7 @@ public class ElevatorConstants {
   /** conversion factor in METERS PER ROTATION */
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
-  public static final Current CURRENT_LIMIT = Amps.of(50);
+  public static final Current CURRENT_LIMIT = Amps.of(65);
 
   // Don't worry about this :)
   public static final Time HIGH_FIVE_DELAY = Seconds.of(.3);

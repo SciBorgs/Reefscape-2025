@@ -28,7 +28,7 @@ import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.BetterElevatorFeedforward;
+import org.sciborgs1155.lib.BetterElevatorFeedForward;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
@@ -36,6 +36,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
@@ -68,7 +69,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT
-  private final BetterElevatorFeedforward ff = new BetterElevatorFeedforward(kS, kG, kV, kA);
+  private final BetterElevatorFeedForward ff = new BetterElevatorFeedForward(kS, kG, kV, kA);
 
   @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));

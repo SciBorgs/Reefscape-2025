@@ -71,6 +71,6 @@ public class VisionConstants {
   // Processor | Red Side: 3 | Blue Side: 16
 
   public static final double[] TAG_WEIGHTS = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1
   };
 }

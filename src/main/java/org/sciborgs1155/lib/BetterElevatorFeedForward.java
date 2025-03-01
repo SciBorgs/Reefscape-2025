@@ -16,7 +16,7 @@ import edu.wpi.first.util.struct.StructSerializable;
  * @see
  *     https://github.com/wpilibsuite/allwpilib/blob/a7ae22d7640c3395e9a8ca37dc8c5fe0b7a2a559/wpimath/src/main/java/edu/wpi/first/math/controller/ElevatorFeedforward.java#L16
  */
-public class BetterElevatorFeedforward implements ProtobufSerializable, StructSerializable {
+public class BetterElevatorFeedForward implements ProtobufSerializable, StructSerializable {
   /** The static gain, in volts. */
   private double ks;
 
@@ -44,7 +44,7 @@ public class BetterElevatorFeedforward implements ProtobufSerializable, StructSe
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  public BetterElevatorFeedforward(double ks, double kg, double kv, double ka, double dtSeconds) {
+  public BetterElevatorFeedForward(double ks, double kg, double kv, double ka, double dtSeconds) {
     this.ks = ks;
     this.kg = kg;
     this.kv = kv;
@@ -72,7 +72,7 @@ public class BetterElevatorFeedforward implements ProtobufSerializable, StructSe
    * @throws IllegalArgumentException for kv &lt; zero.
    * @throws IllegalArgumentException for ka &lt; zero.
    */
-  public BetterElevatorFeedforward(double ks, double kg, double kv, double ka) {
+  public BetterElevatorFeedForward(double ks, double kg, double kv, double ka) {
     this(ks, kg, kv, ka, 0.020);
   }
 
@@ -85,7 +85,7 @@ public class BetterElevatorFeedforward implements ProtobufSerializable, StructSe
    * @param kv The velocity gain in V/(m/s).
    * @throws IllegalArgumentException for kv &lt; zero.
    */
-  public BetterElevatorFeedforward(double ks, double kg, double kv) {
+  public BetterElevatorFeedForward(double ks, double kg, double kv) {
     this(ks, kg, kv, 0);
   }
 
