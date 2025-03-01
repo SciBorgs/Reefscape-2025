@@ -58,7 +58,7 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
+  // private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
@@ -92,7 +92,7 @@ public class Robot extends CommandRobot implements Logged {
     FaultLogger.register(pdh);
 
     // Configure pose estimation updates every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -102,7 +102,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
   }
 

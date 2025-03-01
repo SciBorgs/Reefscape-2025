@@ -1,4 +1,12 @@
 {
+<<<<<<< HEAD
+=======
+  "Keyboard 0 Settings": {
+    "window": {
+      "visible": true
+    }
+  },
+>>>>>>> 82a3a72ec6aac4d3395da4aec7af1e177c54a539
   "keyboardJoysticks": [
     {
       "axisConfig": [
