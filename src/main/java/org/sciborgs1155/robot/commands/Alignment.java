@@ -128,6 +128,7 @@ public class Alignment implements Logged {
                 .andThen(scoral.score()));
   }
 
+  // TODO delete these lmao
   @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
   @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
   @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
@@ -167,7 +168,7 @@ public class Alignment implements Logged {
                     .until(
                         () ->
                             drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                                < DriveConstants.Translation.TOLERANCE.in(Meters)),
+                                < Translation.TOLERANCE.in(Meters) / Translation.PRECISION),
             Set.of(drive))
         .withName("pathfind")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
