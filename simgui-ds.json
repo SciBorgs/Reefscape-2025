@@ -1,12 +1,14 @@
 {
-<<<<<<< HEAD
-=======
-  "Keyboard 0 Settings": {
+  "Joysticks": {
     "window": {
-      "visible": true
+      "visible": false
     }
   },
->>>>>>> 82a3a72ec6aac4d3395da4aec7af1e177c54a539
+  "System Joysticks": {
+    "window": {
+      "visible": false
+    }
+  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -95,14 +97,6 @@
       "axisCount": 0,
       "buttonCount": 0,
       "povCount": 0
-    }
-  ],
-  "robotJoysticks": [
-    {
-      "guid": "Keyboard1"
-    },
-    {
-      "guid": "Keyboard0"
     }
   ]
 }

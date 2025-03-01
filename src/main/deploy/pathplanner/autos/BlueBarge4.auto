@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Up.0"
+            "pathName": "BB4"
           }
         },
         {
@@ -42,12 +42,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Up.1"
-          }
-        },
-        {
           "type": "sequential",
           "data": {
             "commands": [
@@ -64,12 +58,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Up.2"
           }
         },
         {
@@ -104,12 +92,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Up.3"
-          }
-        },
-        {
           "type": "sequential",
           "data": {
             "commands": [
@@ -126,12 +108,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Up.4"
           }
         },
         {
