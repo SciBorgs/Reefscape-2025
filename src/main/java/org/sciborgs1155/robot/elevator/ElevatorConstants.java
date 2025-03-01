@@ -32,8 +32,9 @@ public class ElevatorConstants {
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
-  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);
+  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(1);
+  public static final LinearAcceleration MAX_UPWARDS_ACCEL = MetersPerSecondPerSecond.of(1);
+  public static final LinearAcceleration MAX_DOWNWARDS_ACCEL = MetersPerSecondPerSecond.of(1);
 
   public static final Mass WEIGHT = Pounds.of(6.142);
   public static final double GEARING = 9.375;

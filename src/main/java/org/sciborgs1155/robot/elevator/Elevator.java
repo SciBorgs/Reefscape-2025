@@ -11,6 +11,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
@@ -56,28 +57,28 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Log.NT
-  private final ProfiledPIDController pid =
-      new ProfiledPIDController(
+  private final PIDController pid =
+      new PIDController(
           kP,
           kI,
-          kD,
-          new TrapezoidProfile.Constraints(
-              MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
+          kD);
+
+  @Log.NT
+  private final NewTrapezoid profile = new NewTrapezoid(new NewTrapezoid.Constraints(MAX_VELOCITY.in(MetersPerSecond), MAX_UPWARDS_ACCEL.in(MetersPerSecondPerSecond), MAX_DOWNWARDS_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
-  private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+  private final ElevatorVisualizer setpointVisualizer = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
   @Log.NT
-  private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+  private final ElevatorVisualizer measurementVisualizer = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
 
     pid.setTolerance(POSITION_TOLERANCE.in(Meters));
-    pid.reset(hardware.position());
-    pid.setGoal(MIN_EXTENSION.in(Meters));
+    pid.reset();
 
     sysIdRoutine =
         new SysIdRoutine(
@@ -144,8 +145,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             .scale(MAX_VELOCITY.in(MetersPerSecond))
             .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
-            .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
-            .add(() -> pid.getGoal().position))
+            .add(() -> profile.goal().position))
         .withName("manual elevator");
   }
 
@@ -196,7 +196,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double positionSetpoint() {
-    return pid.getSetpoint().position;
+    return profile.current().position;
   }
 
   /**
@@ -204,7 +204,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double velocitySetpoint() {
-    return pid.getSetpoint().velocity;
+    return profile.current().velocity;
   }
 
   /**
@@ -212,7 +212,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean atGoal() {
-    return pid.atGoal();
+    return profile.atGoal();
   }
 
   /**
@@ -226,9 +226,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         Double.isNaN(position)
             ? MIN_EXTENSION.in(Meters)
             : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
-    double lastVelocity = pid.getSetpoint().velocity;
-    double feedback = pid.calculate(hardware.position(), position);
-    double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
+    double lastVelocity = profile.current().velocity;
+
+    NewTrapezoid.State setpoint = profile.calculate(Constants.PERIOD.in(Seconds), hardware.position(), position);
+    double feedback = pid.calculate(hardware.position(), setpoint.position);
+    double feedforward = ff.calculateWithVelocities(lastVelocity, setpoint.velocity);
 
     hardware.setVoltage(feedforward + feedback);
   }
@@ -239,8 +241,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * lengths.
    */
   public void periodic() {
-    setpoint.setLength(positionSetpoint());
-    measurement.setLength(position());
+    setpointVisualizer.setLength(positionSetpoint());
+    measurementVisualizer.setLength(position());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

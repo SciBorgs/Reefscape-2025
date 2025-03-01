@@ -9,8 +9,10 @@
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
       "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
+      "/Robot/elevator/measurementVisualizer/mech": "Mechanism2d",
+      "/Robot/elevator/pid": "PIDController",
       "/Robot/elevator/setpoint/mech": "Mechanism2d",
+      "/Robot/elevator/setpointVisualizer/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -83,7 +85,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 0,
+          "height": 278,
           "series": [
             {
               "color": [
@@ -102,6 +104,15 @@
                 1.0
               ],
               "id": "NT:/Robot/elevator/position"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/velocitySetpoint"
             }
           ]
         }
