@@ -10,7 +10,11 @@ import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
+import java.util.List;
+
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -31,6 +35,7 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -59,6 +64,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
+  private final Arm arm = Arm.create();
 
   private final LEDStrip led = new LEDStrip();
 
@@ -104,6 +110,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+    teleop().onTrue(arm.climbSetup());
+
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
@@ -194,7 +202,7 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(Level.L1.extension),
             Test.fromCommand(scoral.algae().withTimeout(2)))
         .withName("Test Mechanisms");
-  }
+  } 
 
   @Override
   public void close() {
