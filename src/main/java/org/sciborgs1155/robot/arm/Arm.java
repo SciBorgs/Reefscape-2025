@@ -149,7 +149,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
   }
 
-  @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
     return goTo(() -> goal.in(Radians)).withName("moving to angle");

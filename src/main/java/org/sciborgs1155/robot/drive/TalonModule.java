@@ -68,7 +68,7 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonDriveConfig.Feedback.SensorToMechanismRatio =
         Driving.GEARING / Driving.CIRCUMFERENCE.in(Meters);
-    talonDriveConfig.CurrentLimits.StatorCurrentLimit = Driving.CURRENT_LIMIT.in(Amps);
+    talonDriveConfig.CurrentLimits.StatorCurrentLimit = Driving.STATOR_LIMIT.in(Amps);
 
     talonDriveConfig.MotorOutput.Inverted =
         invert ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;

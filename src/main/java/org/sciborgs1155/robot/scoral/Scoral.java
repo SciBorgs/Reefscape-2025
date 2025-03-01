@@ -98,7 +98,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
                 beambreakTrigger.negate(),
                 "Scoral syst check (beambreak broken)",
                 () -> "broken: " + beambreakTrigger.negate()));
-
     return new Test(testCommand, assertions);
   }
 

@@ -14,9 +14,11 @@ import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -334,12 +336,16 @@ public class Robot extends CommandRobot implements Logged {
 
   public Command systemsCheck() {
     return Test.toCommand(
-            drive.systemsCheck(),
-            hopper.intakeTest(),
-            scoral.intakeTest(),
+            Test.fromCommand(fullLED.blink(Color.kRed)),
+            Test.fromCommand(scoraling.hpsIntake()),
+            // hopper.intakeTest(),
+            // scoral.intakeTest(),
             elevator.goToTest(Level.L1.extension),
             arm.goToTest(MAX_ANGLE),
-            coroller.intakeTest())
+            Test.fromCommand(coroller.intake().withTimeout(2)),
+            drive.systemsCheck(),
+            arm.goToTest(STARTING_ANGLE),
+            elevator.goToTest(MIN_EXTENSION))
         .withName("Test Mechanisms");
   }
 

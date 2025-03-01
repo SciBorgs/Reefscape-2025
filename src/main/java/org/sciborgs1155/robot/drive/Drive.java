@@ -532,7 +532,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 WHEEL_COF,
                 DCMotor.getKrakenX60(1),
                 DriveConstants.ModuleConstants.Driving.GEARING,
-                DriveConstants.ModuleConstants.Driving.CURRENT_LIMIT,
+                DriveConstants.ModuleConstants.Driving.STATOR_LIMIT,
                 1),
             DriveConstants.TRACK_WIDTH),
         () -> false,

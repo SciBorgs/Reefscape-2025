@@ -60,6 +60,19 @@
       }
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Robot": {
+        "open": true,
+        "scoraling": {
+          "elevator": {
+            "open": true
+          },
+          "open": true
+        }
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   }

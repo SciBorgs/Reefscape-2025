@@ -90,7 +90,7 @@ public final class DriveConstants {
               WHEEL_COF,
               DCMotor.getKrakenX60(1),
               1 / ModuleConstants.Driving.GEARING,
-              ModuleConstants.Driving.CURRENT_LIMIT,
+              ModuleConstants.Driving.STATOR_LIMIT,
               1),
           MODULE_OFFSET);
 
@@ -138,7 +138,9 @@ public final class DriveConstants {
 
       public static final double GEARING = 5.68;
 
-      public static final Current CURRENT_LIMIT = Amps.of(60);
+      public static final Current STATOR_LIMIT = Amps.of(80); // 120A max slip current
+      public static final Current SUPPLY_LIMIT = Amps.of(70);
+
 
       public static final class PID {
         public static final double P = 3.2;

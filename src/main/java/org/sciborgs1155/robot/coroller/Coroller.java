@@ -64,18 +64,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   public Command stop() {
     return run(() -> hardware.set(0)).withName("stop");
   }
-
-  /**
-   * Sets the coroller to intake for two seconds. Does not check anything itself, requires human
-   * supervision.
-   *
-   * @return Command to set the coroller to intake.
-   */
-  public Test intakeTest() {
-    Command testCommand = intake().withTimeout(2);
-    return new Test(testCommand, Set.of());
-  }
-
+  
   @Override
   public void close() throws Exception {
     hardware.close();
