@@ -1,26 +1,29 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.disabled;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.Constants.TUNING;
+import static org.sciborgs1155.robot.Constants.alliance;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
@@ -31,7 +34,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.Arrays;
 import java.util.Set;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
@@ -50,7 +55,6 @@ import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -84,18 +88,21 @@ public class Robot extends CommandRobot implements Logged {
         default -> new Vision();
       };
 
+  @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Elevator.create();
         default -> Elevator.none();
       };
 
+  @IgnoreLogged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Scoral.create();
         default -> Scoral.none();
       };
 
+  @IgnoreLogged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Hopper.create();
@@ -147,10 +154,25 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
 
-    log(FRONT_LEFT_CAMERA.name(), FRONT_LEFT_CAMERA.robotToCam());
-    log(FRONT_RIGHT_CAMERA.name(), FRONT_RIGHT_CAMERA.robotToCam());
-    log(BACK_LEFT_CAMERA.name(), BACK_LEFT_CAMERA.robotToCam());
-    log(BACK_RIGHT_CAMERA.name(), BACK_RIGHT_CAMERA.robotToCam());
+    if (TUNING) {
+      addPeriodic(
+          () ->
+              log(
+                  "camera transforms",
+                  Arrays.stream(vision.cameraTransforms())
+                      .map(
+                          t ->
+                              new Pose3d(
+                                  drive
+                                      .pose3d()
+                                      .getTranslation()
+                                      .plus(
+                                          t.getTranslation()
+                                              .rotateBy(drive.pose3d().getRotation())),
+                                  t.getRotation().plus(drive.pose3d().getRotation())))
+                      .toArray(Pose3d[]::new)),
+          PERIOD.in(Seconds));
+    }
 
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
@@ -165,7 +187,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
@@ -210,47 +232,57 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    // driver.a().whileTrue(align.reef(Level.L3, A));
-    driver.a().whileTrue(align.source());
-    driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
-    driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
-
-    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
-    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
-
-    // driver.b().whileTrue(align.pathfind(D.pose));
-
-    driver.b().onTrue(drive.zeroHeading());
-
-    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, L.pose));
-    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
-
-    // leftLED.setDefaultCommand(leftLED.rainbow());
-    // rightLED.setDefaultCommand(rightLED.rainbow());
     leftLED.setDefaultCommand(leftLED.music());
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.music());
-
-    teleop()
-        .onTrue(
-            leftLED
-                .elevatorLED(() -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))
-                .alongWith(
-                    rightLED.elevatorLED(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    // leftLED.setDefaultCommand(leftLED.rainbow());
+    // rightLED.setDefaultCommand(rightLED.rainbow());
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
 
+    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+
     test().whileTrue(systemsCheck());
-    // driver.b().whileTrue(drive.zeroHeading());
+
+    // teleop()
+    //     .onTrue(
+    //         leftLED
+    //             .elevatorLED(() -> elevator.position() /
+    // ElevatorConstants.MAX_EXTENSION.in(Meters))
+    //             .alongWith(
+    //                 rightLED.elevatorLED(
+    //                     () -> elevator.position() /
+    // ElevatorConstants.MAX_EXTENSION.in(Meters))));
+
+    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+
     driver
         .leftBumper()
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
-    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+    driver.a().whileTrue(align.source());
+    driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
+    driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
+
+    driver.b().onTrue(drive.zeroHeading());
+    driver.povUp().whileTrue(coroller.intake());
+    driver.povDown().whileTrue(coroller.outtake());
+
+    driver
+        .povLeft()
+        .onTrue(
+            middleLED
+                .blink(Color.kWhite)
+                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
+    driver.povRight().onTrue(rightLED.scrolling());
+
+    // driver.a().whileTrue(align.reef(Level.L3, A));
+    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
+    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
+
+    // driver.b().whileTrue(align.pathfind(D.pose));
 
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
@@ -273,16 +305,6 @@ public class Robot extends CommandRobot implements Logged {
     operator.povUp().whileTrue(scoraling.scoral(Level.L3));
     operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
 
-    driver.povUp().whileTrue(coroller.intake());
-    driver.povDown().whileTrue(coroller.outtake());
-    driver
-        .povLeft()
-        .onTrue(
-            middleLED
-                .blink(Color.kWhite)
-                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
-    driver.povRight().onTrue(rightLED.scrolling());
-
     Dashboard.reef()
         .whileTrue(
             Commands.defer(
@@ -290,6 +312,11 @@ public class Robot extends CommandRobot implements Logged {
                 Set.of(drive, elevator, scoral)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
+  }
+
+  @Log.NT
+  public boolean isBlueAlliance() {
+    return alliance() == Alliance.Blue;
   }
 
   /**

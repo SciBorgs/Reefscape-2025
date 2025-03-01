@@ -10,6 +10,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import java.util.Queue;
 import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -33,12 +35,12 @@ public class TalonModule implements ModuleIO {
   private final VelocityVoltage velocityOut = new VelocityVoltage(0);
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
-  // private final TalonOdometryThread talonThread;
-  // private final VoltageOut odometryFrequency =
-  //     new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
-  // private final Queue<Double> position;
-  // private final Queue<Double> rotation;
-  // private final Queue<Double> timestamp;
+  private final TalonOdometryThread talonThread;
+  private final VoltageOut odometryFrequency =
+      new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
+  private final Queue<Double> position;
+  private final Queue<Double> rotation;
+  private final Queue<Double> timestamp;
 
   private final SimpleMotorFeedforward driveFF;
 
@@ -75,6 +77,10 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Slot0.kI = Driving.PID.I;
     talonDriveConfig.Slot0.kD = Driving.PID.D;
 
+    // TODO remove
+    talonDriveConfig.Audio.BeepOnBoot = false;
+    talonDriveConfig.Audio.BeepOnConfig = false;
+
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     encoder = new CANcoder(sensorID, CANIVORE_NAME);
 
@@ -94,6 +100,9 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
     talonTurnConfig.Slot0.kD = Turning.PID.D;
+
+    talonTurnConfig.Audio.BeepOnBoot = false;
+    talonTurnConfig.Audio.BeepOnConfig = false;
 
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
@@ -128,11 +137,11 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(driveMotor);
     TalonUtils.addMotor(turnMotor);
 
-    // talonThread = TalonOdometryThread.getInstance();
-    // position = talonThread.registerSignal(driveMotor.getPosition());
-    // rotation = talonThread.registerSignal(turnMotor.getPosition());
+    talonThread = TalonOdometryThread.getInstance();
+    position = talonThread.registerSignal(() -> driveMotor.getPosition().getValueAsDouble());
+    rotation = talonThread.registerSignal(() -> turnMotor.getPosition().getValueAsDouble());
 
-    // timestamp = talonThread.makeTimestampQueue();
+    timestamp = talonThread.makeTimestampQueue();
 
     resetEncoders();
 
@@ -229,31 +238,43 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public double[][] moduleOdometryData() {
-    // Drive.lock.readLock().lock();
-    // try {
-    //   double[][] data = {
-    //     position.stream().mapToDouble((Double d) -> d).toArray(),
-    //     rotation.stream().mapToDouble((Double d) -> d).toArray(),
-    //     timestamp.stream().mapToDouble((Double d) -> d).toArray()
-    //   };
-    //   return data;
-    // } finally {
-    //   Drive.lock.readLock().unlock();
-    // }
-    return new double[0][0];
+    Drive.lock.lock();
+    try {
+      double[][] data = {
+        position.stream().mapToDouble((Double d) -> d).toArray(),
+        rotation.stream().mapToDouble((Double d) -> d).toArray(),
+        timestamp.stream().mapToDouble((Double d) -> d).toArray()
+      };
+      log("position", data[0]);
+      log("rotation", data[1]);
+      log("timestamp", data[2]);
+
+      return data;
+    } finally {
+      Drive.lock.unlock();
+    }
   }
 
   public SwerveModulePosition[] odometryData() {
     SwerveModulePosition[] positions = new SwerveModulePosition[20];
-    Drive.lock.readLock().lock();
+    Drive.lock.lock();
+
     var data = moduleOdometryData();
-    for (int i = 0; i < data.length; i++) {
-      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRadians(data[1][i]));
+
+    for (int i = 0; i < data[0].length; i++) {
+      positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRotations(data[1][i]));
+      // positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
     }
-    Drive.lock.readLock().unlock();
+
+    position.clear();
+    rotation.clear();
+    timestamp.clear();
+
+    Drive.lock.unlock();
     return positions;
   }
 
+  @Log.NT
   public double[] timestamps() {
     return moduleOdometryData()[2];
   }

@@ -181,6 +181,15 @@ public class Vision implements Logged {
     return estStdDevs;
   }
 
+  public Transform3d[] cameraTransforms() {
+    return new Transform3d[] {
+      FRONT_LEFT_CAMERA.robotToCam(),
+      FRONT_RIGHT_CAMERA.robotToCam(),
+      BACK_LEFT_CAMERA.robotToCam(),
+      BACK_RIGHT_CAMERA.robotToCam()
+    };
+  }
+
   /**
    * Updates the vision field simulation. This method should not be called when code is running on
    * the robot.

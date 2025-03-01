@@ -32,12 +32,6 @@ public final class DriveConstants {
     OPEN_LOOP_VELOCITY;
   }
 
-  /** The type of modules being used. */
-  public static enum ModuleType {
-    TALON, // Kraken X60 Drive, NEO 550 Turn
-    SPARK; // NEO Vortex Drive, NEO 550 Turn
-  }
-
   // TODO: Change central drivetrain constants as needed.
 
   // The angle between the velocity and the displacement from a target, above which the robot will
@@ -48,9 +42,6 @@ public final class DriveConstants {
   // The input of the joystick beyond which the assisted driving will not control the rotation of
   // the swerve.
   public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
-
-  // The type of module on the chassis
-  public static final ModuleType TYPE = ModuleType.SPARK;
 
   // The control loop used by all of the modules when driving
   public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;

@@ -26,7 +26,7 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(13).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(160))));
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
@@ -34,14 +34,14 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(-13).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-160))));
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
-              Inches.of(9.375).in(Meters),
+              Inches.of(9.375).in(Meters), // TODO get new
               new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(

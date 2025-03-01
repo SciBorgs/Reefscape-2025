@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -90,18 +91,20 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
                 (state) -> SignalLogger.writeString("elevator state", state.toString())),
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
-    SmartDashboard.putData(
-        "elevator quasistatic forward",
-        sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
-    SmartDashboard.putData(
-        "elevator quasistatic backward",
-        sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
-    SmartDashboard.putData(
-        "elevator dynamic forward",
-        sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
-    SmartDashboard.putData(
-        "elevator dynamic backward",
-        sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
+    if (TUNING) {
+      SmartDashboard.putData(
+          "elevator quasistatic forward",
+          sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
+      SmartDashboard.putData(
+          "elevator quasistatic backward",
+          sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
+      SmartDashboard.putData(
+          "elevator dynamic forward",
+          sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
+      SmartDashboard.putData(
+          "elevator dynamic backward",
+          sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
+    }
   }
 
   /**

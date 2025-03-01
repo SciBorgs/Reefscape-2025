@@ -32,11 +32,20 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  *
  * @see Units
  */
-public class Constants {
+public class Constants implements Logged {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
+  // private static SendableChooser<Alliance> allianceChooser() {
+  //   SendableChooser<Alliance> chooser = new SendableChooser<>();
+  //   chooser.addOption("Blue", Alliance.Blue);
+  //   chooser.addOption("Red", Alliance.Red);
+  //   SmartDashboard.putData("Alliance Chooser", chooser);
+  //   return chooser;
+  // }
+
   public static Alliance alliance() {
-    return DriverStation.getAlliance().orElse(Alliance.Red);
+    return DriverStation.getAlliance().orElse(Alliance.Blue);
+    // return allianceChooser().getSelected();
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
@@ -70,6 +79,8 @@ public class Constants {
   }
 
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+
+  public static boolean TUNING = true;
 
   /** Describes physical properites of the robot. */
   public static class Robot {

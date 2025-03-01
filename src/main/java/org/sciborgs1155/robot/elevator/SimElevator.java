@@ -20,7 +20,6 @@ public class SimElevator implements ElevatorIO {
           MAX_EXTENSION.in(Meters),
           true,
           MIN_EXTENSION.in(Meters));
-  ;
 
   public SimElevator() {
     elevator.update(0);
