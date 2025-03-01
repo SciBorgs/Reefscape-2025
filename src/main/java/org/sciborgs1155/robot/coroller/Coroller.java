@@ -9,8 +9,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Set;
 import monologue.Logged;
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.GroundIntake;
 import org.sciborgs1155.robot.Robot;
 
@@ -61,6 +63,17 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   /** Stops the roller motors. */
   public Command stop() {
     return run(() -> hardware.set(0)).withName("stop");
+  }
+
+  /**
+   * Sets the coroller to intake for two seconds. Does not check anything itself, requires human
+   * supervision.
+   *
+   * @return Command to set the coroller to intake.
+   */
+  public Test intakeTest() {
+    Command testCommand = intake().withTimeout(2);
+    return new Test(testCommand, Set.of());
   }
 
   @Override

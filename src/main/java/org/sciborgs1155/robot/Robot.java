@@ -13,6 +13,7 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
+import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -121,6 +122,7 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
+  private final LEDStrip fullLED = new LEDStrip(0, 103, false);
   private final LEDStrip leftLED = new LEDStrip(0, 37, false);
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
@@ -270,12 +272,7 @@ public class Robot extends CommandRobot implements Logged {
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
-    driver
-        .povLeft()
-        .onTrue(
-            middleLED
-                .blink(Color.kWhite)
-                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
+    driver.povLeft().onTrue(fullLED.blink(Color.kWhite));
     driver.povRight().onTrue(rightLED.scrolling());
 
     // driver.a().whileTrue(align.reef(Level.L3, A));
@@ -287,12 +284,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
-    operator
-        .rightTrigger()
-        .onTrue(
-            middleLED
-                .blink(Color.kWhite)
-                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
+    operator.rightTrigger().onTrue(fullLED.blink(Color.kWhite));
 
     operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
@@ -343,8 +335,12 @@ public class Robot extends CommandRobot implements Logged {
   public Command systemsCheck() {
     return Test.toCommand(
             drive.systemsCheck(),
+            Test.fromCommand(fullLED.rainbow().withTimeout(2)),
+            hopper.intakeTest(),
+            scoral.intakeTest(),
             elevator.goToTest(Level.L1.extension),
-            Test.fromCommand(scoral.algae().withTimeout(2)))
+            arm.goToTest(MAX_ANGLE),
+            coroller.intakeTest())
         .withName("Test Mechanisms");
   }
 
