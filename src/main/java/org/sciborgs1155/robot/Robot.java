@@ -116,8 +116,7 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    teleop().onTrue(arm.climbSetup());
-    autonomous().onTrue(arm.goTo(STARTING_ANGLE));
+    teleop().whileTrue(arm.goTo(STARTING_ANGLE).until(() -> arm.atGoal()).andThen(arm.goTo(Radians.of(-Math.PI/4)).until(() -> arm.atGoal())).repeatedly());
 
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();

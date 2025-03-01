@@ -36,7 +36,7 @@ public class ArmConstants {
   public static final Angle CLIMB_INTAKE_ANGLE = Radians.of(0);
   public static final Angle CLIMB_FINAL_ANGLE = Radians.of(Math.PI * 3 / 4);
 
-  public static final Translation3d AXLE_FROM_CHASSIS = new Translation3d(-.1, -.225, .35);
+  public static final Translation3d AXLE_FROM_CHASSIS = new Translation3d(.05, .25, .39);
 
   public static final DCMotor GEARBOX = DCMotor.getKrakenX60(2);
   public static final double GEARING = 8.21;

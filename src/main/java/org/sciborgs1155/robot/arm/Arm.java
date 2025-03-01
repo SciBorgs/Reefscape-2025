@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -115,7 +116,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public Pose3d pose() {
-    return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), 0));
+    return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI/2));
   }
 
   /**
@@ -124,6 +125,10 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   public boolean atPosition(double radians) {
     return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
+  }
+
+  public boolean atGoal() {
+    return atPosition(fb.getGoal().position);
   }
 
   /**
