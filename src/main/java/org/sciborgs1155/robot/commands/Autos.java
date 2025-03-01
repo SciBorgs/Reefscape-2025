@@ -32,7 +32,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.*;
 
 public class Autos {
-  public static SendableChooser<Command> configureAutos(Drive drive, Scoraling scoraling) {
+  public static SendableChooser<Command> configureAutos(Drive drive, Scoraling scoraling, Elevator elevator) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -55,13 +55,9 @@ public class Autos {
         () -> alliance() == Alliance.Red,
         drive);
 
-    NamedCommands.registerCommand("score L1", new ScheduleCommand(scoraling.scoral(Level.L1)));
+    NamedCommands.registerCommand("elevator L4", new ScheduleCommand(elevator.scoreLevel(Level.L4)));
 
-    NamedCommands.registerCommand("score L2", new ScheduleCommand(scoraling.scoral(Level.L2)));
-
-    NamedCommands.registerCommand("score L3", new ScheduleCommand(scoraling.scoral(Level.L3)));
-
-    NamedCommands.registerCommand("score L4", new ScheduleCommand(scoraling.scoral(Level.L4)));
+    NamedCommands.registerCommand("scoral", new ScheduleCommand(scoraling.scoral(Level.L4)));
 
     NamedCommands.registerCommand("intake", new ScheduleCommand(scoraling.hpsIntake()));
 
