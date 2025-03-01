@@ -38,20 +38,18 @@ import monologue.Logged;
 public class Constants implements Logged {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
-  private static SendableChooser<Alliance> allianceChooser() {
-    SendableChooser<Alliance> chooser = new SendableChooser<>();
-    chooser.setDefaultOption("Blue", Alliance.Blue);
-    chooser.addOption("Red", Alliance.Red);
-    SmartDashboard.putData("Alliance", chooser);
-    return chooser;
-  }
+  private static SendableChooser<Alliance> allianceChooser = new SendableChooser<>();
 
-  private static final SendableChooser<Alliance> alliance = allianceChooser();
+  private static SendableChooser<Alliance> allianceChooser() {
+    allianceChooser.setDefaultOption("Blue", Alliance.Blue);
+    allianceChooser.addOption("Red", Alliance.Red);
+    SmartDashboard.putData("Alliance", allianceChooser);
+    return allianceChooser;
+  }
 
   public static Alliance alliance() {
-    return alliance.getSelected();
+    return allianceChooser().getSelected();
   }
-
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
   public static Rotation2d allianceRotation() {
