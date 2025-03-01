@@ -40,15 +40,18 @@ public class Constants implements Logged {
   /** Returns the robot's alliance. */
   private static SendableChooser<Alliance> allianceChooser() {
     SendableChooser<Alliance> chooser = new SendableChooser<>();
-    chooser.addOption("Blue", Alliance.Blue);
+    chooser.setDefaultOption("Blue", Alliance.Blue);
     chooser.addOption("Red", Alliance.Red);
-    SmartDashboard.putData("AllianceChooser", chooser);
+    SmartDashboard.putData("Alliance", chooser);
     return chooser;
   }
 
+  private static final SendableChooser<Alliance> alliance = allianceChooser();
+
   public static Alliance alliance() {
-    return allianceChooser().getSelected();
+    return alliance.getSelected();
   }
+
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
   public static Rotation2d allianceRotation() {
