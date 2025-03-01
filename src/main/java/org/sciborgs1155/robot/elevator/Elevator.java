@@ -11,9 +11,9 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -28,10 +28,12 @@ import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.BetterElevatorFeedforward;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
@@ -65,13 +67,19 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  @Log.NT
+  private final BetterElevatorFeedforward ff = new BetterElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
   @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+
+  private final DoubleEntry S = Tuning.entry("/Robot/elevator/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/elevator/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/elevator/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/elevator/kA", kA);
 
   public Elevator(ElevatorIO hardware) {
     setDefaultCommand(retract());
@@ -251,6 +259,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+
+    ff.setKs(S.get());
+    ff.setKg(G.get());
+    ff.setKv(V.get());
+    ff.setKa(A.get());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

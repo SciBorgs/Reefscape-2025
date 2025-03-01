@@ -32,7 +32,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  *
  * @see Units
  */
-public class Constants implements Logged {
+public class Constants {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   // private static SendableChooser<Alliance> allianceChooser() {
