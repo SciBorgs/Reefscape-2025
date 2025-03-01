@@ -83,11 +83,6 @@ public class Robot extends CommandRobot implements Logged {
     SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
   }
 
-  @Override
-  public void simulationPeriodic() {
-    SimulatedArena.getInstance().simulationPeriodic();
-  }
-
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
@@ -113,6 +108,7 @@ public class Robot extends CommandRobot implements Logged {
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> SimulatedArena.getInstance().simulationPeriodic(), PERIOD.in(Seconds));
     }
   }
 
