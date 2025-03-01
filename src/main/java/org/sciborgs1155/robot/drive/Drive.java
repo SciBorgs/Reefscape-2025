@@ -10,6 +10,7 @@ import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.*;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
+import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
@@ -237,25 +238,28 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     TalonOdometryThread.getInstance().start();
 
-    SmartDashboard.putData(
-        "translation quasistatic forward",
-        translationCharacterization.quasistatic(Direction.kForward));
-    SmartDashboard.putData(
-        "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
-    SmartDashboard.putData(
-        "translation quasistatic backward",
-        translationCharacterization.quasistatic(Direction.kReverse));
-    SmartDashboard.putData(
-        "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
-    SmartDashboard.putData(
-        "rotation quasistatic forward", rotationalCharacterization.quasistatic(Direction.kForward));
-    SmartDashboard.putData(
-        "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
-    SmartDashboard.putData(
-        "rotation quasistatic backward",
-        rotationalCharacterization.quasistatic(Direction.kReverse));
-    SmartDashboard.putData(
-        "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+    if (TUNING) {
+      SmartDashboard.putData(
+          "translation quasistatic forward",
+          translationCharacterization.quasistatic(Direction.kForward));
+      SmartDashboard.putData(
+          "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
+      SmartDashboard.putData(
+          "translation quasistatic backward",
+          translationCharacterization.quasistatic(Direction.kReverse));
+      SmartDashboard.putData(
+          "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
+      SmartDashboard.putData(
+          "rotation quasistatic forward",
+          rotationalCharacterization.quasistatic(Direction.kForward));
+      SmartDashboard.putData(
+          "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
+      SmartDashboard.putData(
+          "rotation quasistatic backward",
+          rotationalCharacterization.quasistatic(Direction.kReverse));
+      SmartDashboard.putData(
+          "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+    }
   }
 
   /**

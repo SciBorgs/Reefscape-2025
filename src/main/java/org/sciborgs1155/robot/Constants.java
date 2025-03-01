@@ -1,30 +1,28 @@
 package org.sciborgs1155.robot;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
-import org.sciborgs1155.robot.drive.DriveConstants;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import monologue.Logged;
+import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 /**
  * Constants is a globally accessible class for storing immutable values. Every value should be
@@ -38,16 +36,17 @@ import monologue.Logged;
 public class Constants implements Logged {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
-  private static SendableChooser<Alliance> allianceChooser() {
-    SendableChooser<Alliance> chooser = new SendableChooser<>();
-    chooser.addOption("Blue", Alliance.Blue);
-    chooser.addOption("Red", Alliance.Red);
-    SmartDashboard.putData("AllianceChooser", chooser);
-    return chooser;
-  }
+  // private static SendableChooser<Alliance> allianceChooser() {
+  //   SendableChooser<Alliance> chooser = new SendableChooser<>();
+  //   chooser.addOption("Blue", Alliance.Blue);
+  //   chooser.addOption("Red", Alliance.Red);
+  //   SmartDashboard.putData("Alliance Chooser", chooser);
+  //   return chooser;
+  // }
 
   public static Alliance alliance() {
-    return allianceChooser().getSelected();
+    return DriverStation.getAlliance().orElse(Alliance.Blue);
+    // return allianceChooser().getSelected();
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
@@ -81,6 +80,8 @@ public class Constants implements Logged {
   }
 
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+
+  public static boolean TUNING = true;
 
   /** Describes physical properites of the robot. */
   public static class Robot {

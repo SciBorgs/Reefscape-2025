@@ -138,12 +138,7 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(turnMotor);
 
     talonThread = TalonOdometryThread.getInstance();
-    position =
-        talonThread.registerSignal(
-            () ->
-                driveMotor
-                    .getPosition()
-                    .getValueAsDouble()); // TODO try this!! it used to by driveMotor.getPosition()
+    position = talonThread.registerSignal(() -> driveMotor.getPosition().getValueAsDouble());
     rotation = talonThread.registerSignal(() -> turnMotor.getPosition().getValueAsDouble());
 
     timestamp = talonThread.makeTimestampQueue();
@@ -266,8 +261,8 @@ public class TalonModule implements ModuleIO {
 
     var data = moduleOdometryData();
 
-    log("odometrya dtat 0 length", data[0].length);
-    log("odometrya dtat 1 length", data[1].length);
+    // log("odometrya dtat 0 length", data[0].length);
+    // log("odometrya dtat 1 length", data[1].length);
     for (int i = 0; i < data[0].length; i++) {
       positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRotations(data[1][i]));
       // positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
