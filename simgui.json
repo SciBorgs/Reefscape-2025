@@ -12,7 +12,7 @@
       "/Robot/drive/translationController": "ProfiledPIDController",
       "/Robot/elevator/measurement/mech": "Mechanism2d",
       "/Robot/elevator/measurementVisualizer/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "PIDController",
+      "/Robot/elevator/pid": "ProfiledPIDController",
       "/Robot/elevator/setpoint/mech": "Mechanism2d",
       "/Robot/elevator/setpointVisualizer/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",

@@ -100,7 +100,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
-    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d()});
+    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()});
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -117,6 +117,7 @@ public class Robot extends CommandRobot implements Logged {
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
     teleop().whileTrue(arm.goTo(STARTING_ANGLE).until(() -> arm.atGoal()).andThen(arm.goTo(Radians.of(-Math.PI/4)).until(() -> arm.atGoal())).repeatedly());
+    teleop().whileTrue(elevator.scoreLevel(Level.L4).until(() -> elevator.atGoal()).andThen(elevator.retract().until(() -> elevator.atGoal())).repeatedly());
 
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
