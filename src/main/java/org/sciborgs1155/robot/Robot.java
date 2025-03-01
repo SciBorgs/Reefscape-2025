@@ -337,7 +337,7 @@ public class Robot extends CommandRobot implements Logged {
   public Command systemsCheck() {
     return Test.toCommand(
             Test.fromCommand(fullLED.blink(Color.kRed)),
-            Test.fromCommand(scoraling.hpsIntake()),
+            Test.fromCommand(scoraling.hpsIntake().withTimeout(10)),
             // hopper.intakeTest(),
             // scoral.intakeTest(),
             elevator.goToTest(Level.L1.extension),

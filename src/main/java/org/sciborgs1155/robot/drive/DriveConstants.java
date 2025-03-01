@@ -141,7 +141,6 @@ public final class DriveConstants {
       public static final Current STATOR_LIMIT = Amps.of(80); // 120A max slip current
       public static final Current SUPPLY_LIMIT = Amps.of(70);
 
-
       public static final class PID {
         public static final double P = 3.2;
         public static final double I = 0.0;

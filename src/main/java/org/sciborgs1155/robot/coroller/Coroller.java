@@ -9,10 +9,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Set;
 import monologue.Logged;
 import org.sciborgs1155.lib.SimpleMotor;
-import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.GroundIntake;
 import org.sciborgs1155.robot.Robot;
 
@@ -64,7 +62,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   public Command stop() {
     return run(() -> hardware.set(0)).withName("stop");
   }
-  
+
   @Override
   public void close() throws Exception {
     hardware.close();
