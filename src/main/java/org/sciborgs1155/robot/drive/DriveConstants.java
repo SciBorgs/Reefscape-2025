@@ -116,6 +116,8 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Distance TOLERANCE = Centimeters.of(5);
+
+    public static final double PRECISION = 5;
   }
 
   public static final class Rotation {
@@ -124,6 +126,8 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Angle TOLERANCE = Degrees.of(3);
+
+    public static final double PRECISION = 3;
   }
 
   public static final class ModuleConstants {

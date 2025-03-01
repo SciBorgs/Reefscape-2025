@@ -11,7 +11,6 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
-import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
@@ -20,7 +19,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -34,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Arrays;
 import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -59,7 +56,6 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -82,11 +78,11 @@ public class Robot extends CommandRobot implements Logged {
         default -> Drive.none();
       };
 
-  private final Vision vision =
-      switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
-        default -> new Vision();
-      };
+  // private final Vision vision =
+  //     switch (ROBOT_TYPE) {
+  //       case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+  //       default -> new Vision();
+  //     };
 
   @IgnoreLogged
   private final Elevator elevator =
@@ -154,28 +150,28 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
 
-    if (TUNING) {
-      addPeriodic(
-          () ->
-              log(
-                  "camera transforms",
-                  Arrays.stream(vision.cameraTransforms())
-                      .map(
-                          t ->
-                              new Pose3d(
-                                  drive
-                                      .pose3d()
-                                      .getTranslation()
-                                      .plus(
-                                          t.getTranslation()
-                                              .rotateBy(drive.pose3d().getRotation())),
-                                  t.getRotation().plus(drive.pose3d().getRotation())))
-                      .toArray(Pose3d[]::new)),
-          PERIOD.in(Seconds));
-    }
+    // if (TUNING) {
+    //   addPeriodic(
+    //       () ->
+    //           log(
+    //               "camera transforms",
+    //               Arrays.stream(vision.cameraTransforms())
+    //                   .map(
+    //                       t ->
+    //                           new Pose3d(
+    //                               drive
+    //                                   .pose3d()
+    //                                   .getTranslation()
+    //                                   .plus(
+    //                                       t.getTranslation()
+    //                                           .rotateBy(drive.pose3d().getRotation())),
+    //                               t.getRotation().plus(drive.pose3d().getRotation())))
+    //                   .toArray(Pose3d[]::new)),
+    //       PERIOD.in(Seconds));
+    // }
 
     // Configure pose estimation updates from vision every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -187,7 +183,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));

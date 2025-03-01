@@ -32,7 +32,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  *
  * @see Units
  */
-public class Constants implements Logged {
+public class Constants {
   // TODO: Modify as needed.
   /** Returns the robot's alliance. */
   // private static SendableChooser<Alliance> allianceChooser() {
@@ -44,7 +44,7 @@ public class Constants implements Logged {
   // }
 
   public static Alliance alliance() {
-    return DriverStation.getAlliance().orElse(Alliance.Blue);
+    return DriverStation.getAlliance().orElse(Alliance.Red);
     // return allianceChooser().getSelected();
   }
 
@@ -227,8 +227,15 @@ public class Constants implements Logged {
        */
       private Translation2d centerDisplacementUnit() {
         Translation2d diff =
-            pose.getTranslation().minus(allianceReflect(CENTER_REEF).getTranslation());
+            face().pose().getTranslation().minus(allianceReflect(CENTER_REEF).getTranslation());
         return diff.div(diff.getNorm());
+      }
+
+      private Face face() {
+        return Arrays.stream(Face.values())
+            .filter((a) -> (a.left == this || a.right == this))
+            .findFirst()
+            .orElse(Face.AB);
       }
 
       /**
@@ -239,10 +246,13 @@ public class Constants implements Logged {
        */
       public Pose2d withLevel(Level level) {
         return switch (level) {
-          case L1, L2, L3 -> pose;
-          case L4 ->
+          case L1, L2, L3 ->
               new Pose2d(
                   pose.getTranslation().plus(centerDisplacementUnit().times(0.1)),
+                  pose.getRotation());
+          case L4 ->
+              new Pose2d(
+                  pose.getTranslation().plus(centerDisplacementUnit().times(0.15)),
                   pose.getRotation());
           default -> pose; // hi ;P
         };
