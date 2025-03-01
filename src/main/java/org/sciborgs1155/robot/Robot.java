@@ -32,10 +32,12 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -56,14 +58,16 @@ public class Robot extends CommandRobot implements Logged {
 
   // SUBSYSTEMS
   private final Drive drive = Drive.create();
-  private final Vision vision = Vision.create();
+  // private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
 
   private final LEDStrip led = new LEDStrip();
+  private final Hopper hopper = Hopper.create();
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
 
   // COMMANDS
-  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive, scoraling, elevator);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -88,7 +92,7 @@ public class Robot extends CommandRobot implements Logged {
     FaultLogger.register(pdh);
 
     // Configure pose estimation updates every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    // addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -98,7 +102,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
   }
 

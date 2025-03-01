@@ -1,4 +1,19 @@
 {
+  "HALProvider": {
+    "Addressable LEDs": {
+      "0": {
+        "columns": 64
+      },
+      "window": {
+        "visible": true
+      }
+    },
+    "Other Devices": {
+      "window": {
+        "visible": false
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -28,10 +43,27 @@
       "/SmartDashboard/translation quasistatic forward": "Command"
     },
     "windows": {
+      "/Robot/autos": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Robot/drive/field2d": {
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
+        "module- FL": {
+          "style": "Line"
+        },
+        "module- RR": {
+          "style": "Line"
+        },
+        "module-FR": {
+          "style": "Line"
+        },
+        "module-RL": {
+          "style": "Line"
+        },
         "right": 2961,
         "top": 79,
         "width": 16.541748046875,
@@ -45,6 +77,17 @@
         }
       },
       "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
@@ -73,6 +116,9 @@
     },
     "visible": true
   },
+  "NetworkTables View": {
+    "visible": false
+  },
   "Plot": {
     "Plot <0>": {
       "plots": [
@@ -83,7 +129,11 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 0,
+<<<<<<< HEAD
+          "height": 342,
+=======
+          "height": 285,
+>>>>>>> 82a3a72ec6aac4d3395da4aec7af1e177c54a539
           "series": [
             {
               "color": [
@@ -107,7 +157,8 @@
         }
       ],
       "window": {
-        "name": "Elevator"
+        "name": "Elevator",
+        "visible": false
       }
     }
   }
