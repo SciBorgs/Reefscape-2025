@@ -86,11 +86,6 @@ public class TalonOdometryThread extends Thread {
 
   @Override
   public void run() {
-    // log("num signals", talonSignals.length); // should be 2 signals * 4 modules
-    // log("num phoenix queues", talonQueues.size());
-
-    // log("num other queues", otherQueues.size());
-    // log("num timestamp queues", timestampQueues.size()); // should be 1 * 4 modules + 1 gyro
     while (true) {
       try {
         if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {

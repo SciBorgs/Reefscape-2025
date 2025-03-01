@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -19,6 +20,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -103,6 +105,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         new SysIdRoutine(
             new Config(Volts.of(0.5).per(Second), Volts.of(0.2), Seconds.of(5)),
             new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
+
+    if (TUNING) {
+      SmartDashboard.putData("arm quasistatic forward", quasistaticForward());
+      SmartDashboard.putData("arm quasistatic backward", quasistaticBack());
+      SmartDashboard.putData("arm dynamic forward", dynamicForward());
+      SmartDashboard.putData("arm dynamic backward", dynamicBack());
+    }
   }
 
   /**
@@ -114,14 +123,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * @param radians The position, in radians.
-   * @return True if the arm's position is close enough to a given position, False if it isn't.
-   */
-  public boolean atPosition(double radians) {
-    return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
-  }
-
-  /**
    * @return The position in radians/sec.
    */
   @Log.NT
@@ -130,9 +131,28 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Log.NT
+  public double positionSetpoint() {
+    return fb.getSetpoint().position;
+  }
+
+  @Log.NT
+  public double velocitySetpoint() {
+    return fb.getSetpoint().velocity;
+  }
+
+  /**
+   * @param radians The position, in radians.
+   * @return True if the arm's position is close enough to a given position, False if it isn't.
+   */
+  @Log.NT
+  public boolean atPosition(double radians) {
+    return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
+  }
+
+  @Log.NT
   /** Moves the arm towards a specified goal angle. */
   public Command goTo(Angle goal) {
-    return goTo(() -> goal.in(Radians));
+    return goTo(() -> goal.in(Radians)).withName("moving to angle");
   }
 
   public Command goTo(DoubleSupplier goal) {
@@ -190,7 +210,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("climb execute");
   }
 
-  @Log
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
@@ -198,7 +217,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("quasistatic forward");
   }
 
-  @Log
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
@@ -206,7 +224,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("quasistatic backward");
   }
 
-  @Log
   public Command dynamicForward() {
     return sysIdRoutine
         .dynamic(Direction.kForward)
@@ -214,7 +231,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
         .withName("dynamic forward");
   }
 
-  @Log
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)

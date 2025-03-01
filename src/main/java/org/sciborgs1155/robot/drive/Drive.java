@@ -86,7 +86,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   @IgnoreLogged private final List<ModuleIO> modules;
 
-  // Gyro, navX2-MXP
+  // Gyro, Redux Canandgyro
   private final GyroIO gyro;
   private static Rotation2d simRotation = new Rotation2d();
 
@@ -94,7 +94,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
-  @Log.NT private SwerveModulePosition[] lastPositions;
+  private SwerveModulePosition[] lastPositions;
   private Rotation2d lastHeading;
   public static final ReentrantLock lock = new ReentrantLock();
 
@@ -283,6 +283,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The rotation.
    */
+  @Log.NT
   public Rotation2d heading() {
     return pose().getRotation();
   }
@@ -655,23 +656,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               modules.get(3).odometryData(),
             };
         double[][] allGyro = gyro.odometryData();
-        log("gyro vlauesd", allGyro[0]);
-        log("gyro timestamps", allGyro[1]);
-        for (int i = 0; i < timestamps.length; i++) {
-          // System.out.println(timestamps[i]);
 
+        for (int i = 0; i < timestamps.length; i++) {
           log("num timestamps", timestamps);
 
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = allPositions[m][i];
           }
-
-          log("asfdka modules", modulePositions);
-          // modulePositions[0] = new SwerveModulePosition();
-          // modulePositions[1] = new SwerveModulePosition();
-          // modulePositions[2] = new SwerveModulePosition();
-          // modulePositions[3] = new SwerveModulePosition();
 
           odometry.updateWithTime(
               timestamps[i],

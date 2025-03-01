@@ -11,6 +11,7 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
+import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
@@ -153,22 +154,25 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
 
-    addPeriodic(
-        () ->
-            log(
-                "camera transforms",
-                Arrays.stream(vision.cameraTransforms())
-                    .map(
-                        t ->
-                            new Pose3d(
-                                drive
-                                    .pose3d()
-                                    .getTranslation()
-                                    .plus(
-                                        t.getTranslation().rotateBy(drive.pose3d().getRotation())),
-                                t.getRotation().plus(drive.pose3d().getRotation())))
-                    .toArray(Pose3d[]::new)),
-        PERIOD.in(Seconds));
+    if (TUNING) {
+      addPeriodic(
+          () ->
+              log(
+                  "camera transforms",
+                  Arrays.stream(vision.cameraTransforms())
+                      .map(
+                          t ->
+                              new Pose3d(
+                                  drive
+                                      .pose3d()
+                                      .getTranslation()
+                                      .plus(
+                                          t.getTranslation()
+                                              .rotateBy(drive.pose3d().getRotation())),
+                                  t.getRotation().plus(drive.pose3d().getRotation())))
+                      .toArray(Pose3d[]::new)),
+          PERIOD.in(Seconds));
+    }
 
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
