@@ -104,7 +104,10 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
     Command testCommand = intake().until(beambreakTrigger.negate()).withTimeout(5);
     Set<Assertion> assertions =
         Set.of(
-            tAssert(beambreakTrigger.negate(), "Hopper syst check (beambreak broken)", () -> ""));
+            tAssert(
+                beambreakTrigger.negate(),
+                "Hopper syst check (beambreak broken)",
+                () -> "broken: " + beambreakTrigger.negate()));
 
     return new Test(testCommand, assertions);
   }

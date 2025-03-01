@@ -335,7 +335,6 @@ public class Robot extends CommandRobot implements Logged {
   public Command systemsCheck() {
     return Test.toCommand(
             drive.systemsCheck(),
-            Test.fromCommand(fullLED.rainbow().withTimeout(2)),
             hopper.intakeTest(),
             scoral.intakeTest(),
             elevator.goToTest(Level.L1.extension),

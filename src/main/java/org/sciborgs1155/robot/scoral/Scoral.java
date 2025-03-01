@@ -94,7 +94,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     Command testCommand = intake().until(beambreakTrigger.negate()).withTimeout(5);
     Set<Assertion> assertions =
         Set.of(
-            tAssert(beambreakTrigger.negate(), "Scoral syst check (beambreak broken)", () -> ""));
+            tAssert(
+                beambreakTrigger.negate(),
+                "Scoral syst check (beambreak broken)",
+                () -> "broken: " + beambreakTrigger.negate()));
 
     return new Test(testCommand, assertions);
   }
