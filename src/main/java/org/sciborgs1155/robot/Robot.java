@@ -132,7 +132,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
   // COMMANDS
-  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive, scoraling, elevator);
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
@@ -191,7 +191,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
@@ -288,16 +288,16 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightBumper().whileTrue(scoral.algae());
     operator.rightTrigger().onTrue(fullLED.blink(Color.kWhite));
 
-    operator.a().onTrue(elevator.retract());
+    // operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
-    operator.y().whileTrue(scoraling.runRollersBack());
+    // operator.y().whileTrue(scoraling.runRollersBack());
 
-    operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
-    operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
+    operator.povDown().whileTrue(scoraling.scoral(Level.L1));
+    operator.povRight().whileTrue(scoraling.scoral(Level.L2));
     operator.povUp().whileTrue(scoraling.scoral(Level.L3));
-    operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+    operator.povLeft().whileTrue(scoraling.scoral(Level.L4));
 
     Dashboard.reef()
         .whileTrue(
