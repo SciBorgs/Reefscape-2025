@@ -101,7 +101,7 @@ public class Robot extends CommandRobot implements Logged {
   @IgnoreLogged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Scoral.create();
+        case FULL, SCORALING -> Scoral.none(); // TODO create (mod)
         default -> Scoral.none();
       };
 
