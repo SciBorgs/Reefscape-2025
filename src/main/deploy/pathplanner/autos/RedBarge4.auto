@@ -17,6 +17,19 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "elevator L4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
                   "name": "score L4"
                 }
               }

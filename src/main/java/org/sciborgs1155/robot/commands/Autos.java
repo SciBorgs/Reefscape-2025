@@ -57,7 +57,7 @@ public class Autos {
 
     NamedCommands.registerCommand("elevator L4", new ScheduleCommand(elevator.scoreLevel(Level.L4)));
 
-    NamedCommands.registerCommand("scoral", new ScheduleCommand(scoraling.scoral(Level.L4)));
+    NamedCommands.registerCommand("score L4", new ScheduleCommand(scoraling.scoral(Level.L4)));
 
     NamedCommands.registerCommand("intake", new ScheduleCommand(scoraling.hpsIntake()));
 
