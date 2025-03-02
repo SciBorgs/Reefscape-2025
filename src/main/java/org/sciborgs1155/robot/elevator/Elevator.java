@@ -11,7 +11,11 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -54,31 +58,29 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  @Log.NT private final PIDController pid = new PIDController(kP, kI, kD);
-
   @Log.NT
-  private final NewTrapezoid profile =
-      new NewTrapezoid(
-          new NewTrapezoid.Constraints(
-              MAX_VELOCITY.in(MetersPerSecond),
-              MAX_UPWARDS_ACCEL.in(MetersPerSecondPerSecond),
-              MAX_DOWNWARDS_ACCEL.in(MetersPerSecondPerSecond)));
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(
+          kP,
+          kI,
+          kD,
+          new TrapezoidProfile.Constraints(
+              MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
-  private final ElevatorVisualizer setpointVisualizer =
-      new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+  private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
   @Log.NT
-  private final ElevatorVisualizer measurementVisualizer =
-      new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+  private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
 
     pid.setTolerance(POSITION_TOLERANCE.in(Meters));
-    pid.reset();
+    pid.reset(hardware.position());
+    pid.setGoal(MIN_EXTENSION.in(Meters));
 
     sysIdRoutine =
         new SysIdRoutine(
@@ -145,7 +147,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             .scale(MAX_VELOCITY.in(MetersPerSecond))
             .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
-            .add(() -> profile.goal().position))
+            .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
+            .add(() -> pid.getGoal().position))
         .withName("manual elevator");
   }
 
@@ -196,7 +199,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double positionSetpoint() {
-    return profile.current().position;
+    return pid.getSetpoint().position;
   }
 
   /**
@@ -204,7 +207,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double velocitySetpoint() {
-    return profile.current().velocity;
+    return pid.getSetpoint().velocity;
   }
 
   /**
@@ -212,7 +215,17 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean atGoal() {
-    return profile.atGoal();
+    return pid.atGoal();
+  }
+
+  @Log.NT
+  public Pose3d stage1() {
+    return new Pose3d(BASE_FROM_CHASSIS.plus(new Translation3d(Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position()/2)), new Rotation3d());
+  }
+
+  @Log.NT
+  public Pose3d carriage() {
+    return new Pose3d(CARRIAGE_FROM_CHASSIS.plus(new Translation3d(Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())), new Rotation3d());
   }
 
   /**
@@ -226,12 +239,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         Double.isNaN(position)
             ? MIN_EXTENSION.in(Meters)
             : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
-    double lastVelocity = profile.current().velocity;
-
-    NewTrapezoid.State setpoint =
-        profile.calculate(Constants.PERIOD.in(Seconds), hardware.position(), position);
-    double feedback = pid.calculate(hardware.position(), setpoint.position);
-    double feedforward = ff.calculateWithVelocities(lastVelocity, setpoint.velocity);
+    double lastVelocity = pid.getSetpoint().velocity;
+    double feedback = pid.calculate(hardware.position(), position);
+    double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
     hardware.setVoltage(feedforward + feedback);
   }
@@ -242,8 +252,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * lengths.
    */
   public void periodic() {
-    setpointVisualizer.setLength(positionSetpoint());
-    measurementVisualizer.setLength(position());
+    setpoint.setLength(positionSetpoint());
+    measurement.setLength(position());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

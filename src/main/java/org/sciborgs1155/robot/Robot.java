@@ -2,14 +2,12 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -34,7 +32,6 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -63,7 +60,6 @@ public class Robot extends CommandRobot implements Logged {
   private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
-  private final Arm arm = Arm.create();
 
   private final LEDStrip led = new LEDStrip();
 
@@ -95,7 +91,7 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
-    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d()});
+    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()});
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -111,13 +107,6 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    teleop()
-        .whileTrue(
-            arm.goTo(STARTING_ANGLE)
-                .until(() -> arm.atGoal())
-                .andThen(arm.goTo(Radians.of(-Math.PI / 4)).until(() -> arm.atGoal()))
-                .repeatedly());
-
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
