@@ -220,12 +220,20 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
 
   @Log.NT
   public Pose3d stage1() {
-    return new Pose3d(BASE_FROM_CHASSIS.plus(new Translation3d(Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position()/2)), new Rotation3d());
+    return new Pose3d(
+        BASE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position() / 2)),
+        new Rotation3d());
   }
 
   @Log.NT
   public Pose3d carriage() {
-    return new Pose3d(CARRIAGE_FROM_CHASSIS.plus(new Translation3d(Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())), new Rotation3d());
+    return new Pose3d(
+        CARRIAGE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())),
+        new Rotation3d());
   }
 
   /**

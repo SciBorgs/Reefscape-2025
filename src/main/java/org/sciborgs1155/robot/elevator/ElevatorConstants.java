@@ -33,8 +33,8 @@ public class ElevatorConstants {
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
-  public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2,.125);
-  public static final Translation3d CARRIAGE_FROM_CHASSIS = new Translation3d(.015, -0.2,.1);
+  public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2, .125);
+  public static final Translation3d CARRIAGE_FROM_CHASSIS = new Translation3d(.015, -0.2, .1);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);
