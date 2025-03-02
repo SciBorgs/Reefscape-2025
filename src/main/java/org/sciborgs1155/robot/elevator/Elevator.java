@@ -12,8 +12,6 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -56,23 +54,25 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  @Log.NT
-  private final PIDController pid =
-      new PIDController(
-          kP,
-          kI,
-          kD);
+  @Log.NT private final PIDController pid = new PIDController(kP, kI, kD);
 
   @Log.NT
-  private final NewTrapezoid profile = new NewTrapezoid(new NewTrapezoid.Constraints(MAX_VELOCITY.in(MetersPerSecond), MAX_UPWARDS_ACCEL.in(MetersPerSecondPerSecond), MAX_DOWNWARDS_ACCEL.in(MetersPerSecondPerSecond)));
+  private final NewTrapezoid profile =
+      new NewTrapezoid(
+          new NewTrapezoid.Constraints(
+              MAX_VELOCITY.in(MetersPerSecond),
+              MAX_UPWARDS_ACCEL.in(MetersPerSecondPerSecond),
+              MAX_DOWNWARDS_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
-  private final ElevatorVisualizer setpointVisualizer = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+  private final ElevatorVisualizer setpointVisualizer =
+      new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
   @Log.NT
-  private final ElevatorVisualizer measurementVisualizer = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+  private final ElevatorVisualizer measurementVisualizer =
+      new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   public Elevator(ElevatorIO hardware) {
     this.hardware = hardware;
@@ -228,7 +228,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
     double lastVelocity = profile.current().velocity;
 
-    NewTrapezoid.State setpoint = profile.calculate(Constants.PERIOD.in(Seconds), hardware.position(), position);
+    NewTrapezoid.State setpoint =
+        profile.calculate(Constants.PERIOD.in(Seconds), hardware.position(), position);
     double feedback = pid.calculate(hardware.position(), setpoint.position);
     double feedforward = ff.calculateWithVelocities(lastVelocity, setpoint.velocity);
 

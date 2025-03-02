@@ -2,7 +2,6 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
@@ -13,12 +12,8 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 
-import java.util.List;
-
 import com.ctre.phoenix6.SignalLogger;
-
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -116,7 +111,12 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    teleop().whileTrue(arm.goTo(STARTING_ANGLE).until(() -> arm.atGoal()).andThen(arm.goTo(Radians.of(-Math.PI/4)).until(() -> arm.atGoal())).repeatedly());
+    teleop()
+        .whileTrue(
+            arm.goTo(STARTING_ANGLE)
+                .until(() -> arm.atGoal())
+                .andThen(arm.goTo(Radians.of(-Math.PI / 4)).until(() -> arm.atGoal()))
+                .repeatedly());
 
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
@@ -208,7 +208,7 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(Level.L1.extension),
             Test.fromCommand(scoral.algae().withTimeout(2)))
         .withName("Test Mechanisms");
-  } 
+  }
 
   @Override
   public void close() {

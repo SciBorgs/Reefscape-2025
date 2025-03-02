@@ -30,7 +30,7 @@ public class NewTrapezoid {
     return current.equals(goal);
   }
 
-  /** If you want to use zero velocity setpoints */ 
+  /** If you want to use zero velocity setpoints */
   public State calculate(double t, double current, double goal) {
     return calculate(t, new State(current, 0), new State(goal, 0));
   }
@@ -80,10 +80,16 @@ public class NewTrapezoid {
                 / 2;
 
     // Handle the case where the profile never reaches full speed
-    //https://www.desmos.com/calculator/9otnakisu0
+    // https://www.desmos.com/calculator/9otnakisu0
     if (fullSpeedDist < 0) {
-      upwardsAccelerationTime = Math.sqrt((2 * fullTrapezoidDist) / (constraints.upwardsAccel + (constraints.upwardsAccel / constraints.downwardsAccel) + 1));
-      downwardsAccelerationTime = constraints.upwardsAccel * upwardsAccelerationTime / constraints.downwardsAccel;
+      upwardsAccelerationTime =
+          Math.sqrt(
+              (2 * fullTrapezoidDist)
+                  / (constraints.upwardsAccel
+                      + (constraints.upwardsAccel / constraints.downwardsAccel)
+                      + 1));
+      downwardsAccelerationTime =
+          constraints.upwardsAccel * upwardsAccelerationTime / constraints.downwardsAccel;
       fullSpeedDist = 0;
     }
 
@@ -149,7 +155,7 @@ public class NewTrapezoid {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof State rhs
+      return obj instanceof State rhs
           && rhs.position == this.position
           && rhs.velocity == this.velocity;
     }
