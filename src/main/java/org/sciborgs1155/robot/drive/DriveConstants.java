@@ -73,6 +73,10 @@ public final class DriveConstants {
           Rotation2d.fromRadians(0) // rear right
           );
 
+  // The difference in speed (in meters/sec) of the fastest and slowest motors beyond which implies
+  // skidding
+  public static final double SKIDDING_THRESHOLD = 5;
+
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
   // TODO: Change ALL characterization constants for each unique robot as needed.

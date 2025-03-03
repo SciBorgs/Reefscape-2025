@@ -17,7 +17,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,13 +29,17 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -52,6 +55,9 @@ import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.BetterSwerveDrivePoseEstimator;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -77,7 +83,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   // Odometry and pose estimation
-  private final SwerveDrivePoseEstimator odometry;
+  private final BetterSwerveDrivePoseEstimator odometry;
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -85,6 +91,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // Characterization routines
   private final SysIdRoutine translationCharacterization;
   private final SysIdRoutine rotationalCharacterization;
+
+  private Trigger colliding;
+
+  private LinearAcceleration maxAccel;
+
+  private double visionFOM;
 
   // Movement automation
   @Log.NT
@@ -199,11 +211,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     odometry =
-        new SwerveDrivePoseEstimator(
+        new BetterSwerveDrivePoseEstimator(
             kinematics,
             gyro.rotation2d(),
             modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)));
+            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+            this::odomFOM,
+            () -> visionFOM);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -235,6 +249,27 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         rotationalCharacterization.quasistatic(Direction.kReverse));
     SmartDashboard.putData(
         "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+
+    // configure acceleration limiting and change according to conditions
+    maxAccel = MAX_ACCEL;
+
+    colliding = new Trigger(this::isColliding);
+
+    colliding.onTrue(
+        runOnce(() -> maxAccel = MAX_ACCEL.times(3))
+            .andThen(Commands.waitSeconds(4).andThen(() -> maxAccel = MAX_ACCEL))
+            .asProxy());
+
+    FaultLogger.register(
+        this::isColliding,
+        "Colliding",
+        "The robot is accelerating significantly higher than the max acceleration",
+        FaultType.INFO);
+    FaultLogger.register(
+        this::isSkidding,
+        "Skidding",
+        "One wheel is moving significantly faster than the others.",
+        FaultType.INFO);
   }
 
   /**
@@ -433,6 +468,42 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
+  }
+
+  /**
+   * @return If the robot is skidding.
+   */
+  @Log.NT
+  public boolean isSkidding() {
+    List<Double> sorted =
+        Arrays.stream(moduleStates())
+            .map(c -> c.speedMetersPerSecond)
+            .sorted((a, b) -> a > b ? 1 : -1)
+            .collect(Collectors.toList());
+    return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Log.NT
+  public boolean isColliding() {
+    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
+  }
+
+  /**
+   * Updates the vision FOM to a new value
+   *
+   * @param fom
+   */
+  public void updateVisionFOM(double fom) {
+    visionFOM = fom;
+  }
+
+  private double odomFOM() {
+    return 1
+        - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
+        - (isColliding() ? 0.3 : 0); // reduce FOM if colliding
   }
 
   /**
