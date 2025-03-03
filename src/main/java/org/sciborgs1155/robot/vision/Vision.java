@@ -44,6 +44,10 @@ public class Vision implements Logged {
     return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }
 
+  public static Vision none() {
+    return new Vision();
+  }
+
   public Vision(CameraConfig... configs) {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];

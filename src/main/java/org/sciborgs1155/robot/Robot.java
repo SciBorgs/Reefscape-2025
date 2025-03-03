@@ -88,7 +88,7 @@ public class Robot extends CommandRobot implements Logged {
   private final Vision vision =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
-        default -> new Vision();
+        default -> Vision.none();
       };
 
   @IgnoreLogged
@@ -124,7 +124,6 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
-  private final LEDStrip fullLED = new LEDStrip(0, 103, false);
   private final LEDStrip leftLED = new LEDStrip(0, 37, false);
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
@@ -132,7 +131,9 @@ public class Robot extends CommandRobot implements Logged {
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
   // COMMANDS
-  @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive, scoraling, elevator);
+  @Log.NT
+  private final SendableChooser<Command> autos = Autos.configureAutos(drive, scoraling, elevator);
+
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
@@ -274,7 +275,12 @@ public class Robot extends CommandRobot implements Logged {
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
-    driver.povLeft().onTrue(fullLED.blink(Color.kWhite));
+    driver
+        .povLeft()
+        .onTrue(
+            middleLED
+                .blink(Color.kWhite)
+                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
     driver.povRight().onTrue(rightLED.scrolling());
 
     // driver.a().whileTrue(align.reef(Level.L3, A));
@@ -286,7 +292,12 @@ public class Robot extends CommandRobot implements Logged {
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
-    operator.rightTrigger().onTrue(fullLED.blink(Color.kWhite));
+    operator
+        .rightTrigger()
+        .onTrue(
+            middleLED
+                .blink(Color.kWhite)
+                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     // operator.a().onTrue(elevator.retract());
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
@@ -336,16 +347,28 @@ public class Robot extends CommandRobot implements Logged {
 
   public Command systemsCheck() {
     return Test.toCommand(
-            Test.fromCommand(fullLED.blink(Color.kRed)),
-            Test.fromCommand(scoraling.hpsIntake().withTimeout(10)),
-            // hopper.intakeTest(),
-            // scoral.intakeTest(),
+            Test.fromCommand(
+                middleLED
+                    .blink(Color.kRed)
+                    .alongWith(leftLED.blink(Color.kRed), rightLED.blink(Color.kRed))),
+            Test.fromCommand(
+                hopper
+                    .intake()
+                    .alongWith(scoral.intake())
+                    .until(scoral.beambreakTrigger.negate())
+                    .withTimeout(10)
+                    .andThen(
+                        middleLED.blink(Color.kLime).onlyIf(scoral.beambreakTrigger.negate()))),
             elevator.goToTest(Level.L1.extension),
             arm.goToTest(MAX_ANGLE),
-            Test.fromCommand(coroller.intake().withTimeout(2)),
+            Test.fromCommand(coroller.intake().withTimeout(5)),
             drive.systemsCheck(),
             arm.goToTest(STARTING_ANGLE),
-            elevator.goToTest(MIN_EXTENSION))
+            elevator.goToTest(MIN_EXTENSION),
+            Test.fromCommand(
+                middleLED
+                    .solid(Color.kLime)
+                    .alongWith(leftLED.solid(Color.kLime), rightLED.solid(Color.kLime))))
         .withName("Test Mechanisms");
   }
 
