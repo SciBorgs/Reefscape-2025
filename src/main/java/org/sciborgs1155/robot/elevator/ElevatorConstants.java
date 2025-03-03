@@ -18,7 +18,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 1.0;
+  public static final double kP = 3.0;
   public static final double kI = 0.0;
   public static final double kD = 0.3;
 
@@ -33,7 +33,7 @@ public class ElevatorConstants {
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(3);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(3.5);
+  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2);
 
   public static final Mass WEIGHT = Pounds.of(6.142);
   public static final double GEARING = 9.375;

@@ -58,7 +58,8 @@ public class Constants {
     CHASSIS,
     NONE,
     COROLLING,
-    SCORALING
+    SCORALING,
+    ELEVATOR
   }
 
   /**
@@ -78,9 +79,9 @@ public class Constants {
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+  public static RobotType ROBOT_TYPE = RobotType.FULL;
 
-  public static boolean TUNING = true;
+  public static boolean TUNING = true; 
 
   /** Describes physical properites of the robot. */
   public static class Robot {
@@ -94,7 +95,7 @@ public class Constants {
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)
-  public static final Time ODOMETRY_PERIOD = Seconds.of(1.0 / 250.0); // 4 ms (speedy!)
+  public static final Time ODOMETRY_PERIOD = Seconds.of(1.0 / 20.0); // 4 ms (speedy!)
   public static final double DEADBAND = 0.15;
   public static final double MAX_RATE =
       DriveConstants.MAX_ACCEL.baseUnitMagnitude()

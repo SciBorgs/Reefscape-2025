@@ -48,6 +48,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
     return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR, CANIVORE_NAME), config);
   }
 
+  // TODO specify which gamepiece this intakes
   /** Makes the roller spin inwards(towards robot). */
   public Command intake() {
     return run(() -> hardware.set(INTAKE_POWER)).withName("intake");
