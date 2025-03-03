@@ -245,10 +245,6 @@ public class TalonModule implements ModuleIO {
         rotation.stream().mapToDouble((Double d) -> d).toArray(),
         timestamp.stream().mapToDouble((Double d) -> d).toArray()
       };
-      log("position", data[0]);
-      log("rotation", data[1]);
-      log("timestamp", data[2]);
-
       return data;
     } finally {
       Drive.lock.unlock();
