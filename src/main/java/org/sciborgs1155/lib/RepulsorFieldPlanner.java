@@ -333,7 +333,7 @@ public class RepulsorFieldPlanner implements monologue.Logged {
         var netForce = obstacleForce;
         if (useGoal) {
           netForce = getGoalForce(curTrans, goal).plus(netForce);
-          SmartDashboard.putNumber("forceLog", netForce.getNorm());
+          log("forceLog", netForce.getNorm());
           // Calculate how quickly to move in this direction
           var closeToGoalMax = maxSpeed * Math.min(err.getNorm() / 2, 1);
 
@@ -342,7 +342,7 @@ public class RepulsorFieldPlanner implements monologue.Logged {
         var step = new Translation2d(stepSize_m, netForce.getAngle());
         var intermediateGoal = curTrans.plus(step);
         var endTime = System.nanoTime();
-        SmartDashboard.putNumber("repulsorTimeS", (endTime - startTime) / 1e9);
+        log("repulsorTimeS", (endTime - startTime) / 1e9);
         return sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
       }
     }

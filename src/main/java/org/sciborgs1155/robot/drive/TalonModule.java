@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.FaultLogger.*;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Constants.ODOMETRY_PERIOD;
+import static org.sciborgs1155.robot.Constants.PERIOD;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -125,10 +126,11 @@ public class TalonModule implements ModuleIO {
         1 / ODOMETRY_PERIOD.in(Seconds),
         driveMotor.getPosition(),
         driveMotor.getVelocity(),
-        driveMotor.getMotorVoltage(),
         turnMotor.getPosition(),
-        turnMotor.getVelocity(),
-        turnMotor.getMotorVoltage());
+        turnMotor.getVelocity());
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        1 / PERIOD.in(Seconds), driveMotor.getMotorVoltage(), turnMotor.getMotorVoltage());
 
     register(driveMotor);
     register(turnMotor);
@@ -138,8 +140,9 @@ public class TalonModule implements ModuleIO {
     TalonUtils.addMotor(turnMotor);
 
     talonThread = TalonOdometryThread.getInstance();
-    position = talonThread.registerSignal(() -> driveMotor.getPosition().getValueAsDouble());
-    rotation = talonThread.registerSignal(() -> turnMotor.getPosition().getValueAsDouble());
+
+    position = talonThread.registerSignal(driveMotor.getPosition());
+    rotation = talonThread.registerSignal(turnMotor.getPosition());
 
     timestamp = talonThread.makeTimestampQueue();
 
@@ -215,9 +218,10 @@ public class TalonModule implements ModuleIO {
 
   @Override
   public void updateSetpoint(SwerveModuleState setpoint, ControlMode mode) {
-    setpoint.optimize(rotation());
+    Rotation2d rotation = rotation();
+    setpoint.optimize(rotation);
     // Scale setpoint by cos of turning error to reduce tread wear
-    setpoint.cosineScale(rotation());
+    setpoint.cosineScale(rotation);
 
     if (mode == ControlMode.OPEN_LOOP_VELOCITY) {
       setDriveVoltage(driveFF.calculate(setpoint.speedMetersPerSecond));

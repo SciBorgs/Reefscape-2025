@@ -273,7 +273,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns a Pose3D of the estimated pose of the robot. */
-  @Log.NT
   public Pose3d pose3d() {
     return new Pose3d(odometry.getEstimatedPosition());
   }
@@ -577,13 +576,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns the robot-relative chassis speeds. */
-  @Log.NT
   public ChassisSpeeds robotRelativeChassisSpeeds() {
     return kinematics.toChassisSpeeds(moduleStates());
   }
 
   /** Returns the field-relative chassis speeds. */
-  @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
@@ -695,10 +692,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
     }
-
-    log(
-        "turning target",
-        new Pose2d(pose().getTranslation(), new Rotation2d(rotationController.getSetpoint())));
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

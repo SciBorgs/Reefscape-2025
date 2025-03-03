@@ -71,6 +71,21 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Faults": {
+        "Total Faults": {
+          "open": true,
+          "string[]##v_/Faults/Total Faults/errors": {
+            "open": true
+          },
+          "string[]##v_/Faults/Total Faults/infos": {
+            "open": true
+          },
+          "string[]##v_/Faults/Total Faults/warnings": {
+            "open": true
+          }
+        },
+        "open": true
+      },
       "Robot": {
         "open": true,
         "scoraling": {

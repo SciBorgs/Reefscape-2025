@@ -58,6 +58,7 @@ import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
@@ -94,7 +95,7 @@ public class Robot extends CommandRobot implements Logged {
   @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Elevator.create();
+        case FULL, SCORALING, ELEVATOR -> Elevator.create();
         default -> Elevator.none();
       };
 
@@ -151,7 +152,7 @@ public class Robot extends CommandRobot implements Logged {
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
     Dashboard.configure();
-    addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
+    addPeriodic(Monologue::updateAll, 5 * PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -187,7 +188,6 @@ public class Robot extends CommandRobot implements Logged {
     Pathfinding.setPathfinder(new LocalADStar());
 
     if (isReal()) {
-      URCL.start(DataLogManager.getLog());
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
     } else {
@@ -351,20 +351,13 @@ public class Robot extends CommandRobot implements Logged {
                 middleLED
                     .blink(Color.kRed)
                     .alongWith(leftLED.blink(Color.kRed), rightLED.blink(Color.kRed))),
-            Test.fromCommand(
-                hopper
-                    .intake()
-                    .alongWith(scoral.intake())
-                    .until(scoral.beambreakTrigger.negate())
-                    .withTimeout(10)
-                    .andThen(
-                        middleLED.blink(Color.kLime).onlyIf(scoral.beambreakTrigger.negate()))),
             elevator.goToTest(Level.L1.extension),
+            elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
+            scoraling.runRollersTest(),
             arm.goToTest(MAX_ANGLE),
-            Test.fromCommand(coroller.intake().withTimeout(5)),
-            drive.systemsCheck(),
             arm.goToTest(STARTING_ANGLE),
-            elevator.goToTest(MIN_EXTENSION),
+            Test.fromCommand(coroller.intake().withTimeout(2)),
+            drive.systemsCheck(),
             Test.fromCommand(
                 middleLED
                     .solid(Color.kLime)
