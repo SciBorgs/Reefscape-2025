@@ -18,14 +18,14 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 3.0;
+  public static final double kP = 1.0;
   public static final double kI = 0.0;
   public static final double kD = 0.3;
 
-  public static final double kS = 0.064;
+  public static final double kS = 0.062;
   public static final double kG = 0.24;
-  public static final double kV = 3.9;
-  public static final double kA = 0.093;
+  public static final double kV = 3.6;
+  public static final double kA = 0.012;
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(2.5); // (1.0);
 

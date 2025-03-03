@@ -243,7 +243,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     double lastVelocity = pid.getSetpoint().velocity;
     double feedback = pid.calculate(hardware.position(), position);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
-
+        
+    log("elverootr voltager", feedforward + feedback);
     hardware.setVoltage(feedforward + feedback);
   }
 
