@@ -57,6 +57,8 @@ import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import org.sciborgs1155.lib.BetterSwerveDrivePoseEstimator;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Constants;
@@ -64,7 +66,6 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
-import org.sciborgs1155.robot.vision.Vision;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class Drive extends SubsystemBase implements Logged, AutoCloseable {
@@ -252,10 +253,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     // configure acceleration limiting and change according to conditions
     maxAccel = MAX_ACCEL;
+
+    colliding = new Trigger(this::isColliding);
+
     colliding.onTrue(
         runOnce(() -> maxAccel = MAX_ACCEL.times(3))
             .andThen(Commands.waitSeconds(4).andThen(() -> maxAccel = MAX_ACCEL))
             .asProxy());
+
+    FaultLogger.register(
+        this::isColliding,
+        "Colliding",
+        "The robot is accelerating significantly higher than the max acceleration",
+        FaultType.INFO);
+    FaultLogger.register(
+        this::isSkidding,
+        "Skidding",
+        "One wheel is moving significantly faster than the others.",
+        FaultType.INFO);
   }
 
   /**
@@ -468,22 +483,27 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
   }
 
-  private void updateVisionFOM(double fom) {
+  /**
+   * Updates the vision FOM to a new value
+   *
+   * @param fom
+   */
+  public void updateVisionFOM(double fom) {
     visionFOM = fom;
   }
 
   private double odomFOM() {
     return 1
-        - (isSkidding() ? 0.5 : 0) //reduce FOM if skidding
-        - (isColliding() ? 0.3 : 0) //reduce FOM if colliding
-        - (Timer.getMatchTime() < 50 ? 0.2 : 0); //reduce FOM if late in match
+        - (isSkidding() ? 0.5 : 0) // reduce FOM if skidding
+        - (isColliding() ? 0.3 : 0) // reduce FOM if colliding
+        - (Timer.getMatchTime() < 50 ? 0.2 : 0); // reduce FOM if late in match
   }
 
   /**
    * @return If the robot is colliding.
    */
   public boolean isColliding() {
-    return gyro.acceleration().getNorm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
   }
 
   /**

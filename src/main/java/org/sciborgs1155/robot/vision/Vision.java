@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
-
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
@@ -148,7 +146,6 @@ public class Vision implements Logged {
 
   public double fom() {
     return getSeenTags().length * 0.5;
-
   }
 
   /**

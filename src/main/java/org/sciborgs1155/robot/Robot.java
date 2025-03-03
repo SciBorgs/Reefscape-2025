@@ -89,6 +89,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // Configure pose estimation updates every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    addPeriodic(() -> drive.updateVisionFOM(vision.fom()), PERIOD.in(Seconds));
 
     RobotController.setBrownoutVoltage(6.0);
 
