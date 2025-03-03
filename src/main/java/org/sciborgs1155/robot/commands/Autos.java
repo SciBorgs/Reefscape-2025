@@ -81,7 +81,8 @@ public class Autos {
             new Rotation2d(Radians.of(2.194501263104256)));
 
     return alignment
-        .reef(Level.L4, Branch.I).withTimeout(5)
+        .reef(Level.L4, Branch.I)
+        .withTimeout(5)
         .andThen(alignment.pathfind(source).withTimeout(5))
         .andThen(alignment.reef(Level.L4, Branch.K).withTimeout(5))
         .andThen(alignment.pathfind(source).withTimeout(5))

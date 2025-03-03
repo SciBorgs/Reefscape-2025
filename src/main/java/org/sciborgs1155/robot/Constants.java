@@ -81,7 +81,7 @@ public class Constants {
 
   public static RobotType ROBOT_TYPE = RobotType.FULL;
 
-  public static boolean TUNING = true; 
+  public static boolean TUNING = true;
 
   /** Describes physical properites of the robot. */
   public static class Robot {

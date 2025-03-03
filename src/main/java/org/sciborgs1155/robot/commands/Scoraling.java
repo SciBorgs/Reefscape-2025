@@ -1,14 +1,12 @@
 package org.sciborgs1155.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import monologue.Annotations.Log;
-import monologue.Logged;
-
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
-
+import monologue.Annotations.Log;
+import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -118,13 +116,16 @@ public class Scoraling implements Logged {
   }
 
   public Test runRollersTest() {
-    Command testCommand = 
-      Commands.runOnce(() -> stop = false).andThen(
-        runRollers().repeatedly().until(() -> stop)
-      )
-   .withTimeout(2)
-   .finallyDo(() -> stop = false);
-    Assertion hasCoral = tAssert(scoral.beambreakTrigger.negate()::getAsBoolean, "scoral beambreak", () -> "" + scoral.beambreakTrigger.getAsBoolean());
+    Command testCommand =
+        Commands.runOnce(() -> stop = false)
+            .andThen(runRollers().repeatedly().until(() -> stop))
+            .withTimeout(2)
+            .finallyDo(() -> stop = false);
+    Assertion hasCoral =
+        tAssert(
+            scoral.beambreakTrigger.negate()::getAsBoolean,
+            "scoral beambreak",
+            () -> "" + scoral.beambreakTrigger.getAsBoolean());
     return new Test(testCommand, Set.of(hasCoral));
   }
 }
