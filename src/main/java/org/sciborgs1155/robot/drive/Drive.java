@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -415,7 +414,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean isColliding() {
-    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
+    return gyro.acceleration().getNorm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
   /** Resets all drive encoders to read a position of 0. */

@@ -64,7 +64,8 @@ public final class DriveConstants {
   };
 
   // The difference in the fastest and slowest module beyond which implies skidding.
-  public static final LinearVelocity SKIDDING_THRESHOLD = MetersPerSecond.of(3); //3 is random, change
+  public static final LinearVelocity SKIDDING_THRESHOLD =
+      MetersPerSecond.of(3); // 3 is random, change
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
