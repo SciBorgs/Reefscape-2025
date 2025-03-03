@@ -2,6 +2,8 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
@@ -14,11 +16,14 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -29,7 +34,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Autos {
   public static SendableChooser<Command> configureAutos(
-      Drive drive, Scoraling scoraling, Elevator elevator) {
+      Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -64,6 +69,24 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
+    chooser.addOption("RB4 - alignment", RB4(alignment));
     return chooser;
+  }
+
+  public static Command RB4(Alignment alignment) {
+    Pose2d source =
+        new Pose2d(
+            Meters.of(16.063915252685547),
+            Meters.of(0.660247802734375),
+            new Rotation2d(Radians.of(2.194501263104256)));
+
+    return alignment
+        .reef(Level.L4, Branch.I).withTimeout(5)
+        .andThen(alignment.pathfind(source).withTimeout(5))
+        .andThen(alignment.reef(Level.L4, Branch.K).withTimeout(5))
+        .andThen(alignment.pathfind(source).withTimeout(5))
+        .andThen(alignment.reef(Level.L4, Branch.L).withTimeout(5))
+        .andThen(alignment.pathfind(source).withTimeout(5))
+        .andThen(alignment.reef(Level.L4, Branch.J).withTimeout(5));
   }
 }

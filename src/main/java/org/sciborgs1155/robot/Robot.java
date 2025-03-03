@@ -131,10 +131,11 @@ public class Robot extends CommandRobot implements Logged {
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
 
   // COMMANDS
-  @Log.NT
-  private final SendableChooser<Command> autos = Autos.configureAutos(drive, scoraling, elevator);
-
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
+
+  @Log.NT
+  private final SendableChooser<Command> autos =
+      Autos.configureAutos(drive, scoraling, elevator, align);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 

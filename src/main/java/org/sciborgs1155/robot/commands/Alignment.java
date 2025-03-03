@@ -70,7 +70,7 @@ public class Alignment implements Logged {
                     // .deadlineFor(scoral.run(() -> funky = branch.withLevel(level)))
                     .andThen(scoral.score().withTimeout(Seconds.of(1)))))
         .deadlineFor(elevator.scoreLevel(level))
-        .andThen(pathfind(branch.backPose()).alongWith(elevator.retract()));
+        .andThen(pathfind(branch.backPose()).alongWith(elevator.retract().until(() -> elevator.atGoal())));
   }
 
   /**
