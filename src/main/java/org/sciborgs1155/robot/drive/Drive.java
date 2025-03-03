@@ -403,7 +403,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public boolean isSkidding() {
     List<Double> sorted =
         Arrays.stream(moduleStates())
-            .map(c -> c.speedMetersPerSecond)
+            .map(
+                c ->
+                    new Translation2d(c.speedMetersPerSecond, c.angle)
+                        .minus(
+                            new Translation2d(
+                                robotRelativeChassisSpeeds().vxMetersPerSecond,
+                                robotRelativeChassisSpeeds().vyMetersPerSecond)))
+            .map(c -> c.getNorm())
             .sorted((a, b) -> a > b ? 1 : -1)
             .collect(Collectors.toList());
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD.in(MetersPerSecond);
