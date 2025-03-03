@@ -145,6 +145,9 @@ public class Vision implements Logged {
   }
 
   public double fom() {
+    // double fom = 1;
+    // fom -= Arrays.stream(lastResults).map(c ->
+    // c.getBestTarget().bestCameraToTarget.getTranslation().getNorm()).sorted().findFirst().orElse(Double.valueOf(100)) > 2.5 ? 0.3: 0;
     return getSeenTags().length * 0.5;
   }
 

@@ -30,7 +30,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -494,9 +493,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   private double odomFOM() {
     return 1
-        - (isSkidding() ? 0.5 : 0) // reduce FOM if skidding
-        - (isColliding() ? 0.3 : 0) // reduce FOM if colliding
-        - (Timer.getMatchTime() < 50 ? 0.2 : 0); // reduce FOM if late in match
+        - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
+        - (isColliding() ? 0.3 : 0); // reduce FOM if colliding
   }
 
   /**
