@@ -473,6 +473,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return If the robot is skidding.
    */
+  @Log.NT
   public boolean isSkidding() {
     List<Double> sorted =
         Arrays.stream(moduleStates())
@@ -480,6 +481,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             .sorted((a, b) -> a > b ? 1 : -1)
             .collect(Collectors.toList());
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Log.NT
+  public boolean isColliding() {
+    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
   }
 
   /**
@@ -495,13 +504,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return 1
         - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
         - (isColliding() ? 0.3 : 0); // reduce FOM if colliding
-  }
-
-  /**
-   * @return If the robot is colliding.
-   */
-  public boolean isColliding() {
-    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
   }
 
   /**
