@@ -37,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -393,6 +395,27 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         })
         .until(translationController::atGoal)
         .withName("drive to pose");
+  }
+
+  /**
+   * @return If the robot is skidding.
+   */
+  @Log.NT
+  public boolean isSkidding() {
+    List<Double> sorted =
+        Arrays.stream(moduleStates())
+            .map(c -> c.speedMetersPerSecond)
+            .sorted((a, b) -> a > b ? 1 : -1)
+            .collect(Collectors.toList());
+    return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD.in(MetersPerSecond);
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Log.NT
+  public boolean isColliding() {
+    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
   }
 
   /** Resets all drive encoders to read a position of 0. */
