@@ -50,12 +50,7 @@ public class Scoraling implements Logged {
         .andThen(
             elevator
                 .retract()
-                .alongWith(
-                    Commands.waitUntil(elevator::atGoal)
-                        .andThen(
-                            hopper
-                                .intake()
-                                .alongWith(scoral.intake()))) // runRollers().repeatedly()))
+                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers().repeatedly()))
                 .until(() -> stop)
                 .finallyDo(() -> stop = false))
         .withName("intakingHPS");
@@ -106,10 +101,7 @@ public class Scoraling implements Logged {
         .intake()
         .alongWith(scoral.intake())
         .withTimeout(1)
-        .andThen(
-            (runRollersBack()
-                .withTimeout(0.2) // .andThen(runRollers())
-                .onlyIf(hopper.beambreakTrigger.negate())))
+        .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
 

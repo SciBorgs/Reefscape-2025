@@ -11,17 +11,14 @@ import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.ModuleConfig;
-
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -31,7 +28,8 @@ import org.sciborgs1155.robot.elevator.*;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Autos {
-  public static SendableChooser<Command> configureAutos(Drive drive, Scoraling scoraling, Elevator elevator) {
+  public static SendableChooser<Command> configureAutos(
+      Drive drive, Scoraling scoraling, Elevator elevator) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -54,9 +52,11 @@ public class Autos {
         () -> false,
         drive);
 
-    NamedCommands.registerCommand("elevator L4", new ScheduleCommand(elevator.scoreLevel(Level.L4)));
+    NamedCommands.registerCommand(
+        "elevator L4", new ScheduleCommand(elevator.scoreLevel(Level.L4)));
 
-    NamedCommands.registerCommand("score L4", new ScheduleCommand(scoraling.scoral(Level.L4)).withTimeout(1));
+    NamedCommands.registerCommand(
+        "score L4", new ScheduleCommand(scoraling.scoral(Level.L4)).withTimeout(1));
 
     NamedCommands.registerCommand("intake", new ScheduleCommand(scoraling.hpsIntake()));
 
@@ -67,4 +67,3 @@ public class Autos {
     return chooser;
   }
 }
-
