@@ -104,6 +104,7 @@ public class Robot extends CommandRobot implements Logged {
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
+    addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */

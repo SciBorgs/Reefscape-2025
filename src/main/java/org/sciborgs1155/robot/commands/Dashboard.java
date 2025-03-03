@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
-import static java.util.Map.entry;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
@@ -11,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.HashMap;
 import org.sciborgs1155.robot.Constants;
 // import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.Robot;
@@ -28,6 +26,7 @@ public class Dashboard {
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryTargetElevator;
+  private static NetworkTableEntry entryCurrentElevator;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
@@ -35,8 +34,6 @@ public class Dashboard {
   private static NetworkTableEntry entryBlueAlliance;
   private static NetworkTableEntry entryMatch;
   private static NetworkTableEntry entryMatchTime;
-  public static final HashMap<String, NetworkTableEntry> info = new HashMap<>();
-  public static Trigger processorTrigger;
 
   // private static final Branch[] branches = {
   //   Branch.A, Branch.B, Branch.C, Branch.D, Branch.E, Branch.F, Branch.G, Branch.H, Branch.I,
@@ -57,13 +54,15 @@ public class Dashboard {
 
     entryProcessor = base.getEntry("processor");
     entryProcessor.setBoolean(false);
-    processorTrigger = new Trigger(() -> entryProcessor.getBoolean(false));
 
     entryTargetAlgae = base.getEntry("algae");
     entryTargetAlgae.setInteger(-1);
 
-    entryTargetElevator = base.getEntry("elevator");
-    entryTargetElevator.setDouble(MIN_EXTENSION.in(Meters));
+    entryTargetElevator = base.getEntry("targetElevator");
+    entryTargetElevator.setDouble(0);
+
+    entryCurrentElevator = base.getEntry("currentElevator");
+    entryCurrentElevator.setDouble(0);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -104,9 +103,6 @@ public class Dashboard {
       entryMatch.setString("@ Sim / M0");
       entryMatchTime.setDouble(0);
     }
-
-    // info setup
-    transmit("closestBranch");
   }
 
   /** Increments the robot tick value. Used by Dashboard to detect disconnects. */
@@ -114,16 +110,6 @@ public class Dashboard {
     tick += 1;
     entryRobotTick.setInteger(tick);
     entryMatchTime.setDouble(Robot.isReal() ? DriverStation.getMatchTime() : 0);
-  }
-
-  /**
-   * Adds a key/entry pair to the info hashmap.
-   *
-   * @param key the key of the NetworkTables entry
-   */
-  public static void transmit(String key) {
-    NetworkTableEntry entry = base.getEntry(key);
-    info.put(key, entry);
   }
 
   /** Returns a trigger for when a reef request from the Dashboard is recieved. */
@@ -173,5 +159,16 @@ public class Dashboard {
     return entryTargetElevator.getDouble(MIN_EXTENSION.in(Meters))
             * (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters))
         + MIN_EXTENSION.in(Meters);
+  }
+
+  /**
+   * Sends information about the current elevator height, as a percent.
+   *
+   * @param meters Current heigh in meters.
+   */
+  public static void setElevatorEntry(double meters) {
+    entryCurrentElevator.setDouble(
+        (meters - MIN_EXTENSION.in(Meters))
+            / (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters)));
   }
 }
