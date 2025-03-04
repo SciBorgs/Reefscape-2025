@@ -42,6 +42,8 @@ import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
+
+import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
@@ -243,7 +245,7 @@ public class Robot extends CommandRobot implements Logged {
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
@@ -306,7 +308,8 @@ public class Robot extends CommandRobot implements Logged {
                 .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     // operator.a().onTrue(elevator.retract());
-    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    // operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     // operator.y().whileTrue(scoraling.runRollersBack());
@@ -320,7 +323,7 @@ public class Robot extends CommandRobot implements Logged {
         .whileTrue(
             Commands.defer(
                 () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
-                Set.of(drive, elevator, scoral)));
+                Set.of(drive, elevator, scoral)).alongWith(leftLED.blink(Color.kAqua), rightLED.blink(Color.kAqua), middleLED.solid(Color.kAqua)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }

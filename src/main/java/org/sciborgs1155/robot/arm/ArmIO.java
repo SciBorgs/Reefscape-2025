@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.arm;
 
 import edu.wpi.first.units.measure.Current;
+import monologue.Logged;
+import monologue.Annotations.Log;
 
 /** Hardware interface for {@link Arm} subsystem */
-public interface ArmIO extends AutoCloseable {
+public interface ArmIO extends AutoCloseable, Logged {
   /**
    * @return The position in radians.
    */
