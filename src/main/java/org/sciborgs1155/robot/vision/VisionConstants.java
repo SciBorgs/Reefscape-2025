@@ -35,6 +35,14 @@ public class VisionConstants {
               Inches.of(-13).in(Meters),
               Inches.of(9.375).in(Meters),
               new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
+  public static final CameraConfig BACK_MIDDLE_CAMERA =
+      new CameraConfig(
+          "back middle",
+          new Transform3d(
+              Inches.of(-8.358).in(Meters),
+              Inches.of(3.354).in(Meters),
+              Inches.of(12.341).in(Meters),
+              new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",

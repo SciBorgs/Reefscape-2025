@@ -660,7 +660,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         double[][] allGyro = gyro.odometryData();
 
         for (int i = 0; i < timestamps.length; i++) {
-          log("num timestamps", timestamps);
+          // log("num timestamps", timestamps);
 
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {

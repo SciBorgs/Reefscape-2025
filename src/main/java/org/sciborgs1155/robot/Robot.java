@@ -13,7 +13,7 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
@@ -151,7 +151,7 @@ public class Robot extends CommandRobot implements Logged {
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
     Dashboard.configure();
-    addPeriodic(Monologue::updateAll, 5 * PERIOD.in(Seconds));
+    addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
 
     SmartDashboard.putData(CommandScheduler.getInstance());
@@ -191,7 +191,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      // addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
@@ -237,9 +237,9 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega));
 
-    leftLED.setDefaultCommand(leftLED.music());
+    leftLED.setDefaultCommand(leftLED.rainbow());
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
-    rightLED.setDefaultCommand(rightLED.music());
+    rightLED.setDefaultCommand(rightLED.rainbow());
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
 
@@ -267,9 +267,10 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    driver.a().whileTrue(align.source());
+    driver.a().whileTrue(align.source().alongWith(leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
     driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
     driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
+    
 
     driver.b().onTrue(drive.zeroHeading());
     driver.povUp().whileTrue(coroller.intake());
@@ -354,9 +355,11 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
-            arm.goToTest(MAX_ANGLE),
+            Test.fromCommand(scoral.score().until(scoral.beambreakTrigger).withTimeout(1)),
+            arm.goToTest(INTAKE_ANGLE),
+            Test.fromCommand(coroller.intake().withTimeout(1)),
+            Test.fromCommand(coroller.outtake().withTimeout(1)),
             arm.goToTest(STARTING_ANGLE),
-            Test.fromCommand(coroller.intake().withTimeout(2)),
             drive.systemsCheck(),
             Test.fromCommand(
                 middleLED

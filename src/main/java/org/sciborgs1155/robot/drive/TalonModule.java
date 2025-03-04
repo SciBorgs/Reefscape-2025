@@ -181,7 +181,7 @@ public class TalonModule implements ModuleIO {
   @Override
   public Rotation2d rotation() {
     lastRotation =
-        Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble()).minus(angularOffset);
+        Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble());
     return lastRotation;
   }
 
@@ -263,7 +263,6 @@ public class TalonModule implements ModuleIO {
 
     for (int i = 0; i < data[0].length; i++) {
       positions[i] = new SwerveModulePosition(data[0][i], Rotation2d.fromRotations(data[1][i]));
-      // positions[i] = new SwerveModulePosition(0, Rotation2d.fromRadians(0));
     }
 
     position.clear();
