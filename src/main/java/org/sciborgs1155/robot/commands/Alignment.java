@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static org.sciborgs1155.robot.Constants.Field.moveLeft;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -56,7 +57,7 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return (pathfind(branch.withLevel(level))
+    return (pathfind(moveLeft(branch.withLevel(level)))
             .andThen(drive.stop())
             .andThen(
                 Commands.waitUntil(
@@ -65,7 +66,7 @@ public class Alignment implements Logged {
                                 && drive
                                         .pose()
                                         .getTranslation()
-                                        .minus(branch.withLevel(level).getTranslation())
+                                        .minus(moveLeft(branch.withLevel(level)).getTranslation())
                                         .getNorm()
                                     < Translation.TOLERANCE.in(Meters))
                     // .deadlineFor(scoral.run(() -> funky = branch.withLevel(level)))
@@ -74,7 +75,7 @@ public class Alignment implements Logged {
             Commands.waitUntil(
                     () ->
                         drive.atPose(
-                            branch.withLevel(level),
+                            moveLeft(branch.withLevel(level)),
                             Translation.TOLERANCE.times(Translation.PRECISION),
                             Rotation.TOLERANCE.times(Rotation.PRECISION)))
                 .andThen(elevator.scoreLevel(level)))

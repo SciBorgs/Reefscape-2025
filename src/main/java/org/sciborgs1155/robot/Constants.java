@@ -9,6 +9,7 @@ import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -80,7 +81,7 @@ public class Constants {
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+  public static RobotType ROBOT_TYPE = RobotType.CHARLIE;
 
   public static boolean TUNING = false;
 
@@ -197,6 +198,12 @@ public class Constants {
             .findFirst()
             .orElse(AB);
       }
+    }
+
+    public static final Distance TO_THE_LEFT = Inches.of(2.5);
+
+    public static Pose2d moveLeft(Pose2d pose) {
+      return pose.transformBy(new Transform2d(new Translation2d(TO_THE_LEFT.in(Meters), Rotation2d.fromDegrees(90)), Rotation2d.kZero));
     }
 
     // Poses for scoraling.

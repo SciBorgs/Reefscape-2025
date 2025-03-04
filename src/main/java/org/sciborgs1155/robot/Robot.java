@@ -90,7 +90,6 @@ public class Robot extends CommandRobot implements Logged {
         default -> Vision.none();
       };
 
-  @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, ELEVATOR, CHARLIE -> Elevator.create();
