@@ -22,7 +22,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.Queue;
-import monologue.Annotations.Log;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -47,7 +46,7 @@ public class TalonModule implements ModuleIO {
 
   private final Rotation2d angularOffset;
 
- private SwerveModuleState setpoint = new SwerveModuleState();
+  private SwerveModuleState setpoint = new SwerveModuleState();
 
   private Rotation2d lastRotation;
 

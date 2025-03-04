@@ -80,7 +80,7 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
+        case FULL, SCORALING, COROLLING, CHASSIS, CHARLIE -> Drive.create();
         default -> Drive.none();
       };
 
@@ -93,33 +93,33 @@ public class Robot extends CommandRobot implements Logged {
   @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, ELEVATOR -> Elevator.create();
+        case FULL, SCORALING, ELEVATOR, CHARLIE -> Elevator.create();
         default -> Elevator.none();
       };
 
   @IgnoreLogged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Scoral.create(); // TODO create (mod)
+        case FULL, SCORALING, CHARLIE -> Scoral.create(); // TODO create (mod)
         default -> Scoral.none();
       };
 
   @IgnoreLogged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING, CHARLIE -> Hopper.create();
         default -> Hopper.none();
       };
 
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Coroller.create();
+        case FULL, COROLLING, CHARLIE -> Coroller.create();
         default -> Coroller.none();
       };
 
   private final Arm arm =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Arm.create();
+        case FULL, COROLLING, CHARLIE -> Arm.create();
         default -> Arm.none();
       };
 

@@ -77,10 +77,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
-  private final DoubleEntry S = Tuning.entry("/Robot/elevator/kS", kS);
-  private final DoubleEntry G = Tuning.entry("/Robot/elevator/kG", kG);
-  private final DoubleEntry V = Tuning.entry("/Robot/elevator/kV", kV);
-  private final DoubleEntry A = Tuning.entry("/Robot/elevator/kA", kA);
+  private final DoubleEntry S = Tuning.entry("/Robot/tuningElevator/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/tuningElevator/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/tuningElevator/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/tuningElevator/kA", kA);
 
   public Elevator(ElevatorIO hardware) {
     setDefaultCommand(retract());

@@ -59,7 +59,8 @@ public class Constants {
     NONE,
     COROLLING,
     SCORALING,
-    ELEVATOR
+    ELEVATOR,
+    CHARLIE
   }
 
   /**
