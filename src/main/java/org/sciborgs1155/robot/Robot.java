@@ -160,7 +160,7 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    FaultLogger.register(pdh);
+    // FaultLogger.register(pdh);
 
     if (TUNING) {
       addPeriodic(
@@ -271,7 +271,7 @@ public class Robot extends CommandRobot implements Logged {
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
-
+    driver.leftTrigger().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     driver
         .a()
         .whileTrue(
@@ -303,18 +303,12 @@ public class Robot extends CommandRobot implements Logged {
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
-    operator
-        .rightTrigger()
-        .onTrue(
-            middleLED
-                .blink(Color.kWhite)
-                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     // operator.a().onTrue(elevator.retract());
     // operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
-    operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
+    operator.rightTrigger().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     // operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().whileTrue(scoraling.scoral(Level.L1));

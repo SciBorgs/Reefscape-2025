@@ -125,7 +125,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    return hardware.position();
+    return hardware.position() + STARTING_ANGLE.in(Radians);
   }
 
   /**
@@ -134,15 +134,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public Pose3d pose() {
     return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI / 2));
-  }
-
-  /**
-   * @param radians The position, in radians.
-   * @return True if the arm's position is close enough to a given position, False if it isn't.
-   */
-  public boolean atPosition(double radians) {
-    return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
-    return hardware.position() + STARTING_ANGLE.in(Radians);
   }
 
   public boolean atGoal() {
