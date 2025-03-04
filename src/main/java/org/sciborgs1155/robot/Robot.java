@@ -182,6 +182,8 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
+    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()});
+
     RobotController.setBrownoutVoltage(6.0);
 
     Pathfinding.setPathfinder(new LocalADStar());
@@ -243,7 +245,10 @@ public class Robot extends CommandRobot implements Logged {
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected));
+    autonomous()
+        .whileTrue(
+            Commands.deferredProxy(autos::getSelected)
+                .alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
@@ -306,7 +311,8 @@ public class Robot extends CommandRobot implements Logged {
                 .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
 
     // operator.a().onTrue(elevator.retract());
-    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    // operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.x().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
     // operator.y().whileTrue(scoraling.runRollersBack());
@@ -319,8 +325,12 @@ public class Robot extends CommandRobot implements Logged {
     Dashboard.reef()
         .whileTrue(
             Commands.defer(
-                () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
-                Set.of(drive, elevator, scoral)));
+                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
+                    Set.of(drive, elevator, scoral))
+                .alongWith(
+                    leftLED.blink(Color.kAqua),
+                    rightLED.blink(Color.kAqua),
+                    middleLED.solid(Color.kAqua)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }

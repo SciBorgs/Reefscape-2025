@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -32,8 +33,11 @@ public class ElevatorConstants {
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
-  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(3);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2);
+  public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2, .125);
+  public static final Translation3d CARRIAGE_FROM_CHASSIS = new Translation3d(.015, -0.2, .1);
+
+  public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
+  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);
 
   public static final Mass WEIGHT = Pounds.of(6.142);
   public static final double GEARING = 9.375;

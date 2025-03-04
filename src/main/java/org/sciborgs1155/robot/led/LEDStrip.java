@@ -95,18 +95,18 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     if (Constants.alliance() == Alliance.Red) {
       return set(
           LEDPattern.gradient(
-                  LEDPattern.GradientType.kDiscontinuous, Color.kFirstRed, Color.kOrangeRed)
+                  LEDPattern.GradientType.kContinuous, Color.kFirstRed, Color.kOrangeRed)
               .breathe(Seconds.of(2)));
     } else {
       return set(
-          LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kFirstBlue, Color.kAqua)
+          LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kFirstBlue, Color.kAqua)
               .breathe(Seconds.of(2)));
     }
   }
 
   /** Blinks the LEDStrip white for 0.15 seconds, with a followng 0.15 seconds rest, twice. */
   public Command blink(Color color) {
-    return set(LEDPattern.solid(color).blink(Seconds.of(0.15))).withTimeout(0.95);
+    return set(LEDPattern.solid(color).blink(Seconds.of(0.25)));
   }
 
   /** Applies an LEDPattern to the set of LEDs controlled by the LEDStrip. */

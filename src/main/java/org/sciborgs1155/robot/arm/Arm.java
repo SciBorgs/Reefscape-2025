@@ -13,8 +13,11 @@ import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -43,7 +46,7 @@ import org.sciborgs1155.robot.Robot;
 /** Simple Arm subsystem used for climbing and intaking coral from the ground. */
 public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Interface for interacting with the motor itself. */
-  @Log.NT private final ArmIO hardware;
+  private final ArmIO hardware;
 
   /** Trapezoid profile feedback (PID) controller */
   @Log.NT
@@ -96,9 +99,12 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   private Arm(ArmIO hardware) {
     this.hardware = hardware;
+
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(STARTING_ANGLE.in(Radians));
     fb.setGoal(STARTING_ANGLE.in(Radians));
+    fb.enableContinuousInput(-Math.PI, Math.PI);
+
     // setDefaultCommand(goTo(DEFAULT_ANGLE));
 
     this.sysIdRoutine =
@@ -119,7 +125,19 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    return hardware.position() + Math.PI / 2;
+    return hardware.position();
+  }
+
+  /**
+   * @return pose of the arm centered
+   */
+  @Log.NT
+  public Pose3d pose() {
+    return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI / 2));
+  }
+
+  public boolean atGoal() {
+    return atPosition(fb.getGoal().position);
   }
 
   /**
@@ -154,10 +172,14 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     return goTo(() -> goal.in(Radians)).withName("moving to angle");
   }
 
+  /** Moves the arm towards a goal in radians */
   public Command goTo(DoubleSupplier goal) {
     return run(() -> {
           double feedforward = ff.calculate(fb.getSetpoint().position, 0);
-          double feedback = fb.calculate(hardware.position(), goal.getAsDouble());
+          double feedback =
+              fb.calculate(
+                  position(),
+                  MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
           hardware.setVoltage(feedback + feedforward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians");
@@ -239,7 +261,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
 
   @Override
   public void periodic() {
-    armLigament.setAngle(Math.toDegrees(hardware.position()));
+    armLigament.setAngle(Math.toDegrees(position()));
   }
 
   @Override
