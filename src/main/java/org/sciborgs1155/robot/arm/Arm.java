@@ -16,6 +16,8 @@ import static org.sciborgs1155.robot.arm.ArmConstants.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -123,7 +125,28 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
+    return hardware.position();
+  }
+
+  /**
+   * @return pose of the arm centered
+   */
+  @Log.NT
+  public Pose3d pose() {
+    return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI / 2));
+  }
+
+  /**
+   * @param radians The position, in radians.
+   * @return True if the arm's position is close enough to a given position, False if it isn't.
+   */
+  public boolean atPosition(double radians) {
+    return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
     return hardware.position() + STARTING_ANGLE.in(Radians);
+  }
+
+  public boolean atGoal() {
+    return atPosition(fb.getGoal().position);
   }
 
   /**

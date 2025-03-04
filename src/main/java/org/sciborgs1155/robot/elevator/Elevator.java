@@ -12,6 +12,9 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
@@ -227,6 +230,24 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public boolean atGoal() {
     return pid.atGoal();
+  }
+
+  @Log.NT
+  public Pose3d stage1() {
+    return new Pose3d(
+        BASE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position() / 2)),
+        new Rotation3d());
+  }
+
+  @Log.NT
+  public Pose3d carriage() {
+    return new Pose3d(
+        CARRIAGE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())),
+        new Rotation3d());
   }
 
   /**
