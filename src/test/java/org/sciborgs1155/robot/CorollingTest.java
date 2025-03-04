@@ -7,8 +7,8 @@ import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
+import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE;
 import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.PROCESSOR_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
 
@@ -61,10 +61,10 @@ public class CorollingTest {
 
   @Test
   public void intakeTest() {
-    Command testcmd = corolling.intake();
+    Command testcmd = corolling.intake(CORAL_INTAKE);
     runToCompletion(testcmd);
     assertEquals(
-        arm.position(), INTAKE_ANGLE.in(Radians), ArmConstants.POSITION_TOLERANCE.in(Radians));
+        arm.position(), CORAL_INTAKE.in(Radians), ArmConstants.POSITION_TOLERANCE.in(Radians));
     assertTrue(testcmd::isFinished);
 
     assertTrue(arm.getDefaultCommand().equals(arm.getCurrentCommand()));

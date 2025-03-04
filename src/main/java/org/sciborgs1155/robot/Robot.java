@@ -5,10 +5,16 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.*;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.ALGAE_INTAKE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -32,11 +38,16 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
+import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDStrip;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
@@ -60,11 +71,15 @@ public class Robot extends CommandRobot implements Logged {
   private final Vision vision = Vision.create();
   private final Elevator elevator = Elevator.create();
   private final Scoral scoral = Scoral.create();
-
+  private final Hopper hopper = Hopper.create();
+  private final Arm arm = Arm.create();
+  private final Coroller coroller = Coroller.create();
   private final LEDStrip led = new LEDStrip();
 
   // COMMANDS
   @Log.NT private final SendableChooser<Command> autos = Autos.configureAutos(drive);
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
+  private final Corolling corolling = new Corolling(arm, coroller);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -107,6 +122,28 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+
+    // scoral commands
+    operator.povDown().whileTrue(scoraling.scoral(Level.L1));
+    operator.povRight().whileTrue(scoraling.scoral(Level.L2));
+    operator.povLeft().whileTrue(scoraling.scoral(Level.L3));
+    operator.povUp().whileTrue(scoraling.scoral(Level.L4));
+
+    // corolling commands
+    // climb
+    operator.a().onTrue(corolling.intake(CLIMB_INTAKE_ANGLE));
+    operator.b().whileTrue(arm.climbExecute());
+    // coral
+    operator.rightBumper().whileTrue(corolling.trough());
+    operator.rightTrigger().whileTrue(corolling.intake(CORAL_INTAKE));
+    // algae
+    operator.x().whileTrue(corolling.intake(ALGAE_INTAKE));
+    operator.y().whileTrue(corolling.processor());
+    operator.leftBumper().whileTrue(scoraling.cleanAlgae(Level.L2));
+    operator.leftTrigger().whileTrue(scoraling.cleanAlgae(Level.L3));
+
+    // x and y are switched: we use joystick y axis to control field x motion
+
     InputStream x = InputStream.of(driver::getLeftX).log("raw x");
     InputStream y = InputStream.of(driver::getLeftY).log("raw y").negate();
 
@@ -153,21 +190,7 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
-    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
-
-    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
-    operator.leftBumper().whileTrue(scoral.score());
-    operator.rightBumper().whileTrue(scoral.algae());
-
-    operator.a().onTrue(elevator.retract());
-    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
-    operator.y().whileTrue(elevator.highFive());
-
-    operator.povDown().onTrue(elevator.scoreLevel(Level.L1));
-    operator.povRight().onTrue(elevator.scoreLevel(Level.L2));
-    operator.povUp().onTrue(elevator.scoreLevel(Level.L3));
-    operator.povLeft().onTrue(elevator.scoreLevel(Level.L4));
+    driver.leftTrigger().onTrue(scoraling.hpsIntake());
   }
 
   /**
@@ -204,6 +227,12 @@ public class Robot extends CommandRobot implements Logged {
     super.close();
     try {
       drive.close();
+      coroller.close();
+      led.close();
+      elevator.close();
+      scoral.close();
+      hopper.close();
+      arm.close();
     } catch (Exception e) {
     }
   }
