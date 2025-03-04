@@ -43,6 +43,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -440,6 +442,53 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             lastHeading.getRadians()
                 - target.minus(pose().getTranslation()).getAngle().getRadians())
         < rotationController.getErrorTolerance();
+  }
+
+  /**
+   * Checks whether the robot is at a certain field coordinate.
+   *
+   * @param position The target position.
+   * @param tolerance The tolerance, above which the robot will not be considered to be "at" the
+   *     target.
+   * @return Whether the robot is at a target translation.
+   */
+  public boolean atPosition(Translation2d position, Distance tolerance) {
+    return pose().getTranslation().minus(position).getNorm() < tolerance.in(Meters);
+  }
+
+  /**
+   * Checks whether the robot is at a certain rotation.
+   *
+   * @param rotation The target rotation.
+   * @param tolerance The tolerance, above which the robot will not be considered to be "at" the
+   *     rotation.
+   * @return Whether the robot is at a target rotation.
+   */
+  public boolean atRotation(Rotation2d rotation, Angle tolerance) {
+    return Math.abs(heading().minus(rotation).getRadians()) < tolerance.in(Radians);
+  }
+
+  /**
+   * Checks whether the robot is at a certain pose.
+   *
+   * @param pose The target pose.
+   * @param translationTolerance The translational tolerance.
+   * @param rotationTolerance The rotational tolerance.
+   * @return Whether the robot is at a target pose.
+   */
+  public boolean atPose(Pose2d pose, Distance translationTolerance, Angle rotationTolerance) {
+    return atPosition(pose.getTranslation(), translationTolerance)
+        && atRotation(pose.getRotation(), rotationTolerance);
+  }
+
+  /**
+   * Checks whether the robot is at a certain pose. Uses the DriveConstants tolerances.
+   *
+   * @param pose The target pose.
+   * @return Whether the robot is at a target pose.
+   */
+  public boolean atPose(Pose2d pose) {
+    return atPose(pose, Translation.TOLERANCE, Rotation.TOLERANCE);
   }
 
   /**

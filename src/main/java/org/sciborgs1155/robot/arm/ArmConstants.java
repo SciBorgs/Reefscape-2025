@@ -46,10 +46,10 @@ public class ArmConstants {
   public static final Distance ARM_LENGTH = Centimeters.of(10);
 
   /** Fully extended. */
-  public static final Angle MIN_ANGLE = Radians.of(-0.79613);//(-Math.PI / 4 - 0.2);
+  public static final Angle MIN_ANGLE = Radians.of(-0.79613); // (-Math.PI / 4 - 0.2);
 
   /** Fully retracted. */
-  public static final Angle MAX_ANGLE = Radians.of(1.632); //Radians.of(Math.PI * 3 / 4 + 0.1);
+  public static final Angle MAX_ANGLE = Radians.of(1.632); // Radians.of(Math.PI * 3 / 4 + 0.1);
 
   public static final Angle POSITION_TOLERANCE = Degrees.of(2);
 

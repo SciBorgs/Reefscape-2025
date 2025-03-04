@@ -12,8 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
+import org.sciborgs1155.robot.drive.DriveConstants;
 
-// Taken straight from 6995's code. Thanks to 6995!!
+// Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner {
 
   abstract static class Obstacle {
@@ -160,12 +161,17 @@ public class RepulsorFieldPlanner {
   private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
   private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
 
+  private int pathfindingStatus = 0;
+
+  private SwerveSample prevSample;
+
   public RepulsorFieldPlanner() {
     fixedObstacles.addAll(FIELD_OBSTACLES);
     fixedObstacles.addAll(WALLS);
     for (int i = 0; i < ARROWS_SIZE; i++) {
       arrows.add(new Pose2d());
     }
+    this.prevSample = sample(Translation2d.kZero, Rotation2d.kZero, 0, 0, 0);
     // {
     //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useGoalInArrows");
     //   topic.publish().set(useGoalInArrows);
@@ -309,6 +315,13 @@ public class RepulsorFieldPlanner {
     //     new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
     // double currentSpeed =
     //     Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    if (pathfindingStatus != 0) {
+      pathfindingStatus--;
+      return prevSample;
+    } else {
+      pathfindingStatus = DriveConstants.PATHFINDING_PERIOD;
+    }
+
     double stepSize_m = maxSpeed * 0.02; // TODO
     if (goalOpt.isEmpty()) {
       return sample(pose.getTranslation(), pose.getRotation(), 0, 0, 0);
@@ -334,7 +347,9 @@ public class RepulsorFieldPlanner {
         var intermediateGoal = curTrans.plus(step);
         // var endTime = System.nanoTime();
         // log("repulsorTimeS", (endTime - startTime) / 1e9);
-        return sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
+        prevSample =
+            sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
+        return prevSample;
       }
     }
   }

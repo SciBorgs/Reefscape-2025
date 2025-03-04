@@ -20,7 +20,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.geometry.Pose3d;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -43,8 +42,6 @@ import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
-
-import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
@@ -83,7 +80,7 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
+        case FULL, SCORALING, COROLLING, CHASSIS, CHARLIE -> Drive.create();
         default -> Drive.none();
       };
 
@@ -96,33 +93,33 @@ public class Robot extends CommandRobot implements Logged {
   @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, ELEVATOR -> Elevator.create();
+        case FULL, SCORALING, ELEVATOR, CHARLIE -> Elevator.create();
         default -> Elevator.none();
       };
 
   @IgnoreLogged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Scoral.create(); // TODO create (mod)
+        case FULL, SCORALING, CHARLIE -> Scoral.create(); // TODO create (mod)
         default -> Scoral.none();
       };
 
   @IgnoreLogged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING, CHARLIE -> Hopper.create();
         default -> Hopper.none();
       };
 
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Coroller.create();
+        case FULL, COROLLING, CHARLIE -> Coroller.create();
         default -> Coroller.none();
       };
 
   private final Arm arm =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Arm.create();
+        case FULL, COROLLING, CHARLIE -> Arm.create();
         default -> Arm.none();
       };
 
@@ -248,7 +245,13 @@ public class Robot extends CommandRobot implements Logged {
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
+    // scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
+    // hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+
+    autonomous()
+        .whileTrue(
+            Commands.deferredProxy(autos::getSelected)
+                .alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
@@ -271,7 +274,7 @@ public class Robot extends CommandRobot implements Logged {
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
-    driver.leftTrigger().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
+    driver.rightTrigger().whileTrue(scoraling.hpsIntake());
     driver
         .a()
         .whileTrue(
@@ -308,7 +311,7 @@ public class Robot extends CommandRobot implements Logged {
     // operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
-    operator.rightTrigger().whileTrue(scoraling.hpsIntake().alongWith(rumble(RumbleType.kBothRumble, 0.5)));
+    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
     // operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().whileTrue(scoraling.scoral(Level.L1));
@@ -319,8 +322,12 @@ public class Robot extends CommandRobot implements Logged {
     Dashboard.reef()
         .whileTrue(
             Commands.defer(
-                () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
-                Set.of(drive, elevator, scoral)).alongWith(leftLED.blink(Color.kAqua), rightLED.blink(Color.kAqua), middleLED.solid(Color.kAqua)));
+                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
+                    Set.of(drive, elevator, scoral))
+                .alongWith(
+                    leftLED.blink(Color.kAqua),
+                    rightLED.blink(Color.kAqua),
+                    middleLED.solid(Color.kAqua)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
   }

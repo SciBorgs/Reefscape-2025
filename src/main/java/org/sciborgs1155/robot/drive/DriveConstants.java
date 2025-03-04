@@ -97,6 +97,9 @@ public final class DriveConstants {
   public static final PathConstraints PATH_CONSTRAINTS =
       new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
 
+  // How many ticks before it pathfinds again.
+  public static final int PATHFINDING_PERIOD = 1;
+
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =

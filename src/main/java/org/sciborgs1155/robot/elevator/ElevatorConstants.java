@@ -28,7 +28,7 @@ public class ElevatorConstants {
   public static final double kV = 3.6;
   public static final double kA = 0.012;
 
-  public static final Distance POSITION_TOLERANCE = Centimeters.of(2.5); // (1.0);
+  public static final Distance POSITION_TOLERANCE = Centimeters.of(3.5); // (1.0);
 
   public static final Distance MIN_EXTENSION = Meters.of(0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);

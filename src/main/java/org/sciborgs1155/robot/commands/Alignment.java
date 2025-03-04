@@ -20,6 +20,7 @@ import org.sciborgs1155.robot.Constants.Field.Face.Side;
 import org.sciborgs1155.robot.Constants.Field.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
@@ -69,7 +70,14 @@ public class Alignment implements Logged {
                                     < Translation.TOLERANCE.in(Meters))
                     // .deadlineFor(scoral.run(() -> funky = branch.withLevel(level)))
                     .andThen(scoral.score().withTimeout(Seconds.of(1)))))
-        .deadlineFor(elevator.scoreLevel(level))
+        .deadlineFor(
+            Commands.waitUntil(
+                    () ->
+                        drive.atPose(
+                            branch.withLevel(level),
+                            Translation.TOLERANCE.times(Translation.PRECISION),
+                            Rotation.TOLERANCE.times(Rotation.PRECISION)))
+                .andThen(elevator.scoreLevel(level)))
         .andThen(
             pathfind(branch.backPose())
                 .alongWith(elevator.retract().until(() -> elevator.atGoal())));
@@ -154,7 +162,7 @@ public class Alignment implements Logged {
     return Commands.defer(
             () ->
                 (drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                            > DriveConstants.Translation.TOLERANCE.in(Meters) * 2
+                            > DriveConstants.Translation.TOLERANCE.in(Meters) * 3
                         ? drive.run(
                             () -> {
                               planner.setGoal(goal.getTranslation());
