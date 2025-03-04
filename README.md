@@ -18,7 +18,6 @@ This project currently contains drive, vision, and autos. You are expected to ad
 - [PathPlannerLib](https://pathplanner.dev/home.html)
 - [PhotonLib](https://docs.photonvision.org/en/latest/docs/programming/photonlib/adding-vendordep.html)
 - [Phoenix6](https://v6.docs.ctr-electronics.com/en/stable/)
-- [URCL](https://github.com/Mechanical-Advantage/URCL)
 - [Studica](https://pdocs.kauailabs.com/navx-mxp/software/roborio-libraries/java/)
 - [ReduxLib](https://docs.reduxrobotics.com/canandgyro/getting-started)
 - [Spotless](https://github.com/diffplug/spotless/blob/main/plugin-gradle/README.md)

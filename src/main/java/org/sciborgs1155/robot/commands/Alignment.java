@@ -63,6 +63,7 @@ public class Alignment implements Logged {
                 Commands.waitUntil(
                         () ->
                             elevator.atPosition(level.extension.in(Meters))
+                                && Math.abs(elevator.velocity()) < 0.005
                                 && drive
                                         .pose()
                                         .getTranslation()
@@ -78,10 +79,10 @@ public class Alignment implements Logged {
                             moveLeft(branch.withLevel(level)),
                             Translation.TOLERANCE.times(Translation.PRECISION),
                             Rotation.TOLERANCE.times(Rotation.PRECISION)))
-                .andThen(elevator.scoreLevel(level)))
-        .andThen(
-            pathfind(branch.backPose())
-                .alongWith(elevator.retract().until(() -> elevator.atGoal())));
+                .andThen(elevator.scoreLevel(level)));
+        // .andThen(
+        //     pathfind(branch.backPose())
+        //         .alongWith(elevator.retract().until(() -> elevator.atGoal())));
   }
 
   /**
@@ -179,7 +180,7 @@ public class Alignment implements Logged {
                     .until(
                         () ->
                             drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                                < Translation.TOLERANCE.in(Meters) / Translation.PRECISION),
+                                < Translation.TOLERANCE.in(Meters)),// / Translation.PRECISION),
             Set.of(drive))
         .withName("pathfind")
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);

@@ -81,7 +81,7 @@ public class Constants {
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.CHARLIE;
+  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = false;
 
@@ -257,11 +257,11 @@ public class Constants {
         return switch (level) {
           case L1, L2, L3 ->
               new Pose2d(
-                  pose.getTranslation().plus(centerDisplacementUnit().times(0.1)),
+                  pose.getTranslation().plus(centerDisplacementUnit().times(0)),
                   pose.getRotation());
           case L4 ->
               new Pose2d(
-                  pose.getTranslation().plus(centerDisplacementUnit().times(0.15)),
+                  pose.getTranslation().plus(centerDisplacementUnit().times(0)),
                   pose.getRotation());
           default -> pose; // hi ;P
         };

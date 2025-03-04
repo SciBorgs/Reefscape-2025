@@ -146,7 +146,7 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
-    // Configure logging with DataLogManager, Monologue, URCL, and FaultLogger
+    // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
     Dashboard.configure();
@@ -284,7 +284,7 @@ public class Robot extends CommandRobot implements Logged {
     driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
     driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
 
-    driver.b().onTrue(drive.zeroHeading());
+    // driver.b().onTrue(drive.zeroHeading());
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
@@ -311,7 +311,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     // operator.y().whileTrue(elevator.highFive());
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
-    // operator.y().whileTrue(scoraling.runRollersBack());
+    operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povDown().whileTrue(scoraling.scoral(Level.L1));
     operator.povRight().whileTrue(scoraling.scoral(Level.L2));
@@ -319,6 +319,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.povLeft().whileTrue(scoraling.scoral(Level.L4));
 
     Dashboard.reef()
+      .and(driver.b())
         .whileTrue(
             Commands.defer(
                     () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
