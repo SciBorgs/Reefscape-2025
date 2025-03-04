@@ -472,6 +472,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).updateSetpoint(desiredStates[i], mode);
+      // modules.get(1).updateSetpoint(desiredStates[1], mode);
     }
   }
 

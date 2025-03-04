@@ -267,10 +267,15 @@ public class Robot extends CommandRobot implements Logged {
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
-    driver.a().whileTrue(align.source().alongWith(leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
+    driver
+        .a()
+        .whileTrue(
+            align
+                .source()
+                .alongWith(
+                    leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
     driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
     driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
-    
 
     driver.b().onTrue(drive.zeroHeading());
     driver.povUp().whileTrue(coroller.intake());

@@ -163,7 +163,7 @@ public final class DriveConstants {
       public static final class PID {
         public static final double P = 14;
         public static final double I = 0.0;
-        public static final double D = 0.05;
+        public static final double D = 0.0;
       }
 
       // system constants only used in simulation

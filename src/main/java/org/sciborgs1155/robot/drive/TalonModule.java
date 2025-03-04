@@ -47,7 +47,7 @@ public class TalonModule implements ModuleIO {
 
   private final Rotation2d angularOffset;
 
-  @Log.NT private SwerveModuleState setpoint = new SwerveModuleState();
+ private SwerveModuleState setpoint = new SwerveModuleState();
 
   private Rotation2d lastRotation;
 
@@ -173,15 +173,13 @@ public class TalonModule implements ModuleIO {
   }
 
   @Override
-  @Log
   public double driveVelocity() {
     return driveMotor.getVelocity().getValueAsDouble();
   }
 
   @Override
   public Rotation2d rotation() {
-    lastRotation =
-        Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble());
+    lastRotation = Rotation2d.fromRotations(turnMotor.getPosition().getValueAsDouble());
     return lastRotation;
   }
 
@@ -273,7 +271,6 @@ public class TalonModule implements ModuleIO {
     return positions;
   }
 
-  @Log.NT
   public double[] timestamps() {
     return moduleOdometryData()[2];
   }

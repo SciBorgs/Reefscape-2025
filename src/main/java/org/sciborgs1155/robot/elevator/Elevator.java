@@ -263,10 +263,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     measurement.setLength(position());
 
     if (TUNING) {
-    ff.setKs(S.get());
-    ff.setKg(G.get());
-    ff.setKv(V.get());
-    ff.setKa(A.get());
+      ff.setKs(S.get());
+      ff.setKg(G.get());
+      ff.setKv(V.get());
+      ff.setKa(A.get());
     }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));

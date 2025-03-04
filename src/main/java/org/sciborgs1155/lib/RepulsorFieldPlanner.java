@@ -1,28 +1,20 @@
 package org.sciborgs1155.lib;
 
-// Taken straight from 6995's code. Thanks to 6995!!
-
 import choreo.trajectory.SwerveSample;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableEvent.Kind;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableListener;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 
-@Logged
-public class RepulsorFieldPlanner implements monologue.Logged {
+// Taken straight from 6995's code. Thanks to 6995!!
+public class RepulsorFieldPlanner {
 
   abstract static class Obstacle {
     double strength = 1.0;
@@ -96,8 +88,8 @@ public class RepulsorFieldPlanner implements monologue.Logged {
       var targetToLocAngle = targetToLoc.getAngle();
       // 1 meter away from loc, opposite target.
       var sidewaysCircle = new Translation2d(1, targetToLoc.getAngle()).plus(loc);
-      var dist = loc.getDistance(position);
-      var sidewaysDist = sidewaysCircle.getDistance(position);
+      // var dist = loc.getDistance(position);
+      // var sidewaysDist = sidewaysCircle.getDistance(position);
       var sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position));
       var outwardsMag = distToForceMag(Math.max(0.01, loc.getDistance(position) - radius));
       var initial = new Force(outwardsMag, position.minus(loc).getAngle());
@@ -174,50 +166,50 @@ public class RepulsorFieldPlanner implements monologue.Logged {
     for (int i = 0; i < ARROWS_SIZE; i++) {
       arrows.add(new Pose2d());
     }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useGoalInArrows");
-      topic.publish().set(useGoalInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useGoalInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useGoalInArrows);
-    }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useObstaclesInArrows");
-      topic.publish().set(useObstaclesInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useObstaclesInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useObstaclesInArrows);
-    }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useWallsInArrows");
-      topic.publish().set(useWallsInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useWallsInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useWallsInArrows);
-    }
-    NetworkTableInstance.getDefault()
-        .startEntryDataLog(
-            DataLogManager.getLog(), "SmartDashboard/Alerts", "SmartDashboard/Alerts");
+    // {
+    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useGoalInArrows");
+    //   topic.publish().set(useGoalInArrows);
+    //   NetworkTableListener.createListener(
+    //       topic,
+    //       EnumSet.of(Kind.kValueAll),
+    //       (event) -> {
+    //         useGoalInArrows = event.valueData.value.getBoolean();
+    //         updateArrows();
+    //       });
+    //   topic.subscribe(useGoalInArrows);
+    // }
+    // {
+    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useObstaclesInArrows");
+    //   topic.publish().set(useObstaclesInArrows);
+    //   NetworkTableListener.createListener(
+    //       topic,
+    //       EnumSet.of(Kind.kValueAll),
+    //       (event) -> {
+    //         useObstaclesInArrows = event.valueData.value.getBoolean();
+    //         updateArrows();
+    //       });
+    //   topic.subscribe(useObstaclesInArrows);
+    // }
+    // {
+    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useWallsInArrows");
+    //   topic.publish().set(useWallsInArrows);
+    //   NetworkTableListener.createListener(
+    //       topic,
+    //       EnumSet.of(Kind.kValueAll),
+    //       (event) -> {
+    //         useWallsInArrows = event.valueData.value.getBoolean();
+    //         updateArrows();
+    //       });
+    //   topic.subscribe(useWallsInArrows);
+    // }
+    // NetworkTableInstance.getDefault()
+    //     .startEntryDataLog(
+    //         DataLogManager.getLog(), "SmartDashboard/Alerts", "SmartDashboard/Alerts");
   }
 
-  @NotLogged private boolean useGoalInArrows = false;
-  @NotLogged private boolean useObstaclesInArrows = true;
-  @NotLogged private boolean useWallsInArrows = true;
+  @IgnoreLogged private boolean useGoalInArrows = false;
+  @IgnoreLogged private boolean useObstaclesInArrows = true;
+  @IgnoreLogged private boolean useWallsInArrows = true;
   private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
 
   // A grid of arrows drawn in AScope
@@ -313,15 +305,15 @@ public class RepulsorFieldPlanner implements monologue.Logged {
       double maxSpeed,
       boolean useGoal,
       Rotation2d goalRotation) {
-    Translation2d speedPerSec =
-        new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    double currentSpeed =
-        Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    // Translation2d speedPerSec =
+    //     new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    // double currentSpeed =
+    //     Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
     double stepSize_m = maxSpeed * 0.02; // TODO
     if (goalOpt.isEmpty()) {
       return sample(pose.getTranslation(), pose.getRotation(), 0, 0, 0);
     } else {
-      var startTime = System.nanoTime();
+      // var startTime = System.nanoTime();
       var goal = goalOpt.get();
       var curTrans = pose.getTranslation();
       var err = curTrans.minus(goal);
@@ -332,7 +324,7 @@ public class RepulsorFieldPlanner implements monologue.Logged {
         var netForce = obstacleForce;
         if (useGoal) {
           netForce = getGoalForce(curTrans, goal).plus(netForce);
-          log("forceLog", netForce.getNorm());
+          // log("forceLog", netForce.getNorm());
           // Calculate how quickly to move in this direction
           var closeToGoalMax = maxSpeed * Math.min(err.getNorm() / 2, 1);
 
@@ -340,8 +332,8 @@ public class RepulsorFieldPlanner implements monologue.Logged {
         }
         var step = new Translation2d(stepSize_m, netForce.getAngle());
         var intermediateGoal = curTrans.plus(step);
-        var endTime = System.nanoTime();
-        log("repulsorTimeS", (endTime - startTime) / 1e9);
+        // var endTime = System.nanoTime();
+        // log("repulsorTimeS", (endTime - startTime) / 1e9);
         return sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
       }
     }
