@@ -111,7 +111,7 @@ public final class DriveConstants {
           );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
-  
+
   // TODO: Change ALL characterization constants for each unique robot as needed.
   public static final class Translation {
     public static final double P = 3.0;

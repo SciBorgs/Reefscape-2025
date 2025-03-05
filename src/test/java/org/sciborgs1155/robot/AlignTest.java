@@ -46,8 +46,6 @@ public class AlignTest {
     scoral = Scoral.create();
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
-
-    align = new Alignment(drive, elevator, scoral);
   }
 
   @AfterEach

@@ -90,6 +90,7 @@ public class Robot extends CommandRobot implements Logged {
         default -> Vision.none();
       };
 
+  @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, ELEVATOR, CHARLIE -> Elevator.create();
@@ -236,7 +237,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega));
+    drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
 
     leftLED.setDefaultCommand(leftLED.rainbow());
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
@@ -281,6 +282,7 @@ public class Robot extends CommandRobot implements Logged {
                 .source()
                 .alongWith(
                     leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
+
     driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
     driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
 
@@ -319,7 +321,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.povLeft().whileTrue(scoraling.scoral(Level.L4));
 
     Dashboard.reef()
-      .and(driver.b())
+        .and(driver.b())
         .whileTrue(
             Commands.defer(
                     () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),

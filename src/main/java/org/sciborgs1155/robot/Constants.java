@@ -203,7 +203,10 @@ public class Constants {
     public static final Distance TO_THE_LEFT = Inches.of(2.5);
 
     public static Pose2d moveLeft(Pose2d pose) {
-      return pose.transformBy(new Transform2d(new Translation2d(TO_THE_LEFT.in(Meters), Rotation2d.fromDegrees(90)), Rotation2d.kZero));
+      return pose.transformBy(
+          new Transform2d(
+              new Translation2d(TO_THE_LEFT.in(Meters), Rotation2d.fromDegrees(90)),
+              Rotation2d.kZero));
     }
 
     // Poses for scoraling.

@@ -2,12 +2,10 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.Field.moveLeft;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Set;
@@ -21,18 +19,16 @@ import org.sciborgs1155.robot.Constants.Field.Face.Side;
 import org.sciborgs1155.robot.Constants.Field.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
-import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
-import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment implements Logged {
-  @IgnoreLogged private Drive drive;
+  @IgnoreLogged private final Drive drive;
 
-  @IgnoreLogged private Elevator elevator;
+  @IgnoreLogged private final Elevator elevator;
 
-  @IgnoreLogged private Scoral scoral;
+  @IgnoreLogged private final Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
@@ -57,32 +53,17 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    return (pathfind(moveLeft(branch.withLevel(level)))
-            .andThen(drive.stop())
-            .andThen(
-                Commands.waitUntil(
-                        () ->
-                            elevator.atPosition(level.extension.in(Meters))
-                                && Math.abs(elevator.velocity()) < 0.005
-                                && drive
-                                        .pose()
-                                        .getTranslation()
-                                        .minus(moveLeft(branch.withLevel(level)).getTranslation())
-                                        .getNorm()
-                                    < Translation.TOLERANCE.in(Meters))
-                    // .deadlineFor(scoral.run(() -> funky = branch.withLevel(level)))
-                    .andThen(scoral.score().withTimeout(Seconds.of(1)))))
-        .deadlineFor(
-            Commands.waitUntil(
-                    () ->
-                        drive.atPose(
-                            moveLeft(branch.withLevel(level)),
-                            Translation.TOLERANCE.times(Translation.PRECISION),
-                            Rotation.TOLERANCE.times(Rotation.PRECISION)))
-                .andThen(elevator.scoreLevel(level)));
-        // .andThen(
-        //     pathfind(branch.backPose())
-        //         .alongWith(elevator.retract().until(() -> elevator.atGoal())));
+    Pose2d goal = moveLeft(branch.withLevel(level));
+    return Commands.sequence(
+        pathfind(goal).asProxy(),
+        Commands.parallel(
+            elevator.scoreLevel(level).asProxy(),
+            drive
+                .driveTo(goal).asProxy()
+                .andThen(
+                    Commands.waitUntil(elevator::atGoal)
+                        .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
+     .withName("align to reef");
   }
 
   /**
@@ -118,9 +99,8 @@ public class Alignment implements Logged {
    * @return A command to score on the nearest reef branch.
    */
   public Command nearReef(Level level, Side side) {
-    return Commands.defer(
-        () -> reef(level, Face.nearest(drive.pose()).branch(side)),
-        Set.of(drive, elevator, scoral));
+    return Commands.deferredProxy(
+        () -> reef(level, Face.nearest(drive.pose()).branch(side)));
   }
 
   /**
@@ -163,26 +143,20 @@ public class Alignment implements Logged {
   public Command pathfind(Pose2d goal) {
     return Commands.defer(
             () ->
-                (drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                            > DriveConstants.Translation.TOLERANCE.in(Meters) * 3
-                        ? drive.run(
-                            () -> {
-                              planner.setGoal(goal.getTranslation());
-                              drive.goToSample(
-                                  planner.getCmd(
-                                      drive.pose(),
-                                      drive.fieldRelativeChassisSpeeds(),
-                                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                                      true),
-                                  goal.getRotation());
-                            })
-                        : drive.driveTo(goal))
-                    .until(
-                        () ->
-                            drive.pose().getTranslation().minus(goal.getTranslation()).getNorm()
-                                < Translation.TOLERANCE.in(Meters)),// / Translation.PRECISION),
+                drive
+                    .run(
+                        () -> {
+                          planner.setGoal(goal.getTranslation());
+                          drive.goToSample(
+                              planner.getCmd(
+                                  drive.pose(),
+                                  drive.fieldRelativeChassisSpeeds(),
+                                  DriveConstants.MAX_SPEED.in(MetersPerSecond),
+                                  true),
+                              goal.getRotation());
+                        })
+                    .until(() -> drive.atPosition(goal.getTranslation(), Meters.of(0.08))),
             Set.of(drive))
-        .withName("pathfind")
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
+        .withName("pathfind");
   }
 }

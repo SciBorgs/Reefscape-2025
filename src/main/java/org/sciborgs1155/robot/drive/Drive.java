@@ -24,6 +24,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
@@ -534,25 +535,26 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command driveTo(Pose2d target) {
     return run(() -> {
-          Transform2d transform = pose().minus(target);
+          Pose2d pose = pose();
           Vector<N3> difference =
               VecBuilder.fill(
-                  transform.getX(),
-                  transform.getY(),
-                  transform.getRotation().getRadians() * RADIUS.in(Meters));
+                  pose.getX() - target.getX(),
+                  pose.getY() - target.getY(),
+                  MathUtil.angleModulus(
+                          pose.getRotation().getRadians() - target.getRotation().getRadians())
+                      * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
           setChassisSpeeds(
-              new ChassisSpeeds(
-                  velocities.get(0), velocities.get(1), velocities.get(2) / RADIUS.in(Meters)),
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  velocities.get(0),
+                  velocities.get(1),
+                  velocities.get(2) / RADIUS.in(Meters),
+                  pose().getRotation()),
               ControlMode.CLOSED_LOOP_VELOCITY);
         })
-        .until(
-            () ->
-                pose().getTranslation().minus(target.getTranslation()).getNorm()
-                        < Translation.TOLERANCE.in(Meters) / Translation.PRECISION
-                    && Math.abs(heading().minus(target.getRotation()).getRotations())
-                        < Rotation.TOLERANCE.in(Radians) / Rotation.PRECISION)
+        .until(() -> atPose(target))
+        .andThen(stop())
         .withName("drive to pose");
   }
 
