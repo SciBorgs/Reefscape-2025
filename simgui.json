@@ -16,6 +16,13 @@
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
+    },
+    "windows": {
+      "/Robot/autos": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables Info": {

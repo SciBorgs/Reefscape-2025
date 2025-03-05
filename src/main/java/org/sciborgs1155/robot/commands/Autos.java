@@ -2,8 +2,6 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
@@ -16,8 +14,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,25 +65,18 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", RB4(alignment));
+    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling));
     return chooser;
   }
 
-  public static Command RB4(Alignment alignment) {
-    Pose2d source =
-        new Pose2d(
-            Meters.of(16.063915252685547),
-            Meters.of(0.660247802734375),
-            new Rotation2d(Radians.of(2.194501263104256)));
-
-    return alignment
-        .reef(Level.L4, Branch.I)
-        .withTimeout(5)
-        .andThen(alignment.pathfind(source).withTimeout(5))
-        .andThen(alignment.reef(Level.L4, Branch.K).withTimeout(5))
-        .andThen(alignment.pathfind(source).withTimeout(5))
-        .andThen(alignment.reef(Level.L4, Branch.L).withTimeout(5))
-        .andThen(alignment.pathfind(source).withTimeout(5))
-        .andThen(alignment.reef(Level.L4, Branch.J).withTimeout(5));
+  public static Command RB4(Alignment alignment, Scoraling scoraling) {
+    return Commands.sequence(
+        alignment.reef(Level.L4, Branch.I).withTimeout(5).asProxy(),
+        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
+        alignment.reef(Level.L4, Branch.K).withTimeout(5).asProxy(),
+        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
+        alignment.reef(Level.L4, Branch.L).withTimeout(5).asProxy(),
+        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
+        alignment.reef(Level.L4, Branch.J).withTimeout(5).asProxy());
   }
 }

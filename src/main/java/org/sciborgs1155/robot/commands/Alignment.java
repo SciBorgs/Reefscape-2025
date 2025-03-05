@@ -75,7 +75,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> pathfind(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -86,9 +86,13 @@ public class Alignment implements Logged {
   public Command source() {
     return Commands.defer(
         () ->
-            pathfind(drive.pose().nearest(List.of(Source.LEFT.pose, Source.RIGHT.pose)))
+            alignTo(drive.pose().nearest(List.of(Source.LEFT.pose, Source.RIGHT.pose)))
                 .alongWith(elevator.retract()),
         Set.of(drive, elevator));
+  }
+
+  public Command alignTo(Pose2d goal) {
+    return pathfind(goal).andThen(drive.driveTo(goal));
   }
 
   /**
@@ -155,7 +159,7 @@ public class Alignment implements Logged {
                                   true),
                               goal.getRotation());
                         })
-                    .until(() -> drive.atPosition(goal.getTranslation(), Meters.of(0.08))),
+                    .until(() -> drive.atPosition(goal.getTranslation(), Meters.of(1))),
             Set.of(drive))
         .withName("pathfind");
   }
