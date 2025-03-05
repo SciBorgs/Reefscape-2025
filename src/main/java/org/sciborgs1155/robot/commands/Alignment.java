@@ -159,7 +159,7 @@ public class Alignment implements Logged {
                                   true),
                               goal.getRotation());
                         })
-                    .until(() -> drive.atPosition(goal.getTranslation(), Meters.of(1))),
+                    .until(() -> drive.atTranslation(goal.getTranslation(), Meters.of(1))),
             Set.of(drive))
         .withName("pathfind");
   }

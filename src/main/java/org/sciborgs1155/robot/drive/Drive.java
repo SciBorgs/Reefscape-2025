@@ -453,7 +453,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *     target.
    * @return Whether the robot is at a target translation.
    */
-  public boolean atPosition(Translation2d position, Distance tolerance) {
+  public boolean atTranslation(Translation2d position, Distance tolerance) {
     return pose().getTranslation().minus(position).getNorm() < tolerance.in(Meters);
   }
 
@@ -478,7 +478,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @return Whether the robot is at a target pose.
    */
   public boolean atPose(Pose2d pose, Distance translationTolerance, Angle rotationTolerance) {
-    return atPosition(pose.getTranslation(), translationTolerance)
+    return atTranslation(pose.getTranslation(), translationTolerance)
         && atRotation(pose.getRotation(), rotationTolerance);
   }
 
