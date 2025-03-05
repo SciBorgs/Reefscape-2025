@@ -13,7 +13,6 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
@@ -26,7 +25,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -244,11 +242,9 @@ public class Robot extends CommandRobot implements Logged {
     leftLED.setDefaultCommand(leftLED.rainbow());
     middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     rightLED.setDefaultCommand(rightLED.rainbow());
-    // leftLED.setDefaultCommand(leftLED.rainbow());
-    // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    // scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
-    // hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+    scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
+    hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
 
     autonomous()
         .whileTrue(
@@ -258,16 +254,6 @@ public class Robot extends CommandRobot implements Logged {
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
     test().whileTrue(systemsCheck());
-
-    // teleop()
-    //     .onTrue(
-    //         leftLED
-    //             .elevatorLED(() -> elevator.position() /
-    // ElevatorConstants.MAX_EXTENSION.in(Meters))
-    //             .alongWith(
-    //                 rightLED.elevatorLED(
-    //                     () -> elevator.position() /
-    // ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
@@ -285,34 +271,18 @@ public class Robot extends CommandRobot implements Logged {
                 .alongWith(
                     leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
 
-    driver.x().whileTrue(align.source());
-    driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
+    driver.x().whileTrue(align.nearReef(Level.L3, Side.LEFT));
+    driver.b().whileTrue(align.nearReef(Level.L3, Side.RIGHT));
 
-    // driver.b().onTrue(drive.zeroHeading());
+    driver.povLeft().onTrue(drive.zeroHeading());
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
-
-    driver
-        .povLeft()
-        .onTrue(
-            middleLED
-                .blink(Color.kWhite)
-                .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
-
-    // driver.a().whileTrue(align.reef(Level.L3, A));
-    // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
-    // driver.y().whileTrue(drive.assistedDrive(x, y, omega, G.pose));
-
-    // driver.b().whileTrue(align.pathfind(D.pose));
 
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
 
-    // operator.a().onTrue(elevator.retract());
-    // operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
-    // operator.y().whileTrue(elevator.highFive());
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
     operator.y().whileTrue(scoraling.runRollersBack());
 
@@ -322,7 +292,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.povLeft().whileTrue(scoraling.scoral(Level.L4));
 
     Dashboard.reef()
-        .and(driver.b())
+        .and(driver.a())
         .whileTrue(
             Commands.defer(
                     () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
@@ -376,7 +346,8 @@ public class Robot extends CommandRobot implements Logged {
             Test.fromCommand(coroller.intake().withTimeout(1)),
             arm.goToTest(STARTING_ANGLE),
             drive.systemsCheck(),
-            Test.fromCommand(scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),
+            Test.fromCommand(
+                scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),
             Test.fromCommand(
                 middleLED
                     .solid(Color.kLime)

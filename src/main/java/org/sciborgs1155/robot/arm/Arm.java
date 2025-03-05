@@ -179,12 +179,15 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Moves the arm towards a goal in radians */
   public Command goTo(DoubleSupplier goal) {
     return run(() -> {
-      double lastVelocity = fb.getSetpoint().velocity;
-      double position = position();
-      double feedback = fb.calculate(position, 
-          MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
-      double feedforward = ff.calculateWithVelocities(position(), lastVelocity, fb.getSetpoint().velocity);
-      hardware.setVoltage(feedback + feedforward);
+          double lastVelocity = fb.getSetpoint().velocity;
+          double position = position();
+          double feedback =
+              fb.calculate(
+                  position,
+                  MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
+          double feedforward =
+              ff.calculateWithVelocities(position(), lastVelocity, fb.getSetpoint().velocity);
+          hardware.setVoltage(feedback + feedforward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians");
   }

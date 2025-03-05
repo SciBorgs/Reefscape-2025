@@ -46,7 +46,6 @@ public class RealArm implements ArmIO {
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.Feedback.FeedbackRemoteSensorID = CANCODER;
-    
 
     leader.getConfigurator().apply(config);
     // follower.getConfigurator().apply(config);
