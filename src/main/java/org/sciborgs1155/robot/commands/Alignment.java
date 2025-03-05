@@ -55,15 +55,16 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     Pose2d goal = moveLeft(branch.withLevel(level));
     return Commands.sequence(
-        pathfind(goal).asProxy(),
-        Commands.parallel(
-            elevator.scoreLevel(level).asProxy(),
-            drive
-                .driveTo(goal).asProxy()
-                .andThen(
-                    Commands.waitUntil(elevator::atGoal)
-                        .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
-     .withName("align to reef");
+            pathfind(goal).asProxy(),
+            Commands.parallel(
+                elevator.scoreLevel(level).asProxy(),
+                drive
+                    .driveTo(goal)
+                    .asProxy()
+                    .andThen(
+                        Commands.waitUntil(elevator::atGoal)
+                            .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
+        .withName("align to reef");
   }
 
   /**
@@ -99,8 +100,7 @@ public class Alignment implements Logged {
    * @return A command to score on the nearest reef branch.
    */
   public Command nearReef(Level level, Side side) {
-    return Commands.deferredProxy(
-        () -> reef(level, Face.nearest(drive.pose()).branch(side)));
+    return Commands.deferredProxy(() -> reef(level, Face.nearest(drive.pose()).branch(side)));
   }
 
   /**

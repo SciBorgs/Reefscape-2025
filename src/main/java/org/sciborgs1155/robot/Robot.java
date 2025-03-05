@@ -80,7 +80,7 @@ public class Robot extends CommandRobot implements Logged {
   // SUBSYSTEMS
   private final Drive drive =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS, CHARLIE -> Drive.create();
+        case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
         default -> Drive.none();
       };
 
@@ -93,33 +93,33 @@ public class Robot extends CommandRobot implements Logged {
   @IgnoreLogged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, ELEVATOR, CHARLIE -> Elevator.create();
+        case FULL, SCORALING -> Elevator.create();
         default -> Elevator.none();
       };
 
   @IgnoreLogged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, CHARLIE -> Scoral.create(); // TODO create (mod)
+        case FULL, SCORALING -> Scoral.create();
         default -> Scoral.none();
       };
 
   @IgnoreLogged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, CHARLIE -> Hopper.create();
+        case FULL, SCORALING -> Hopper.create();
         default -> Hopper.none();
       };
 
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING, CHARLIE -> Coroller.create();
+        case FULL, COROLLING -> Coroller.create();
         default -> Coroller.none();
       };
 
   private final Arm arm =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING, CHARLIE -> Arm.create();
+        case FULL, COROLLING -> Arm.create();
         default -> Arm.none();
       };
 
@@ -283,7 +283,7 @@ public class Robot extends CommandRobot implements Logged {
                 .alongWith(
                     leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
 
-    driver.x().whileTrue(align.nearReef(Level.L4, Side.LEFT));
+    driver.x().whileTrue(align.source());
     driver.y().whileTrue(align.nearReef(Level.L4, Side.RIGHT));
 
     // driver.b().onTrue(drive.zeroHeading());
