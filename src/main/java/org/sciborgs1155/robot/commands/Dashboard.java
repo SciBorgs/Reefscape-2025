@@ -27,6 +27,7 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryTargetElevator;
   private static NetworkTableEntry entryCurrentElevator;
+  private static NetworkTableEntry entryCameraEnabled;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
@@ -63,6 +64,9 @@ public class Dashboard {
 
     entryCurrentElevator = base.getEntry("currentElevator");
     entryCurrentElevator.setDouble(0);
+
+    entryCameraEnabled = base.getEntry("cameraEnabled");
+    entryCameraEnabled.setBooleanArray(new boolean[]{true, true, true, true});
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -110,6 +114,7 @@ public class Dashboard {
     tick += 1;
     entryRobotTick.setInteger(tick);
     entryMatchTime.setDouble(Robot.isReal() ? DriverStation.getMatchTime() : 0);
+
   }
 
   /** Returns a trigger for when a reef request from the Dashboard is recieved. */
