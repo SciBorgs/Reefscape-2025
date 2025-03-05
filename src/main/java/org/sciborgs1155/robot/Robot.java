@@ -13,6 +13,7 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
+import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
@@ -25,6 +26,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -296,7 +298,6 @@ public class Robot extends CommandRobot implements Logged {
             middleLED
                 .blink(Color.kWhite)
                 .alongWith(leftLED.blink(Color.kWhite), rightLED.blink(Color.kWhite)));
-    driver.povRight().onTrue(rightLED.scrolling());
 
     // driver.a().whileTrue(align.reef(Level.L3, A));
     // driver.x().whileTrue(drive.assistedDrive(x, y, omega, A.pose));
@@ -365,20 +366,22 @@ public class Robot extends CommandRobot implements Logged {
             Test.fromCommand(
                 middleLED
                     .blink(Color.kRed)
-                    .alongWith(leftLED.blink(Color.kRed), rightLED.blink(Color.kRed))),
+                    .alongWith(leftLED.blink(Color.kRed), rightLED.blink(Color.kRed))
+                    .withTimeout(0.5)),
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
-            Test.fromCommand(scoral.score().until(scoral.beambreakTrigger).withTimeout(1)),
             arm.goToTest(INTAKE_ANGLE),
-            Test.fromCommand(coroller.intake().withTimeout(1)),
             Test.fromCommand(coroller.outtake().withTimeout(1)),
+            Test.fromCommand(coroller.intake().withTimeout(1)),
             arm.goToTest(STARTING_ANGLE),
             drive.systemsCheck(),
+            Test.fromCommand(scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),
             Test.fromCommand(
                 middleLED
                     .solid(Color.kLime)
-                    .alongWith(leftLED.solid(Color.kLime), rightLED.solid(Color.kLime))))
+                    .alongWith(leftLED.solid(Color.kLime), rightLED.solid(Color.kLime))
+                    .withTimeout(0.5)))
         .withName("Test Mechanisms");
   }
 

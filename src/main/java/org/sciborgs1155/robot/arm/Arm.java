@@ -101,11 +101,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     this.hardware = hardware;
 
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
-    fb.reset(STARTING_ANGLE.in(Radians));
-    fb.setGoal(STARTING_ANGLE.in(Radians));
+    fb.reset(position());
+    fb.setGoal(DEFAULT_ANGLE.in(Radians));
     fb.enableContinuousInput(-Math.PI, Math.PI);
 
-    // setDefaultCommand(goTo(DEFAULT_ANGLE));
+    setDefaultCommand(goTo(DEFAULT_ANGLE));
 
     this.sysIdRoutine =
         new SysIdRoutine(
@@ -125,7 +125,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public double position() {
-    return hardware.position() + STARTING_ANGLE.in(Radians);
+    return hardware.position();
+  }
+
+  public void setVoltage(double volts) {
+    hardware.setVoltage(volts);
   }
 
   /**
@@ -175,12 +179,12 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /** Moves the arm towards a goal in radians */
   public Command goTo(DoubleSupplier goal) {
     return run(() -> {
-          double feedforward = ff.calculate(fb.getSetpoint().position, 0);
-          double feedback =
-              fb.calculate(
-                  position(),
-                  MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
-          hardware.setVoltage(feedback + feedforward);
+      double lastVelocity = fb.getSetpoint().velocity;
+      double position = position();
+      double feedback = fb.calculate(position, 
+          MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
+      double feedforward = ff.calculateWithVelocities(position(), lastVelocity, fb.getSetpoint().velocity);
+      hardware.setVoltage(feedback + feedforward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians");
   }

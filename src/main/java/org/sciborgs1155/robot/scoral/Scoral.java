@@ -61,6 +61,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
   }
 
+  public Command scoreSlow() {
+    return run(() -> motor.set(SCORE_POWER / 5)).withName("score");
+  }
+
   public Command algae() {
     return run(() -> motor.set(-SCORE_POWER)).withName("algaeing");
   }

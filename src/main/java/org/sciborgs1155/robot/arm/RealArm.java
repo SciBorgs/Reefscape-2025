@@ -12,6 +12,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Current;
@@ -42,8 +43,10 @@ public class RealArm implements ArmIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.SensorToMechanismRatio = GEARING;
 
-    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-    // config.Feedback.FeedbackRemoteSensorID = CANCODER;
+    config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.Feedback.FeedbackRemoteSensorID = CANCODER;
+    
 
     leader.getConfigurator().apply(config);
     // follower.getConfigurator().apply(config);
