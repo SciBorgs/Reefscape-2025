@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Ports.Scoral.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 
@@ -11,10 +12,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
+import java.util.Set;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
@@ -41,7 +45,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(ROLLER), config);
+    return SimpleMotor.talon(new TalonFX(ROLLER, "rio"), config);
   }
 
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
@@ -54,11 +58,19 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command score() {
-    return run(() -> motor.set(SCORE_POWER)).withName("outtake");
+    return run(() -> motor.set(SCORE_POWER)).withName("score");
+  }
+
+  public Command scoreSlow() {
+    return run(() -> motor.set(SCORE_POWER / 5)).withName("score");
   }
 
   public Command algae() {
     return run(() -> motor.set(-SCORE_POWER)).withName("algaeing");
+  }
+
+  public Command intake() {
+    return run(() -> motor.set(INTAKE_POWER)).withName("intake");
   }
 
   /** Stops the motor */
@@ -75,6 +87,22 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+  }
+
+  /**
+   * Sets the scoral to intake, expecting a coral. Can also be used to test beambreak.
+   *
+   * @return Command to set the scoral to intake and check whether it has a coral.
+   */
+  public Test intakeTest() {
+    Command testCommand = intake().until(beambreakTrigger.negate()).withTimeout(5);
+    Set<Assertion> assertions =
+        Set.of(
+            tAssert(
+                beambreakTrigger.negate(),
+                "Scoral syst check (beambreak broken)",
+                () -> "broken: " + beambreakTrigger.negate()));
+    return new Test(testCommand, assertions);
   }
 
   @Override

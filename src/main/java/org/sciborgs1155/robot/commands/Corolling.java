@@ -9,7 +9,6 @@ import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.coroller.Coroller;
 
 public class Corolling {
-
   private Arm arm;
   private Coroller roller;
 

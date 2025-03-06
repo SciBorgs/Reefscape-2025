@@ -45,6 +45,10 @@ public class Vision implements Logged {
     return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }
 
+  public static Vision none() {
+    return new Vision();
+  }
+
   public Vision(CameraConfig... configs) {
     cameras = new PhotonCamera[configs.length];
     estimators = new PhotonPoseEstimator[configs.length];
@@ -181,6 +185,15 @@ public class Vision implements Logged {
     estStdDevs = estStdDevs.times(avgWeight);
 
     return estStdDevs;
+  }
+
+  public Transform3d[] cameraTransforms() {
+    return new Transform3d[] {
+      FRONT_LEFT_CAMERA.robotToCam(),
+      FRONT_RIGHT_CAMERA.robotToCam(),
+      BACK_LEFT_CAMERA.robotToCam(),
+      BACK_RIGHT_CAMERA.robotToCam()
+    };
   }
 
   /**
