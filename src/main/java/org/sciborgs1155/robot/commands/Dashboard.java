@@ -27,6 +27,10 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryTargetElevator;
   private static NetworkTableEntry entryCurrentElevator;
+  private static NetworkTableEntry entryCameraFL;
+  private static NetworkTableEntry entryCameraFR;
+  private static NetworkTableEntry entryCameraBL;
+  private static NetworkTableEntry entryCameraBR;
   private static NetworkTableEntry entryCameraEnabled;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
@@ -65,8 +69,17 @@ public class Dashboard {
     entryCurrentElevator = base.getEntry("currentElevator");
     entryCurrentElevator.setDouble(0);
 
-    entryCameraEnabled = base.getEntry("cameraEnabled");
-    entryCameraEnabled.setBooleanArray(new boolean[] {true, true, true, true});
+    entryCameraFL = base.getEntry("cameraFL");
+    entryCameraFL.setBoolean(true);
+
+    entryCameraFR = base.getEntry("cameraFR");
+    entryCameraFR.setBoolean(true);
+
+    entryCameraBL = base.getEntry("cameraBL");
+    entryCameraBL.setBoolean(true);
+
+    entryCameraBR = base.getEntry("cameraBR");
+    entryCameraBR.setBoolean(true);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -158,6 +171,26 @@ public class Dashboard {
     return entryTargetElevator.getDouble(MIN_EXTENSION.in(Meters))
             * (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters))
         + MIN_EXTENSION.in(Meters);
+  }
+
+  // * Returns a trigger based on the enabled status of camera front left. */
+  public static Trigger cameraFL() {
+    return new Trigger(() -> entryCameraFL.getBoolean(true));
+  }
+
+  // * Returns a trigger based on the enabled status of camera front right */
+  public static Trigger cameraFR() {
+    return new Trigger(() -> entryCameraFR.getBoolean(true));
+  }
+
+  // * Returns a trigger based on the enabled status of camera back left. */
+  public static Trigger cameraBL() {
+    return new Trigger(() -> entryCameraBL.getBoolean(true));
+  }
+
+  // * Returns a trigger based on the enabled status of camera back right. */
+  public static Trigger cameraBR() {
+    return new Trigger(() -> entryCameraBR.getBoolean(true));
   }
 
   /**
