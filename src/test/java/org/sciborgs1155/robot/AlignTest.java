@@ -91,6 +91,6 @@ public class AlignTest {
   }
 
   private static Stream<Arguments> goals() {
-    return Arrays.stream(FieldConstants.Branch.values()).map(v -> Arguments.of(v.pose));
+    return Arrays.stream(FieldConstants.Branch.values()).map(v -> Arguments.of(v.pose()));
   }
 }

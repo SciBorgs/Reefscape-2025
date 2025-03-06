@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -87,8 +86,8 @@ public class FieldConstants {
      */
     public Pose2d pose() {
       return new Pose2d(
-          left.pose.getTranslation().plus(right.pose.getTranslation()).div(2),
-          left.pose.getRotation());
+          left.pose().getTranslation().plus(right.pose().getTranslation()).div(2),
+          left.pose().getRotation());
     }
 
     /**
@@ -138,10 +137,14 @@ public class FieldConstants {
     K(swapReefFace(REEF_BRANCH_A, 5)),
     L(swapReefFace(REEF_BRANCH_B, 5));
 
-    public final Pose2d pose;
+    private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose = allianceReflect(pose);
+      this.pose = pose;
+    }
+
+    public Pose2d pose() {
+      return allianceReflect(pose);
     }
 
     /**
@@ -170,28 +173,21 @@ public class FieldConstants {
       return switch (level) {
         case L1, L2, L3 ->
             new Pose2d(
-                pose.getTranslation().plus(centerDisplacementUnit().times(0)), pose.getRotation());
+                pose().getTranslation().plus(centerDisplacementUnit().times(0)),
+                pose().getRotation());
         case L4 ->
             new Pose2d(
-                pose.getTranslation().plus(centerDisplacementUnit().times(0)), pose.getRotation());
-        default -> pose; // hi ;P
+                pose().getTranslation().plus(centerDisplacementUnit().times(0)),
+                pose().getRotation());
+        default -> pose(); // hi ;P
       };
-    }
-
-    /**
-     * @return The pose, moved slightly away from the reef face such that it is safe to retract the
-     *     elevator.
-     */
-    public Pose2d backPose() {
-      return new Pose2d(
-          pose.getTranslation().plus(centerDisplacementUnit().times(0.5)), pose.getRotation());
     }
 
     /**
      * @return A list of all branch poses.
      */
     public static List<Pose2d> poseList() {
-      return Arrays.stream(Branch.values()).map(b -> b.pose).collect(Collectors.toList());
+      return Arrays.stream(Branch.values()).map(b -> b.pose()).collect(Collectors.toList());
     }
 
     /**
@@ -217,7 +213,7 @@ public class FieldConstants {
      */
     public static Branch nearest(Pose2d pose) {
       return Arrays.stream(Branch.values())
-          .filter(branch -> branch.pose == pose.nearest(poseList()))
+          .filter(branch -> branch.pose() == pose.nearest(poseList()))
           .findFirst()
           .orElse(A);
     }
@@ -228,10 +224,14 @@ public class FieldConstants {
     MID(new Pose2d()),
     RIGHT(new Pose2d());
 
-    public final Pose2d pose;
+    private final Pose2d pose;
 
     Cage(Pose2d pose) {
       this.pose = pose;
+    }
+
+    public Pose2d pose() {
+      return allianceReflect(pose);
     }
 
     /**
@@ -279,16 +279,20 @@ public class FieldConstants {
 
   public static enum Source {
     LEFT_SOURCE_MID(LEFT_SOURCE),
-    LEFT_SOURCE_LEFT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
-    LEFT_SOURCE_RIGHT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT))),
-    RIGHT_SOURCE_MID(RIGHT_SOURCE),
-    RIGHT_SOURCE_LEFT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
-    RIGHT_SOURCE_RIGHT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT)));
+    // LEFT_SOURCE_LEFT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
+    // LEFT_SOURCE_RIGHT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT))),
+    RIGHT_SOURCE_MID(RIGHT_SOURCE);
+    // RIGHT_SOURCE_LEFT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
+    // RIGHT_SOURCE_RIGHT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT)));
 
-    public Pose2d pose;
+    private Pose2d pose;
 
     Source(Pose2d pose) {
-      this.pose = allianceReflect(pose);
+      this.pose = pose;
+    }
+
+    public Pose2d pose() {
+      return allianceReflect(pose);
     }
   }
 

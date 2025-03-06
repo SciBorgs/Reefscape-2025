@@ -74,7 +74,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> alignTo(source.pose).deadlineFor(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source.pose()).deadlineFor(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -90,7 +90,7 @@ public class Alignment implements Logged {
                         .pose()
                         .nearest(
                             Arrays.stream(Source.values())
-                                .map(s -> s.pose)
+                                .map(s -> s.pose())
                                 .collect(Collectors.toList())))
                 .deadlineFor(elevator.retract()),
         Set.of(drive, elevator));
@@ -121,7 +121,7 @@ public class Alignment implements Logged {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return pathfind(branch.pose)
+    return pathfind(branch.pose())
         .andThen(elevator.scoreLevel(level))
         .until(scoral::beambreak)
         .deadlineFor(
