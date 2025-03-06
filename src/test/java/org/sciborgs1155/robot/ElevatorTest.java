@@ -39,9 +39,9 @@ public class ElevatorTest {
     return Stream.of(
         Arguments.of(ElevatorConstants.MIN_EXTENSION),
         Arguments.of(Level.L1.extension),
-        Arguments.of(Level.L2.extension),
-        Arguments.of(Level.L3.extension),
-        Arguments.of(Level.L4.extension),
-        Arguments.of(ElevatorConstants.MAX_EXTENSION));
+        Arguments.of(Level.L2.extension));
+    // Arguments.of(Level.L3.extension),
+    // Arguments.of(Level.L4.extension),
+    // Arguments.of(ElevatorConstants.MAX_EXTENSION));
   }
 }

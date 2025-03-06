@@ -18,7 +18,6 @@ import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,6 +45,7 @@ public class AlignTest {
     scoral = Scoral.create();
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
+    align = new Alignment(drive, elevator, scoral);
   }
 
   @AfterEach
@@ -53,7 +53,6 @@ public class AlignTest {
     reset(drive, elevator, scoral);
   }
 
-  @Disabled
   @RepeatedTest(5)
   public void reflectionTest() {
     Random rand = new Random();
@@ -79,7 +78,7 @@ public class AlignTest {
   @MethodSource("goals")
   public void pathfindTest(Pose2d pose) throws Exception {
     // Make and run the pathfinding command
-    runToCompletion(align.pathfind(pose).withTimeout(Seconds.of(20)));
+    runToCompletion(align.alignTo(pose).withTimeout(Seconds.of(20)));
 
     // Assert the command works
     assertEquals(pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));

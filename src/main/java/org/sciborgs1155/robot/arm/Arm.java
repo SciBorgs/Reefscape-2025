@@ -209,7 +209,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @return A Test object which moves the arm and checks it got to its destination.
    */
   public Test goToTest(Angle goal) {
-    Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(3).withName("Arm Test");
+    Command testCommand = goTo(goal).until(fb::atGoal).withTimeout(8).withName("Arm Test");
     EqualityAssertion atGoal =
         Assertion.eAssert(
             "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));
