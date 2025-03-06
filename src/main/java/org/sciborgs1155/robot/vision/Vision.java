@@ -27,6 +27,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
 public class Vision implements Logged {
@@ -136,12 +137,12 @@ public class Vision implements Logged {
           estimate = estimators[i].update(change);
           log("estimates present " + i, estimate.isPresent());
           estimate
-              // .filter(
-              //     f ->
-              //         Field.inField(f.estimatedPose)
-              //             && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-              //             && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-              //             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+              .filter(
+                  f ->
+                      FieldConstants.inField(f.estimatedPose)
+                          && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                          && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                          && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
               .ifPresent(
               e ->
                   estimates.add(

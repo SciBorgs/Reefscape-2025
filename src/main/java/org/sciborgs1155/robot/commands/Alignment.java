@@ -2,8 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static org.sciborgs1155.robot.Constants.Field.TO_THE_LEFT;
-import static org.sciborgs1155.robot.Constants.Field.moveLeft;
+import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.Constants.strafe;
+import static org.sciborgs1155.robot.FieldConstants.TO_THE_LEFT;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,13 +13,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
-import org.sciborgs1155.robot.Constants.Field.Branch;
-import org.sciborgs1155.robot.Constants.Field.Face;
-import org.sciborgs1155.robot.Constants.Field.Face.Side;
-import org.sciborgs1155.robot.Constants.Field.Source;
+import org.sciborgs1155.robot.FieldConstants.Branch;
+import org.sciborgs1155.robot.FieldConstants.Face;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
+import org.sciborgs1155.robot.FieldConstants.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -53,17 +53,16 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    Pose2d goal = moveLeft(branch.withLevel(level), TO_THE_LEFT);
+    Pose2d goal = branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
     return Commands.sequence(
             pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
-                drive
-                    .driveTo(goal)
-                    .asProxy()
-                    .andThen(
-                        Commands.waitUntil(elevator::atGoal)
-                            .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy(),
+                    Commands.waitUntil(elevator::atGoal)
+                        .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
+                    drive.driveTo(goal.transformBy(advance(Meters.of(-0.2)))).asProxy())))
         .withName("align to reef");
   }
 
@@ -75,7 +74,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> alignTo(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source.pose()).deadlineFor(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -91,9 +90,9 @@ public class Alignment implements Logged {
                         .pose()
                         .nearest(
                             Arrays.stream(Source.values())
-                                .map(s -> s.pose)
+                                .map(s -> s.pose())
                                 .collect(Collectors.toList())))
-                .alongWith(elevator.retract()),
+                .deadlineFor(elevator.retract()),
         Set.of(drive, elevator));
   }
 
@@ -122,7 +121,7 @@ public class Alignment implements Logged {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return pathfind(branch.pose)
+    return pathfind(branch.pose())
         .andThen(elevator.scoreLevel(level))
         .until(scoral::beambreak)
         .deadlineFor(
@@ -169,10 +168,10 @@ public class Alignment implements Logged {
   // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
   // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
 
-  @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
-  @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
-  @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
-  @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
-  @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
-  @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
+  // @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
+  // @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }

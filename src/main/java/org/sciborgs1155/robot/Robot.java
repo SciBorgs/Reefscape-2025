@@ -14,6 +14,8 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
+import static org.sciborgs1155.robot.FieldConstants.Face;
+import static org.sciborgs1155.robot.FieldConstants.Face.Side;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -51,8 +53,8 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Face;
-import org.sciborgs1155.robot.Constants.Field.Face.Side;
+import org.sciborgs1155.robot.FieldConstants.Face;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
@@ -93,7 +95,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final Vision vision =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+          case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
