@@ -19,6 +19,11 @@ import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -261,6 +266,22 @@ public class Robot extends CommandRobot implements Logged {
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
     test().whileTrue(systemsCheck());
+
+    Dashboard.cameraFR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name())));
+    Dashboard.cameraFL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name())));
+    Dashboard.cameraBR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name())));
+    Dashboard.cameraBL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name())));
+    Dashboard.cameraBM()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name())));
 
     // DRIVER
     driver

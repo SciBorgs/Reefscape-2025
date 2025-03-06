@@ -8,13 +8,9 @@ import static org.sciborgs1155.robot.Constants.Field.moveLeft;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -90,7 +86,13 @@ public class Alignment implements Logged {
   public Command source() {
     return Commands.defer(
         () ->
-            alignTo(drive.pose().nearest(Arrays.stream(Source.values()).map(s -> s.pose).collect(Collectors.toList())))
+            alignTo(
+                    drive
+                        .pose()
+                        .nearest(
+                            Arrays.stream(Source.values())
+                                .map(s -> s.pose)
+                                .collect(Collectors.toList())))
                 .alongWith(elevator.retract()),
         Set.of(drive, elevator));
   }
@@ -173,5 +175,4 @@ public class Alignment implements Logged {
   @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
   @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
   @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
-
 }

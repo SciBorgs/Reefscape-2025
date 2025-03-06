@@ -31,6 +31,7 @@ public class Dashboard {
   private static NetworkTableEntry entryCameraFR;
   private static NetworkTableEntry entryCameraBL;
   private static NetworkTableEntry entryCameraBR;
+  private static NetworkTableEntry entryCameraBM;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
@@ -79,6 +80,9 @@ public class Dashboard {
 
     entryCameraBR = base.getEntry("cameraBR");
     entryCameraBR.getBoolean(true);
+
+    entryCameraBM = base.getEntry("cameraBM");
+    entryCameraBM.getBoolean(true);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -190,6 +194,11 @@ public class Dashboard {
   // * Returns a trigger based on the enabled status of camera back right. */
   public static Trigger cameraBR() {
     return new Trigger(() -> entryCameraBR.getBoolean(true));
+  }
+
+  // * Returns a trigger based on the enabled status of camera back middle. */
+  public static Trigger cameraBM() {
+    return new Trigger(() -> entryCameraBM.getBoolean(true));
   }
 
   /**
