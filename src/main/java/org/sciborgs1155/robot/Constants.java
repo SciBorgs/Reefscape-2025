@@ -1,11 +1,11 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
+import static org.sciborgs1155.lib.TransformUtils.strafe;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
-import static org.sciborgs1155.lib.TransformUtils.strafe;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -189,7 +189,6 @@ public class Constants {
     }
 
     public static final Distance TO_THE_LEFT = Inches.of(2.5);
-
 
     public static Pose2d moveForward(Pose2d pose, Distance distance) {
       return pose.transformBy(

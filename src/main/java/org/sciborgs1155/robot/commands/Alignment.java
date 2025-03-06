@@ -2,9 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static org.sciborgs1155.lib.TransformUtils.strafe;
 import static org.sciborgs1155.robot.Constants.Field.TO_THE_LEFT;
 import static org.sciborgs1155.robot.Constants.Field.moveForward;
-import static org.sciborgs1155.lib.TransformUtils.strafe;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
@@ -169,10 +168,10 @@ public class Alignment implements Logged {
   // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
   // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
 
-  @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
-  @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
-  @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
-  @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
-  @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
-  @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
+  // @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
+  // @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }
