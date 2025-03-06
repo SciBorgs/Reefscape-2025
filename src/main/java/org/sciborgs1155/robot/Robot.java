@@ -10,7 +10,6 @@ import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.disabled;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
 import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
-import static org.sciborgs1155.robot.Constants.Field.moveLeft;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
@@ -25,6 +24,7 @@ import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -287,27 +287,19 @@ public class Robot extends CommandRobot implements Logged {
                     leftLED.progressGradient(
                         () ->
                             1
-                                / (drive
-                                    .pose()
-                                    .minus(
-                                        moveLeft(
-                                            Face.nearest(drive.pose())
-                                                .branch(Side.LEFT)
-                                                .withLevel(Level.L3)))
-                                    .getTranslation()
-                                    .getNorm())),
+                                / (calculateAlignment(
+                                    Face.nearest(drive.pose())
+                                        .branch(Side.LEFT)
+                                        .withLevel(Level.L3)
+                                        .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
-                                / (drive
-                                    .pose()
-                                    .minus(
-                                        (moveLeft(
-                                            Face.nearest(drive.pose())
-                                                .branch(Side.RIGHT)
-                                                .withLevel(Level.L3))))
-                                    .getTranslation()
-                                    .getNorm()))));
+                                / (calculateAlignment(
+                                    Face.nearest(drive.pose())
+                                        .branch(Side.LEFT)
+                                        .withLevel(Level.L3)
+                                        .getTranslation())))));
 
     driver
         .b()
@@ -318,27 +310,19 @@ public class Robot extends CommandRobot implements Logged {
                     leftLED.progressGradient(
                         () ->
                             1
-                                / (drive
-                                    .pose()
-                                    .minus(
-                                        moveLeft(
-                                            Face.nearest(drive.pose())
-                                                .branch(Side.RIGHT)
-                                                .withLevel(Level.L3)))
-                                    .getTranslation()
-                                    .getNorm())),
+                                / (calculateAlignment(
+                                    Face.nearest(drive.pose())
+                                        .branch(Side.RIGHT)
+                                        .withLevel(Level.L3)
+                                        .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
-                                / (drive
-                                    .pose()
-                                    .minus(
-                                        (moveLeft(
-                                            Face.nearest(drive.pose())
-                                                .branch(Side.RIGHT)
-                                                .withLevel(Level.L3))))
-                                    .getTranslation()
-                                    .getNorm()))));
+                                / (calculateAlignment(
+                                    Face.nearest(drive.pose())
+                                        .branch(Side.RIGHT)
+                                        .withLevel(Level.L3)
+                                        .getTranslation())))));
 
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
@@ -429,6 +413,10 @@ public class Robot extends CommandRobot implements Logged {
   @Log.NT
   public boolean isBlueAlliance() {
     return alliance() == Alliance.Blue;
+  }
+
+  private double calculateAlignment(Translation2d target) {
+    return drive.pose().getTranslation().minus(target).getNorm();
   }
 
   /**
