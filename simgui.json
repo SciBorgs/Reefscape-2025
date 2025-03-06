@@ -1,4 +1,11 @@
 {
+  "HALProvider": {
+    "Addressable LEDs": {
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -48,6 +55,25 @@
         "width": 16.541748046875,
         "window": {
           "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Robot": {
+        "open": true,
+        "scoraling": {
+          "elevator": {
+            "open": true
+          },
+          "open": true,
+          "scoral": {
+            "beambreak": {
+              "open": true
+            },
+            "open": true
+          }
         }
       }
     }

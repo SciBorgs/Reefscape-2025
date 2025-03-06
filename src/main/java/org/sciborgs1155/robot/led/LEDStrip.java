@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
 
@@ -66,9 +67,9 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @param percent A double supplier that supplies the elevator's percent raised.
    */
-  public Command elevatorLED(DoubleSupplier percent) {
+  public Command progressGradient(DoubleSupplier percent) {
     return set(
-        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kGreen, Color.kYellow)
+        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen)
             .mask(LEDPattern.progressMaskLayer(percent)));
   }
 
@@ -95,18 +96,18 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     if (Constants.alliance() == Alliance.Red) {
       return set(
           LEDPattern.gradient(
-                  LEDPattern.GradientType.kContinuous, Color.kFirstRed, Color.kOrangeRed)
-              .breathe(Seconds.of(2)));
+                  LEDPattern.GradientType.kDiscontinuous, Color.kFirstRed, Color.kOrangeRed)
+              .breathe(Seconds.of(1)));
     } else {
       return set(
-          LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kFirstBlue, Color.kAqua)
-              .breathe(Seconds.of(2)));
+          LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kFirstBlue, Color.kAqua)
+              .breathe(Seconds.of(1)));
     }
   }
 
   /** Blinks the LEDStrip white for 0.15 seconds, with a followng 0.15 seconds rest, twice. */
   public Command blink(Color color) {
-    return set(LEDPattern.solid(color).blink(Seconds.of(0.25)));
+    return set(LEDPattern.solid(color).blink(Seconds.of(0.2)));
   }
 
   /** Applies an LEDPattern to the set of LEDs controlled by the LEDStrip. */
@@ -131,7 +132,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
       }
     };
   }
-
+  
   @Override
   public void periodic() {
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
