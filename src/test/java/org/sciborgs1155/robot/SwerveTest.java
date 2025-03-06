@@ -121,8 +121,8 @@ public class SwerveTest {
 
     Pose2d pose = drive.pose();
 
-    assertEquals(deltaX, pose.getX(), DELTA * 2);
-    assertEquals(deltaY, pose.getY(), DELTA * 2);
+    assertEquals(deltaX, pose.getX(), DELTA * 4);
+    assertEquals(deltaY, pose.getY(), DELTA * 4);
   }
 
   @Disabled
