@@ -255,16 +255,26 @@ public class Robot extends CommandRobot implements Logged {
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
-    test().whileTrue(systemsCheck());
-
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
+    test().whileTrue(systemsCheck());
+
+    // DRIVER
     driver
         .leftBumper()
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
+
+    // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
+    driver.leftTrigger().whileTrue(scoraling.runRollersBack());
+
+    // X to nearest left branch, B to nearest right branch
+    driver.x().whileTrue(align.nearReef(Level.L3, Side.LEFT));
+    driver.b().whileTrue(align.nearReef(Level.L3, Side.RIGHT));
+
+    // A to nearest source
     driver
         .a()
         .whileTrue(
@@ -273,26 +283,30 @@ public class Robot extends CommandRobot implements Logged {
                 .alongWith(
                     leftLED.blink(Color.kAliceBlue).alongWith(rightLED.blink(Color.kAliceBlue))));
 
-    driver.x().whileTrue(align.nearReef(Level.L3, Side.LEFT));
-    driver.b().whileTrue(align.nearReef(Level.L3, Side.RIGHT));
-
+    // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
+
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
+    // OPERATOR
     operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE));
+    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
+
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
-    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
     operator.y().whileTrue(scoraling.runRollersBack());
 
+    // MANUAL SCORING ROUTINES
     operator.povDown().whileTrue(scoraling.scoral(Level.L1));
     operator.povRight().whileTrue(scoraling.scoral(Level.L2));
     operator.povUp().whileTrue(scoraling.scoral(Level.L3));
     operator.povLeft().whileTrue(scoraling.scoral(Level.L4));
 
+    // DASHBOARD
+    // TO REEF - DASHBOARD SELECT + DRIVER A
     Dashboard.reef()
         .and(driver.a())
         .whileTrue(

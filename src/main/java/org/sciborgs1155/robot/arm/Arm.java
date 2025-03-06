@@ -186,7 +186,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
                   position,
                   MathUtil.clamp(goal.getAsDouble(), MIN_ANGLE.in(Radians), MAX_ANGLE.in(Radians)));
           double feedforward =
-              ff.calculateWithVelocities(position(), lastVelocity, fb.getSetpoint().velocity);
+              ff.calculateWithVelocities(position, lastVelocity, fb.getSetpoint().velocity);
           hardware.setVoltage(feedback + feedforward);
         })
         .withName("Moving Arm To: " + goal.toString() + " radians");
