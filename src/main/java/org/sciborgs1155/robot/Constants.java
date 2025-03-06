@@ -34,19 +34,9 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  * @see Units
  */
 public class Constants {
-  // TODO: Modify as needed.
   /** Returns the robot's alliance. */
-  // private static SendableChooser<Alliance> allianceChooser() {
-  //   SendableChooser<Alliance> chooser = new SendableChooser<>();
-  //   chooser.addOption("Blue", Alliance.Blue);
-  //   chooser.addOption("Red", Alliance.Red);
-  //   SmartDashboard.putData("Alliance Chooser", chooser);
-  //   return chooser;
-  // }
-
   public static Alliance alliance() {
     return DriverStation.getAlliance().orElse(Alliance.Red);
-    // return allianceChooser().getSelected();
   }
 
   /** Returns the rotation of the robot's alliance with respect to the origin. */
@@ -89,9 +79,8 @@ public class Constants {
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
 
     public static final Distance SIDE_LENGTH = Inches.of(28);
-    // TODO add bumper length to this
 
-    public static final Distance BUMPER_LENGTH = Inches.of(28 + 3); // TODO NOT A FINAL VALUE
+    public static final Distance BUMPER_LENGTH = Inches.of(28 + 3);
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)

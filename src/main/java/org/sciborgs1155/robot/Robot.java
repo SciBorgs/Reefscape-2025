@@ -160,7 +160,7 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    // FaultLogger.register(pdh);
+    FaultLogger.register(pdh);
 
     if (TUNING) {
       addPeriodic(
@@ -185,7 +185,9 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
-    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()});
+    log(
+        "Zero Poses",
+        new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()}); // is this used for anything?
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -256,17 +258,19 @@ public class Robot extends CommandRobot implements Logged {
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
-    test().whileTrue(systemsCheck());
-
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
+    test().whileTrue(systemsCheck());
+
+    // DRIVER
     driver
         .leftBumper()
         .or(driver.rightBumper())
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
-    driver.rightTrigger().whileTrue(scoraling.hpsIntake());
 
+    // RT to intake, LT to run backwards
+    driver.rightTrigger().whileTrue(scoraling.hpsIntake());
     driver
         .a()
         .whileTrue(
@@ -336,10 +340,13 @@ public class Robot extends CommandRobot implements Logged {
                                     .getTranslation()
                                     .getNorm()))));
 
+    // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
+
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
+    // OPERATOR
     operator
         .leftTrigger()
         .whileTrue(
@@ -350,15 +357,17 @@ public class Robot extends CommandRobot implements Logged {
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
                     rightLED.progressGradient(
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+
+    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
+
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
-    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator
-        .a()
+        .povDown()
         .whileTrue(
             scoraling
                 .scoral(Level.L1)
@@ -388,7 +397,7 @@ public class Robot extends CommandRobot implements Logged {
                     rightLED.progressGradient(
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
     operator
-        .x()
+        .povLeft()
         .whileTrue(
             scoraling
                 .scoral(Level.L4)
@@ -398,6 +407,8 @@ public class Robot extends CommandRobot implements Logged {
                     rightLED.progressGradient(
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
+    // DASHBOARD
+    // TO REEF - DASHBOARD SELECT + DRIVER A
     Dashboard.reef()
         .and(driver.a())
         .whileTrue(

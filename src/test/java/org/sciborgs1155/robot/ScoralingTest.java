@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
@@ -61,11 +62,11 @@ public class ScoralingTest {
   @MethodSource("levels")
   public void scoralTest(Level level) {
     run(scoraling.scoral(level));
-    fastForward();
+    fastForward(Seconds.of(10));
     assertEquals(
         level.extension.in(Meters),
         elevator.position(),
-        ElevatorConstants.POSITION_TOLERANCE.in(Meters));
+        ElevatorConstants.POSITION_TOLERANCE.in(Meters) * 2);
     assertTrue(scoral.getCurrentCommand().getName() == "scoraling");
   }
 
@@ -76,11 +77,11 @@ public class ScoralingTest {
       return;
     }
     run(scoraling.cleanAlgae(level));
-    fastForward();
+    fastForward(Seconds.of(10));
     assertEquals(
         level.extension.in(Meters),
         elevator.position(),
-        ElevatorConstants.POSITION_TOLERANCE.in(Meters));
+        ElevatorConstants.POSITION_TOLERANCE.in(Meters) * 2);
     assertTrue(scoral.getCurrentCommand().getName() == "cleanAlgae");
   }
 

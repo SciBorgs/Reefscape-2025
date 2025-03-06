@@ -11,7 +11,6 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -36,15 +35,11 @@ public class TalonModule implements ModuleIO {
   private final PositionVoltage rotationsIn = new PositionVoltage(0);
 
   private final TalonOdometryThread talonThread;
-  private final VoltageOut odometryFrequency =
-      new VoltageOut(0).withUpdateFreqHz(1 / ODOMETRY_PERIOD.in(Seconds));
   private final Queue<Double> position;
   private final Queue<Double> rotation;
   private final Queue<Double> timestamp;
 
   private final SimpleMotorFeedforward driveFF;
-
-  private final Rotation2d angularOffset;
 
   private SwerveModuleState setpoint = new SwerveModuleState();
 
@@ -77,10 +72,6 @@ public class TalonModule implements ModuleIO {
     talonDriveConfig.Slot0.kI = Driving.PID.I;
     talonDriveConfig.Slot0.kD = Driving.PID.D;
 
-    // TODO remove
-    talonDriveConfig.Audio.BeepOnBoot = false;
-    talonDriveConfig.Audio.BeepOnConfig = false;
-
     turnMotor = new TalonFX(turnPort, CANIVORE_NAME);
     encoder = new CANcoder(sensorID, CANIVORE_NAME);
 
@@ -100,9 +91,6 @@ public class TalonModule implements ModuleIO {
     talonTurnConfig.Slot0.kP = Turning.PID.P;
     talonTurnConfig.Slot0.kI = Turning.PID.I;
     talonTurnConfig.Slot0.kD = Turning.PID.D;
-
-    talonTurnConfig.Audio.BeepOnBoot = false;
-    talonTurnConfig.Audio.BeepOnConfig = false;
 
     talonTurnConfig.CurrentLimits.StatorCurrentLimit = Turning.CURRENT_LIMIT.in(Amps);
 
@@ -148,7 +136,6 @@ public class TalonModule implements ModuleIO {
     resetEncoders();
 
     this.name = name;
-    this.angularOffset = angularOffset;
   }
 
   @Override

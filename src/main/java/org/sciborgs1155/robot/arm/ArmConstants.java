@@ -22,19 +22,19 @@ public class ArmConstants {
   public static final double kD = 1;
 
   public static final double kS = 0.09;
-  public static final double kV = 0;
+  public static final double kV = 1;
   public static final double kA = 0;
   public static final double kG = 0;
 
-  public static final Angle INTAKE_ANGLE = Radians.of(-0.79613);
-  public static final Angle HP_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
-  public static final Angle PROCESSOR_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
-  public static final Angle TROUGH_OUTTAKE_ANGLE = Radians.of(Math.PI * 3 / 4);
-
   public static final Angle STARTING_ANGLE = Radians.of(1.78862); // Radians.of(Math.PI / 2);
   public static final Angle DEFAULT_ANGLE = Radians.of(1.632); // Radians.of(Math.PI * 5 / 8);
-  public static final Angle CLIMB_INTAKE_ANGLE = Radians.of(0);
-  public static final Angle CLIMB_FINAL_ANGLE = Radians.of(Math.PI * 3 / 4);
+
+  public static final Angle INTAKE_ANGLE = Radians.of(-0.79613);
+  public static final Angle PROCESSOR_OUTTAKE_ANGLE = DEFAULT_ANGLE;
+  public static final Angle TROUGH_OUTTAKE_ANGLE = DEFAULT_ANGLE;
+
+  @Deprecated public static final Angle CLIMB_INTAKE_ANGLE = Radians.of(0);
+  @Deprecated public static final Angle CLIMB_FINAL_ANGLE = Radians.of(Math.PI * 3 / 4);
 
   public static final Translation3d AXLE_FROM_CHASSIS = new Translation3d(.05, .25, .39);
 
@@ -51,7 +51,7 @@ public class ArmConstants {
   /** Fully retracted. */
   public static final Angle MAX_ANGLE = Radians.of(1.632); // Radians.of(Math.PI * 3 / 4 + 0.1);
 
-  public static final Angle POSITION_TOLERANCE = Degrees.of(2);
+  public static final Angle POSITION_TOLERANCE = Degrees.of(8);
 
   public static final AngularVelocity MAX_VELOCITY = RadiansPerSecond.of(10);
   public static final AngularAcceleration MAX_ACCEL = RadiansPerSecondPerSecond.of(20);

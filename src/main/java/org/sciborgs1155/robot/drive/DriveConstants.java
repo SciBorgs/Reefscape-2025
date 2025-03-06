@@ -21,18 +21,13 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import java.util.List;
 
-/**
- * Constants for our 2025 Swerve X2t drivetrain. All fields in this file should be updated for the
- * current robot configuration!
- */
+/** Constants for our 2025 Swerve X2t drivetrain. */
 public final class DriveConstants {
   /** The type of control loop to use when controlling a module's drive motor. */
   public static enum ControlMode {
     CLOSED_LOOP_VELOCITY,
     OPEN_LOOP_VELOCITY;
   }
-
-  // TODO: Change central drivetrain constants as needed.
 
   // The angle between the velocity and the displacement from a target, above which the robot will
   // not use assisted driving to the target. (the driver must be driving in the general direction of
@@ -112,7 +107,6 @@ public final class DriveConstants {
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
-  // TODO: Change ALL characterization constants for each unique robot as needed.
   public static final class Translation {
     public static final double P = 3.0;
     public static final double I = 0.0;

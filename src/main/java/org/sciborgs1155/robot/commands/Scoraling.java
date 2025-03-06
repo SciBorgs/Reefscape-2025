@@ -39,12 +39,6 @@ public class Scoraling implements Logged {
         .negate()
         .or(scoral.beambreakTrigger)
         .onFalse(Commands.runOnce(() -> stop = true));
-    // stop()
-    //     .alongWith(leftStrip.blink(Color.kWhite), rightStrip.blink(Color.kWhite))
-    //     .onlyIf(
-    //         () ->
-    //             hopper.getCurrentCommand().getName().equals("intakingHPS")
-    //                 && scoral.getCurrentCommand().getName().equals("intakingHPS")));
   }
 
   @Log.NT private boolean stop = false;
@@ -99,7 +93,7 @@ public class Scoraling implements Logged {
 
   /**
    * A command which runs the hps + scoral rollers forward (generally as a form of intaking), then
-   * runs them back and forth until
+   * runs them back and forth until a coral enters the scoral.
    */
   public Command runRollers() {
     return hopper
