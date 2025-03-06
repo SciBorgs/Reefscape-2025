@@ -66,7 +66,7 @@ public class Dashboard {
     entryCurrentElevator.setDouble(0);
 
     entryCameraEnabled = base.getEntry("cameraEnabled");
-    entryCameraEnabled.setBooleanArray(new boolean[]{true, true, true, true});
+    entryCameraEnabled.setBooleanArray(new boolean[] {true, true, true, true});
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -114,7 +114,6 @@ public class Dashboard {
     tick += 1;
     entryRobotTick.setInteger(tick);
     entryMatchTime.setDouble(Robot.isReal() ? DriverStation.getMatchTime() : 0);
-
   }
 
   /** Returns a trigger for when a reef request from the Dashboard is recieved. */

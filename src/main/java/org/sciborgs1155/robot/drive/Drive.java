@@ -89,7 +89,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   @IgnoreLogged private final List<ModuleIO> modules;
 
-  // Gyro, Redux Canandgyro
+  // Gyro
   private final GyroIO gyro;
   private static Rotation2d simRotation = new Rotation2d();
 
@@ -522,7 +522,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     for (int i = 0; i < modules.size(); i++) {
       modules.get(i).updateSetpoint(desiredStates[i], mode);
-      // modules.get(1).updateSetpoint(desiredStates[1], mode);
     }
   }
 
@@ -640,14 +639,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * Drives the robot to a Choreo {@link SwerveSample}.
    *
-   * @param smaple The SwerveSample to drive the robot to.
+   * @param sample The SwerveSample to drive the robot to.
    */
-  public void goToSample(SwerveSample smaple, Rotation2d rotation) {
+  public void goToSample(SwerveSample sample, Rotation2d rotation) {
     Vector<N2> displacement =
-        pose().getTranslation().minus(smaple.getPose().getTranslation()).toVector();
+        pose().getTranslation().minus(sample.getPose().getTranslation()).toVector();
 
     Vector<N2> result =
-        VecBuilder.fill(smaple.vx, smaple.vy)
+        VecBuilder.fill(sample.vx, sample.vy)
             .plus(
                 displacement.norm() > 1e-4
                     ? displacement
@@ -712,8 +711,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         double[][] allGyro = gyro.odometryData();
 
         for (int i = 0; i < timestamps.length; i++) {
-          // log("num timestamps", timestamps);
-
           SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = allPositions[m][i];

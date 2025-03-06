@@ -18,7 +18,7 @@ public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-  // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
+  // WARNING: EMPTY TRANSFORMS WILL CRASH CODE UPON TAG DETECTION
   public static final CameraConfig BACK_LEFT_CAMERA =
       new CameraConfig(
           "back left",

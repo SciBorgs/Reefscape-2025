@@ -54,9 +54,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Method to create a no elevator.
+   * Method to create a non-existent elevator.
    *
-   * @return No elevator object.
+   * @return Non-real elevator object.
    */
   public static Elevator none() {
     return new Elevator(new NoElevator());

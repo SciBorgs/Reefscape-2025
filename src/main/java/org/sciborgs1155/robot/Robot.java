@@ -157,7 +157,7 @@ public class Robot extends CommandRobot implements Logged {
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
-    // FaultLogger.register(pdh);
+    FaultLogger.register(pdh);
 
     if (TUNING) {
       addPeriodic(
@@ -182,7 +182,9 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
-    log("Zero Poses", new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()});
+    log(
+        "Zero Poses",
+        new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()}); // is this used for anything?
 
     RobotController.setBrownoutVoltage(6.0);
 

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.Constants.Field.Branch;
@@ -25,9 +24,7 @@ import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment implements Logged {
   @IgnoreLogged private final Drive drive;
-
   @IgnoreLogged private final Elevator elevator;
-
   @IgnoreLogged private final Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
@@ -124,20 +121,6 @@ public class Alignment implements Logged {
                 .andThen(scoral.score()));
   }
 
-  // TODO delete these lmao
-  @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
-  @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
-  @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
-  @Log.NT public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
-  @Log.NT public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
-  @Log.NT public Pose2d kll = Face.KL.left.withLevel(Level.L4);
-  @Log.NT public Pose2d abr = Face.AB.right.withLevel(Level.L4);
-  @Log.NT public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
-  @Log.NT public Pose2d efr = Face.EF.right.withLevel(Level.L4);
-  @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
-  @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
-  @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
-
   /**
    * Pathfinds around obstacles and drives to a certain pose on the field.
    *
@@ -163,4 +146,17 @@ public class Alignment implements Logged {
             Set.of(drive))
         .withName("pathfind");
   }
+
+  // @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d kll = Face.KL.left.withLevel(Level.L4);
+  // @Log.NT public Pose2d abr = Face.AB.right.withLevel(Level.L4);
+  // @Log.NT public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
+  // @Log.NT public Pose2d efr = Face.EF.right.withLevel(Level.L4);
+  // @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
+  // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
+  // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
 }
