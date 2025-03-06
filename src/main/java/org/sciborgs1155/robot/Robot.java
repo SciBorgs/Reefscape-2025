@@ -14,8 +14,6 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -59,6 +57,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
@@ -136,6 +135,7 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
+  private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
@@ -161,6 +161,7 @@ public class Robot extends CommandRobot implements Logged {
     Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
+    addPeriodic(vision::logCamEnabled, 1);
 
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
@@ -303,7 +304,7 @@ public class Robot extends CommandRobot implements Logged {
         .x()
         .whileTrue(
             align
-                .nearReef(Level.L3, Side.LEFT)
+                .nearReef(Side.LEFT)
                 .alongWith(
                     leftLED.progressGradient(
                         () ->
@@ -326,7 +327,7 @@ public class Robot extends CommandRobot implements Logged {
         .b()
         .whileTrue(
             align
-                .nearReef(Level.L3, Side.RIGHT)
+                .nearReef(Side.RIGHT)
                 .alongWith(
                     leftLED.progressGradient(
                         () ->
@@ -347,6 +348,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
+    driver.povRight().whileTrue(corolling.intake());
 
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
@@ -484,10 +486,10 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
-            arm.goToTest(INTAKE_ANGLE),
+            // arm.goToTest(INTAKE_ANGLE),
             Test.fromCommand(coroller.outtake().withTimeout(1)),
             Test.fromCommand(coroller.intake().withTimeout(1)),
-            arm.goToTest(STARTING_ANGLE),
+            // arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(
                 scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),

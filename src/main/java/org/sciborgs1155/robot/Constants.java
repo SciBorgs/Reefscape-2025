@@ -71,7 +71,7 @@ public class Constants {
 
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
-  public static boolean TUNING = true;
+  public static boolean TUNING = false;
 
   /** Describes physical properites of the robot. */
   public static class Robot {

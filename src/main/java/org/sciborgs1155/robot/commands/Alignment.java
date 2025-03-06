@@ -55,7 +55,7 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     Pose2d goal = moveLeft(branch.withLevel(level), TO_THE_LEFT);
     return Commands.sequence(
-            pathfind(goal).asProxy(),
+            pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
                 drive
@@ -105,12 +105,12 @@ public class Alignment implements Logged {
    * Finds the nearest reef face, then pathfinds to the branch with a given side on that face, and
    * scores on a designated level on that branch.
    *
-   * @param level The level (L1, L2, L3, L4) being scored on.
    * @param side The branch side (Left/Right) to score on.
-   * @return A command to score on the nearest reef branch.
+   * @return A command to align to the nearest reef branch.
    */
-  public Command nearReef(Level level, Side side) {
-    return Commands.deferredProxy(() -> reef(level, Face.nearest(drive.pose()).branch(side)));
+  public Command nearReef(Side side) {
+    return Commands.deferredProxy(
+        () -> alignTo(moveLeft(Face.nearest(drive.pose()).branch(side).pose, TO_THE_LEFT)));
   }
 
   /**
