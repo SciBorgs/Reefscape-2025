@@ -406,6 +406,19 @@ public class Robot extends CommandRobot implements Logged {
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
+    Dashboard.cameraFL()
+        .onTrue(Commands.run(() -> vision.enableCam("front left")))
+        .onFalse(Commands.run(() -> vision.disableCam("front left")));
+    Dashboard.cameraFR()
+        .onTrue(Commands.run(() -> vision.enableCam("front right")))
+        .onFalse(Commands.run(() -> vision.disableCam("front right")));
+    Dashboard.cameraBL()
+        .onTrue(Commands.run(() -> vision.enableCam("back left")))
+        .onFalse(Commands.run(() -> vision.disableCam("back left")));
+    Dashboard.cameraBR()
+        .onTrue(Commands.run(() -> vision.enableCam("back right")))
+        .onFalse(Commands.run(() -> vision.disableCam("back right")));
+
     scoral.beambreakTrigger.onTrue(
         leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));
   }
