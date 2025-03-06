@@ -189,11 +189,16 @@ public class Constants {
 
     public static final Distance TO_THE_LEFT = Inches.of(2.5);
 
-    public static Pose2d moveLeft(Pose2d pose, Distance distance) {
-      return pose.transformBy(
-          new Transform2d(
-              new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(90)),
-              Rotation2d.kZero));
+    /**
+     * Transforms the pose to the right by a certain distance. A negative number strafes to the
+     * left.
+     *
+     * @param distance
+     * @return
+     */
+    public static Transform2d strafe(Distance distance) {
+      return new Transform2d(
+          new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(-90)), Rotation2d.kZero);
     }
 
     // Poses for scoraling.
@@ -339,31 +344,31 @@ public class Constants {
     // Rotation of the top source (facing into the field)
     private static final Rotation2d SOURCE_ROTATION = Rotation2d.fromDegrees(90 - 144.011);
 
-    private static final Pose2d LEFT_SOURCE = new Pose2d(
-      new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
-          .plus(
-              new Translation2d(
-                  BUMPER_LENGTH.div(2).in(Meters) + 0.05,
-                  Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
-      SOURCE_ROTATION);
+    private static final Pose2d LEFT_SOURCE =
+        new Pose2d(
+            new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
+                .plus(
+                    new Translation2d(
+                        BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                        Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
+            SOURCE_ROTATION);
 
-     private static final Pose2d RIGHT_SOURCE =  new Pose2d(
-        new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
-            .plus(
-                new Translation2d(
-                    BUMPER_LENGTH.div(2).in(Meters) + 0.05,
-                    Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
-        SOURCE_ROTATION.unaryMinus());
+    private static final Pose2d RIGHT_SOURCE =
+        new Pose2d(
+            new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
+                .plus(
+                    new Translation2d(
+                        BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                        Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
+            SOURCE_ROTATION.unaryMinus());
 
     public static enum Source {
-      LEFT_SOURCE_MID(
-          LEFT_SOURCE),
-      LEFT_SOURCE_LEFT(moveLeft(LEFT_SOURCE, SOURCE_MID_DISPLACEMENT)),
-      LEFT_SOURCE_RIGHT(moveLeft(LEFT_SOURCE, SOURCE_MID_DISPLACEMENT.times(-1))),
-      RIGHT_SOURCE_MID(RIGHT_SOURCE
-          ),
-      RIGHT_SOURCE_LEFT(moveLeft(RIGHT_SOURCE, SOURCE_MID_DISPLACEMENT)),
-      RIGHT_SOURCE_RIGHT(moveLeft(RIGHT_SOURCE, SOURCE_MID_DISPLACEMENT.times(-1)));
+      LEFT_SOURCE_MID(LEFT_SOURCE),
+      LEFT_SOURCE_LEFT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
+      LEFT_SOURCE_RIGHT(LEFT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT))),
+      RIGHT_SOURCE_MID(RIGHT_SOURCE),
+      RIGHT_SOURCE_LEFT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
+      RIGHT_SOURCE_RIGHT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT)));
 
       public Pose2d pose;
 
