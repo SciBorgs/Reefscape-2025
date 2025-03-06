@@ -5,6 +5,7 @@ import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import static org.sciborgs1155.robot.Constants.Field.LENGTH;
 import static org.sciborgs1155.robot.Constants.Field.WIDTH;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
+import static org.sciborgs1155.lib.TransformUtils.strafe;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -189,17 +190,6 @@ public class Constants {
 
     public static final Distance TO_THE_LEFT = Inches.of(2.5);
 
-    /**
-     * Transforms the pose to the right by a certain distance. A negative number strafes to the
-     * left.
-     *
-     * @param distance
-     * @return
-     */
-    public static Transform2d strafe(Distance distance) {
-      return new Transform2d(
-          new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(-90)), Rotation2d.kZero);
-    }
 
     public static Pose2d moveForward(Pose2d pose, Distance distance) {
       return pose.transformBy(

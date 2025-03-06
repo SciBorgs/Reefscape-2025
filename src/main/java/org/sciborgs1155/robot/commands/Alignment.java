@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.Field.TO_THE_LEFT;
 import static org.sciborgs1155.robot.Constants.Field.moveForward;
-import static org.sciborgs1155.robot.Constants.Field.strafe;
+import static org.sciborgs1155.lib.TransformUtils.strafe;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
