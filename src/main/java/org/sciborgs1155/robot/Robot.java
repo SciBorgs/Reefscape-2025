@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -282,53 +281,75 @@ public class Robot extends CommandRobot implements Logged {
                 .nearReef(Level.L3, Side.LEFT)
                 .alongWith(
                     leftLED.progressGradient(
-                        () -> 1 / (
-                            drive
-                                .pose().minus(
-                                    moveLeft(
-                                        Face.nearest(drive.pose())
-                                            .branch(Side.LEFT)
-                                            .withLevel(Level.L3)))
-                                .getTranslation()
-                                .getNorm())), 
-                      rightLED.progressGradient(
-                        () -> 1 / (
-                            drive
-                                .pose().minus(
-                                    (moveLeft(
-                                        Face.nearest(drive.pose())
-                                            .branch(Side.RIGHT)
-                                            .withLevel(Level.L3))))
-                                .getTranslation()
-                                .getNorm()))));
+                        () ->
+                            1
+                                / (drive
+                                    .pose()
+                                    .minus(
+                                        moveLeft(
+                                            Face.nearest(drive.pose())
+                                                .branch(Side.LEFT)
+                                                .withLevel(Level.L3)))
+                                    .getTranslation()
+                                    .getNorm())),
+                    rightLED.progressGradient(
+                        () ->
+                            1
+                                / (drive
+                                    .pose()
+                                    .minus(
+                                        (moveLeft(
+                                            Face.nearest(drive.pose())
+                                                .branch(Side.RIGHT)
+                                                .withLevel(Level.L3))))
+                                    .getTranslation()
+                                    .getNorm()))));
 
-    driver.b().whileTrue(align.nearReef(Level.L3, Side.RIGHT).alongWith(
-      leftLED.progressGradient(
-          () -> 1 / (
-              drive
-                  .pose().minus(
-                      moveLeft(
-                          Face.nearest(drive.pose())
-                              .branch(Side.RIGHT)
-                              .withLevel(Level.L3)))
-                  .getTranslation()
-                  .getNorm())), 
-        rightLED.progressGradient(
-          () -> 1 / (
-              drive
-                  .pose().minus(
-                      (moveLeft(
-                          Face.nearest(drive.pose())
-                              .branch(Side.RIGHT)
-                              .withLevel(Level.L3))))
-                  .getTranslation()
-                  .getNorm()))));
+    driver
+        .b()
+        .whileTrue(
+            align
+                .nearReef(Level.L3, Side.RIGHT)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () ->
+                            1
+                                / (drive
+                                    .pose()
+                                    .minus(
+                                        moveLeft(
+                                            Face.nearest(drive.pose())
+                                                .branch(Side.RIGHT)
+                                                .withLevel(Level.L3)))
+                                    .getTranslation()
+                                    .getNorm())),
+                    rightLED.progressGradient(
+                        () ->
+                            1
+                                / (drive
+                                    .pose()
+                                    .minus(
+                                        (moveLeft(
+                                            Face.nearest(drive.pose())
+                                                .branch(Side.RIGHT)
+                                                .withLevel(Level.L3))))
+                                    .getTranslation()
+                                    .getNorm()))));
 
     driver.povLeft().onTrue(drive.zeroHeading());
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
 
-    operator.leftTrigger().whileTrue(elevator.scoreLevel(Level.L3_ALGAE).alongWith(leftLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters)), rightLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator
+        .leftTrigger()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L3_ALGAE)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
+                    rightLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
 
@@ -336,10 +357,46 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
     operator.y().whileTrue(scoraling.runRollersBack());
 
-    operator.a().whileTrue(scoraling.scoral(Level.L1).alongWith(leftLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters)), rightLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator.povRight().whileTrue(scoraling.scoral(Level.L2).alongWith(leftLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters)), rightLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator.povUp().whileTrue(scoraling.scoral(Level.L3).alongWith(leftLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters)), rightLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator.x().whileTrue(scoraling.scoral(Level.L4).alongWith(leftLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters)), rightLED.progressGradient(() -> elevator.position()/ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator
+        .a()
+        .whileTrue(
+            scoraling
+                .scoral(Level.L1)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
+                    rightLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator
+        .povRight()
+        .whileTrue(
+            scoraling
+                .scoral(Level.L2)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
+                    rightLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator
+        .povUp()
+        .whileTrue(
+            scoraling
+                .scoral(Level.L3)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
+                    rightLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator
+        .x()
+        .whileTrue(
+            scoraling
+                .scoral(Level.L4)
+                .alongWith(
+                    leftLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
+                    rightLED.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
 
     Dashboard.reef()
         .and(driver.a())
@@ -354,7 +411,8 @@ public class Robot extends CommandRobot implements Logged {
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
-    scoral.beambreakTrigger.onTrue(leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));
+    scoral.beambreakTrigger.onTrue(
+        leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));
   }
 
   @Log.NT
