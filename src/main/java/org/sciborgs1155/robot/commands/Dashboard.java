@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 

@@ -8,6 +8,8 @@ import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
+import static org.sciborgs1155.robot.FieldConstants.LENGTH;
+import static org.sciborgs1155.robot.FieldConstants.WIDTH;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,7 +24,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
@@ -60,13 +61,13 @@ public class AlignTest {
     DriverStationSim.notifyNewData();
     Pose2d bluePose =
         new Pose2d(
-            Field.LENGTH.times(rand.nextDouble()),
-            Field.WIDTH.times(rand.nextDouble()),
+            LENGTH.times(rand.nextDouble()),
+            WIDTH.times(rand.nextDouble()),
             Rotation2d.fromRotations(rand.nextDouble()));
     Pose2d redPose = allianceReflect(bluePose);
 
-    assertEquals(Field.LENGTH.minus(bluePose.getMeasureX()), redPose.getMeasureX());
-    assertEquals(Field.WIDTH.minus(bluePose.getMeasureY()), redPose.getMeasureY());
+    assertEquals(LENGTH.minus(bluePose.getMeasureX()), redPose.getMeasureX());
+    assertEquals(WIDTH.minus(bluePose.getMeasureY()), redPose.getMeasureY());
     assertEquals(
         bluePose.getRotation().rotateBy(Rotation2d.fromRotations(0.5)), redPose.getRotation());
     DriverStationSim.resetData();
@@ -90,6 +91,6 @@ public class AlignTest {
   }
 
   private static Stream<Arguments> goals() {
-    return Arrays.stream(Constants.Field.Branch.values()).map(v -> Arguments.of(v.pose));
+    return Arrays.stream(FieldConstants.Branch.values()).map(v -> Arguments.of(v.pose));
   }
 }

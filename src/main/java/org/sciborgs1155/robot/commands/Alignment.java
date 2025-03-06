@@ -2,9 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static org.sciborgs1155.lib.TransformUtils.strafe;
-import static org.sciborgs1155.robot.Constants.Field.TO_THE_LEFT;
-import static org.sciborgs1155.robot.Constants.Field.moveForward;
+import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.Constants.strafe;
+import static org.sciborgs1155.robot.FieldConstants.TO_THE_LEFT;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
-import org.sciborgs1155.robot.Constants.Field.Branch;
-import org.sciborgs1155.robot.Constants.Field.Face;
-import org.sciborgs1155.robot.Constants.Field.Face.Side;
-import org.sciborgs1155.robot.Constants.Field.Source;
+import org.sciborgs1155.robot.FieldConstants.Branch;
+import org.sciborgs1155.robot.FieldConstants.Face;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
+import org.sciborgs1155.robot.FieldConstants.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -62,7 +62,7 @@ public class Alignment implements Logged {
                     drive.driveTo(goal).asProxy(),
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
-                    drive.driveTo(moveForward(goal, Meters.of(-0.2))).asProxy())))
+                    drive.driveTo(goal.transformBy(advance(Meters.of(-0.2)))).asProxy())))
         .withName("align to reef");
   }
 
