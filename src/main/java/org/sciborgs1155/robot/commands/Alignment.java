@@ -3,6 +3,7 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.Field.TO_THE_LEFT;
+import static org.sciborgs1155.robot.Constants.Field.moveForward;
 import static org.sciborgs1155.robot.Constants.Field.moveLeft;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -58,12 +59,11 @@ public class Alignment implements Logged {
             pathfind(goal).asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
-                drive
-                    .driveTo(goal)
-                    .asProxy()
-                    .andThen(
-                        Commands.waitUntil(elevator::atGoal)
-                            .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy(),
+                    Commands.waitUntil(elevator::atGoal)
+                        .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
+                    drive.driveTo(moveForward(goal, Meters.of(-0.2))).asProxy())))
         .withName("align to reef");
   }
 
@@ -75,7 +75,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> alignTo(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source.pose).deadlineFor(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -93,7 +93,7 @@ public class Alignment implements Logged {
                             Arrays.stream(Source.values())
                                 .map(s -> s.pose)
                                 .collect(Collectors.toList())))
-                .alongWith(elevator.retract()),
+                .deadlineFor(elevator.retract()),
         Set.of(drive, elevator));
   }
 
