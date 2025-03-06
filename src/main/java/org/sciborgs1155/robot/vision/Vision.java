@@ -27,8 +27,8 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.Constants.Field;
 
 public class Vision implements Logged {
   public static record CameraConfig(String name, Transform3d robotToCam) {}
@@ -120,26 +120,30 @@ public class Vision implements Logged {
 
         int unreadLength = unreadChanges.size();
 
-        // feeds latest result for visualization; multiple different pos breaks getSeenTags()
-        lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
+      if (cameras[i].getName() != "back middle") {
+        unreadChanges.forEach(r ->   r.targets.forEach(t -> t.pitch *= -1));
+      }
+      
+      // if ()
+      // feeds latest result for visualization; multiple different pos breaks getSeenTags()
+      lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
 
-        for (int j = 0; j < unreadLength; j++) {
-          var change = unreadChanges.get(j);
-          estimate = estimators[i].update(change);
-          log("estimates present " + i, estimate.isPresent());
-          estimate
-              .filter(
-                  f ->
-                      Field.inField(f.estimatedPose)
-                          && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                          && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                          && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
-              .ifPresent(
-                  e ->
-                      estimates.add(
-                          new PoseEstimate(
-                              e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
-        }
+      for (int j = 0; j < unreadLength; j++) {
+        var change = unreadChanges.get(j);
+
+        estimate = estimators[i].update(change);
+        log("estimates present " + i, estimate.isPresent());
+        estimate
+            .filter(
+                f ->
+                    Field.inField(f.estimatedPose)
+                        && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                        && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                        && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+            .ifPresent(
+            e ->
+                estimates.add(
+                    new PoseEstimate(e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
       }
     }
     return estimates.toArray(PoseEstimate[]::new);
