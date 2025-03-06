@@ -201,6 +201,12 @@ public class Constants {
           new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(-90)), Rotation2d.kZero);
     }
 
+    public static Pose2d moveForward(Pose2d pose, Distance distance) {
+      return pose.transformBy(
+          new Transform2d(
+              new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(0)), Rotation2d.kZero));
+    }
+
     // Poses for scoraling.
     // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
     // There are two reef branches per side, so the more counter-clockwise one is 1, and the
