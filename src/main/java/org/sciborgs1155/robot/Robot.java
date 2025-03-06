@@ -19,6 +19,11 @@ import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -89,7 +94,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final Vision vision =
       switch (ROBOT_TYPE) {
-          case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
@@ -262,6 +267,22 @@ public class Robot extends CommandRobot implements Logged {
 
     test().whileTrue(systemsCheck());
 
+    Dashboard.cameraFR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name())));
+    Dashboard.cameraFL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name())));
+    Dashboard.cameraBR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name())));
+    Dashboard.cameraBL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name())));
+    Dashboard.cameraBM()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name())));
+
     // DRIVER
     driver
         .leftBumper()
@@ -407,17 +428,17 @@ public class Robot extends CommandRobot implements Logged {
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
     Dashboard.cameraFL()
-        .onTrue(Commands.run(() -> vision.enableCam("front left")))
-        .onFalse(Commands.run(() -> vision.disableCam("front left")));
+        .onTrue(Commands.runOnce(() -> vision.enableCam("front left")))
+        .onFalse(Commands.runOnce(() -> vision.disableCam("front left")));
     Dashboard.cameraFR()
-        .onTrue(Commands.run(() -> vision.enableCam("front right")))
-        .onFalse(Commands.run(() -> vision.disableCam("front right")));
+        .onTrue(Commands.runOnce(() -> vision.enableCam("front right")))
+        .onFalse(Commands.runOnce(() -> vision.disableCam("front right")));
     Dashboard.cameraBL()
-        .onTrue(Commands.run(() -> vision.enableCam("back left")))
-        .onFalse(Commands.run(() -> vision.disableCam("back left")));
+        .onTrue(Commands.runOnce(() -> vision.enableCam("back left")))
+        .onFalse(Commands.runOnce(() -> vision.disableCam("back left")));
     Dashboard.cameraBR()
-        .onTrue(Commands.run(() -> vision.enableCam("back right")))
-        .onFalse(Commands.run(() -> vision.disableCam("back right")));
+        .onTrue(Commands.runOnce(() -> vision.enableCam("back right")))
+        .onFalse(Commands.runOnce(() -> vision.disableCam("back right")));
 
     scoral.beambreakTrigger.onTrue(
         leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));

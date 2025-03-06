@@ -1,7 +1,9 @@
 package org.sciborgs1155.robot.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -26,7 +28,10 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(13).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
+              //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
+              new Rotation3d(Radians.zero(), Degrees.of(-25), Radians.zero())
+                  .rotateBy(new Rotation3d(Radians.zero(), Radians.zero(), Degrees.of(108.25)))));
+
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
@@ -34,7 +39,9 @@ public class VisionConstants {
               Inches.of(-12).in(Meters),
               Inches.of(-13).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
+              //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
+              new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-108.25)))));
   public static final CameraConfig BACK_MIDDLE_CAMERA =
       new CameraConfig(
           "back middle",
@@ -42,15 +49,21 @@ public class VisionConstants {
               Inches.of(-8.358).in(Meters),
               Inches.of(3.354).in(Meters),
               Inches.of(12.341).in(Meters),
-              new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
+              //   new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
+              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
+
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
               Inches.of(13).in(Meters),
               Inches.of(11).in(Meters),
-              Inches.of(9.375).in(Meters), // TODO get new
-              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
+              Inches.of(3.875).in(Meters), // TODO get new
+              //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
+              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-30)))));
+
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
@@ -58,7 +71,10 @@ public class VisionConstants {
               Inches.of(13).in(Meters),
               Inches.of(-11).in(Meters),
               Inches.of(9.375).in(Meters),
-              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
+              //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
+              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(30)))));
+
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;

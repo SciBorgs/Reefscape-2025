@@ -45,7 +45,12 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
+    return new Vision(
+        FRONT_LEFT_CAMERA,
+        FRONT_RIGHT_CAMERA,
+        BACK_LEFT_CAMERA,
+        BACK_RIGHT_CAMERA,
+        BACK_MIDDLE_CAMERA);
   }
 
   public static Vision none() {
@@ -115,11 +120,17 @@ public class Vision implements Logged {
 
         int unreadLength = unreadChanges.size();
 
+        if (cameras[i].getName() != "back middle") {
+          unreadChanges.forEach(r -> r.targets.forEach(t -> t.pitch *= -1));
+        }
+
+        // if ()
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
 
         for (int j = 0; j < unreadLength; j++) {
           var change = unreadChanges.get(j);
+
           estimate = estimators[i].update(change);
           log("estimates present " + i, estimate.isPresent());
           estimate
