@@ -11,7 +11,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -37,6 +39,7 @@ public class Vision implements Logged {
   private final PhotonPoseEstimator[] estimators;
   private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
+  private final Map<String, Boolean> camerasEnabled;
 
   private VisionSystemSim visionSim;
 
@@ -59,6 +62,7 @@ public class Vision implements Logged {
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
     lastResults = new PhotonPipelineResult[configs.length];
+    camerasEnabled = new HashMap<>();
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
@@ -72,6 +76,7 @@ public class Vision implements Logged {
       cameras[i] = camera;
       estimators[i] = estimator;
       lastResults[i] = new PhotonPipelineResult();
+      camerasEnabled.put(camera.getName(), true);
 
       FaultLogger.register(camera);
     }
@@ -109,10 +114,11 @@ public class Vision implements Logged {
   public PoseEstimate[] estimatedGlobalPoses() {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
-      var unreadChanges = cameras[i].getAllUnreadResults();
-      Optional<EstimatedRobotPose> estimate = Optional.empty();
+      if (camerasEnabled.get(cameras[i].getName())) {
+        var unreadChanges = cameras[i].getAllUnreadResults();
+        Optional<EstimatedRobotPose> estimate = Optional.empty();
 
-      int unreadLength = unreadChanges.size();
+        int unreadLength = unreadChanges.size();
 
       if (cameras[i].getName() != "back middle") {
         unreadChanges.forEach(r ->   r.targets.forEach(t -> t.pitch *= -1));
@@ -141,6 +147,14 @@ public class Vision implements Logged {
       }
     }
     return estimates.toArray(PoseEstimate[]::new);
+  }
+
+  public void disableCam(String name) {
+    camerasEnabled.put(name, false);
+  }
+
+  public void enableCam(String name) {
+    camerasEnabled.put(name, true);
   }
 
   /**
