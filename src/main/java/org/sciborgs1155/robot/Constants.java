@@ -108,7 +108,4 @@ public class Constants {
   public static final double SLOW_SPEED_MULTIPLIER = 0.33;
   public static final double FULL_SPEED_MULTIPLIER = 1.0;
   public static final String CANIVORE_NAME = "drivetrain";
-
-  // Origin at corner of blue alliance side of field
-
 }

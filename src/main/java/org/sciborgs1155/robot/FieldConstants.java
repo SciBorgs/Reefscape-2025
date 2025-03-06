@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class FieldConstants {
+  // Origin at corner of blue alliance side of field
+
   public static final Distance LENGTH = Centimeters.of(1755);
   public static final Distance WIDTH = Centimeters.of(805);
 
@@ -290,6 +292,7 @@ public class FieldConstants {
     }
   }
 
+  // We don't have these poses. do NOT use them.
   public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
 
   public static final Pose2d CAGE_1 = allianceReflect(new Pose2d());
