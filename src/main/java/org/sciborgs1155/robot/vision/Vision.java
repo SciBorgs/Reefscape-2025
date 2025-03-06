@@ -135,6 +135,8 @@ public class Vision implements Logged {
                           new PoseEstimate(
                               e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
         }
+      } else {
+        log("estimates present " + i, false);
       }
     }
     return estimates.toArray(PoseEstimate[]::new);
