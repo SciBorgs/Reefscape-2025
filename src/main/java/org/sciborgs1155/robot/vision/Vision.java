@@ -25,8 +25,8 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.robot.Constants.Field;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.Constants.Field;
 
 public class Vision implements Logged {
   public static record CameraConfig(String name, Transform3d robotToCam) {}
@@ -42,7 +42,12 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
+    return new Vision(
+        FRONT_LEFT_CAMERA,
+        FRONT_RIGHT_CAMERA,
+        BACK_LEFT_CAMERA,
+        BACK_RIGHT_CAMERA,
+        BACK_MIDDLE_CAMERA);
   }
 
   public static Vision none() {
@@ -109,11 +114,17 @@ public class Vision implements Logged {
 
       int unreadLength = unreadChanges.size();
 
+      if (cameras[i].getName() != "back middle") {
+        unreadChanges.forEach(r ->   r.targets.forEach(t -> t.pitch *= -1));
+      }
+      
+      // if ()
       // feeds latest result for visualization; multiple different pos breaks getSeenTags()
       lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
 
       for (int j = 0; j < unreadLength; j++) {
         var change = unreadChanges.get(j);
+
         estimate = estimators[i].update(change);
         log("estimates present " + i, estimate.isPresent());
         estimate
@@ -124,10 +135,9 @@ public class Vision implements Logged {
                         && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
                         && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
             .ifPresent(
-                e ->
-                    estimates.add(
-                        new PoseEstimate(
-                            e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
+            e ->
+                estimates.add(
+                    new PoseEstimate(e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
       }
     }
     return estimates.toArray(PoseEstimate[]::new);
