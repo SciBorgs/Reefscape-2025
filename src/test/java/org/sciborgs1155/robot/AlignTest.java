@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;

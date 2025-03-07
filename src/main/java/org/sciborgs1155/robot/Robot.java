@@ -95,7 +95,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final Vision vision =
       switch (ROBOT_TYPE) {
-          case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
