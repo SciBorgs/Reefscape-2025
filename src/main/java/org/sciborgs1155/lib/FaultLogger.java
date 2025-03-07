@@ -479,4 +479,18 @@ public final class FaultLogger {
         .map(Fault::toString)
         .toArray(String[]::new);
   }
+
+  /**
+   * Returns the value of the supplier. If the supplier returns true, reports it.
+   *
+   * @param supplier The boolean supplier to report if true.
+   * @param fault The fault to report if the boolean supplier returns true.
+   * @return The value of the supplier.
+   */
+  public static boolean returnButReport(BooleanSupplier supplier, Fault fault) {
+    if (supplier.getAsBoolean()) {
+      report(fault);
+    }
+    return supplier.getAsBoolean();
+  }
 }

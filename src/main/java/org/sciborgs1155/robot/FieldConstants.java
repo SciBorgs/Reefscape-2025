@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +39,10 @@ public class FieldConstants {
   public static final Pose2d CENTER_REEF =
       new Pose2d(
           new Translation2d(Feet.of(12).plus(REEF_MIN_RADIUS), WIDTH.div(2)), Rotation2d.kZero);
+
+  public static Alliance allianceFromPose(Pose2d pose) {
+    return pose.getX() > LENGTH.in(Meters) / 2 ? Alliance.Red : Alliance.Blue;
+  }
 
   // The field robot poses for blue alliance's reef branches A and B. Both are the farthest to the
   // blue

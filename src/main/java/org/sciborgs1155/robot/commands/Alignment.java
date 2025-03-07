@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.TO_THE_LEFT;
+import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,6 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.Fault;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.FieldConstants.Face;
@@ -31,6 +35,12 @@ public class Alignment implements Logged {
   @IgnoreLogged private final Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+
+  private Fault alternateAlliancePathfinding =
+      new Fault(
+          "Alternate Alliance Pathfinding",
+          "The robot is attempting to pathfind to a pose on the other alliance.",
+          FaultType.WARNING);
 
   /**
    * Constructor for an Alignment command object.
@@ -63,7 +73,12 @@ public class Alignment implements Logged {
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
                     drive.driveTo(goal.transformBy(advance(Meters.of(-0.2)))).asProxy())))
-        .withName("align to reef");
+        .withName("align to reef")
+        .onlyWhile(
+            () ->
+                FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding));
   }
 
   /**
@@ -97,7 +112,13 @@ public class Alignment implements Logged {
   }
 
   public Command alignTo(Pose2d goal) {
-    return pathfind(goal).andThen(drive.driveTo(goal));
+    return pathfind(goal)
+        .andThen(drive.driveTo(goal))
+        .onlyWhile(
+            () ->
+                FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding));
   }
 
   /**
@@ -152,6 +173,11 @@ public class Alignment implements Logged {
                         })
                     .until(() -> drive.atTranslation(goal.getTranslation(), Meters.of(1))),
             Set.of(drive))
+        .onlyWhile(
+            () ->
+                FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding))
         .withName("pathfind");
   }
 
