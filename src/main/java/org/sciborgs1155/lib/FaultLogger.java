@@ -487,10 +487,10 @@ public final class FaultLogger {
    * @param fault The fault to report if the boolean supplier returns true.
    * @return The value of the supplier.
    */
-  public static boolean returnButReport(BooleanSupplier supplier, Fault fault) {
-    if (supplier.getAsBoolean()) {
+  public static boolean returnButReport(boolean supplier, Fault fault) {
+    if (supplier) {
       report(fault);
     }
-    return supplier.getAsBoolean();
+    return supplier;
   }
 }

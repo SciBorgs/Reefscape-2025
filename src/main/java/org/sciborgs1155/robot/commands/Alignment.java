@@ -77,7 +77,7 @@ public class Alignment implements Logged {
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
+                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -117,7 +117,7 @@ public class Alignment implements Logged {
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
+                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -181,7 +181,7 @@ public class Alignment implements Logged {
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
+                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
   }
