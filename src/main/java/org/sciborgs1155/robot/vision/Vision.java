@@ -45,12 +45,7 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(
-        FRONT_LEFT_CAMERA,
-        FRONT_RIGHT_CAMERA,
-        BACK_LEFT_CAMERA,
-        BACK_RIGHT_CAMERA,
-        BACK_MIDDLE_CAMERA);
+    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA);
   }
 
   public static Vision none() {
@@ -221,7 +216,8 @@ public class Vision implements Logged {
       FRONT_LEFT_CAMERA.robotToCam(),
       FRONT_RIGHT_CAMERA.robotToCam(),
       BACK_LEFT_CAMERA.robotToCam(),
-      BACK_RIGHT_CAMERA.robotToCam()
+      BACK_RIGHT_CAMERA.robotToCam(),
+      BACK_MIDDLE_CAMERA.robotToCam()
     };
   }
 
