@@ -72,7 +72,7 @@ public class Alignment implements Logged {
                 Commands.sequence(
                     drive.driveTo(goal).asProxy(),
                     Commands.waitUntil(elevator::atGoal)
-                        .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
+                        .andThen(scoral.score(level).asProxy().until(scoral.beambreakTrigger)),
                     drive.driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2)))).asProxy())))
         .withName("align to reef")
         .onlyWhile(
@@ -153,7 +153,7 @@ public class Alignment implements Logged {
         .until(scoral::beambreak)
         .deadlineFor(
             Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                .andThen(scoral.score()));
+                .andThen(scoral.score(level)));
   }
 
   /**

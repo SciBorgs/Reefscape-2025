@@ -69,7 +69,7 @@ public class Scoraling implements Logged {
   public Command scoral(Level level) {
     return elevator
         .scoreLevel(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score(level)))
         .withName("scoraling");
   }
 
