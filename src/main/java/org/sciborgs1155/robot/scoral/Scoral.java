@@ -20,6 +20,7 @@ import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor motor;
@@ -59,6 +60,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command score() {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
+  }
+
+  public Command score(Level level) {
+    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.8 * SCORE_POWER));
   }
 
   public Command scoreSlow() {

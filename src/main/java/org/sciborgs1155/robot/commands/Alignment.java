@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
@@ -63,7 +64,7 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    Pose2d goal = branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
+    Supplier<Pose2d> goal = () -> branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
     return Commands.sequence(
             pathfind(goal).withName("").asProxy(),
             Commands.parallel(
@@ -72,12 +73,12 @@ public class Alignment implements Logged {
                     drive.driveTo(goal).asProxy(),
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)),
-                    drive.driveTo(goal.transformBy(advance(Meters.of(-0.2)))).asProxy())))
+                    drive.driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2)))).asProxy())))
         .withName("align to reef")
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
+                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -89,7 +90,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> alignTo(source.pose()).deadlineFor(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source::pose).deadlineFor(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -100,7 +101,7 @@ public class Alignment implements Logged {
   public Command source() {
     return Commands.defer(
         () ->
-            alignTo(
+            alignTo(() ->
                     drive
                         .pose()
                         .nearest(
@@ -111,13 +112,13 @@ public class Alignment implements Logged {
         Set.of(drive, elevator));
   }
 
-  public Command alignTo(Pose2d goal) {
+  public Command alignTo(Supplier<Pose2d> goal) {
     return pathfind(goal)
         .andThen(drive.driveTo(goal))
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
+                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -131,7 +132,7 @@ public class Alignment implements Logged {
   public Command nearReef(Side side) {
     return Commands.deferredProxy(
         () ->
-            alignTo(
+            alignTo(() ->
                 Face.nearest(drive.pose())
                     .branch(side)
                     .pose()
@@ -147,7 +148,7 @@ public class Alignment implements Logged {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return pathfind(branch.pose())
+    return pathfind(branch::pose)
         .andThen(elevator.scoreLevel(level))
         .until(scoral::beambreak)
         .deadlineFor(
@@ -161,28 +162,30 @@ public class Alignment implements Logged {
    * @param goal The field pose to pathfind to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Pose2d goal) {
+  public Command pathfind(Supplier<Pose2d> goal) {
     return Commands.defer(
-            () ->
-                drive
+            () ->{
+              Pose2d realGoal = goal.get();
+                return drive
                     .run(
                         () -> {
-                          planner.setGoal(goal.getTranslation());
+                          planner.setGoal(realGoal.getTranslation());
                           drive.goToSample(
                               planner.getCmd(
                                   drive.pose(),
                                   drive.fieldRelativeChassisSpeeds(),
                                   DriveConstants.MAX_SPEED.in(MetersPerSecond),
                                   true),
-                              goal.getRotation());
+                                  realGoal.getRotation());
                         })
-                    .until(() -> drive.atTranslation(goal.getTranslation(), Meters.of(1))),
-            Set.of(drive))
-        .onlyWhile(
+                    .until(() -> drive.atTranslation(realGoal.getTranslation(), Meters.of(1)))
+                    .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
-                    allianceFromPose(goal) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding))
+                    allianceFromPose(realGoal) != allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding)); 
+                  },
+            Set.of(drive))
         .withName("pathfind");
   }
 

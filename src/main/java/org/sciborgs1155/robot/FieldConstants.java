@@ -290,7 +290,7 @@ public class FieldConstants {
     // RIGHT_SOURCE_LEFT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT.times(-1)))),
     // RIGHT_SOURCE_RIGHT(RIGHT_SOURCE.transformBy(strafe(SOURCE_MID_DISPLACEMENT)));
 
-    private Pose2d pose;
+    private final Pose2d pose;
 
     Source(Pose2d pose) {
       this.pose = pose;

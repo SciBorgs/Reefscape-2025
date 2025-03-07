@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.sciborgs1155.lib.UnitTestingUtil.fastForward;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
@@ -47,6 +49,8 @@ public class AlignTest {
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
     align = new Alignment(drive, elevator, scoral);
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
   }
 
   @AfterEach
@@ -77,9 +81,10 @@ public class AlignTest {
   /** Tests whether the obstacle-avoiding pathing works correctly. */
   @ParameterizedTest
   @MethodSource("goals")
-  public void pathfindTest(Pose2d pose) throws Exception {
+  public void pathfindTest(Branch branch) throws Exception {
+    Pose2d pose = branch.pose();
     // Make and run the pathfinding command
-    runToCompletion(align.alignTo(pose).withTimeout(Seconds.of(20)));
+    runToCompletion(align.alignTo(() -> pose).withTimeout(Seconds.of(20)));
 
     // Assert the command works
     assertEquals(pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
@@ -91,6 +96,6 @@ public class AlignTest {
   }
 
   private static Stream<Arguments> goals() {
-    return Arrays.stream(FieldConstants.Branch.values()).map(v -> Arguments.of(v.pose()));
+    return Arrays.stream(FieldConstants.Branch.values()).map(v -> Arguments.of(v));
   }
 }
