@@ -1,13 +1,13 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 1936,
-      "height": 1056,
+      "x": -9,
+      "y": -9,
+      "width": 1607,
+      "height": 866,
       "state": {
         "sidebar": {
-          "width": 385,
+          "width": 389,
           "expanded": [
             "/Robot/vision/getSeenTags/4",
             "/Robot/vision/getSeenTags/4/translation",
@@ -29,11 +29,16 @@
             "/Robot/scoraling/hopper/beambreak",
             "/Robot/scoraling/scoral",
             "/Robot/scoraling/scoral/beambreak",
-            "/Robot/drive"
+            "/Robot/drive",
+            "/NT",
+            "/NT/Robot",
+            "/NT/Robot/scoraling",
+            "/NT/Robot/scoraling/elevator",
+            "/NT/Robot/arm"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 4,
           "tabs": [
             {
               "type": 0,
@@ -238,7 +243,7 @@
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
-                      "model": "2025 KitBot"
+                      "model": "Sciduck"
                     }
                   },
                   {
@@ -270,6 +275,27 @@
                       "color": "#0000ff",
                       "arrangement": "0,1,2,3"
                     }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/Robot/arm/pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/Robot/scoraling/elevator/stage1",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/Robot/scoraling/elevator/carriage",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
                   },
                   {
                     "type": "ghost",
@@ -310,17 +336,27 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  3.5851051612731673,
-                  5.184222047485978,
-                  -11.340950267713172
+                  1.4705303552633422,
+                  1.7654032697251743,
+                  4.374467521737858
                 ],
                 "cameraTarget": [
-                  2.912156391416277,
-                  0.8402731944072571,
-                  -0.7876662160529859
+                  3.4340872728078744,
+                  0.9876251917678255,
+                  0.6288662010102938
                 ]
               },
               "controlsHeight": 199
+            },
+            {
+              "type": 5,
+              "title": "Console",
+              "controller": "console",
+              "controllerUUID": "brlsc677pcnvlaeuuubezhdw4vc2jfhq",
+              "renderer": {
+                "highlight": false
+              },
+              "controlsHeight": 0
             },
             {
               "type": 4,
@@ -401,5 +437,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.0"
+  "version": "4.1.2"
 }

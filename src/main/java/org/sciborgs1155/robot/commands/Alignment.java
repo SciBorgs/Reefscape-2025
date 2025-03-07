@@ -65,7 +65,7 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     Pose2d goal = branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
     return Commands.sequence(
-            pathfind(goal).asProxy(),
+            pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
                 Commands.sequence(
@@ -76,8 +76,8 @@ public class Alignment implements Logged {
         .withName("align to reef")
         .onlyWhile(
             () ->
-                FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                !FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -116,8 +116,8 @@ public class Alignment implements Logged {
         .andThen(drive.driveTo(goal))
         .onlyWhile(
             () ->
-                FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                !FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
 
@@ -125,12 +125,17 @@ public class Alignment implements Logged {
    * Finds the nearest reef face, then pathfinds to the branch with a given side on that face, and
    * scores on a designated level on that branch.
    *
-   * @param level The level (L1, L2, L3, L4) being scored on.
    * @param side The branch side (Left/Right) to score on.
-   * @return A command to score on the nearest reef branch.
+   * @return A command to align to the nearest reef branch.
    */
-  public Command nearReef(Level level, Side side) {
-    return Commands.deferredProxy(() -> reef(level, Face.nearest(drive.pose()).branch(side)));
+  public Command nearReef(Side side) {
+    return Commands.deferredProxy(
+        () ->
+            alignTo(
+                Face.nearest(drive.pose())
+                    .branch(side)
+                    .pose()
+                    .transformBy(strafe(TO_THE_LEFT.times(-1)))));
   }
 
   /**
@@ -175,8 +180,8 @@ public class Alignment implements Logged {
             Set.of(drive))
         .onlyWhile(
             () ->
-                FaultLogger.returnButReport(
-                    () -> allianceFromPose(goal) == allianceFromPose(drive.pose()),
+                !FaultLogger.returnButReport(
+                    () -> allianceFromPose(goal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
   }

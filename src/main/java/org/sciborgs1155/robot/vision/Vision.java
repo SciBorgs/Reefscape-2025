@@ -105,6 +105,10 @@ public class Vision implements Logged {
     }
   }
 
+  public void logCamEnabled() {
+    camerasEnabled.forEach((name, enabled) -> log(name + " enabled", enabled));
+  }
+
   /**
    * Returns a list of all currently visible pose estimates and their standard deviation vectors.
    *
@@ -124,7 +128,6 @@ public class Vision implements Logged {
           unreadChanges.forEach(r -> r.targets.forEach(t -> t.pitch *= -1));
         }
 
-        // if ()
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
 

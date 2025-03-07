@@ -114,7 +114,7 @@ public class Scoraling implements Logged {
         Commands.runOnce(() -> stop = false)
             .andThen(runRollers().repeatedly().asProxy())
             .until(() -> stop)
-            .withTimeout(2)
+            .withTimeout(5)
             .finallyDo(() -> stop = false);
     Assertion hasCoral =
         tAssert(
