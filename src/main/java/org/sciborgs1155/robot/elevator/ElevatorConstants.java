@@ -30,7 +30,7 @@ public class ElevatorConstants {
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(3.5); // (1.0);
 
-  public static final Distance MIN_EXTENSION = Meters.of(0);
+  public static final Distance MIN_EXTENSION = Meters.of(0.0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
   public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2, .125);

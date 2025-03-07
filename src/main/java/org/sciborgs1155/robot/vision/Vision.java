@@ -114,7 +114,19 @@ public class Vision implements Logged {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
       if (camerasEnabled.get(cameras[i].getName())) {
-        var unreadChanges = cameras[i].getAllUnreadResults();
+        // var reefTags = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
+        var allUnreadChanges = cameras[i].getAllUnreadResults();
+        List<PhotonPipelineResult> unreadChanges =
+            // Set.of("back left", "back right").contains(cameras[i].getName())
+            //     ? allUnreadChanges.stream()
+            //         .filter(
+            //             change ->
+            //                 change.getTargets().stream()
+            //                     .map(target -> reefTags.contains(target.fiducialId))
+            //                     .reduce(true, (a, b) -> a && b))
+            //         .toList()
+            //     :
+            allUnreadChanges;
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();

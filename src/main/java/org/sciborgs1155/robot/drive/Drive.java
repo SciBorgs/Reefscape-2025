@@ -500,6 +500,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param mode The control loop used to achieve those speeds.
    */
   public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
+
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
@@ -553,7 +554,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                   pose().getRotation()),
               ControlMode.CLOSED_LOOP_VELOCITY);
         })
-        .until(() -> atPose(target.get()))
+        .until(
+            () ->
+                atPose(
+                    target.get(),
+                    Translation.TOLERANCE.times(1 / 3.0),
+                    Rotation.TOLERANCE.times(1 / 3.0)))
         .andThen(stop())
         .withName("drive to pose");
   }

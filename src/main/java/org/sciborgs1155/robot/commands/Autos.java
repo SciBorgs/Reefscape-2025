@@ -14,11 +14,13 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import java.util.function.Consumer;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -65,12 +67,17 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling));
+    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling, drive::resetOdometry));
     return chooser;
   }
 
-  public static Command RB4(Alignment alignment, Scoraling scoraling) {
+  public static Command RB4(
+      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
     return Commands.sequence(
+        // Commands.runOnce(() ->
+        //     resetOdometry.accept(allianceReflect(new Pose2d(Meters.of(7.12), Meters.of(6),
+        // Rotation2d.fromDegrees(180))))
+        //     ),
         alignment.reef(Level.L4, Branch.I).withTimeout(5).asProxy(),
         alignment.source().withTimeout(8).andThen(scoraling.hpsIntake().withTimeout(5)).asProxy(),
         alignment.reef(Level.L4, Branch.K).withTimeout(5).asProxy(),

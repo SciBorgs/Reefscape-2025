@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
-import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -252,9 +251,9 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
 
-    leftLED.setDefaultCommand(leftLED.rainbow());
-    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
-    rightLED.setDefaultCommand(rightLED.rainbow());
+    // leftLED.setDefaultCommand(leftLED.rainbow());
+    // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
+    // rightLED.setDefaultCommand(rightLED.rainbow());
 
     scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
     hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
@@ -375,55 +374,19 @@ public class Robot extends CommandRobot implements Logged {
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
-    operator
-        .povDown()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L1)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povRight()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L2)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povUp()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L3)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povLeft()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L4)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator.povRight().whileTrue(elevator.scoreLevel(Level.L2));
+    operator.povUp().whileTrue(elevator.scoreLevel(Level.L3));
+
+    operator.povLeft().whileTrue(elevator.scoreLevel(Level.L4));
+    operator.povDown().whileTrue(scoraling.noElevatorIntake()); 
 
     // DASHBOARD
     // TO REEF - DASHBOARD SELECT + DRIVER A
     Dashboard.reef()
-        .and(driver.a())
+        .and(driver.y())
         .whileTrue(
-            Commands.defer(
-                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
-                    Set.of(drive, elevator, scoral))
+            Commands.deferredProxy(
+                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
                 .alongWith(
                     leftLED.blink(Color.kAqua),
                     rightLED.blink(Color.kAqua),
@@ -445,7 +408,7 @@ public class Robot extends CommandRobot implements Logged {
         .onFalse(Commands.runOnce(() -> vision.disableCam("back right")));
 
     scoral.beambreakTrigger.onTrue(
-        leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));
+        leftLED.blink(Color.kLime).alongWith(rightLED.blink(Color.kLime)));
   }
 
   @Log.NT

@@ -52,7 +52,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    beambreakTrigger = new Trigger(beambreak::get);
+    beambreakTrigger = new Trigger(beambreak::get).negate();
 
     setDefaultCommand(stop());
   }
@@ -63,7 +63,8 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command score(Level level) {
-    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.8 * SCORE_POWER));
+    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.8 * SCORE_POWER))
+        .withName("score level");
   }
 
   public Command scoreSlow() {
@@ -75,7 +76,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command intake() {
-    return run(() -> motor.set(INTAKE_POWER)).withName("intake");
+    return run(() -> motor.set(INTAKE_POWER * 0.6)).withName("intake");
   }
 
   /** Stops the motor */

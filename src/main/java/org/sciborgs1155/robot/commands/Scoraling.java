@@ -34,14 +34,24 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper
-        .beambreakTrigger
-        .negate()
-        .or(scoral.beambreakTrigger)
+    // hopper
+        // .beambreakTrigger
+        // .negate()
+        // .or(
+          scoral.beambreakTrigger
+          // )
         .onFalse(Commands.runOnce(() -> stop = true));
   }
 
   @Log.NT private boolean stop = false;
+
+  public Command noElevatorIntake() {
+    return Commands.runOnce(() -> stop = false)
+        .andThen(runRollers().repeatedly())
+        .until(() -> stop)
+        .finallyDo(() -> stop = false)
+        .withName("no elevator intake");
+  }
 
   /** A command which intakes from the human player station. */
   public Command hpsIntake() {
