@@ -78,12 +78,12 @@ public class Autos {
         //     resetOdometry.accept(allianceReflect(new Pose2d(Meters.of(7.12), Meters.of(6),
         // Rotation2d.fromDegrees(180))))
         //     ),
-        alignment.reef(Level.L4, Branch.I).withTimeout(5).asProxy(),
-        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake().withTimeout(5)).asProxy(),
-        alignment.reef(Level.L4, Branch.K).withTimeout(5).asProxy(),
-        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake().withTimeout(5)).asProxy(),
-        alignment.reef(Level.L4, Branch.L).withTimeout(5).asProxy(),
-        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake().withTimeout(5)).asProxy(),
-        alignment.reef(Level.L4, Branch.J).withTimeout(5).asProxy());
+        alignment.reef(Level.L4, Branch.I).withTimeout(5).asProxy(), //.onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake().withTimeout(5)).asProxy(), //.onlyIf(() -> scoraling.scoralBeambreak()),
+        alignment.reef(Level.L4, Branch.K).withTimeout(5).asProxy(), //.onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake(), //.withTimeout(5)).asProxy().onlyIf(() -> scoraling.scoralBeambreak()),
+        alignment.reef(Level.L4, Branch.L).withTimeout(5).asProxy(), //.onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment.source().withTimeout(8).andThen(scoraling.hpsIntake(), //.withTimeout(5)).asProxy().onlyIf(() -> scoraling.scoralBeambreak()),
+        alignment.reef(Level.L4, Branch.J).withTimeout(5).asProxy()))); //.onlyIf(() -> !scoraling.scoralBeambreak());
   }
 }
