@@ -312,16 +312,14 @@ public class Robot extends CommandRobot implements Logged {
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.LEFT)
-                                        .withLevel(Level.L3)
+                                        .branch(Side.LEFT).pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.LEFT)
-                                        .withLevel(Level.L3)
+                                        .branch(Side.LEFT).pose()
                                         .getTranslation())))));
 
     driver
@@ -335,16 +333,14 @@ public class Robot extends CommandRobot implements Logged {
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT)
-                                        .withLevel(Level.L3)
+                                        .branch(Side.RIGHT).pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT)
-                                        .withLevel(Level.L3)
+                                        .branch(Side.RIGHT).pose()
                                         .getTranslation())))));
 
     // B for dashboard select

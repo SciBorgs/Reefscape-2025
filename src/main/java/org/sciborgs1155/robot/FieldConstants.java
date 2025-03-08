@@ -145,7 +145,7 @@ public class FieldConstants {
     private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose = pose;
+      this.pose = pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1))).transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
     public Pose2d pose() {
@@ -168,21 +168,21 @@ public class FieldConstants {
           .orElse(Face.AB);
     }
 
-    /**
-     * Moves the pose in or out depending on the level.
-     *
-     * @param level The level that the movement depends on.
-     * @return A new pose moved to account for elevator tilt.
-     */
-    public Pose2d withLevel(Level level) {
-      return switch (level) {
-        case L1, L2, L3 ->
-            pose().transformBy(Constants.advance(Inches.of(-2)));
-        case L4 ->
-            pose().transformBy(Constants.advance(Inches.of(-2)));
-        default -> pose(); // hi ;P
-      };
-    }
+    // /**
+    //  * Moves the pose in or out depending on the level.
+    //  *
+    //  * @param level The level that the movement depends on.
+    //  * @return A new pose moved to account for elevator tilt.
+    //  */
+    // public Pose2d withLevel(Level level) {
+    //   return switch (level) {
+    //     case L1, L2, L3 ->
+    //         pose().transformBy(Constants.advance(Inches.of(-2)));
+    //     case L4 ->
+    //         pose().transformBy(Constants.advance(Inches.of(-2)));
+    //     default -> pose(); // hi ;P
+    //   };
+    // }
 
     /**
      * @return A list of all branch poses.

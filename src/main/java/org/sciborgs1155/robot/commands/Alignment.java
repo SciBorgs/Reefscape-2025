@@ -67,8 +67,7 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    Supplier<Pose2d> goal =
-        () -> branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
+    Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
             pathfind(goal).withName("").asProxy(),
