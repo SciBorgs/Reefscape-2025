@@ -82,6 +82,7 @@ public class Robot extends CommandRobot implements Logged {
 
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
+  boolean dashboardConfig = Dashboard.configure();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -159,7 +160,6 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
-    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
     addPeriodic(vision::logCamEnabled, 1);

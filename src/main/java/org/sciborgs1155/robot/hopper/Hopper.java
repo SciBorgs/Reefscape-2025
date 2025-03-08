@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
 import java.util.Set;
+import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
@@ -49,7 +50,8 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   public Hopper(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    this.beambreakTrigger = new Trigger(() -> Dashboard.invertBeambreakHPI() ? !beambreak.get() : beambreak.get());
+    this.beambreakTrigger =
+        new Trigger(() -> Dashboard.invertBeambreakHPI() ? !beambreak.get() : beambreak.get());
 
     setDefaultCommand(stop());
   }
@@ -89,6 +91,12 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
    */
   public Command stop() {
     return run(0);
+  }
+
+  /** Returns the value of the beambreak, which is false when the beam is broken. */
+  @Log.NT
+  public boolean beambreak() {
+    return Dashboard.invertBeambreakHPI() ? !beambreak.get() : beambreak.get();
   }
 
   @Override

@@ -49,7 +49,7 @@ public class Dashboard {
   private static final Level[] levels = {Level.L1, Level.L2, Level.L3, Level.L4};
 
   /** Sets up the dashboard. */
-  public static void configure() {
+  public static boolean configure() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
 
     // Scoring
@@ -131,6 +131,7 @@ public class Dashboard {
       entryMatch.setString("@ Sim / M0");
       entryMatchTime.setDouble(0);
     }
+    return true;
   }
 
   /** Increments the robot tick value. Used by Dashboard to detect disconnects. */
