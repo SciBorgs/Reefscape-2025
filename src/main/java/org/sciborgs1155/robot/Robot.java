@@ -144,7 +144,7 @@ public class Robot extends CommandRobot implements Logged {
 
   @Log.NT
   private final SendableChooser<Command> autos =
-      Autos.configureAutos(drive, scoraling, elevator, align);
+      Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -448,8 +448,8 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
             // arm.goToTest(INTAKE_ANGLE),
-            Test.fromCommand(coroller.outtake().withTimeout(1)),
-            Test.fromCommand(coroller.intake().withTimeout(1)),
+            // Test.fromCommand(coroller.outtake().withTimeout(1)),
+            // Test.fromCommand(coroller.intake().withTimeout(1)),
             // arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(

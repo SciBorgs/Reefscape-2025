@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import org.sciborgs1155.robot.FieldConstants.Branch;
-import org.sciborgs1155.robot.Ports.Scoral;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -31,10 +30,11 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.*;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Autos {
   public static SendableChooser<Command> configureAutos(
-      Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment) {
+      Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment, Scoral scoral) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -69,7 +69,7 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
     return chooser;
   }
 
@@ -80,9 +80,10 @@ public class Autos {
   }
 
   public static Command RB4(
-      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
+      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry, org.sciborgs1155.robot.scoral.Scoral scoral, Elevator elevator) {
     return Commands.sequence(
         alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
+        scoral.score().asProxy().deadlineFor(elevator.scoreLevel(Level.L4).asProxy()).withTimeout(0.5),
         // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
