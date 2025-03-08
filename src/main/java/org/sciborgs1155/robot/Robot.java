@@ -378,7 +378,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.povUp().whileTrue(elevator.scoreLevel(Level.L3));
 
     operator.povLeft().whileTrue(elevator.scoreLevel(Level.L4));
-    operator.povDown().whileTrue(scoraling.noElevatorIntake()); 
+    operator.povDown().whileTrue(scoraling.noElevatorIntake());
 
     // DASHBOARD
     // TO REEF - DASHBOARD SELECT + DRIVER A

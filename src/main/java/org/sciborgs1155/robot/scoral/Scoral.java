@@ -20,6 +20,7 @@ import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
@@ -52,7 +53,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    beambreakTrigger = new Trigger(beambreak::get);
+    beambreakTrigger = new Trigger(() -> Dashboard.invertBeambreakSCL() ? !beambreak.get() : beambreak.get());
 
     setDefaultCommand(stop());
   }
@@ -87,7 +88,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   /** Returns the value of the beambreak, which is false when the beam is broken. */
   @Log.NT
   public boolean beambreak() {
-    return !beambreak.get();
+    return Dashboard.invertBeambreakSCL() ? !beambreak.get() : beambreak.get();
   }
 
   @Override

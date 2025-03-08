@@ -35,11 +35,11 @@ public class Scoraling implements Logged {
     beambreaks.
     */
     // hopper
-        // .beambreakTrigger
-        // .negate()
-        // .or(
-          scoral.beambreakTrigger
-          // )
+    // .beambreakTrigger
+    // .negate()
+    // .or(
+    scoral.beambreakTrigger
+        // )
         .onFalse(Commands.runOnce(() -> stop = true));
   }
 
