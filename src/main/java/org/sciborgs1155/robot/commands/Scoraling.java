@@ -59,7 +59,7 @@ public class Scoraling implements Logged {
         .andThen(
             elevator
                 .retract()
-                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers().repeatedly()))
+                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
                 .until(() -> stop)
                 .finallyDo(() -> stop = false))
         .withName("intakingHPS");
@@ -109,8 +109,7 @@ public class Scoraling implements Logged {
     return hopper
         .intake()
         .alongWith(scoral.intake())
-        .withTimeout(1)
-        .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
+        // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
 
@@ -122,7 +121,7 @@ public class Scoraling implements Logged {
   public Test runRollersTest() {
     Command testCommand =
         Commands.runOnce(() -> stop = false)
-            .andThen(runRollers().repeatedly().asProxy())
+            .andThen(runRollers().asProxy())
             .until(() -> stop)
             .withTimeout(5)
             .finallyDo(() -> stop = false);

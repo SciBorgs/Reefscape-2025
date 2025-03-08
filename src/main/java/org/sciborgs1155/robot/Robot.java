@@ -312,14 +312,16 @@ public class Robot extends CommandRobot implements Logged {
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.LEFT).pose()
+                                        .branch(Side.LEFT)
+                                        .pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.LEFT).pose()
+                                        .branch(Side.LEFT)
+                                        .pose()
                                         .getTranslation())))));
 
     driver
@@ -333,14 +335,16 @@ public class Robot extends CommandRobot implements Logged {
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT).pose()
+                                        .branch(Side.RIGHT)
+                                        .pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
                             1
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT).pose()
+                                        .branch(Side.RIGHT)
+                                        .pose()
                                         .getTranslation())))));
 
     // B for dashboard select
@@ -365,6 +369,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
+    operator.x().whileTrue(scoral.score(Level.L3));
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));

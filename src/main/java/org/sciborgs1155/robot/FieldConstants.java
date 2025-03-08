@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
+import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,7 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class FieldConstants {
   // Origin at corner of blue alliance side of field
@@ -60,7 +60,7 @@ public class FieldConstants {
               .getMeasureX()
               .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
           CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-          Rotation2d.fromRotations(0));
+          Rotation2d.fromRotations(0)).transformBy(strafe(Inches.of(3)));
 
   // Reef faces
 
@@ -121,7 +121,7 @@ public class FieldConstants {
     }
   }
 
-  public static final Distance TO_THE_LEFT = Inches.of(2.5);
+  public static final Distance TO_THE_LEFT = Inches.of(0);
 
   // Poses for scoraling.
   // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
@@ -145,7 +145,10 @@ public class FieldConstants {
     private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose = pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1))).transformBy(Constants.advance(Inches.of(-1.25)));
+      this.pose =
+          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(
+            -1)))
+              .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
     public Pose2d pose() {
