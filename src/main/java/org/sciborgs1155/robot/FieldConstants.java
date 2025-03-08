@@ -177,13 +177,9 @@ public class FieldConstants {
     public Pose2d withLevel(Level level) {
       return switch (level) {
         case L1, L2, L3 ->
-            new Pose2d(
-                pose().getTranslation().plus(centerDisplacementUnit().times(0)),
-                pose().getRotation());
+            pose().transformBy(Constants.advance(Inches.of(-2)));
         case L4 ->
-            new Pose2d(
-                pose().getTranslation().plus(centerDisplacementUnit().times(0)),
-                pose().getRotation());
+            pose().transformBy(Constants.advance(Inches.of(-2)));
         default -> pose(); // hi ;P
       };
     }

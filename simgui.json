@@ -71,6 +71,9 @@
         "open": true
       },
       "Robot": {
+        "align": {
+          "open": true
+        },
         "open": true,
         "scoraling": {
           "elevator": {
@@ -89,8 +92,5 @@
   },
   "NetworkTables Info": {
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
@@ -16,6 +17,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
+import monologue.Monologue;
+
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
@@ -67,12 +70,13 @@ public class Alignment implements Logged {
     Supplier<Pose2d> goal =
         () -> branch.withLevel(level).transformBy(strafe(TO_THE_LEFT.times(-1)));
     return Commands.sequence(
+            Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
             pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
                 Commands.sequence(
-                    drive.driveTo(goal).asProxy(),
-                    Commands.waitUntil(elevator::atGoal)
+                    drive.driveTo(goal).asProxy().withTimeout(1.5),
+                    Commands.waitUntil(elevator::atGoal).withTimeout(1.5)
                         .andThen(scoral.score(level).asProxy().until(scoral.beambreakTrigger)),
                     drive
                         .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
@@ -117,13 +121,14 @@ public class Alignment implements Logged {
   }
 
   public Command alignTo(Supplier<Pose2d> goal) {
-    return pathfind(goal)
+    return Commands.runOnce(() -> log("goal pose", goal.get())).asProxy().andThen(
+    pathfind(goal)
         .andThen(drive.driveTo(goal))
         .onlyWhile(
             () ->
                 !FaultLogger.returnButReport(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding));
+                    alternateAlliancePathfinding)));
   }
 
   /**
@@ -141,7 +146,8 @@ public class Alignment implements Logged {
                     Face.nearest(drive.pose())
                         .branch(side)
                         .pose()
-                        .transformBy(strafe(TO_THE_LEFT.times(-1)))));
+                        .transformBy(strafe(TO_THE_LEFT.times(-1)))
+                        .transformBy(advance(Inches.of(-1.25)))));
   }
 
   /**

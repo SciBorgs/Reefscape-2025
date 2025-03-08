@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
@@ -45,7 +47,7 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA);
+    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
   }
 
   public static Vision none() {
@@ -114,18 +116,18 @@ public class Vision implements Logged {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
       if (camerasEnabled.get(cameras[i].getName())) {
-        // var reefTags = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
+        var reefTags = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
         var allUnreadChanges = cameras[i].getAllUnreadResults();
         List<PhotonPipelineResult> unreadChanges =
-            // Set.of("back left", "back right").contains(cameras[i].getName())
-            //     ? allUnreadChanges.stream()
-            //         .filter(
-            //             change ->
-            //                 change.getTargets().stream()
-            //                     .map(target -> reefTags.contains(target.fiducialId))
-            //                     .reduce(true, (a, b) -> a && b))
-            //         .toList()
-            //     :
+            Set.of("back left", "back right").contains(cameras[i].getName())
+                ? allUnreadChanges.stream()
+                    .filter(
+                        change ->
+                            change.getTargets().stream()
+                                .map(target -> reefTags.contains(target.fiducialId))
+                                .reduce(true, (a, b) -> a && b))
+                    .toList()
+                :
             allUnreadChanges;
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 

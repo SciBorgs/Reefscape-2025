@@ -20,8 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import java.util.Arrays;
 import java.util.function.Consumer;
 import org.sciborgs1155.robot.FieldConstants.Branch;
+import org.sciborgs1155.robot.Ports.Scoral;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -71,42 +73,87 @@ public class Autos {
     return chooser;
   }
 
+  public static Command sequence(Command... commands) {
+    return Arrays.stream(commands)
+        .map(c -> (Command) c.asProxy())
+        .reduce(Commands.none(), (a, b) -> a.andThen(b));
+  }
+
   public static Command RB4(
       Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
     return Commands.sequence(
-        alignment
-            .reef(Level.L4, Branch.I)
-            .withTimeout(5)
-            .asProxy()
-            .onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
+        // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
-            .withTimeout(8)
-            .andThen(scoraling.hpsIntake().withTimeout(5))
-            .asProxy(), // .onlyIf(() -> scoraling.scoralBeambreak()),
+            .asProxy()
+            .withTimeout(5)
+            .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
+            // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)
             .withTimeout(5)
             .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
+            .asProxy()
             .withTimeout(8)
-            .andThen(
-                scoraling.hpsIntake(), // .withTimeout(5)).asProxy().onlyIf(() ->
-                // scoraling.scoralBeambreak()),
-                alignment
-                    .reef(Level.L4, Branch.L)
-                    .withTimeout(5)
-                    .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-                alignment
-                    .source()
-                    .withTimeout(8)
-                    .andThen(
-                        scoraling.hpsIntake(), // .withTimeout(5)).asProxy().onlyIf(() ->
-                        // scoraling.scoralBeambreak()),
-                        alignment
-                            .reef(Level.L4, Branch.J)
-                            .withTimeout(5)
-                            .asProxy()))); // .onlyIf(() -> !scoraling.scoralBeambreak());
+            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
+        // .asProxy().onlyIf(() ->
+        // scoraling.scoralBeambreak()),
+        alignment
+            .reef(Level.L4, Branch.L)
+            .withTimeout(5)
+            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment
+            .source()
+            .asProxy()
+            .withTimeout(8)
+            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
+        // scoraling.scoralBeambreak()),
+        alignment
+            .reef(Level.L4, Branch.J)
+            .asProxy()
+            .withTimeout(5)
+            .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
   }
+
+  public static Command RP4(
+    Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
+  return Commands.sequence(
+      alignment.reef(Level.L4, Branch.E).withTimeout(4).asProxy(),
+      // .onlyIf(() -> !scoraling.scoralBeambreak()),
+      alignment
+          .source()
+          .asProxy()
+          .withTimeout(5)
+          .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
+          // .onlyIf(() -> scoraling.scoralBeambreak()),
+      alignment
+          .reef(Level.L4, Branch.D)
+          .withTimeout(5)
+          .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+      alignment
+          .source()
+          .asProxy()
+          .withTimeout(8)
+          .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
+      // .asProxy().onlyIf(() ->
+      // scoraling.scoralBeambreak()),
+      alignment
+          .reef(Level.L4, Branch.C)
+          .withTimeout(5)
+          .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+      alignment
+          .source()
+          .asProxy()
+          .withTimeout(8)
+          .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
+      // scoraling.scoralBeambreak()),
+      alignment
+          .reef(Level.L4, Branch.B)
+          .asProxy()
+          .withTimeout(5)
+          .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+}
 }

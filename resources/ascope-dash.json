@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": -9,
-      "y": -9,
+      "x": -10,
+      "y": -10,
       "width": 1607,
       "height": 866,
       "state": {
@@ -34,7 +34,8 @@
             "/NT/Robot",
             "/NT/Robot/scoraling",
             "/NT/Robot/scoraling/elevator",
-            "/NT/Robot/arm"
+            "/NT/Robot/arm",
+            "/Robot/align"
           ]
         },
         "tabs": {
@@ -303,18 +304,8 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
-                      "model": "2025 KitBot",
+                      "model": "Sciduck",
                       "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "NT:/Robot/align/planner/goal",
-                    "logType": "Pose2d",
-                    "visible": true,
-                    "options": {
-                      "model": "2025 KitBot",
-                      "color": "#0000ff"
                     }
                   },
                   {
@@ -326,6 +317,16 @@
                       "color": "#ff0000",
                       "position": "center"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/align/goal pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Sciduck",
+                      "color": "#ffff00"
+                    }
                   }
                 ],
                 "game": "2025 Field (Welded)",
@@ -336,7 +337,7 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.4705303552633422,
+                  1.4705303552633413,
                   1.7654032697251743,
                   4.374467521737858
                 ],
