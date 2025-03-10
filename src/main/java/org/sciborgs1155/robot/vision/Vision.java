@@ -46,12 +46,14 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(
-        FRONT_LEFT_CAMERA,
-        FRONT_RIGHT_CAMERA,
-        BACK_MIDDLE_CAMERA,
-        BACK_LEFT_CAMERA,
-        BACK_RIGHT_CAMERA);
+    return Robot.isReal()
+        ? new Vision(
+            FRONT_LEFT_CAMERA,
+            FRONT_RIGHT_CAMERA,
+            BACK_MIDDLE_CAMERA,
+            BACK_LEFT_CAMERA,
+            BACK_RIGHT_CAMERA)
+        : new Vision();
   }
 
   public static Vision none() {
