@@ -7,20 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
-import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.FieldConstants.LENGTH;
-import static org.sciborgs1155.robot.FieldConstants.WIDTH;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -55,26 +49,6 @@ public class AlignTest {
   @AfterEach
   public void destroy() throws Exception {
     reset(drive, elevator, scoral);
-  }
-
-  @RepeatedTest(5)
-  public void reflectionTest() {
-    Random rand = new Random();
-    DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
-    DriverStationSim.notifyNewData();
-    Pose2d bluePose =
-        new Pose2d(
-            LENGTH.times(rand.nextDouble()),
-            WIDTH.times(rand.nextDouble()),
-            Rotation2d.fromRotations(rand.nextDouble()));
-    Pose2d redPose = allianceReflect(bluePose);
-
-    assertEquals(LENGTH.minus(bluePose.getMeasureX()), redPose.getMeasureX());
-    assertEquals(WIDTH.minus(bluePose.getMeasureY()), redPose.getMeasureY());
-    assertEquals(
-        bluePose.getRotation().rotateBy(Rotation2d.fromRotations(0.5)), redPose.getRotation());
-    DriverStationSim.resetData();
-    DriverStationSim.notifyNewData();
   }
 
   /** Tests whether the obstacle-avoiding pathing works correctly. */

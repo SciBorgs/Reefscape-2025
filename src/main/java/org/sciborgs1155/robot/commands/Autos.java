@@ -128,16 +128,15 @@ public class Autos {
   }
 
   public static Command test(
-    Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
-  return Commands.sequence(
-      alignment.reef(Level.L4, Branch.G).withTimeout(4).asProxy());
-      // .onlyIf(() -> !scoraling.scoralBeambreak()),
+      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
+    return Commands.sequence(alignment.reef(Level.L4, Branch.G).withTimeout(4).asProxy());
+    // .onlyIf(() -> !scoraling.scoralBeambreak()),
     //   alignment
     //       .source()
     //       .asProxy()
     //       .withTimeout(5)
     //       .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()));
-      // .onlyIf(() -> scoraling.scoralBeambreak()),
+    // .onlyIf(() -> scoraling.scoralBeambreak()),
     //   alignment
     //       .reef(Level.L4, Branch.K)
     //       .withTimeout(5)
@@ -158,13 +157,13 @@ public class Autos {
     //       .asProxy()
     //       .withTimeout(8)
     //       .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
-      // scoraling.scoralBeambreak()),
+    // scoraling.scoralBeambreak()),
     //   alignment
     //       .reef(Level.L4, Branch.J)
     //       .asProxy()
     //       .withTimeout(5)
     //       .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
-}
+  }
 
   public static Command RP4(
       Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {

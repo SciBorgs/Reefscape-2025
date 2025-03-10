@@ -56,11 +56,12 @@ public class FieldConstants {
           Rotation2d.fromRotations(0));
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-          CENTER_REEF
-              .getMeasureX()
-              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-          Rotation2d.fromRotations(0)).transformBy(strafe(Inches.of(3)));
+              CENTER_REEF
+                  .getMeasureX()
+                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+              Rotation2d.fromRotations(0))
+          .transformBy(strafe(Inches.of(3)));
 
   // Reef faces
 
@@ -146,29 +147,12 @@ public class FieldConstants {
 
     private Branch(Pose2d pose) {
       this.pose =
-          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(
-            -1)))
+          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1)))
               .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
     public Pose2d pose() {
       return allianceReflect(pose);
-    }
-
-    /**
-     * @return The unit vector of the displacement from the center of the reef to the pose.
-     */
-    private Translation2d centerDisplacementUnit() {
-      Translation2d diff =
-          face().pose().getTranslation().minus(allianceReflect(CENTER_REEF).getTranslation());
-      return diff.div(diff.getNorm());
-    }
-
-    private Face face() {
-      return Arrays.stream(Face.values())
-          .filter((a) -> (a.left == this || a.right == this))
-          .findFirst()
-          .orElse(Face.AB);
     }
 
     // /**
