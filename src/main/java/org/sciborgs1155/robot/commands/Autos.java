@@ -75,54 +75,45 @@ public class Autos {
   }
 
   /** Warning that your list will be desecrated */
-  public static Command alignAuto(
-      Alignment alignment, Scoraling scoraling, LinkedList<Branch> branches) {
+  public static Command alignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
     if (branches.isEmpty()) {
       FaultLogger.report(
           new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.WARNING));
       return Commands.none();
     }
 
-    Command part =
-        alignment
-            .reef(Level.L4, branches.getFirst())
-            .withTimeout(5)
-            .onlyIf(() -> !scoraling.scoralBeambreak())
-            .asProxy();
-
-    if (branches.size() > 1) {
-      part =
-          part.andThen(
+    Command auto = Commands.none();
+    for (int i = 0; i < branches.size(); i++) {
+      System.out.println(i);
+      auto =
+          Commands.sequence(
+              auto,
               alignment
-                  .source()
-                  .andThen(scoraling.hpsIntake())
+                  .reef(Level.L4, branches.get(i))
+                  .withTimeout(5)
+                  .onlyIf(() -> !scoraling.scoralBeambreak())
+                  .asProxy(),
+              source(alignment, scoraling, 1)
+                  .andThen(scoraling.hpsIntake().withTimeout(2.5))
                   .withTimeout(5)
                   .onlyIf(() -> scoraling.scoralBeambreak())
-                  .asProxy());
+                  .asProxy()
+            );
     }
 
-    branches.removeFirst();
-
-    return part.andThen(alignAuto(alignment, scoraling, branches));
+    return auto;
   }
 
   public static Command testyStuffy(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(
-        alignment, scoraling, new LinkedList<Branch>(Arrays.asList(Branch.A, Branch.B, Branch.C)));
+    return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B, Branch.C));
   }
 
   public static Command B4(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(
-        alignment,
-        scoraling,
-        new LinkedList<Branch>(Arrays.asList(Branch.I, Branch.K, Branch.L, Branch.J)));
+    return alignAuto(alignment, scoraling, List.of(Branch.I, Branch.K, Branch.L, Branch.J));
   }
 
   public static Command P4(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(
-        alignment,
-        scoraling,
-        new LinkedList<Branch>(Arrays.asList(Branch.E, Branch.D, Branch.C, Branch.B)));
+    return alignAuto(alignment, scoraling, List.of(Branch.E, Branch.D, Branch.C, Branch.B));
   }
 
   /**
@@ -131,11 +122,11 @@ public class Autos {
    * @param retries the number of times to retry (0 means it runs and never retries)
    * @return A command to go to the nearest source.
    */
-  public Command source(Alignment alignment, Scoraling scoraling, int retries) {
+  public static Command source(Alignment alignment, Scoraling scoraling, int retries) {
     Command source = alignment.source();
 
     for (int i = 0; i < retries; i++) {
-        source = source.andThen(alignment.source());
+      source = source.andThen(alignment.source());
     }
 
     return Commands.race(
