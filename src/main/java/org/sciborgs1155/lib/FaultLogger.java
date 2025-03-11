@@ -165,6 +165,14 @@ public final class FaultLogger {
     report(new Fault(name, description, type));
   }
 
+  /** Conditionally reports a fault and returns the condition */
+  public static boolean report(boolean condition, Fault fault) {
+    if (condition) {
+      report(fault);
+    }
+    return condition;
+  }
+
   /**
    * Registers a new fault supplier.
    *
@@ -478,19 +486,5 @@ public final class FaultLogger {
         .filter(a -> a.type() == type)
         .map(Fault::toString)
         .toArray(String[]::new);
-  }
-
-  /**
-   * Returns the value of the supplier. If the supplier returns true, reports it.
-   *
-   * @param supplier The boolean supplier to report if true.
-   * @param fault The fault to report if the boolean supplier returns true.
-   * @return The value of the supplier.
-   */
-  public static boolean returnButReport(boolean supplier, Fault fault) {
-    if (supplier) {
-      report(fault);
-    }
-    return supplier;
   }
 }

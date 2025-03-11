@@ -70,7 +70,8 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
+    chooser.addOption(
+        "B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
     chooser.addOption("P4", RP4(alignment, scoraling, drive::resetOdometry));
     chooser.addOption(
         "line",
@@ -90,10 +91,18 @@ public class Autos {
   }
 
   public static Command RB4(
-      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry, org.sciborgs1155.robot.scoral.Scoral scoral, Elevator elevator) {
+      Alignment alignment,
+      Scoraling scoraling,
+      Consumer<Pose2d> resetOdometry,
+      org.sciborgs1155.robot.scoral.Scoral scoral,
+      Elevator elevator) {
     return Commands.sequence(
         alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
-        scoral.score().asProxy().deadlineFor(elevator.scoreLevel(Level.L4).asProxy()).withTimeout(0.5),
+        scoral
+            .score()
+            .asProxy()
+            .deadlineFor(elevator.scoreLevel(Level.L4).asProxy())
+            .withTimeout(0.5),
         // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()

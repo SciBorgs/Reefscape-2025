@@ -82,7 +82,7 @@ public class Alignment implements Logged {
         .withName("align to reef")
         .onlyWhile(
             () ->
-                !FaultLogger.returnButReport(
+                !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
   }
@@ -126,7 +126,7 @@ public class Alignment implements Logged {
                 .andThen(drive.driveTo(goal))
                 .onlyWhile(
                     () ->
-                        !FaultLogger.returnButReport(
+                        !FaultLogger.report(
                             allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                             alternateAlliancePathfinding)));
   }
@@ -192,7 +192,7 @@ public class Alignment implements Logged {
                   .until(() -> drive.atTranslation(realGoal.getTranslation(), Meters.of(1)))
                   .onlyWhile(
                       () ->
-                          !FaultLogger.returnButReport(
+                          !FaultLogger.report(
                               allianceFromPose(realGoal) != allianceFromPose(drive.pose()),
                               alternateAlliancePathfinding));
             },
