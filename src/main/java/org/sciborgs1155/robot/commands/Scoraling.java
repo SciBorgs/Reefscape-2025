@@ -123,4 +123,8 @@ public class Scoraling implements Logged {
             () -> "" + scoral.beambreakTrigger.getAsBoolean());
     return new Test(testCommand, Set.of(hasCoral));
   }
+
+  public boolean scoralBeambreak() {
+    return scoral.beambreak();
+  }
 }

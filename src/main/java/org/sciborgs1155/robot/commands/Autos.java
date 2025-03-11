@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import java.util.*;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.Fault;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.Constants.Field.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -65,18 +69,76 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling));
+    chooser.addOption("RB4 - alignment", B4(alignment, scoraling));
+    chooser.addOption("testy stuffy", testyStuffy(alignment, scoraling));
     return chooser;
   }
 
-  public static Command RB4(Alignment alignment, Scoraling scoraling) {
-    return Commands.sequence(
-        alignment.reef(Level.L4, Branch.I).withTimeout(5).asProxy(),
-        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
-        alignment.reef(Level.L4, Branch.K).withTimeout(5).asProxy(),
-        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
-        alignment.reef(Level.L4, Branch.L).withTimeout(5).asProxy(),
-        alignment.source().andThen(scoraling.hpsIntake()).withTimeout(5).asProxy(),
-        alignment.reef(Level.L4, Branch.J).withTimeout(5).asProxy());
+  /** Warning that your list will be desecrated */
+  public static Command alignAuto(
+      Alignment alignment, Scoraling scoraling, LinkedList<Branch> branches) {
+    if (branches.isEmpty()) {
+      FaultLogger.report(
+          new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.WARNING));
+      return Commands.none();
+    }
+
+    Command part =
+        alignment
+            .reef(Level.L4, branches.getFirst())
+            .withTimeout(5)
+            .onlyIf(() -> !scoraling.scoralBeambreak())
+            .asProxy();
+
+    if (branches.size() > 1) {
+      part =
+          part.andThen(
+              alignment
+                  .source()
+                  .andThen(scoraling.hpsIntake())
+                  .withTimeout(5)
+                  .onlyIf(() -> scoraling.scoralBeambreak())
+                  .asProxy());
+    }
+
+    branches.removeFirst();
+
+    return part.andThen(alignAuto(alignment, scoraling, branches));
+  }
+
+  public static Command testyStuffy(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(
+        alignment, scoraling, new LinkedList<Branch>(Arrays.asList(Branch.A, Branch.B, Branch.C)));
+  }
+
+  public static Command B4(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(
+        alignment,
+        scoraling,
+        new LinkedList<Branch>(Arrays.asList(Branch.I, Branch.K, Branch.L, Branch.J)));
+  }
+
+  public static Command P4(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(
+        alignment,
+        scoraling,
+        new LinkedList<Branch>(Arrays.asList(Branch.E, Branch.D, Branch.C, Branch.B)));
+  }
+
+  /**
+   * Pathfinds and aligns to the nearest source.
+   *
+   * @param retries the number of times to retry (0 means it runs and never retries)
+   * @return A command to go to the nearest source.
+   */
+  public Command source(Alignment alignment, Scoraling scoraling, int retries) {
+    Command source = alignment.source();
+
+    for (int i = 0; i < retries; i++) {
+        source = source.andThen(alignment.source());
+    }
+
+    return Commands.race(
+        alignment.source(), Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
   }
 }
