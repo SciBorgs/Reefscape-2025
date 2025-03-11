@@ -15,6 +15,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,7 +70,16 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
+    chooser.addOption("B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption("P4", RP4(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption(
+        "line",
+        drive.run(
+            () ->
+                drive.setChassisSpeeds(
+                    new ChassisSpeeds(0.5, 0, 0), ControlMode.OPEN_LOOP_VELOCITY)));
+    chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
+
     return chooser;
   }
 
@@ -90,7 +100,7 @@ public class Autos {
             .asProxy()
             .withTimeout(5)
             .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
-            // .onlyIf(() -> scoraling.scoralBeambreak()),
+        // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)
             .withTimeout(5)
@@ -119,42 +129,80 @@ public class Autos {
             .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
   }
 
+  public static Command test(
+      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
+    return Commands.sequence(alignment.reef(Level.L4, Branch.G).withTimeout(4).asProxy());
+    // .onlyIf(() -> !scoraling.scoralBeambreak()),
+    //   alignment
+    //       .source()
+    //       .asProxy()
+    //       .withTimeout(5)
+    //       .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()));
+    // .onlyIf(() -> scoraling.scoralBeambreak()),
+    //   alignment
+    //       .reef(Level.L4, Branch.K)
+    //       .withTimeout(5)
+    //       .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+    //   alignment
+    //       .source()
+    //       .asProxy()
+    //       .withTimeout(8)
+    //       .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
+    //   // .asProxy().onlyIf(() ->
+    //   // scoraling.scoralBeambreak()),
+    //   alignment
+    //       .reef(Level.L4, Branch.L)
+    //       .withTimeout(5)
+    //       .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+    //   alignment
+    //       .source()
+    //       .asProxy()
+    //       .withTimeout(8)
+    //       .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
+    // scoraling.scoralBeambreak()),
+    //   alignment
+    //       .reef(Level.L4, Branch.J)
+    //       .asProxy()
+    //       .withTimeout(5)
+    //       .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+  }
+
   public static Command RP4(
-    Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
-  return Commands.sequence(
-      alignment.reef(Level.L4, Branch.E).withTimeout(4).asProxy(),
-      // .onlyIf(() -> !scoraling.scoralBeambreak()),
-      alignment
-          .source()
-          .asProxy()
-          .withTimeout(5)
-          .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
-          // .onlyIf(() -> scoraling.scoralBeambreak()),
-      alignment
-          .reef(Level.L4, Branch.D)
-          .withTimeout(5)
-          .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-      alignment
-          .source()
-          .asProxy()
-          .withTimeout(8)
-          .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
-      // .asProxy().onlyIf(() ->
-      // scoraling.scoralBeambreak()),
-      alignment
-          .reef(Level.L4, Branch.C)
-          .withTimeout(5)
-          .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-      alignment
-          .source()
-          .asProxy()
-          .withTimeout(8)
-          .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
-      // scoraling.scoralBeambreak()),
-      alignment
-          .reef(Level.L4, Branch.B)
-          .asProxy()
-          .withTimeout(5)
-          .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
-}
+      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
+    return Commands.sequence(
+        alignment.reef(Level.L4, Branch.E).withTimeout(4).asProxy(),
+        // .onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment
+            .source()
+            .asProxy()
+            .withTimeout(5)
+            .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
+        // .onlyIf(() -> scoraling.scoralBeambreak()),
+        alignment
+            .reef(Level.L4, Branch.D)
+            .withTimeout(5)
+            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment
+            .source()
+            .asProxy()
+            .withTimeout(8)
+            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
+        // .asProxy().onlyIf(() ->
+        // scoraling.scoralBeambreak()),
+        alignment
+            .reef(Level.L4, Branch.C)
+            .withTimeout(5)
+            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
+        alignment
+            .source()
+            .asProxy()
+            .withTimeout(8)
+            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
+        // scoraling.scoralBeambreak()),
+        alignment
+            .reef(Level.L4, Branch.B)
+            .asProxy()
+            .withTimeout(5)
+            .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+  }
 }

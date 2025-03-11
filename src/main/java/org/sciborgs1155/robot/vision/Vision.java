@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
@@ -47,7 +46,14 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA, BACK_LEFT_CAMERA, BACK_RIGHT_CAMERA);
+    return Robot.isReal()
+        ? new Vision(
+            FRONT_LEFT_CAMERA,
+            FRONT_RIGHT_CAMERA,
+            BACK_MIDDLE_CAMERA,
+            BACK_LEFT_CAMERA,
+            BACK_RIGHT_CAMERA)
+        : new Vision();
   }
 
   public static Vision none() {
@@ -127,8 +133,7 @@ public class Vision implements Logged {
                                 .map(target -> reefTags.contains(target.fiducialId))
                                 .reduce(true, (a, b) -> a && b))
                     .toList()
-                :
-            allUnreadChanges;
+                : allUnreadChanges;
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();

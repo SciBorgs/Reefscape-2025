@@ -17,8 +17,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
-import monologue.Monologue;
-
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
@@ -74,8 +72,9 @@ public class Alignment implements Logged {
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
                 Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(1.5),
-                    Commands.waitUntil(elevator::atGoal).withTimeout(1.5)
+                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    Commands.waitUntil(elevator::atGoal)
+                        .withTimeout(1.5)
                         .andThen(scoral.score(level).asProxy().until(scoral.beambreakTrigger)),
                     drive
                         .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
@@ -120,14 +119,16 @@ public class Alignment implements Logged {
   }
 
   public Command alignTo(Supplier<Pose2d> goal) {
-    return Commands.runOnce(() -> log("goal pose", goal.get())).asProxy().andThen(
-    pathfind(goal)
-        .andThen(drive.driveTo(goal))
-        .onlyWhile(
-            () ->
-                !FaultLogger.returnButReport(
-                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding)));
+    return Commands.runOnce(() -> log("goal pose", goal.get()))
+        .asProxy()
+        .andThen(
+            pathfind(goal)
+                .andThen(drive.driveTo(goal))
+                .onlyWhile(
+                    () ->
+                        !FaultLogger.returnButReport(
+                            allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
+                            alternateAlliancePathfinding)));
   }
 
   /**

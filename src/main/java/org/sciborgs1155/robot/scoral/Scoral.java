@@ -54,9 +54,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     this.motor = motor;
     this.beambreak = beambreak;
     beambreakTrigger = new Trigger(() -> !beambreak.get());
-        new Trigger(() -> Dashboard
-        
-        .invertBeambreakSCL() ? !beambreak.get() : beambreak.get());
+    new Trigger(() -> Dashboard.invertBeambreakSCL() ? !beambreak.get() : beambreak.get());
 
     setDefaultCommand(stop());
   }
