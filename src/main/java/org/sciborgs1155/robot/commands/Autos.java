@@ -69,12 +69,11 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("RB4 - alignment", B4(alignment, scoraling));
-    chooser.addOption("testy stuffy", testyStuffy(alignment, scoraling));
+    chooser.addOption("B4 - alignment", B4(alignment, scoraling));
+    chooser.addOption("P4 - alignment", P4(alignment, scoraling));
     return chooser;
   }
 
-  /** Warning that your list will be desecrated */
   public static Command alignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
     if (branches.isEmpty()) {
       FaultLogger.report(
@@ -84,7 +83,6 @@ public class Autos {
 
     Command auto = Commands.none();
     for (int i = 0; i < branches.size(); i++) {
-      System.out.println(i);
       auto =
           Commands.sequence(
               auto,
@@ -97,15 +95,10 @@ public class Autos {
                   .andThen(scoraling.hpsIntake().withTimeout(2.5))
                   .withTimeout(5)
                   .onlyIf(() -> scoraling.scoralBeambreak())
-                  .asProxy()
-            );
+                  .asProxy());
     }
 
     return auto;
-  }
-
-  public static Command testyStuffy(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B, Branch.C));
   }
 
   public static Command B4(Alignment alignment, Scoraling scoraling) {
@@ -117,7 +110,7 @@ public class Autos {
   }
 
   /**
-   * Pathfinds and aligns to the nearest source.
+   * Pathfinds and aligns to the nearest source. Will reattempt to intake a set number of times.
    *
    * @param retries the number of times to retry (0 means it runs and never retries)
    * @return A command to go to the nearest source.
@@ -129,7 +122,6 @@ public class Autos {
       source = source.andThen(alignment.source());
     }
 
-    return Commands.race(
-        alignment.source(), Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
+    return Commands.race(source, Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
   }
 }
