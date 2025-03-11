@@ -70,7 +70,7 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption("B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
     chooser.addOption("P4", RP4(alignment, scoraling, drive::resetOdometry));
     chooser.addOption(
         "line",
