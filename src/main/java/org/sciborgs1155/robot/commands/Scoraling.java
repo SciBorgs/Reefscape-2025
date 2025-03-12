@@ -34,7 +34,7 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper.blocked.or(scoral.blocked.negate()).onFalse(Commands.runOnce(() -> stop = true));
+    hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
   }
 
   @Log.NT private boolean stop = false;
