@@ -74,10 +74,17 @@ public class Autos {
     return chooser;
   }
 
+  /**
+   * A smart auto which utilizes alignment for planning. It will dynamically replan based on whether
+   * is has a coral or not; see alignSource() and alignReef().
+   *
+   * @param branches an <i>ordered</i> list representing what branches to score in auto. May be any
+   *     length greater than or equal to 1.
+   */
   public static Command alignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
     if (branches.isEmpty()) {
       FaultLogger.report(
-          new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.WARNING));
+          new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.ERROR));
       return Commands.none();
     }
 
@@ -86,42 +93,54 @@ public class Autos {
       auto =
           Commands.sequence(
               auto,
-              alignment
-                  .reef(Level.L4, branches.get(i))
-                  .withTimeout(5)
-                  .onlyIf(() -> !scoraling.scoralBeambreak())
-                  .asProxy(),
-              source(alignment, scoraling, 1)
-                  .andThen(scoraling.hpsIntake().withTimeout(2.5))
-                  .withTimeout(5)
-                  .onlyIf(() -> scoraling.scoralBeambreak())
-                  .asProxy());
+              alignReef(branches.get(i), alignment, scoraling),
+              alignSource(alignment, scoraling, 1));
     }
 
     return auto;
   }
 
+  /**
+   * Aligns to the reef with appropriate timeouts. It will end if it does not possess a coral.
+   *
+   * @param branch the branch to score on.
+   */
+  public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
+    return alignment
+        .reef(Level.L4, branch)
+        .withTimeout(5)
+        .onlyIf(() -> !scoraling.scoralBeambreak())
+        .asProxy();
+  }
+
+  /**
+   * Aligns to the source with appropriate timeouts. It will end if it already has a coral. It will
+   * retry intaking a specified number of times.
+   *
+   * @param retries the number of times to retry (0 indicates to only run the command once)
+   */
+  public static Command alignSource(Alignment alignment, Scoraling scoraling, int retries) {
+    Command source =
+        alignment.source().andThen(scoraling.hpsIntake().withTimeout(2.5)).withTimeout(5);
+
+    for (int i = 0; i < retries; i++) {
+      source =
+          source.andThen(
+              alignment.source().andThen(scoraling.hpsIntake().withTimeout(2.5)).withTimeout(5));
+    }
+
+    source = Commands.race(source, Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
+
+    return source.onlyIf(() -> scoraling.scoralBeambreak()).asProxy();
+  }
+
+  /** Runas a "bottom" side auto with 4 L4 coral scored. */
   public static Command B4(Alignment alignment, Scoraling scoraling) {
     return alignAuto(alignment, scoraling, List.of(Branch.I, Branch.K, Branch.L, Branch.J));
   }
 
+  /** runs a proceser side auto with 4 L4 coral scored. */
   public static Command P4(Alignment alignment, Scoraling scoraling) {
     return alignAuto(alignment, scoraling, List.of(Branch.E, Branch.D, Branch.C, Branch.B));
-  }
-
-  /**
-   * Pathfinds and aligns to the nearest source. Will reattempt to intake a set number of times.
-   *
-   * @param retries the number of times to retry (0 means it runs and never retries)
-   * @return A command to go to the nearest source.
-   */
-  public static Command source(Alignment alignment, Scoraling scoraling, int retries) {
-    Command source = alignment.source();
-
-    for (int i = 0; i < retries; i++) {
-      source = source.andThen(alignment.source());
-    }
-
-    return Commands.race(source, Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
   }
 }
