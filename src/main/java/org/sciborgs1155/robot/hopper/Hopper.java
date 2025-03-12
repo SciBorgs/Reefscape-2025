@@ -20,7 +20,6 @@ import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.commands.Dashboard;
 
 public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   private final SimpleMotor motor;
@@ -50,8 +49,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   public Hopper(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    this.beambreakTrigger =
-        new Trigger(() -> Dashboard.invertBeambreakHPI() ? !beambreak.get() : beambreak.get());
+    this.beambreakTrigger = new Trigger(() -> beambreak.get());
 
     setDefaultCommand(stop());
   }
@@ -96,7 +94,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   /** Returns the value of the beambreak, which is false when the beam is broken. */
   @Log.NT
   public boolean beambreak() {
-    return Dashboard.invertBeambreakHPI() ? !beambreak.get() : beambreak.get();
+    return beambreak.get();
   }
 
   @Override

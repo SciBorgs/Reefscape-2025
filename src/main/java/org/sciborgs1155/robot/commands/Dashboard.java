@@ -32,8 +32,6 @@ public class Dashboard {
   private static NetworkTableEntry entryCameraBL;
   private static NetworkTableEntry entryCameraBR;
   private static NetworkTableEntry entryCameraBM;
-  private static NetworkTableEntry entryInvertBeambreakSCL;
-  private static NetworkTableEntry entryInvertBeambreakHPI;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
@@ -85,12 +83,6 @@ public class Dashboard {
 
     entryCameraBM = base.getEntry("cameraBM");
     entryCameraBM.getBoolean(true);
-
-    entryInvertBeambreakSCL = base.getEntry("invertBeambreakSCL");
-    entryInvertBeambreakSCL.getBoolean(false);
-
-    entryInvertBeambreakHPI = base.getEntry("invertBeambreakHPI");
-    entryInvertBeambreakHPI.getBoolean(false);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -208,16 +200,6 @@ public class Dashboard {
   // * Returns a trigger based on the enabled status of camera back middle. */
   public static Trigger cameraBM() {
     return new Trigger(() -> entryCameraBM.getBoolean(true));
-  }
-
-  // * Returns a whether the dashboard wants the scoral beambreak to be inverted.. */
-  public static boolean invertBeambreakSCL() {
-    return entryInvertBeambreakSCL.getBoolean(false);
-  }
-
-  // * Returns a whether the dashboard wants the human player intake beambreak to be inverted.. */
-  public static boolean invertBeambreakHPI() {
-    return entryInvertBeambreakHPI.getBoolean(false);
   }
 
   /**
