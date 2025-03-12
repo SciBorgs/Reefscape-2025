@@ -108,6 +108,14 @@ public interface ModuleIO extends Logged, AutoCloseable {
    */
   void updateInputs(Rotation2d angle, double voltage);
 
+  double[][] moduleOdometryData();
+
+  /** Returns the list of positions of the module for the last tick, from a faster thread. */
+  SwerveModulePosition[] odometryData();
+
+  /** Returns odometry-affiliated timestamps for pose estimation. */
+  double[] timestamps();
+
   @Override
   void close();
 }

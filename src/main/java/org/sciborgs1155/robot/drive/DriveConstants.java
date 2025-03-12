@@ -1,10 +1,16 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static org.sciborgs1155.robot.Constants.Robot.MASS;
+import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -15,10 +21,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import java.util.List;
 
-/**
- * Constants for our 2025 Swerve X2t drivetrain. All fields in this file should be updated for the
- * current robot configuration!
- */
+/** Constants for our 2025 Swerve X2t drivetrain. */
 public final class DriveConstants {
   /** The type of control loop to use when controlling a module's drive motor. */
   public static enum ControlMode {
@@ -26,8 +29,17 @@ public final class DriveConstants {
     OPEN_LOOP_VELOCITY;
   }
 
+  // The angle between the velocity and the displacement from a target, above which the robot will
+  // not use assisted driving to the target. (the driver must be driving in the general direction of
+  // the assisted driving target.)
+  public static final Angle ASSISTED_DRIVING_THRESHOLD = Radians.of(Math.PI / 6);
+
+  // The input of the joystick beyond which the assisted driving will not control the rotation of
+  // the swerve.
+  public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
+
   // The control loop used by all of the modules when driving
-  public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
+  public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;
 
   // Rate at which sensors update periodicially
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
@@ -63,6 +75,26 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
 
+  public static final RobotConfig ROBOT_CONFIG =
+      new RobotConfig(
+          MASS,
+          MOI,
+          new ModuleConfig(
+              WHEEL_RADIUS,
+              MAX_SPEED,
+              WHEEL_COF,
+              DCMotor.getKrakenX60(1),
+              1 / ModuleConstants.Driving.GEARING,
+              ModuleConstants.Driving.STATOR_LIMIT,
+              1),
+          MODULE_OFFSET);
+
+  public static final PathConstraints PATH_CONSTRAINTS =
+      new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
+
+  // How many ticks before it pathfinds again.
+  public static final int PATHFINDING_PERIOD = 1;
+
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
@@ -75,13 +107,14 @@ public final class DriveConstants {
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
-  // TODO: Change ALL characterization constants for each unique robot as needed.
   public static final class Translation {
     public static final double P = 3.0;
     public static final double I = 0.0;
     public static final double D = 0.05;
 
     public static final Distance TOLERANCE = Centimeters.of(5);
+
+    public static final double PRECISION = 5;
   }
 
   public static final class Rotation {
@@ -90,6 +123,8 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Angle TOLERANCE = Degrees.of(3);
+
+    public static final double PRECISION = 3;
   }
 
   public static final class ModuleConstants {
@@ -100,7 +135,8 @@ public final class DriveConstants {
 
       public static final double GEARING = 5.68;
 
-      public static final Current CURRENT_LIMIT = Amps.of(60);
+      public static final Current STATOR_LIMIT = Amps.of(80); // 120A max slip current
+      public static final Current SUPPLY_LIMIT = Amps.of(70);
 
       public static final class PID {
         public static final double P = 3.2;
@@ -109,9 +145,9 @@ public final class DriveConstants {
       }
 
       public static final class FF {
-        public static final double S = 0.088468;
-        public static final double V = 2.1314;
-        public static final double A = 0.33291;
+        public static final double S = 0.022436;
+        public static final double V = 2.1154;
+        public static final double A = 0.45287;
       }
     }
 
@@ -122,9 +158,9 @@ public final class DriveConstants {
       public static final Current CURRENT_LIMIT = Amps.of(20);
 
       public static final class PID {
-        public static final double P = 14;
+        public static final double P = 35;
         public static final double I = 0.0;
-        public static final double D = 0.05;
+        public static final double D = 0.0;
       }
 
       // system constants only used in simulation

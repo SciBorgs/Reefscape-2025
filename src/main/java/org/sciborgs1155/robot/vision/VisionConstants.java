@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.vision;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static java.lang.Math.PI;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -17,43 +16,49 @@ import org.sciborgs1155.robot.vision.Vision.CameraConfig;
 
 public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-  // WARNING: EMPTY TRANSFORMS WILL CRASH SIMULATION UPON TAG DETECTION
-  // See https://www.desmos.com/calculator/xbs9mtqkrr for a visualization of camera positions.
+  // WARNING: EMPTY TRANSFORMS WILL CRASH CODE UPON TAG DETECTION
   public static final CameraConfig BACK_LEFT_CAMERA =
       new CameraConfig(
           "back left",
           new Transform3d(
-              Inches.of(-12.101091).in(Meters),
-              Inches.of(13.3687655).in(Meters),
-              Inches.of(-8.8799715).in(Meters),
-              new Rotation3d(0, -PI * 13 / 36, PI * 11 / 18)));
+              Inches.of(-12).in(Meters),
+              Inches.of(13).in(Meters),
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
   public static final CameraConfig BACK_RIGHT_CAMERA =
       new CameraConfig(
           "back right",
           new Transform3d(
-              Inches.of(-12.101091).in(Meters),
-              Inches.of(-13.3687655).in(Meters),
-              Inches.of(-8.8799715).in(Meters),
-              new Rotation3d(0, -PI * 13 / 36, -PI * 11 / 18)));
+              Inches.of(-12).in(Meters),
+              Inches.of(-13).in(Meters),
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
+  public static final CameraConfig BACK_MIDDLE_CAMERA =
+      new CameraConfig(
+          "back middle",
+          new Transform3d(
+              Inches.of(-8.358).in(Meters),
+              Inches.of(3.354).in(Meters),
+              Inches.of(12.341).in(Meters),
+              new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
-              Inches.of(13.525813).in(Meters),
-              Inches.of(10.7835795).in(Meters),
-              Inches.of(-8.334).in(Meters),
-              new Rotation3d(0, 0, -PI / 6)));
+              Inches.of(13).in(Meters),
+              Inches.of(11).in(Meters),
+              Inches.of(9.375).in(Meters), // TODO get new
+              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
           "front right",
           new Transform3d(
-              Inches.of(13.525813).in(Meters),
-              Inches.of(-10.7835795).in(Meters),
-              Inches.of(-8.334).in(Meters),
-              new Rotation3d(0, 0, PI / 6)));
-
+              Inches.of(13).in(Meters),
+              Inches.of(-11).in(Meters),
+              Inches.of(9.375).in(Meters),
+              new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
   // OV9281 constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
@@ -74,6 +79,6 @@ public class VisionConstants {
   // Processor | Red Side: 3 | Blue Side: 16
 
   public static final double[] TAG_WEIGHTS = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 1
   };
 }

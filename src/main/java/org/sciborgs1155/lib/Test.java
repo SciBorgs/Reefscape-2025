@@ -17,7 +17,7 @@ public record Test(Command testCommand, Set<Assertion> assertions) {
   }
 
   private static Command toCommand(Test test, boolean unitTest) {
-    return test.testCommand.finallyDo(() -> test.assertions.forEach(a -> a.apply(unitTest)));
+    return test.testCommand.andThen(() -> test.assertions.forEach(a -> a.apply(unitTest)));
   }
 
   /**

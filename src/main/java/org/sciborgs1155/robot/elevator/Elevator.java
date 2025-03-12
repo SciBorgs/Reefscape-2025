@@ -6,13 +6,17 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -27,12 +31,15 @@ import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.BetterElevatorFeedForward;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
@@ -47,9 +54,9 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Method to create a no elevator.
+   * Method to create a non-existent elevator.
    *
-   * @return No elevator object.
+   * @return Non-real elevator object.
    */
   public static Elevator none() {
     return new Elevator(new NoElevator());
@@ -64,7 +71,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  @Log.NT
+  private final BetterElevatorFeedForward ff = new BetterElevatorFeedForward(kS, kG, kV, kA);
 
   @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
@@ -72,7 +80,14 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
+  private final DoubleEntry S = Tuning.entry("/Robot/tuningElevator/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/tuningElevator/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/tuningElevator/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/tuningElevator/kA", kA);
+
   public Elevator(ElevatorIO hardware) {
+    setDefaultCommand(retract());
+
     this.hardware = hardware;
 
     pid.setTolerance(POSITION_TOLERANCE.in(Meters));
@@ -88,18 +103,20 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
                 (state) -> SignalLogger.writeString("elevator state", state.toString())),
             new SysIdRoutine.Mechanism(v -> hardware.setVoltage(v.in(Volts)), null, this));
 
-    SmartDashboard.putData(
-        "elevator quasistatic forward",
-        sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
-    SmartDashboard.putData(
-        "elevator quasistatic backward",
-        sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
-    SmartDashboard.putData(
-        "elevator dynamic forward",
-        sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
-    SmartDashboard.putData(
-        "elevator dynamic backward",
-        sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
+    if (TUNING) {
+      SmartDashboard.putData(
+          "elevator quasistatic forward",
+          sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
+      SmartDashboard.putData(
+          "elevator quasistatic backward",
+          sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
+      SmartDashboard.putData(
+          "elevator dynamic forward",
+          sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
+      SmartDashboard.putData(
+          "elevator dynamic backward",
+          sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
+    }
   }
 
   /**
@@ -215,6 +232,24 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return pid.atGoal();
   }
 
+  @Log.NT
+  public Pose3d stage1() {
+    return new Pose3d(
+        BASE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position() / 2)),
+        new Rotation3d());
+  }
+
+  @Log.NT
+  public Pose3d carriage() {
+    return new Pose3d(
+        CARRIAGE_FROM_CHASSIS.plus(
+            new Translation3d(
+                Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())),
+        new Rotation3d());
+  }
+
   /**
    * Method to set voltages to the hardware based off feedforward and feedback. Control should only
    * be used in a command.
@@ -222,15 +257,21 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @param position Goal height for the elevator to achieve.
    */
   private void update(double position) {
-    position =
+    double goal =
         Double.isNaN(position)
             ? MIN_EXTENSION.in(Meters)
             : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
     double lastVelocity = pid.getSetpoint().velocity;
-    double feedback = pid.calculate(hardware.position(), position);
+    double feedback = pid.calculate(hardware.position(), goal);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
+    log("elverootr voltager", feedforward + feedback);
     hardware.setVoltage(feedforward + feedback);
+  }
+
+  public boolean atPosition(double position) {
+    return Meters.of(position).minus(Meters.of(position())).magnitude()
+        < POSITION_TOLERANCE.in(Meters);
   }
 
   @Override
@@ -241,6 +282,13 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   public void periodic() {
     setpoint.setLength(positionSetpoint());
     measurement.setLength(position());
+
+    if (TUNING) {
+      ff.setKs(S.get());
+      ff.setKg(G.get());
+      ff.setKv(V.get());
+      ff.setKa(A.get());
+    }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
