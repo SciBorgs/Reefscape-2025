@@ -34,13 +34,7 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    // hopper
-    // .beambreakTrigger
-    // .negate()
-    // .or(
-    scoral.beambreakTrigger
-        // )
-        .onFalse(Commands.runOnce(() -> stop = true));
+    hopper.blocked.or(scoral.blocked.negate()).onFalse(Commands.runOnce(() -> stop = true));
   }
 
   @Log.NT private boolean stop = false;
@@ -92,7 +86,7 @@ public class Scoraling implements Logged {
     return elevator
         .clean(level)
         .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
-        .onlyIf(scoral.beambreakTrigger)
+        .onlyIf(scoral.blocked.negate())
         .withName("cleanAlgae");
   }
 
@@ -127,13 +121,7 @@ public class Scoraling implements Logged {
             .finallyDo(() -> stop = false);
     Assertion hasCoral =
         tAssert(
-            scoral.beambreakTrigger.negate()::getAsBoolean,
-            "scoral beambreak",
-            () -> "" + scoral.beambreakTrigger.getAsBoolean());
+            scoral.blocked, "scoral beambreak blocked", () -> "" + scoral.blocked.getAsBoolean());
     return new Test(testCommand, Set.of(hasCoral));
-  }
-
-  public boolean scoralBeambreak() {
-    return scoral.beambreak();
   }
 }

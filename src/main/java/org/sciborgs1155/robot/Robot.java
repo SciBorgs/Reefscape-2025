@@ -14,8 +14,6 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.FieldConstants.Face;
-import static org.sciborgs1155.robot.FieldConstants.Face.Side;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -79,10 +77,9 @@ import org.sciborgs1155.robot.vision.Vision;
  */
 public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
-
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
-  boolean dashboardConfig = Dashboard.configure();
+  private final boolean dashboardConfig = Dashboard.configure();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -192,10 +189,6 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
-    log(
-        "Zero Poses",
-        new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()}); // is this used for anything?
-
     RobotController.setBrownoutVoltage(6.0);
 
     Pathfinding.setPathfinder(new LocalADStar());
@@ -255,8 +248,8 @@ public class Robot extends CommandRobot implements Logged {
     // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
     // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
-    hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+    scoral.blocked.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+    hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
     autonomous()
         .whileTrue(
@@ -395,21 +388,7 @@ public class Robot extends CommandRobot implements Logged {
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
-    Dashboard.cameraFL()
-        .onTrue(Commands.runOnce(() -> vision.enableCam("front left")))
-        .onFalse(Commands.runOnce(() -> vision.disableCam("front left")));
-    Dashboard.cameraFR()
-        .onTrue(Commands.runOnce(() -> vision.enableCam("front right")))
-        .onFalse(Commands.runOnce(() -> vision.disableCam("front right")));
-    Dashboard.cameraBL()
-        .onTrue(Commands.runOnce(() -> vision.enableCam("back left")))
-        .onFalse(Commands.runOnce(() -> vision.disableCam("back left")));
-    Dashboard.cameraBR()
-        .onTrue(Commands.runOnce(() -> vision.enableCam("back right")))
-        .onFalse(Commands.runOnce(() -> vision.disableCam("back right")));
-
-    scoral.beambreakTrigger.onTrue(
-        leftLED.blink(Color.kLime).alongWith(rightLED.blink(Color.kLime)));
+    scoral.blocked.onFalse(leftLED.blink(Color.kLime).alongWith(rightLED.blink(Color.kLime)));
   }
 
   @Log.NT
@@ -458,7 +437,7 @@ public class Robot extends CommandRobot implements Logged {
             // arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(
-                scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),
+                scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             Test.fromCommand(
                 middleLED
                     .solid(Color.kLime)

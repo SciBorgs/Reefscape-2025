@@ -75,7 +75,7 @@ public class Alignment implements Logged {
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
-                        .andThen(scoral.score(level).asProxy().until(scoral.beambreakTrigger)),
+                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
                     drive
                         .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
                         .asProxy())))
@@ -161,7 +161,7 @@ public class Alignment implements Logged {
   public Command safeReef(Level level, Branch branch) {
     return pathfind(branch::pose)
         .andThen(elevator.scoreLevel(level))
-        .until(scoral::beambreak)
+        .until(scoral.blocked.negate())
         .deadlineFor(
             Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
                 .andThen(scoral.score(level)));
