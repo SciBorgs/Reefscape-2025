@@ -28,6 +28,11 @@ public class GyroIOSim implements GyroIO {
   }
 
   @Override
+  public double[][] odometryData() {
+      return new double[20][20];
+  }
+
+  @Override
   public void reset() {}
 
   @Override

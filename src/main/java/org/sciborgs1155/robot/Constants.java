@@ -2,9 +2,6 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.Field.Branch.*;
-import static org.sciborgs1155.robot.Constants.Field.LENGTH;
-import static org.sciborgs1155.robot.Constants.Field.WIDTH;
-import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -70,13 +67,38 @@ public class Constants {
         : new Pose2d(
             pose.getTranslation()
                 .rotateAround(
-                    new Translation2d(LENGTH.div(2), WIDTH.div(2)), Rotation2d.fromRotations(0.5)),
+                    new Translation2d(FieldConstants.LENGTH.div(2), FieldConstants.WIDTH.div(2)),
+                    Rotation2d.fromRotations(0.5)),
             pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.FULL;
+  /**
+   * A transform that will translate the pose robot-relative right by a certain distance. Negative
+   * distances will move the pose left.
+   *
+   * @distance The distance that the pose will be moved.
+   * @return A transform to strafe a pose.
+   */
+  public static Transform2d strafe(Distance distance) {
+    return new Transform2d(
+        new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(-90)), Rotation2d.kZero);
+  }
 
-  public static boolean TUNING = true;
+  /**
+   * A transform that will translate the pose robot-relative forward by a certain distance. Negative
+   * distances will move the pose backward.
+   *
+   * @distance The distance that the pose will be moved.
+   * @return A transform to move a pose forward.
+   */
+  public static Transform2d advance(Distance distance) {
+    return new Transform2d(
+        new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(0)), Rotation2d.kZero);
+  }
+
+  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+
+  public static boolean TUNING = false;
 
   /** Describes physical properites of the robot. */
   public static class Robot {
@@ -132,12 +154,12 @@ public class Constants {
     // alliance side, and B is counter-clockwise of A.
     public static final Pose2d REEF_BRANCH_A =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2))),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(Robot.BUMPER_LENGTH.div(2))),
             CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
     public static final Pose2d REEF_BRANCH_B =
         new Pose2d(
-            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(BUMPER_LENGTH.div(2))),
+            CENTER_REEF.getMeasureX().minus(REEF_MIN_RADIUS.plus(Robot.BUMPER_LENGTH.div(2))),
             CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
             Rotation2d.fromRotations(0));
 
@@ -354,7 +376,7 @@ public class Constants {
               new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
                   .plus(
                       new Translation2d(
-                          BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                          Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
                           Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
               SOURCE_ROTATION)),
       RIGHT(
@@ -362,7 +384,7 @@ public class Constants {
               new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
                   .plus(
                       new Translation2d(
-                          BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                          Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
                           Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
               SOURCE_ROTATION.unaryMinus()));
 

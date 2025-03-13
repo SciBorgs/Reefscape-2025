@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Ports.GroundIntake.*;
-import static org.sciborgs1155.robot.arm.ArmConstants.GEARING;
+import static org.sciborgs1155.robot.arm.ArmConstants.CANCODER_GEARING;
 import static org.sciborgs1155.robot.arm.ArmConstants.STATOR_LIMIT;
 import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
 
@@ -16,7 +16,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.units.measure.Current;
-import monologue.Annotations.Log;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
 
@@ -41,7 +40,7 @@ public class RealArm implements ArmIO {
     config.CurrentLimits.StatorCurrentLimit = STATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Feedback.SensorToMechanismRatio = GEARING;
+    config.Feedback.SensorToMechanismRatio = CANCODER_GEARING;
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -58,7 +57,6 @@ public class RealArm implements ArmIO {
   }
 
   @Override
-  @Log.NT
   public double position() {
     // Converting 'rotations' to 'radians'
     return leader.getPosition().getValue().in(Radians);

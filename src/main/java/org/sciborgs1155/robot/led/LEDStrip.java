@@ -48,6 +48,12 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
       led.start();
     }
     selfBuffer = new AddressableLEDBuffer(end - start + 1);
+    setDefaultCommand(
+        run(
+            () ->
+                update(
+                    LEDPattern.rainbow(225, 225)
+                        .scrollAtAbsoluteSpeed(MetersPerSecond.of(0.5), LED_SPACING))));
   }
 
   /** Rainbow LEDs, scrolling at 0.5 m/s. Very cool. */
@@ -111,14 +117,15 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Applies an LEDPattern to the set of LEDs controlled by the LEDStrip. */
   public Command set(LEDPattern pattern) {
-    return run(
-        () -> {
-          (inverted ? pattern.reversed() : pattern).applyTo(selfBuffer);
-          for (int i = startLED; i <= endLED; i++) {
-            allBuffer.setLED(i, selfBuffer.getLED(i - startLED));
-          }
-          led.setData(allBuffer);
-        });
+    return run(() -> update(pattern)).asProxy();
+  }
+
+  private void update(LEDPattern pattern) {
+    (inverted ? pattern.reversed() : pattern).applyTo(selfBuffer);
+    for (int i = startLED; i <= endLED; i++) {
+      allBuffer.setLED(i, selfBuffer.getLED(i - startLED));
+    }
+    led.setData(allBuffer);
   }
 
   /** Alternates between two colors, for a given length for each. */
