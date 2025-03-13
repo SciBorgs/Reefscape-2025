@@ -30,7 +30,7 @@ public class ElevatorConstants {
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(3.5); // (1.0);
 
-  public static final Distance MIN_EXTENSION = Meters.of(0);
+  public static final Distance MIN_EXTENSION = Meters.of(0.0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
 
   public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2, .125);
@@ -59,7 +59,7 @@ public class ElevatorConstants {
   public enum Level {
     L1(Meters.of(0.3)),
     L2(Meters.of(0.427)),
-    L3(Meters.of(0.809)),
+    L3(Meters.of(0.82)),
     L4(Meters.of(1.42)),
 
     L3_ALGAE(Meters.of(0.68286));

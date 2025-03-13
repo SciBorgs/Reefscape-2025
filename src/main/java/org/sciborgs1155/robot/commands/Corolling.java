@@ -24,6 +24,7 @@ public class Corolling {
    */
   public Command intake() {
     return arm.goTo(INTAKE_ANGLE)
+        .asProxy()
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radians)))
                 .andThen(roller.intake().asProxy().withTimeout(1)))

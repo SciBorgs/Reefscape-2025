@@ -13,19 +13,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
 import java.util.Set;
-import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor motor;
 
   private final Beambreak beambreak;
-  public final Trigger beambreakTrigger;
+  public final Trigger blocked;
 
   /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {
@@ -51,7 +51,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    beambreakTrigger = new Trigger(beambreak::get);
+    this.blocked = new Trigger(beambreak::get); // it spontaneously negated....
 
     setDefaultCommand(stop());
   }
@@ -59,6 +59,11 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command score() {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
+  }
+
+  public Command score(Level level) {
+    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.6 * SCORE_POWER))
+        .withName("score level");
   }
 
   public Command scoreSlow() {
@@ -70,18 +75,12 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command intake() {
-    return run(() -> motor.set(INTAKE_POWER)).withName("intake");
+    return run(() -> motor.set(INTAKE_POWER * 0.6)).withName("intake");
   }
 
   /** Stops the motor */
   public Command stop() {
     return run(() -> motor.set(0)).withName("stop");
-  }
-
-  /** Returns the value of the beambreak, which is false when the beam is broken. */
-  @Log.NT
-  public boolean beambreak() {
-    return beambreak.get();
   }
 
   @Override
@@ -95,13 +94,10 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
    * @return Command to set the scoral to intake and check whether it has a coral.
    */
   public Test intakeTest() {
-    Command testCommand = intake().until(beambreakTrigger.negate()).withTimeout(5);
+    Command testCommand = intake().until(blocked).withTimeout(5);
     Set<Assertion> assertions =
         Set.of(
-            tAssert(
-                beambreakTrigger.negate(),
-                "Scoral syst check (beambreak broken)",
-                () -> "broken: " + beambreakTrigger.negate()));
+            tAssert(blocked, "Scoral syst check (beambreak broken)", () -> "broken: " + blocked));
     return new Test(testCommand, assertions);
   }
 
