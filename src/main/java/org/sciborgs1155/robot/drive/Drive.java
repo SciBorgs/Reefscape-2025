@@ -405,12 +405,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         Arrays.stream(moduleStates())
             .map(
                 c ->
-                    new Translation2d(c.speedMetersPerSecond, c.angle)
+                    Constants.fromPolarCoords(c.speedMetersPerSecond, c.angle)
                         .minus(
-                            new Translation2d(
+                            VecBuilder.fill(
                                 robotRelativeChassisSpeeds().vxMetersPerSecond,
                                 robotRelativeChassisSpeeds().vyMetersPerSecond)))
-            .map(c -> c.getNorm())
+            .map(c -> c.norm())
             .sorted((a, b) -> a > b ? 1 : -1)
             .collect(Collectors.toList());
     return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD.in(MetersPerSecond);
@@ -421,7 +421,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean isColliding() {
-    return gyro.acceleration().getNorm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
   /** Resets all drive encoders to read a position of 0. */

@@ -3,8 +3,10 @@ package org.sciborgs1155.robot.drive;
 import static org.sciborgs1155.robot.Ports.Drive.CANANDGYRO;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
 import org.sciborgs1155.lib.FaultLogger;
 
 /** GyroIO implementation for NavX */
@@ -33,8 +35,8 @@ public class ReduxGyro implements GyroIO {
   }
 
   @Override
-  public Translation2d acceleration() {
-    return new Translation2d(
+  public Vector<N2> acceleration() {
+    return VecBuilder.fill(
         canandgyro.getAccelerationX(),
         canandgyro.getAccelerationY()); // .rotateBy(canandgyro.getRotation2d());
 
