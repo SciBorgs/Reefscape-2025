@@ -2,6 +2,7 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -32,6 +33,7 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -51,7 +53,9 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
@@ -90,9 +94,8 @@ public class Robot extends CommandRobot implements Logged {
   private final PowerDistribution pdh = new PowerDistribution();
 
   // SUBSYSTEMS
-  private final SwerveDriveSimulation simDrive =
-      new SwerveDriveSimulation(
-          SIM_DRIVE_CONFIG, new Pose2d(3, 3, new Rotation2d())); // Start Position
+  private final SelfControlledSwerveDriveSimulation simDrive =
+      new SelfControlledSwerveDriveSimulation(new SwerveDriveSimulation(SIM_DRIVE_CONFIG, new Pose2d(3, 3, new Rotation2d()))); // Start Position
   private final Drive drive =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
@@ -160,7 +163,7 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
     SimulatedArena.getInstance();
-    SimulatedArena.getInstance().addDriveTrainSimulation(simDrive);
+    SimulatedArena.getInstance().addDriveTrainSimulation(simDrive.getDriveTrainSimulation());
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -210,15 +213,32 @@ public class Robot extends CommandRobot implements Logged {
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
       addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
-      addPeriodic(() -> SimulatedArena.getInstance().simulationPeriodic(), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
     addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
   }
 
+  @Override
+  public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+  }
+
+  @Log
+  public Pose2d drivePose() {
+    return simDrive.getDriveTrainSimulation().getSimulatedDriveTrainPose();
+  }
+
+  @Log
+  public Pose3d[] pieces() {
+    return SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"); 
+  }
+
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+    operator.b().onTrue(Commands.runOnce(() -> SimulatedArena.getInstance().clearGamePieces()));
+    operator.a().toggleOnTrue(Commands.waitSeconds(.05).andThen(Commands.runOnce(() -> SimulatedArena.getInstance().addGamePieceProjectile(new ReefscapeAlgaeOnFly(drivePose().getTranslation(), new Translation2d(), simDrive.getDriveTrainSimulation().getDriveTrainSimulatedChassisSpeedsFieldRelative(), new Rotation2d(), Meters.of(3), MetersPerSecond.of(0), Radians.of(0))))).repeatedly());
+
     InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
 
@@ -254,7 +274,8 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
+    // drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
+    teleop().whileTrue(Commands.run(() -> simDrive.runChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(x.getAsDouble(), y.getAsDouble(), omega.getAsDouble()), drivePose().getRotation()), new Translation2d(), false, true)).withName("joysticks"));
 
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
