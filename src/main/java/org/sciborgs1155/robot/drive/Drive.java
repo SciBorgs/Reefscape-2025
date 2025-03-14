@@ -14,8 +14,6 @@ import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -541,15 +539,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         VecBuilder.fill(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond).minus(currentVelocity);
 
     Vector<N2> limitedVelocity =
-        currentVelocity.plus(
-            currentVelocity.norm() > 1e-6
-                ? forwardAccelerationLimit(
-                    skidAccelerationLimit(
-                        tiltAccelerationLimit(
-                            skidAccelerationLimit(forwardAccelerationLimit(accel)),
-                            elevatorHeight.getAsDouble())))
-                : accel);
+        currentVelocity.plus(currentVelocity.norm() > 1e-6 ? skidAccelerationLimit(accel) : accel);
 
+    log("forward accel limit", forwardAccelerationLimit(accel).norm());
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
             limitedVelocity.get(0), limitedVelocity.get(1), speeds.omegaRadiansPerSecond);
@@ -578,31 +570,33 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     double limit =
         MAX_ACCEL.in(MetersPerSecondPerSecond)
             * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
+    log("limit", limit);
     Vector<N2> proj = desiredAccel.projection(currVel);
     if (proj.norm() > limit) {
       Vector<N2> parl = proj.unit().times(limit);
       Vector<N2> perp = desiredAccel.minus(parl);
+      log("end", parl.plus(perp).norm());
       return parl.plus(perp);
     }
     return desiredAccel;
   }
 
-  /**
-   * Applies tilt acceleration limiting based on the height of the elevator. The higher the
-   * elevator, the more the acceleration is limited to prevent tipping.
-   *
-   * @param desiredAccel The desired field-relative acceleration vector.
-   * @param elevatorHeight The current height of the elevator.
-   * @return The adjusted acceleration vector after applying tilt acceleration limits.
-   */
-  private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight) {
-    double limit =
-        MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
-            * (1 - (elevatorHeight / MAX_EXTENSION.in(Meters)));
-    return desiredAccel.norm() > limit && elevatorHeight > MIN_EXTENSION.in(Meters)
-        ? desiredAccel.unit().times(limit)
-        : desiredAccel;
-  }
+  // /**
+  //  * Applies tilt acceleration limiting based on the height of the elevator. The higher the
+  //  * elevator, the more the acceleration is limited to prevent tipping.
+  //  *
+  //  * @param desiredAccel The desired field-relative acceleration vector.
+  //  * @param elevatorHeight The current height of the elevator.
+  //  * @return The adjusted acceleration vector after applying tilt acceleration limits.
+  //  */
+  // private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight) {
+  //   double limit =
+  //       MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
+  //           * (1 - (elevatorHeight / MAX_EXTENSION.in(Meters)));
+  //   return desiredAccel.norm() > limit && elevatorHeight > MIN_EXTENSION.in(Meters)
+  //       ? desiredAccel.unit().times(limit)
+  //       : desiredAccel;
+  // }
 
   /**
    * Applies skid acceleration limiting based on the maximum allowed skid acceleration. Ensures that

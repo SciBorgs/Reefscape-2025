@@ -60,17 +60,13 @@ public class SwerveTest {
   public void reachesRobotVelocity() {
     double xVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
     double yVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
+
     run(
-        drive.run(
-            () ->
-                drive.setChassisSpeeds(
-                    new ChassisSpeeds(xVelocitySetpoint, yVelocitySetpoint, 0),
-                    ControlMode.CLOSED_LOOP_VELOCITY,
-                    () -> 0)));
-    run(drive.drive(() -> xVelocitySetpoint, () -> yVelocitySetpoint, drive::heading, () -> 0));
+        drive.drive(
+            () -> xVelocitySetpoint, () -> yVelocitySetpoint, () -> Rotation2d.kZero, () -> 0));
     fastForward(500);
 
-    ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
+    ChassisSpeeds chassisSpeed = drive.fieldRelativeChassisSpeeds();
 
     assertEquals(xVelocitySetpoint, chassisSpeed.vxMetersPerSecond, DELTA);
     assertEquals(yVelocitySetpoint, chassisSpeed.vyMetersPerSecond, DELTA);

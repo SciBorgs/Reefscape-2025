@@ -93,7 +93,12 @@ public class RepulsorFieldPlanner {
       // var sidewaysDist = sidewaysCircle.getDistance(position);
       var sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position));
       var outwardsMag = distToForceMag(Math.max(0.01, loc.getDistance(position) - radius));
-      var initial = new Force(outwardsMag, position.minus(loc).getAngle());
+      var initial =
+          new Force(
+              outwardsMag,
+              position.minus(loc).getNorm() > 1e-4
+                  ? position.minus(loc).getAngle()
+                  : Rotation2d.kZero);
 
       // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
       var sidewaysTheta =
