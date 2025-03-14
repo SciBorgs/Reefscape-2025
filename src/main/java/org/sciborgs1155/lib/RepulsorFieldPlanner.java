@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.Optional;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
+import monologue.Logged;
 import org.sciborgs1155.robot.drive.DriveConstants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
-public class RepulsorFieldPlanner {
+public class RepulsorFieldPlanner implements Logged {
 
   abstract static class Obstacle {
     double strength = 1.0;
@@ -326,7 +327,7 @@ public class RepulsorFieldPlanner {
     if (goalOpt.isEmpty()) {
       return sample(pose.getTranslation(), pose.getRotation(), 0, 0, 0);
     } else {
-      // var startTime = System.nanoTime();
+      var startTime = System.nanoTime();
       var goal = goalOpt.get();
       var curTrans = pose.getTranslation();
       var err = curTrans.minus(goal);
@@ -345,8 +346,8 @@ public class RepulsorFieldPlanner {
         }
         var step = new Translation2d(stepSize_m, netForce.getAngle());
         var intermediateGoal = curTrans.plus(step);
-        // var endTime = System.nanoTime();
-        // log("repulsorTimeS", (endTime - startTime) / 1e9);
+        var endTime = System.nanoTime();
+        log("repulsorTimeS", (endTime - startTime) / 1e9);
         prevSample =
             sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
         return prevSample;

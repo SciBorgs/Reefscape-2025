@@ -72,7 +72,10 @@
       },
       "Robot": {
         "align": {
-          "open": true
+          "open": true,
+          "planner": {
+            "open": true
+          }
         },
         "open": true,
         "scoraling": {

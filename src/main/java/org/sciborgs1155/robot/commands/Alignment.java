@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
+import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
@@ -36,7 +37,7 @@ public class Alignment implements Logged {
   @IgnoreLogged private final Elevator elevator;
   @IgnoreLogged private final Scoral scoral;
 
-  private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+  @Log.NT private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
   private Fault alternateAlliancePathfinding =
       new Fault(
