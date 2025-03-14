@@ -85,6 +85,7 @@ public class VisionConstants {
 
   public static final double MAX_HEIGHT = 0.305;
   public static final double MAX_ANGLE = 0.3;
+  public static final double MAX_AMBIGUITY = 0.2;
 
   // Total of 22 AprilTags
   // Reference: https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf (page 35)
