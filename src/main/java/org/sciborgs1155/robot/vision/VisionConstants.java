@@ -25,8 +25,8 @@ public class VisionConstants {
       new CameraConfig(
           "back left",
           new Transform3d(
-              Inches.of(-12).in(Meters),
-              Inches.of(13).in(Meters),
+              Inches.of(-13.2278115).in(Meters),
+              Inches.of(12.049788).in(Meters),
               Inches.of(9.375).in(Meters),
               //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
               new Rotation3d(Radians.zero(), Degrees.of(-25), Radians.zero())
@@ -36,8 +36,8 @@ public class VisionConstants {
       new CameraConfig(
           "back right",
           new Transform3d(
-              Inches.of(-12).in(Meters),
-              Inches.of(-13).in(Meters),
+              Inches.of(-13.2278115).in(Meters),
+              Inches.of(-12.049788).in(Meters),
               Inches.of(9.375).in(Meters),
               //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
               new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
@@ -57,8 +57,8 @@ public class VisionConstants {
       new CameraConfig(
           "front left",
           new Transform3d(
-              Inches.of(13).in(Meters),
-              Inches.of(11).in(Meters),
+              Inches.of(13.249431).in(Meters),
+              Inches.of(10.943149).in(Meters),
               Inches.of(3.875).in(Meters), // TODO get new
               //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
@@ -68,8 +68,8 @@ public class VisionConstants {
       new CameraConfig(
           "front right",
           new Transform3d(
-              Inches.of(13).in(Meters),
-              Inches.of(-11).in(Meters),
+              Inches.of(13.295385).in(Meters),
+              Inches.of(-10.916667).in(Meters),
               Inches.of(9.375).in(Meters),
               //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
