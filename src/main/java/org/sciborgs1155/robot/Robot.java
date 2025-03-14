@@ -58,6 +58,7 @@ import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
+import org.sciborgs1155.robot.commands.LEDing;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
@@ -132,6 +133,7 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip leftLED = new LEDStrip(0, 37, false);
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
+  private final LEDing leding = new LEDing(leftLED, middleLED, rightLED);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
   private final Corolling corolling = new Corolling(arm, coroller);
@@ -244,10 +246,6 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
 
-    // leftLED.setDefaultCommand(leftLED.rainbow());
-    // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
-    // rightLED.setDefaultCommand(rightLED.rainbow());
-
     scoral.blocked.onTrue(rumble(RumbleType.kBothRumble, 0.5));
     hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
@@ -354,10 +352,9 @@ public class Robot extends CommandRobot implements Logged {
             elevator
                 .scoreLevel(Level.L3_ALGAE)
                 .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+                    leding.progressGradient(
+                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters),
+                        elevator::atGoal)));
 
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 

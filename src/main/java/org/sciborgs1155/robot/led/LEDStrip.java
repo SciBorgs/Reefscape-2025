@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
@@ -68,14 +69,29 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * A gradient of green to yellow LEDs, with an applied mask of how much the elevator is raised.
+   * A gradient of orange red to lime LEDs, with an applied mask of how much the elevator is raised.
    *
    * @param percent A double supplier that supplies the elevator's percent raised.
    */
   public Command progressGradient(DoubleSupplier percent) {
     return set(
-        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kYellow, Color.kGreen)
+        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kOrangeRed, Color.kLime)
             .mask(LEDPattern.progressMaskLayer(percent)));
+  }
+
+  /**
+   * A gradient of orange red to lime LEDs representing how much the elevator is raised, until the
+   * elevator reaches its setpoint, where it then solid lime.
+   *
+   * @param percent A double supplier that supplies the elevator's percent raised.
+   * @param atGoal A boolean supplier that supplies whether the elevator is at its goal.
+   */
+  public Command progressGradient(DoubleSupplier percent, BooleanSupplier atGoal) {
+    return set(LEDPattern.gradient(
+                LEDPattern.GradientType.kDiscontinuous, Color.kOrangeRed, Color.kLime)
+            .mask(LEDPattern.progressMaskLayer(percent)))
+        .until(atGoal)
+        .andThen(solid(Color.kLime));
   }
 
   /** A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many song. */
