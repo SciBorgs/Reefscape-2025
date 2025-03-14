@@ -42,6 +42,7 @@ public class VisionConstants {
               //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
               new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-108.25)))));
+
   public static final CameraConfig BACK_MIDDLE_CAMERA =
       new CameraConfig(
           "back middle",

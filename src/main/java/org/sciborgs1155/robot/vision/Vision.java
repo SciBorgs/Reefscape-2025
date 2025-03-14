@@ -130,6 +130,7 @@ public class Vision implements Logged {
                     .filter(
                         change ->
                             change.getTargets().stream()
+                                .filter(t -> t.getPoseAmbiguity() < MAX_AMBIGUITY)
                                 .map(target -> reefTags.contains(target.fiducialId))
                                 .reduce(true, (a, b) -> a && b))
                     .toList()
