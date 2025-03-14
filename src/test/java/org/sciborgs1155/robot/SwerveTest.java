@@ -21,14 +21,14 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.drive.NoGyro;
-import org.sciborgs1155.robot.drive.SimModule;
+import org.sciborgs1155.robot.drive.OldSimModule;
 
 /** Swerve test. Currently incomplete and does nothing. */
 public class SwerveTest {
-  SimModule frontLeft;
-  SimModule frontRight;
-  SimModule rearLeft;
-  SimModule rearRight;
+  OldSimModule frontLeft;
+  OldSimModule frontRight;
+  OldSimModule rearLeft;
+  OldSimModule rearRight;
   NoGyro gyro;
   Drive drive;
 
@@ -37,10 +37,10 @@ public class SwerveTest {
   @BeforeEach
   public void setup() {
     setupTests();
-    frontLeft = new SimModule("FL");
-    frontRight = new SimModule("FR");
-    rearLeft = new SimModule("RL");
-    rearRight = new SimModule("RR");
+    frontLeft = new OldSimModule("FL");
+    frontRight = new OldSimModule("FR");
+    rearLeft = new OldSimModule("RL");
+    rearRight = new OldSimModule("RR");
     gyro = new NoGyro();
     drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
   }

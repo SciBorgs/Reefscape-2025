@@ -65,6 +65,10 @@ import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
@@ -158,12 +162,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               "RR",
               true));
     } else {
+      SwerveModuleSimulation[] modules = driveSim.getModules();
+      SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+
       return new Drive(
-          new NoGyro(),
-          new SimModule("FL"),
-          new SimModule("FR"),
-          new SimModule("RL"),
-          new SimModule("RR"));
+          new SimGyro(driveSim.getGyroSimulation()),
+          new SimModule(modules[0], "FL"),
+          new SimModule(modules[1], "FR"),
+          new SimModule(modules[2], "RL"),
+          new SimModule(modules[3], "RR"));
     }
   }
 
@@ -223,12 +230,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     gyro.reset();
-    odometry =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            lastHeading,
-            lastPositions,
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+    odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, STARTING_POSE);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);

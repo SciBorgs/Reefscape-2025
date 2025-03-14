@@ -1,12 +1,14 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,6 +22,12 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import java.util.List;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 /** Constants for our 2025 Swerve X2t drivetrain. */
 public final class DriveConstants {
@@ -56,6 +64,8 @@ public final class DriveConstants {
   public static final double WHEEL_COF = 1.0;
   // Robot width with bumpers
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
+  // Robot starting position in sim
+  public static final Pose2d STARTING_POSE = new Pose2d(3, 3, new Rotation2d());
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
@@ -74,6 +84,26 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(2)), // rear left
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
+
+  public static final DriveTrainSimulationConfig SIM_DRIVE_CONFIG =
+      DriveTrainSimulationConfig.Default()
+          .withGyro(COTS.ofPigeon2())
+          .withSwerveModule(
+              new SwerveModuleSimulationConfig(
+                  DCMotor.getKrakenX60(1),
+                  DCMotor.getKrakenX60(1),
+                  Driving.GEARING, // Drive Motor Gear Ratio
+                  Turning.GEARING, // Steer Motor Gear Ratio
+                  Volts.of(Driving.FF.S), // Drive Friction Voltage
+                  Volts.of(Turning.FF.S), // Steer Friction Voltage
+                  WHEEL_RADIUS, // Wheel Radius
+                  KilogramSquareMeters.of(0.02), // Steer Moment of Inertia
+                  WHEEL_COF // Wheel Coefficient of Friction
+                  ))
+          .withTrackLengthTrackWidth(TRACK_WIDTH, TRACK_WIDTH)
+          .withBumperSize(BUMPER_LENGTH, BUMPER_LENGTH);
+
+  public static final SwerveDriveSimulation driveSim = new SwerveDriveSimulation(SIM_DRIVE_CONFIG, STARTING_POSE);
 
   public static final RobotConfig ROBOT_CONFIG =
       new RobotConfig(

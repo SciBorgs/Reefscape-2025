@@ -4,10 +4,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
-public class GyroIOSim implements GyroIO {
+public class SimGyro implements GyroIO {
   private final GyroSimulation gyroSimulation;
 
-  public GyroIOSim(GyroSimulation gyroSimulation) {
+  public SimGyro(GyroSimulation gyroSimulation) {
     this.gyroSimulation = gyroSimulation;
   }
 
@@ -29,7 +29,7 @@ public class GyroIOSim implements GyroIO {
 
   @Override
   public double[][] odometryData() {
-      return new double[20][20];
+    return new double[20][20];
   }
 
   @Override

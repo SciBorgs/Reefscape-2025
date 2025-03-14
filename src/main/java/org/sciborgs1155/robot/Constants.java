@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Constants.Field.Branch.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -17,9 +16,6 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -408,22 +404,4 @@ public class Constants {
       return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(allianceRotation());
     }
   }
-
-  public static final DriveTrainSimulationConfig SIM_DRIVE_CONFIG =
-      DriveTrainSimulationConfig.Default()
-          .withGyro(COTS.ofPigeon2())
-          .withSwerveModule(
-              new SwerveModuleSimulationConfig(
-                  DCMotor.getKrakenX60(1),
-                  DCMotor.getKrakenX60(1),
-                  5.68, // Drive Motor Gear Ratio
-                  12.2, // Steer Motor Gear Ratio
-                  Volts.of(0.1), // Drive Friction Voltage
-                  Volts.of(0.1), // Steer Friction Voltage
-                  Inches.of(2), // Wheel Radius
-                  KilogramSquareMeters.of(0.02), // Steer Moment of Inertia
-                  1.2 // Wheel Coefficient of Friction
-                  ))
-          .withTrackLengthTrackWidth(Robot.BUMPER_LENGTH, Robot.BUMPER_LENGTH)
-          .withBumperSize(Robot.BUMPER_LENGTH, Robot.BUMPER_LENGTH);
 }
