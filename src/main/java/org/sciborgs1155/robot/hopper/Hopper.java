@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Ports.Hopper.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -9,14 +10,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.Optional;
+import monologue.Logged;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Robot;
 
-public class Hopper extends SubsystemBase implements AutoCloseable {
+public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   private final SimpleMotor motor;
   private final Beambreak beambreak;
-  public final Trigger beambreakTrigger;
+  public final Trigger blocked;
 
   /** Creates a Hopper based on whether it is utilizing hardware. */
   public static Hopper create() {
@@ -35,13 +38,13 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = HopperConstants.CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(MOTOR), config);
+    return SimpleMotor.talon(new TalonFX(MOTOR, CANIVORE_NAME), config);
   }
 
   public Hopper(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    this.beambreakTrigger = new Trigger(beambreak::get);
+    this.blocked = new Trigger(beambreak::get).negate();
 
     setDefaultCommand(stop());
   }
@@ -53,7 +56,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to set the power of the hopper motors.
    */
   public Command run(double power) {
-    return runOnce(() -> motor.set(power));
+    return run(() -> motor.set(power));
   }
 
   /**
@@ -81,6 +84,11 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    */
   public Command stop() {
     return run(0);
+  }
+
+  @Override
+  public void periodic() {
+    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   @Override

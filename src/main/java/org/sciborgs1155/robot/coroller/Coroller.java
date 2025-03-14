@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.coroller;
 
 import static edu.wpi.first.units.Units.Amps;
+import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -26,7 +27,7 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
     return new Coroller(Robot.isReal() ? real() : SimpleMotor.none());
   }
 
-  /** Creates a new {@link Coroller} with no hardware interface(does nothing). */
+  /** Creates a new {@link Coroller} with no hardware interface (does nothing). */
   public static Coroller none() {
     return new Coroller(SimpleMotor.none());
   }
@@ -39,25 +40,28 @@ public class Coroller extends SubsystemBase implements Logged, AutoCloseable {
   private static SimpleMotor real() {
     /** Configuration of the motor used in the Coroller. */
     TalonFXConfiguration config = new TalonFXConfiguration();
+
     config.CurrentLimits.StatorCurrentLimit = STRATOR_LIMIT.in(Amps);
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR), config);
+
+    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR, CANIVORE_NAME), config);
   }
 
+  // TODO specify which gamepiece this intakes
   /** Makes the roller spin inwards(towards robot). */
   public Command intake() {
-    return run(() -> hardware.set(INTAKE_POWER)).withName("Intaking");
+    return run(() -> hardware.set(INTAKE_POWER)).withName("intake");
   }
 
   /** Makes the roller spin outwards(away from robot). */
   public Command outtake() {
-    return run(() -> hardware.set(OUTTAKE_POWER)).withName("Outtaking");
+    return run(() -> hardware.set(OUTTAKE_POWER)).withName("outtake");
   }
 
   /** Stops the roller motors. */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("Stopping");
+    return run(() -> hardware.set(0)).withName("stop");
   }
 
   @Override

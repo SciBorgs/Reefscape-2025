@@ -1,8 +1,8 @@
 {
   "HALProvider": {
-    "Other Devices": {
+    "Addressable LEDs": {
       "window": {
-        "visible": false
+        "visible": true
       }
     }
   },
@@ -11,20 +11,26 @@
       "/FMSInfo": "FMSInfo",
       "/Faults/Active Faults": "Alerts",
       "/Faults/Total Faults": "Alerts",
+      "/Robot/arm/armCanvas": "Mechanism2d",
+      "/Robot/arm/fb": "ProfiledPIDController",
       "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
-      "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
-      "/Robot/elevator/setpoint/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
+      "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
-      "/SmartDashboard/pivot dynamic backward": "Command",
-      "/SmartDashboard/pivot dynamic forward": "Command",
-      "/SmartDashboard/pivot quasistatic backward": "Command",
-      "/SmartDashboard/pivot quasistatic forward": "Command",
+      "/SmartDashboard/arm dynamic backward": "Command",
+      "/SmartDashboard/arm dynamic forward": "Command",
+      "/SmartDashboard/arm quasistatic backward": "Command",
+      "/SmartDashboard/arm quasistatic forward": "Command",
+      "/SmartDashboard/elevator dynamic backward": "Command",
+      "/SmartDashboard/elevator dynamic forward": "Command",
+      "/SmartDashboard/elevator quasistatic backward": "Command",
+      "/SmartDashboard/elevator quasistatic forward": "Command",
       "/SmartDashboard/rotation dynamic backward": "Command",
       "/SmartDashboard/rotation dynamic forward": "Command",
       "/SmartDashboard/rotation quasistatic backward": "Command",
@@ -35,13 +41,12 @@
       "/SmartDashboard/translation quasistatic forward": "Command"
     },
     "windows": {
-      "/Robot/drive/field2d": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/autos": {
         "window": {
           "visible": true
         }
@@ -55,39 +60,31 @@
         "window": {
           "visible": true
         }
-      },
-      "/SmartDashboard/VisionSystemSim-main/Sim Field": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
       }
     }
   },
   "NetworkTables": {
     "transitory": {
+      "CameraPublisher": {
+        "open": true
+      },
       "Robot": {
-        "drive": {
-          "ChassisSpeeds##v_/Robot/drive/fieldRelativeChassisSpeeds": {
+        "align": {
+          "open": true
+        },
+        "open": true,
+        "scoraling": {
+          "elevator": {
             "open": true
           },
-          "ChassisSpeeds##v_/Robot/drive/robotRelativeChassisSpeeds": {
-            "open": true
-          },
-          "Pose2d##v_/Robot/drive/pose": {
-            "Translation2d##v_translation": {
+          "open": true,
+          "scoral": {
+            "beambreak": {
               "open": true
             },
             "open": true
-          },
-          "open": true
-        },
-        "open": true
+          }
+        }
       }
     }
   },
