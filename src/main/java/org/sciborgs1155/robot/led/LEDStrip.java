@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Ports.LEDs.*;
 import static org.sciborgs1155.robot.led.LEDConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -75,7 +76,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command progressGradient(DoubleSupplier percent) {
     return set(
-        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kOrangeRed, Color.kLime)
+        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kOrangeRed, Color.kLime)
             .mask(LEDPattern.progressMaskLayer(percent)));
   }
 
@@ -88,16 +89,25 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
    */
   public Command progressGradient(DoubleSupplier percent, BooleanSupplier atGoal) {
     return set(LEDPattern.gradient(
-                LEDPattern.GradientType.kDiscontinuous, Color.kOrangeRed, Color.kLime)
+                LEDPattern.GradientType.kContinuous, Color.kOrangeRed, Color.kLime)
             .mask(LEDPattern.progressMaskLayer(percent)))
         .until(atGoal)
         .andThen(solid(Color.kLime));
   }
 
+  /**
+   * Sets the LEDPattern based on an error.
+   *
+   * @param percentError The error. 1 is a really bad error while 0 is no error.
+   */
+  public Command error(DoubleSupplier error) {
+    return set(errorSolid(error)).until(() -> error.getAsDouble() < ERROR_TOLERANCE).andThen(blink(Color.kAqua));
+  }
+
   /** A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many song. */
   public Command music() {
     return set(
-        LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kGreen, Color.kYellow)
+        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kGreen, Color.kYellow)
             .mask(
                 LEDPattern.progressMaskLayer(
                     () ->
@@ -117,11 +127,11 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     if (Constants.alliance() == Alliance.Red) {
       return set(
           LEDPattern.gradient(
-                  LEDPattern.GradientType.kDiscontinuous, Color.kFirstRed, Color.kOrangeRed)
+                  LEDPattern.GradientType.kContinuous, Color.kFirstRed, Color.kOrangeRed)
               .breathe(Seconds.of(1)));
     } else {
       return set(
-          LEDPattern.gradient(LEDPattern.GradientType.kDiscontinuous, Color.kFirstBlue, Color.kAqua)
+          LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kFirstBlue, Color.kAqua)
               .breathe(Seconds.of(1)));
     }
   }
@@ -154,6 +164,19 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
       }
     };
   }
+
+  private static LEDPattern errorSolid(DoubleSupplier error) {
+  return (reader, writer) -> {
+    Color color = Color.fromHSV(
+      (int) MathUtil.clamp(Math.round((1 - error.getAsDouble()) * 50), 0, 50),
+      255,
+      255);
+    int bufLen = reader.getLength();
+    for (int i = 0; i < bufLen; i++) {
+      writer.setLED(i, color);
+    }
+  };
+}
 
   @Override
   public void periodic() {

@@ -34,4 +34,9 @@ public class LEDing {
   public Command solid(Color color) {
     return leftStrip.solid(color).alongWith(middleStrip.solid(color), rightStrip.solid(color));
   }
+
+  /** Sets all the LEDs based on an error. */
+  public Command error(DoubleSupplier error) {
+    return leftStrip.error(error).alongWith(middleStrip.error(error), rightStrip.error(error));
+  }
 }
