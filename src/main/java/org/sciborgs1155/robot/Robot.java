@@ -292,28 +292,52 @@ public class Robot extends CommandRobot implements Logged {
 
     // OPERATOR
     operator
-        .leftTrigger()
+        .x()
         .whileTrue(
             elevator
                 .scoreLevel(Level.L3_ALGAE)
                 .alongWith(
                     leds.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters),
+                        () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
                         elevator::atGoal)));
 
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
-    operator.x().whileTrue(scoral.score(Level.L3));
+    // operator.x().whileTrue(scoral.score(Level.L3));
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
-    operator.povRight().whileTrue(elevator.scoreLevel(Level.L2));
-    operator.povUp().whileTrue(elevator.scoreLevel(Level.L3));
+    operator
+        .povRight()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L2)
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L2.extension.in(Meters),
+                        elevator::atGoal)));
+    operator
+        .povUp()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L3)
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L3.extension.in(Meters),
+                        elevator::atGoal)));
 
-    operator.povLeft().whileTrue(elevator.scoreLevel(Level.L4));
+    operator
+        .povLeft()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L4)
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L4.extension.in(Meters),
+                        elevator::atGoal)));
     operator.povDown().whileTrue(scoraling.noElevatorIntake());
 
     // DASHBOARD

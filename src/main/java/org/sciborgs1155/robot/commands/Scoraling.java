@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
 import edu.wpi.first.wpilibj.util.Color;
@@ -71,7 +72,10 @@ public class Scoraling implements Logged {
   public Command scoral(Level level) {
     return elevator
         .scoreLevel(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score(level)))
+        .alongWith(
+            Commands.waitUntil(elevator::atGoal).andThen(scoral.score(level)),
+            leds.progressGradient(
+                () -> 1 - elevator.position() / level.extension.in(Meters), elevator::atGoal))
         .withName("scoraling");
   }
 
@@ -83,7 +87,10 @@ public class Scoraling implements Logged {
   public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .alongWith(
+            Commands.waitUntil(elevator::atGoal).andThen(scoral.score()),
+            leds.progressGradient(
+                () -> 1 - elevator.position() / level.extension.in(Meters), elevator::atGoal))
         .onlyIf(scoral.blocked.negate())
         .withName("cleanAlgae");
   }

@@ -70,29 +70,28 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * A gradient of orange red to lime LEDs, with an applied mask of how much the elevator is raised.
+   * Sets a percent of the strip to a color from red to green LEDs, both depending on a given
+   * percent.
    *
-   * @param percent A double supplier that supplies the elevator's percent raised.
+   * @param percent A double supplier that represents percent completion.
    */
   public Command progressGradient(DoubleSupplier percent) {
     return set(
-        LEDPattern.gradient(LEDPattern.GradientType.kContinuous, Color.kOrangeRed, Color.kLime)
-            .mask(LEDPattern.progressMaskLayer(percent)));
+        solidGradient(percent).mask(LEDPattern.progressMaskLayer(() -> 1 - percent.getAsDouble())));
   }
 
   /**
-   * A gradient of orange red to lime LEDs representing how much the elevator is raised, until the
+   * A gradient of red to green LEDs representing how much the elevator is raised, until the
    * elevator reaches its setpoint, where it then solid lime.
    *
    * @param percent A double supplier that supplies the elevator's percent raised.
    * @param atGoal A boolean supplier that supplies whether the elevator is at its goal.
    */
   public Command progressGradient(DoubleSupplier percent, BooleanSupplier atGoal) {
-    return set(LEDPattern.gradient(
-                LEDPattern.GradientType.kContinuous, Color.kOrangeRed, Color.kLime)
-            .mask(LEDPattern.progressMaskLayer(percent)))
+    return set(solidGradient(percent)
+            .mask(LEDPattern.progressMaskLayer(() -> 1 - percent.getAsDouble())))
         .until(atGoal)
-        .andThen(solid(Color.kLime));
+        .andThen(solid(Color.kAqua));
   }
 
   /**
@@ -102,7 +101,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
    * @param tolerance The allowed tolerance in error.
    */
   public Command error(DoubleSupplier error, double tolerance) {
-    return set(errorSolid(error))
+    return set(solidGradient(error))
         .until(() -> error.getAsDouble() < tolerance)
         .andThen(blink(Color.kAqua));
   }
@@ -169,7 +168,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Sets a solid color of a range from red to green, given an error double supplier. */
-  private static LEDPattern errorSolid(DoubleSupplier error) {
+  private static LEDPattern solidGradient(DoubleSupplier error) {
     return (reader, writer) -> {
       Color color =
           Color.fromHSV(
