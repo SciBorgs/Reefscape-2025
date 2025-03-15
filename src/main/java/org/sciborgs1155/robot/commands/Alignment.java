@@ -16,11 +16,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
+import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
+import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
@@ -36,7 +38,7 @@ public class Alignment implements Logged {
   @IgnoreLogged private final Elevator elevator;
   @IgnoreLogged private final Scoral scoral;
 
-  private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+  @Log.NT private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
   private Fault alternateAlliancePathfinding =
       new Fault(
@@ -180,6 +182,7 @@ public class Alignment implements Logged {
               return drive
                   .run(
                       () -> {
+                        Tracer.startTrace("repulsor pathfinding");
                         planner.setGoal(realGoal.getTranslation());
                         drive.goToSample(
                             planner.getCmd(
@@ -189,6 +192,7 @@ public class Alignment implements Logged {
                                 true),
                             realGoal.getRotation(),
                             elevator::position);
+                        Tracer.endTrace();
                       })
                   .until(() -> drive.atTranslation(realGoal.getTranslation(), Meters.of(1)))
                   .onlyWhile(

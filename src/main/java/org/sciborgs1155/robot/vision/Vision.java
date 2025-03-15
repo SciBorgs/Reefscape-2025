@@ -207,6 +207,7 @@ public class Vision implements Logged {
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())
+        .filter(t -> t.getPoseAmbiguity() < MAX_AMBIGUITY)
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
         .map(Optional::get)
