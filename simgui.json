@@ -71,23 +71,11 @@
         "open": true
       },
       "Robot": {
-        "align": {
-          "open": true,
-          "planner": {
-            "open": true
-          }
-        },
-        "open": true,
         "scoraling": {
-          "elevator": {
-            "open": true
-          },
-          "open": true,
           "scoral": {
             "beambreak": {
               "open": true
-            },
-            "open": true
+            }
           }
         }
       }

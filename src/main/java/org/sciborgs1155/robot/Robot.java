@@ -35,12 +35,10 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
@@ -162,32 +160,15 @@ public class Robot extends CommandRobot implements Logged {
         .schedule();
   }
 
-  private final Tracer mainLoop = new Tracer();
-
-  @Override
-  public void robotPeriodic() {
-    mainLoop.clearEpochs();
-
-    CommandScheduler.getInstance().run();
-    mainLoop.addEpoch("Command Scheduler");
-
-    Monologue.updateAll();
-    mainLoop.addEpoch("Monologue Updates");
-
-    mainLoop.printEpochs();
-  }
-
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
     SignalLogger.enableAutoLogging(true);
-    // addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
+    addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
     addPeriodic(vision::logCamEnabled, 1);
-
-    SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
