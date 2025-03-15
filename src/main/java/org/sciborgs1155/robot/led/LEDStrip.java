@@ -101,7 +101,9 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
    * @param percentError The error. 1 is a really bad error while 0 is no error.
    */
   public Command error(DoubleSupplier error) {
-    return set(errorSolid(error)).until(() -> error.getAsDouble() < ERROR_TOLERANCE).andThen(blink(Color.kAqua));
+    return set(errorSolid(error))
+        .until(() -> error.getAsDouble() < ERROR_TOLERANCE)
+        .andThen(blink(Color.kAqua));
   }
 
   /** A gradient of green to yellow LEDs, moving at 60 bpm, which synchronizes with many song. */
@@ -166,17 +168,16 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   private static LEDPattern errorSolid(DoubleSupplier error) {
-  return (reader, writer) -> {
-    Color color = Color.fromHSV(
-      (int) MathUtil.clamp(Math.round((1 - error.getAsDouble()) * 50), 0, 50),
-      255,
-      255);
-    int bufLen = reader.getLength();
-    for (int i = 0; i < bufLen; i++) {
-      writer.setLED(i, color);
-    }
-  };
-}
+    return (reader, writer) -> {
+      Color color =
+          Color.fromHSV(
+              (int) MathUtil.clamp(Math.round((1 - error.getAsDouble()) * 50), 0, 50), 255, 255);
+      int bufLen = reader.getLength();
+      for (int i = 0; i < bufLen; i++) {
+        writer.setLED(i, color);
+      }
+    };
+  }
 
   @Override
   public void periodic() {
