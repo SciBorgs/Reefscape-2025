@@ -151,6 +151,28 @@ public class Alignment implements Logged {
   }
 
   /**
+   * Finds the nearest available reef (according to the Dashboard), then aligns to it and raises the
+   * elevator to that point.
+   *
+   * @return A command that aligns to the nearest available reef.
+   */
+  public Command availableReef() {
+    return Commands.deferredProxy(
+        () ->
+            alignTo(
+                    () ->
+                        drive
+                            .pose()
+                            .nearest(
+                                Dashboard.getAvailableBranchEntry().stream()
+                                    .map(p -> p.pose())
+                                    .toList())
+                            .transformBy(strafe(TO_THE_LEFT.times(-1)))
+                            .transformBy(advance(Inches.of(-1.25))))
+                .andThen(elevator.scoreLevel(Dashboard.getLevelEntry())));
+  }
+
+  /**
    * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
    * level on that branch.
    *

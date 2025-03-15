@@ -376,13 +376,20 @@ public class Robot extends CommandRobot implements Logged {
 
     // DASHBOARD
     // TO REEF - DASHBOARD SELECT + DRIVER A
-    Dashboard.reef()
-        .and(driver.y())
+    // Dashboard.reef()
+    //     .and(driver.y())
+    //     .whileTrue(
+    //         Commands.deferredProxy(
+    //                 () ->
+    //                     align.reef(
+    //                         Dashboard.getLevelEntry(),
+    // Dashboard.getAvailableBranchEntry().get(0)))
+
+    driver
+        .y()
         .whileTrue(
-            Commands.deferredProxy(
-                    () ->
-                        align.reef(
-                            Dashboard.getLevelEntry(), Dashboard.getAvailableBranchEntry().get(0)))
+            align
+                .availableReef()
                 .alongWith(
                     leftLED.blink(Color.kAqua),
                     rightLED.blink(Color.kAqua),
