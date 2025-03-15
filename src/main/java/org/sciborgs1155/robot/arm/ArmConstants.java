@@ -17,19 +17,18 @@ import edu.wpi.first.units.measure.Distance;
 
 /** Constants for the {@link Arm} subsystem. */
 public class ArmConstants {
-  public static final double kP = 3;
+  public static final double kP = 17.5;
   public static final double kI = 0;
-  public static final double kD = 1;
+  public static final double kD = 0;
 
   public static final double kS = 0.09;
-  public static final double kV = 1;
+  public static final double kV = 2.9;
   public static final double kA = 0;
   public static final double kG = 0;
 
-  public static final Angle STARTING_ANGLE = Radians.of(1.78862); // Radians.of(Math.PI / 2);
-  public static final Angle DEFAULT_ANGLE = Radians.of(1.632); // Radians.of(Math.PI * 5 / 8);
+  public static final Angle DEFAULT_ANGLE = Radians.of(1.325); // Radians.of(Math.PI * 5 / 8);
 
-  public static final Angle INTAKE_ANGLE = Radians.of(-0.79613);
+  public static final Angle INTAKE_ANGLE = Radians.of(-0.79);
   public static final Angle PROCESSOR_OUTTAKE_ANGLE = DEFAULT_ANGLE;
   public static final Angle TROUGH_OUTTAKE_ANGLE = DEFAULT_ANGLE;
 
@@ -46,10 +45,10 @@ public class ArmConstants {
   public static final Distance ARM_LENGTH = Centimeters.of(10);
 
   /** Fully extended. */
-  public static final Angle MIN_ANGLE = Radians.of(-0.79613); // (-Math.PI / 4 - 0.2);
+  public static final Angle MIN_ANGLE = Radians.of(-0.83); // (-Math.PI / 4 - 0.2);
 
   /** Fully retracted. */
-  public static final Angle MAX_ANGLE = Radians.of(1.632); // Radians.of(Math.PI * 3 / 4 + 0.1);
+  public static final Angle MAX_ANGLE = Radians.of(1.325); // Radians.of(Math.PI * 3 / 4 + 0.1);
 
   public static final Angle POSITION_TOLERANCE = Degrees.of(8);
 

@@ -14,11 +14,14 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.arm.ArmConstants.INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.STARTING_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
@@ -39,7 +42,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
-import java.util.Set;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
@@ -48,12 +50,13 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Face;
-import org.sciborgs1155.robot.Constants.Field.Face.Side;
+import org.sciborgs1155.robot.FieldConstants.Face;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
@@ -74,9 +77,9 @@ import org.sciborgs1155.robot.vision.Vision;
  */
 public class Robot extends CommandRobot implements Logged {
   // INPUT DEVICES
-
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
+  private final boolean dashboardConfig = Dashboard.configure();
 
   private final PowerDistribution pdh = new PowerDistribution();
 
@@ -131,13 +134,14 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
+  private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
 
   @Log.NT
   private final SendableChooser<Command> autos =
-      Autos.configureAutos(drive, scoraling, elevator, align);
+      Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
   @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
@@ -153,9 +157,9 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
-    Dashboard.configure();
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
+    addPeriodic(vision::logCamEnabled, 1);
 
     SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
@@ -184,10 +188,6 @@ public class Robot extends CommandRobot implements Logged {
 
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
-
-    log(
-        "Zero Poses",
-        new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d()}); // is this used for anything?
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -244,12 +244,12 @@ public class Robot extends CommandRobot implements Logged {
 
     drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
 
-    leftLED.setDefaultCommand(leftLED.rainbow());
-    middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
-    rightLED.setDefaultCommand(rightLED.rainbow());
+    // leftLED.setDefaultCommand(leftLED.rainbow());
+    // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
+    // rightLED.setDefaultCommand(rightLED.rainbow());
 
-    scoral.beambreakTrigger.onFalse(rumble(RumbleType.kBothRumble, 0.5));
-    hopper.beambreakTrigger.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+    scoral.blocked.onTrue(rumble(RumbleType.kBothRumble, 0.5));
+    hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
     autonomous()
         .whileTrue(
@@ -261,6 +261,22 @@ public class Robot extends CommandRobot implements Logged {
     disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
 
     test().whileTrue(systemsCheck());
+
+    Dashboard.cameraFR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name())));
+    Dashboard.cameraFL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name())));
+    Dashboard.cameraBR()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name())));
+    Dashboard.cameraBL()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name())));
+    Dashboard.cameraBM()
+        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name())))
+        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name())));
 
     // DRIVER
     driver
@@ -282,7 +298,7 @@ public class Robot extends CommandRobot implements Logged {
         .x()
         .whileTrue(
             align
-                .nearReef(Level.L3, Side.LEFT)
+                .nearReef(Side.LEFT)
                 .alongWith(
                     leftLED.progressGradient(
                         () ->
@@ -290,7 +306,7 @@ public class Robot extends CommandRobot implements Logged {
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
                                         .branch(Side.LEFT)
-                                        .withLevel(Level.L3)
+                                        .pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
@@ -298,14 +314,14 @@ public class Robot extends CommandRobot implements Logged {
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
                                         .branch(Side.LEFT)
-                                        .withLevel(Level.L3)
+                                        .pose()
                                         .getTranslation())))));
 
     driver
         .b()
         .whileTrue(
             align
-                .nearReef(Level.L3, Side.RIGHT)
+                .nearReef(Side.RIGHT)
                 .alongWith(
                     leftLED.progressGradient(
                         () ->
@@ -313,7 +329,7 @@ public class Robot extends CommandRobot implements Logged {
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
                                         .branch(Side.RIGHT)
-                                        .withLevel(Level.L3)
+                                        .pose()
                                         .getTranslation()))),
                     rightLED.progressGradient(
                         () ->
@@ -321,11 +337,12 @@ public class Robot extends CommandRobot implements Logged {
                                 / (calculateAlignment(
                                     Face.nearest(drive.pose())
                                         .branch(Side.RIGHT)
-                                        .withLevel(Level.L3)
+                                        .pose()
                                         .getTranslation())))));
 
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
+    driver.povRight().whileTrue(corolling.intake());
 
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
@@ -345,60 +362,25 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
+    operator.x().whileTrue(scoral.score(Level.L3));
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
-    operator
-        .povDown()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L1)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povRight()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L2)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povUp()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L3)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
-    operator
-        .povLeft()
-        .whileTrue(
-            scoraling
-                .scoral(Level.L4)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters)),
-                    rightLED.progressGradient(
-                        () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters))));
+    operator.povRight().whileTrue(elevator.scoreLevel(Level.L2));
+    operator.povUp().whileTrue(elevator.scoreLevel(Level.L3));
+
+    operator.povLeft().whileTrue(elevator.scoreLevel(Level.L4));
+    operator.povDown().whileTrue(scoraling.noElevatorIntake());
 
     // DASHBOARD
     // TO REEF - DASHBOARD SELECT + DRIVER A
     Dashboard.reef()
-        .and(driver.a())
+        .and(driver.y())
         .whileTrue(
-            Commands.defer(
-                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()),
-                    Set.of(drive, elevator, scoral))
+            Commands.deferredProxy(
+                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
                 .alongWith(
                     leftLED.blink(Color.kAqua),
                     rightLED.blink(Color.kAqua),
@@ -406,8 +388,7 @@ public class Robot extends CommandRobot implements Logged {
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
-    scoral.beambreakTrigger.onTrue(
-        leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua)));
+    scoral.blocked.onFalse(leftLED.blink(Color.kLime).alongWith(rightLED.blink(Color.kLime)));
   }
 
   @Log.NT
@@ -450,13 +431,13 @@ public class Robot extends CommandRobot implements Logged {
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
-            arm.goToTest(INTAKE_ANGLE),
-            Test.fromCommand(coroller.outtake().withTimeout(1)),
-            Test.fromCommand(coroller.intake().withTimeout(1)),
-            arm.goToTest(STARTING_ANGLE),
+            // arm.goToTest(INTAKE_ANGLE),
+            // Test.fromCommand(coroller.outtake().withTimeout(1)),
+            // Test.fromCommand(coroller.intake().withTimeout(1)),
+            // arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(
-                scoral.scoreSlow().asProxy().until(scoral.beambreakTrigger).withTimeout(1)),
+                scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             Test.fromCommand(
                 middleLED
                     .solid(Color.kLime)

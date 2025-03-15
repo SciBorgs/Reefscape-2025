@@ -41,6 +41,11 @@
       "/SmartDashboard/translation quasistatic forward": "Command"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Robot/autos": {
         "window": {
           "visible": true
@@ -62,7 +67,13 @@
   },
   "NetworkTables": {
     "transitory": {
+      "CameraPublisher": {
+        "open": true
+      },
       "Robot": {
+        "align": {
+          "open": true
+        },
         "open": true,
         "scoraling": {
           "elevator": {

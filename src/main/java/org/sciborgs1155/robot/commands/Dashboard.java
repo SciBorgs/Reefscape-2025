@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
@@ -27,7 +27,11 @@ public class Dashboard {
   private static NetworkTableEntry entryTargetAlgae;
   private static NetworkTableEntry entryTargetElevator;
   private static NetworkTableEntry entryCurrentElevator;
-  private static NetworkTableEntry entryCameraEnabled;
+  private static NetworkTableEntry entryCameraFL;
+  private static NetworkTableEntry entryCameraFR;
+  private static NetworkTableEntry entryCameraBL;
+  private static NetworkTableEntry entryCameraBR;
+  private static NetworkTableEntry entryCameraBM;
   private static NetworkTableEntry entryRobotTick;
   private static NetworkTableEntry entryIsReal;
   private static NetworkTableEntry entryRequest;
@@ -43,7 +47,7 @@ public class Dashboard {
   private static final Level[] levels = {Level.L1, Level.L2, Level.L3, Level.L4};
 
   /** Sets up the dashboard. */
-  public static void configure() {
+  public static boolean configure() {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
 
     // Scoring
@@ -65,8 +69,20 @@ public class Dashboard {
     entryCurrentElevator = base.getEntry("currentElevator");
     entryCurrentElevator.setDouble(0);
 
-    entryCameraEnabled = base.getEntry("cameraEnabled");
-    entryCameraEnabled.setBooleanArray(new boolean[] {true, true, true, true});
+    entryCameraFL = base.getEntry("cameraFL");
+    entryCameraFL.getBoolean(true);
+
+    entryCameraFR = base.getEntry("cameraFR");
+    entryCameraFR.getBoolean(true);
+
+    entryCameraBL = base.getEntry("cameraBL");
+    entryCameraBL.getBoolean(true);
+
+    entryCameraBR = base.getEntry("cameraBR");
+    entryCameraBR.getBoolean(true);
+
+    entryCameraBM = base.getEntry("cameraBM");
+    entryCameraBM.getBoolean(true);
 
     // Status
     entryRobotTick = base.getEntry("robotTick");
@@ -107,6 +123,7 @@ public class Dashboard {
       entryMatch.setString("@ Sim / M0");
       entryMatchTime.setDouble(0);
     }
+    return true;
   }
 
   /** Increments the robot tick value. Used by Dashboard to detect disconnects. */
@@ -158,6 +175,31 @@ public class Dashboard {
     return entryTargetElevator.getDouble(MIN_EXTENSION.in(Meters))
             * (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters))
         + MIN_EXTENSION.in(Meters);
+  }
+
+  /** Returns a trigger based on the enabled status of camera front left. */
+  public static Trigger cameraFL() {
+    return new Trigger(() -> entryCameraFL.getBoolean(true));
+  }
+
+  /** Returns a trigger based on the enabled status of camera front right */
+  public static Trigger cameraFR() {
+    return new Trigger(() -> entryCameraFR.getBoolean(true));
+  }
+
+  /** Returns a trigger based on the enabled status of camera back left. */
+  public static Trigger cameraBL() {
+    return new Trigger(() -> entryCameraBL.getBoolean(true));
+  }
+
+  /** Returns a trigger based on the enabled status of camera back right. */
+  public static Trigger cameraBR() {
+    return new Trigger(() -> entryCameraBR.getBoolean(true));
+  }
+
+  /** Returns a trigger based on the enabled status of camera back middle. */
+  public static Trigger cameraBM() {
+    return new Trigger(() -> entryCameraBM.getBoolean(true));
   }
 
   /**

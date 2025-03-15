@@ -23,7 +23,7 @@ import java.util.*;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.robot.Constants.Field.Branch;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
@@ -31,10 +31,11 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.*;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Autos {
   public static SendableChooser<Command> configureAutos(
-      Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment) {
+      Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment, Scoral scoral) {
     AutoBuilder.configure(
         drive::pose,
         drive::resetOdometry,
@@ -109,7 +110,7 @@ public class Autos {
     return alignment
         .reef(Level.L4, branch)
         .withTimeout(5)
-        .onlyIf(() -> !scoraling.scoralBeambreak())
+        .onlyIf(() -> scoraling.hasCoral())
         .asProxy();
   }
 
@@ -129,9 +130,9 @@ public class Autos {
               alignment.source().andThen(scoraling.hpsIntake().withTimeout(2.5)).withTimeout(5));
     }
 
-    source = Commands.race(source, Commands.waitUntil(() -> !scoraling.scoralBeambreak()));
+    source = Commands.race(source, Commands.waitUntil(() -> scoraling.hasCoral()));
 
-    return source.onlyIf(() -> scoraling.scoralBeambreak()).asProxy();
+    return source.onlyIf(() -> !scoraling.hasCoral()).asProxy();
   }
 
   /** Runas a "bottom" side auto with 4 L4 coral scored. */

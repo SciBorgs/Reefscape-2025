@@ -1,21 +1,30 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static org.sciborgs1155.robot.Constants.Field.moveLeft;
+import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.Constants.strafe;
+import static org.sciborgs1155.robot.FieldConstants.TO_THE_LEFT;
+import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.Fault;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
-import org.sciborgs1155.robot.Constants.Field.Branch;
-import org.sciborgs1155.robot.Constants.Field.Face;
-import org.sciborgs1155.robot.Constants.Field.Face.Side;
-import org.sciborgs1155.robot.Constants.Field.Source;
+import org.sciborgs1155.robot.FieldConstants.Branch;
+import org.sciborgs1155.robot.FieldConstants.Face;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
+import org.sciborgs1155.robot.FieldConstants.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -28,6 +37,12 @@ public class Alignment implements Logged {
   @IgnoreLogged private final Scoral scoral;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+
+  private Fault alternateAlliancePathfinding =
+      new Fault(
+          "Alternate Alliance Pathfinding",
+          "The robot is attempting to pathfind to a pose on the other alliance.",
+          FaultType.WARNING);
 
   /**
    * Constructor for an Alignment command object.
@@ -50,18 +65,26 @@ public class Alignment implements Logged {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    Pose2d goal = moveLeft(branch.withLevel(level));
+    Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
-            pathfind(goal).asProxy(),
+            Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
+            pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
-                drive
-                    .driveTo(goal)
-                    .asProxy()
-                    .andThen(
-                        Commands.waitUntil(elevator::atGoal)
-                            .andThen(scoral.score().asProxy().until(scoral.beambreakTrigger)))))
-        .withName("align to reef");
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    Commands.waitUntil(elevator::atGoal)
+                        .withTimeout(1.5)
+                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
+                    drive
+                        .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
+                        .asProxy())))
+        .withName("align to reef")
+        .onlyWhile(
+            () ->
+                !FaultLogger.report(
+                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding));
   }
 
   /**
@@ -72,7 +95,7 @@ public class Alignment implements Logged {
    */
   public Command source(Source source) {
     return Commands.defer(
-        () -> alignTo(source.pose).alongWith(elevator.retract()), Set.of(drive, elevator));
+        () -> alignTo(source::pose).deadlineFor(elevator.retract()), Set.of(drive, elevator));
   }
 
   /**
@@ -83,25 +106,48 @@ public class Alignment implements Logged {
   public Command source() {
     return Commands.defer(
         () ->
-            alignTo(drive.pose().nearest(List.of(Source.LEFT.pose, Source.RIGHT.pose)))
-                .alongWith(elevator.retract()),
+            alignTo(
+                    () ->
+                        drive
+                            .pose()
+                            .nearest(
+                                Arrays.stream(Source.values())
+                                    .map(s -> s.pose())
+                                    .collect(Collectors.toList())))
+                .deadlineFor(elevator.retract()),
         Set.of(drive, elevator));
   }
 
-  public Command alignTo(Pose2d goal) {
-    return pathfind(goal).andThen(drive.driveTo(goal));
+  public Command alignTo(Supplier<Pose2d> goal) {
+    return Commands.runOnce(() -> log("goal pose", goal.get()))
+        .asProxy()
+        .andThen(
+            pathfind(goal)
+                .andThen(drive.driveTo(goal))
+                .onlyWhile(
+                    () ->
+                        !FaultLogger.report(
+                            allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
+                            alternateAlliancePathfinding)));
   }
 
   /**
    * Finds the nearest reef face, then pathfinds to the branch with a given side on that face, and
    * scores on a designated level on that branch.
    *
-   * @param level The level (L1, L2, L3, L4) being scored on.
    * @param side The branch side (Left/Right) to score on.
-   * @return A command to score on the nearest reef branch.
+   * @return A command to align to the nearest reef branch.
    */
-  public Command nearReef(Level level, Side side) {
-    return Commands.deferredProxy(() -> reef(level, Face.nearest(drive.pose()).branch(side)));
+  public Command nearReef(Side side) {
+    return Commands.deferredProxy(
+        () ->
+            alignTo(
+                () ->
+                    Face.nearest(drive.pose())
+                        .branch(side)
+                        .pose()
+                        .transformBy(strafe(TO_THE_LEFT.times(-1)))
+                        .transformBy(advance(Inches.of(-1.25)))));
   }
 
   /**
@@ -113,12 +159,12 @@ public class Alignment implements Logged {
    * @return A command to score in the reef without raising the elevator while moving.
    */
   public Command safeReef(Level level, Branch branch) {
-    return pathfind(branch.pose)
+    return pathfind(branch::pose)
         .andThen(elevator.scoreLevel(level))
-        .until(scoral::beambreak)
+        .until(scoral.blocked.negate())
         .deadlineFor(
             Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                .andThen(scoral.score()));
+                .andThen(scoral.score(level)));
   }
 
   /**
@@ -127,22 +173,29 @@ public class Alignment implements Logged {
    * @param goal The field pose to pathfind to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Pose2d goal) {
+  public Command pathfind(Supplier<Pose2d> goal) {
     return Commands.defer(
-            () ->
-                drive
-                    .run(
-                        () -> {
-                          planner.setGoal(goal.getTranslation());
-                          drive.goToSample(
-                              planner.getCmd(
-                                  drive.pose(),
-                                  drive.fieldRelativeChassisSpeeds(),
-                                  DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                                  true),
-                              goal.getRotation());
-                        })
-                    .until(() -> drive.atTranslation(goal.getTranslation(), Meters.of(1))),
+            () -> {
+              Pose2d realGoal = goal.get();
+              return drive
+                  .run(
+                      () -> {
+                        planner.setGoal(realGoal.getTranslation());
+                        drive.goToSample(
+                            planner.getCmd(
+                                drive.pose(),
+                                drive.fieldRelativeChassisSpeeds(),
+                                DriveConstants.MAX_SPEED.in(MetersPerSecond),
+                                true),
+                            realGoal.getRotation());
+                      })
+                  .until(() -> drive.atTranslation(realGoal.getTranslation(), Meters.of(1)))
+                  .onlyWhile(
+                      () ->
+                          !FaultLogger.report(
+                              allianceFromPose(realGoal) != allianceFromPose(drive.pose()),
+                              alternateAlliancePathfinding));
+            },
             Set.of(drive))
         .withName("pathfind");
   }
@@ -159,4 +212,11 @@ public class Alignment implements Logged {
   // @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
   // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
   // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
+
+  // @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
+  // @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
+  // @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
+  // @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }

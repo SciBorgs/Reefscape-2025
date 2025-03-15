@@ -165,6 +165,14 @@ public final class FaultLogger {
     report(new Fault(name, description, type));
   }
 
+  /** Conditionally reports a fault and returns the condition */
+  public static boolean report(boolean condition, Fault fault) {
+    if (condition) {
+      report(fault);
+    }
+    return condition;
+  }
+
   /**
    * Registers a new fault supplier.
    *

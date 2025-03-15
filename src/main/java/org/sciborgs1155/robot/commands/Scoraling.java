@@ -34,14 +34,18 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper
-        .beambreakTrigger
-        .negate()
-        .or(scoral.beambreakTrigger)
-        .onFalse(Commands.runOnce(() -> stop = true));
+    hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
   }
 
   @Log.NT private boolean stop = false;
+
+  public Command noElevatorIntake() {
+    return Commands.runOnce(() -> stop = false)
+        .andThen(runRollers().repeatedly())
+        .until(() -> stop)
+        .finallyDo(() -> stop = false)
+        .withName("no elevator intake");
+  }
 
   /** A command which intakes from the human player station. */
   public Command hpsIntake() {
@@ -49,7 +53,7 @@ public class Scoraling implements Logged {
         .andThen(
             elevator
                 .retract()
-                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers().repeatedly()))
+                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
                 .until(() -> stop)
                 .finallyDo(() -> stop = false))
         .withName("intakingHPS");
@@ -69,7 +73,7 @@ public class Scoraling implements Logged {
   public Command scoral(Level level) {
     return elevator
         .scoreLevel(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score(level)))
         .withName("scoraling");
   }
 
@@ -82,7 +86,7 @@ public class Scoraling implements Logged {
     return elevator
         .clean(level)
         .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
-        .onlyIf(scoral.beambreakTrigger)
+        .onlyIf(scoral.blocked.negate())
         .withName("cleanAlgae");
   }
 
@@ -99,8 +103,7 @@ public class Scoraling implements Logged {
     return hopper
         .intake()
         .alongWith(scoral.intake())
-        .withTimeout(1)
-        .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
+        // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
 
@@ -112,19 +115,17 @@ public class Scoraling implements Logged {
   public Test runRollersTest() {
     Command testCommand =
         Commands.runOnce(() -> stop = false)
-            .andThen(runRollers().repeatedly().asProxy())
+            .andThen(runRollers().asProxy())
             .until(() -> stop)
-            .withTimeout(2)
+            .withTimeout(5)
             .finallyDo(() -> stop = false);
     Assertion hasCoral =
         tAssert(
-            scoral.beambreakTrigger.negate()::getAsBoolean,
-            "scoral beambreak",
-            () -> "" + scoral.beambreakTrigger.getAsBoolean());
+            scoral.blocked, "scoral beambreak blocked", () -> "" + scoral.blocked.getAsBoolean());
     return new Test(testCommand, Set.of(hasCoral));
   }
 
-  public boolean scoralBeambreak() {
-    return scoral.beambreak();
+  public boolean hasCoral() {
+    return scoral.blocked.getAsBoolean();
   }
 }

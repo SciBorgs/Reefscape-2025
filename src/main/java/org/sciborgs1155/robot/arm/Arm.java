@@ -13,12 +13,13 @@ import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -38,8 +39,10 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
@@ -59,7 +62,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
               MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
   /** Arm feed forward controller. */
-  private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
+  private final BetterArmFeedforward ff = new BetterArmFeedforward(kS, kG, kV, kA);
 
   /** Routine for recording and analyzing motor data. */
   private final SysIdRoutine sysIdRoutine;
@@ -75,9 +78,14 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
           new MechanismLigament2d(
               "Arm",
               ARM_LENGTH.in(Centimeters),
-              STARTING_ANGLE.in(Degrees),
+              DEFAULT_ANGLE.in(Degrees),
               10,
               new Color8Bit(Color.kSkyBlue)));
+
+  private final DoubleEntry S = Tuning.entry("/Robot/tuningArm/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/tuningArm/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/tuningArm/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/tuningArm/kA", kA);
 
   /**
    * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
@@ -109,7 +117,11 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
 
     this.sysIdRoutine =
         new SysIdRoutine(
-            new Config(Volts.of(0.5).per(Second), Volts.of(0.2), Seconds.of(5)),
+            new Config(
+                Volts.of(0.5).per(Second),
+                Volts.of(0.2),
+                Seconds.of(5),
+                (state) -> SignalLogger.writeString("arm state", state.toString())),
             new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
 
     if (TUNING) {
@@ -269,6 +281,13 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     armLigament.setAngle(Math.toDegrees(position()));
+
+    if (TUNING) {
+      ff.setKa(A.get());
+      ff.setKg(G.get());
+      ff.setKs(S.get());
+      ff.setKv(V.get());
+    }
   }
 
   @Override

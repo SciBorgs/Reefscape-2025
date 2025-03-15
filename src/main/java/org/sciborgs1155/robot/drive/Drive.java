@@ -532,15 +532,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param target The pose to reach.
    * @return The command to run the control loop until the pose is reached.
    */
-  public Command driveTo(Pose2d target) {
+  public Command driveTo(Supplier<Pose2d> target) {
     return run(() -> {
+          Pose2d targetPose = target.get();
           Pose2d pose = pose();
           Vector<N3> difference =
               VecBuilder.fill(
-                  pose.getX() - target.getX(),
-                  pose.getY() - target.getY(),
+                  pose.getX() - targetPose.getX(),
+                  pose.getY() - targetPose.getY(),
                   MathUtil.angleModulus(
-                          pose.getRotation().getRadians() - target.getRotation().getRadians())
+                          pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
@@ -552,7 +553,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                   pose().getRotation()),
               ControlMode.CLOSED_LOOP_VELOCITY);
         })
-        .until(() -> atPose(target))
+        .until(
+            () ->
+                atPose(
+                    target.get(),
+                    Translation.TOLERANCE.times(1 / 3.0),
+                    Rotation.TOLERANCE.times(1 / 3.0)))
         .andThen(stop())
         .withName("drive to pose");
   }
