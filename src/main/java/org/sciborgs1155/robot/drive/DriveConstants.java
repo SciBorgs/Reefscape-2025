@@ -63,6 +63,10 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
 
+  // The difference in the fastest and slowest module beyond which implies skidding.
+  public static final LinearVelocity SKIDDING_THRESHOLD =
+      MetersPerSecond.of(3); // 3 is random, change
+
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
@@ -72,10 +76,6 @@ public final class DriveConstants {
           Rotation2d.fromRadians(0), // rear left
           Rotation2d.fromRadians(0) // rear right
           );
-
-  // The difference in speed (in meters/sec) of the fastest and slowest motors beyond which implies
-  // skidding
-  public static final double SKIDDING_THRESHOLD = 5;
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 

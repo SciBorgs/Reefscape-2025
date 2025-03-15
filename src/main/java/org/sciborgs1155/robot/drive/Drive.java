@@ -430,6 +430,34 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         .withName("drive to pose");
   }
 
+  /**
+   * @return If the robot is skidding.
+   */
+  @Log.NT
+  public boolean isSkidding() {
+    List<Double> sorted =
+        Arrays.stream(moduleStates())
+            .map(
+                c ->
+                    Constants.fromPolarCoords(c.speedMetersPerSecond, c.angle)
+                        .minus(
+                            VecBuilder.fill(
+                                robotRelativeChassisSpeeds().vxMetersPerSecond,
+                                robotRelativeChassisSpeeds().vyMetersPerSecond)))
+            .map(c -> c.norm())
+            .sorted((a, b) -> a > b ? 1 : -1)
+            .collect(Collectors.toList());
+    return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD.in(MetersPerSecond);
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Log.NT
+  public boolean isColliding() {
+    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+  }
+
   /** Resets all drive encoders to read a position of 0. */
   public void resetEncoders() {
     modules.forEach(ModuleIO::resetEncoders);
@@ -468,27 +496,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public ChassisSpeeds fieldRelativeChassisSpeeds() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
-  }
-
-  /**
-   * @return If the robot is skidding.
-   */
-  @Log.NT
-  public boolean isSkidding() {
-    List<Double> sorted =
-        Arrays.stream(moduleStates())
-            .map(c -> c.speedMetersPerSecond)
-            .sorted((a, b) -> a > b ? 1 : -1)
-            .collect(Collectors.toList());
-    return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD;
-  }
-
-  /**
-   * @return If the robot is colliding.
-   */
-  @Log.NT
-  public boolean isColliding() {
-    return gyro.acceleration().getNorm() > maxAccel.in(MetersPerSecondPerSecond) * 2;
   }
 
   /**
