@@ -144,13 +144,6 @@ public class Vision implements Logged {
         .toArray(Pose3d[]::new);
   }
 
-  public double fom() {
-    // double fom = 1;
-    // fom -= Arrays.stream(lastResults).map(c ->
-    // c.getBestTarget().bestCameraToTarget.getTranslation().getNorm()).sorted().findFirst().orElse(Double.valueOf(100)) > 2.5 ? 0.3: 0;
-    return getSeenTags().length * 0.5;
-  }
-
   /**
    * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
    * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.

@@ -498,15 +498,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
-  /**
-   * Updates the vision FOM to a new value
-   *
-   * @param fom
-   */
-  public void updateVisionFOM(double fom) {
-    visionFOM = fom;
-  }
-
   private double odomFOM() {
     return 1
         - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
@@ -530,6 +521,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
+    visionFOM =
+        1
+            - Arrays.stream(poses)
+                .mapToDouble(
+                    pose ->
+                        pose.estimatedPose().targetsUsed.stream()
+                            .mapToDouble(a -> a.poseAmbiguity)
+                            .min()
+                            .orElse(1))
+                .min()
+                .orElse(1);
     log("estimated poses", loggedEstimates);
   }
 

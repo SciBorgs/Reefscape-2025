@@ -287,7 +287,7 @@ public class BetterPoseEstimator<T> {
 
     // Compute a dynamic weight for the Kalman gain
     double totalFOM = visionFOMvalue + odometryFOMvalue;
-    double visionWeight =
+    double visionWeight = 
         (totalFOM > 0)
             ? (visionFOMvalue / totalFOM)
             : 0.5; // Default to equal trust if both FOMs are zero
