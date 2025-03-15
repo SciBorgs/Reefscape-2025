@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import java.util.Set;
 import org.sciborgs1155.robot.vision.Vision.CameraConfig;
 
 public class VisionConstants {
@@ -97,4 +98,8 @@ public class VisionConstants {
   public static final double[] TAG_WEIGHTS = {
     0.25, 0.25, 0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 0.25, 0.25, 0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1
   };
+
+  public static final Set<Integer> REEF_TAGS = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
+
+  public static final double MAX_AMBIGUITY = 0.2;
 }
