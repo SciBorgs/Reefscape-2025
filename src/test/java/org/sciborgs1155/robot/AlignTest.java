@@ -24,14 +24,15 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class AlignTest {
-
   Drive drive;
   Elevator elevator;
   Scoral scoral;
   Alignment align;
+  LEDs leds;
 
   @BeforeEach
   public void setup() {
@@ -39,9 +40,10 @@ public class AlignTest {
     drive = Drive.create();
     elevator = Elevator.create();
     scoral = Scoral.create();
+    leds = LEDs.create();
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
-    align = new Alignment(drive, elevator, scoral);
+    align = new Alignment(drive, elevator, scoral, leds);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.notifyNewData();
   }
