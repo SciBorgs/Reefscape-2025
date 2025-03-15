@@ -14,6 +14,8 @@ import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
+
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -44,6 +46,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -73,9 +76,12 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
+import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning.FF;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
@@ -95,6 +101,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
+  public final DoubleEntry translationP = Tuning.entry("translation p", Translation.P);
+  public final DoubleEntry translationI = Tuning.entry("translation i", Translation.I);
+  public final DoubleEntry translationD = Tuning.entry("translation d", Translation.D);
+ 
+  public final DoubleEntry rotationP = Tuning.entry("rotation p", Rotation.P);
+  public final DoubleEntry rotationI = Tuning.entry("rotation i", Rotation.I);
+  public final DoubleEntry rotationD = Tuning.entry("rotation d", Rotation.D);
+ 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
   private SwerveModulePosition[] lastPositions;
@@ -112,15 +126,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final ProfiledPIDController translationController =
       new ProfiledPIDController(
-          Translation.P,
-          Translation.I,
-          Translation.D,
+          translationP.get(),
+          translationI.get(),
+          translationD.get(),
           new TrapezoidProfile.Constraints(
               MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Log.NT
   private final PIDController rotationController =
-      new PIDController(Rotation.P, Rotation.I, Rotation.D);
+      new PIDController(rotationP.get(), rotationI.get(), rotationD.get());
 
   /**
    * A factory to create a new swerve drive based on the type of module used / real or simulation.
@@ -134,6 +148,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               FRONT_LEFT_TURNING,
               FRONT_LEFT_CANCODER,
               ANGULAR_OFFSETS.get(0),
+              FF_CONSTANTS.get(0),
               "FL",
               false),
           new TalonModule(
@@ -141,6 +156,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               FRONT_RIGHT_TURNING,
               FRONT_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(1),
+              FF_CONSTANTS.get(1),
               "FR",
               true),
           new TalonModule(
@@ -148,6 +164,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               REAR_LEFT_TURNING,
               REAR_LEFT_CANCODER,
               ANGULAR_OFFSETS.get(2),
+              FF_CONSTANTS.get(2),
               "RL",
               false),
           new TalonModule(
@@ -155,6 +172,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               REAR_RIGHT_TURNING,
               REAR_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(3),
+              FF_CONSTANTS.get(3),
               "RR",
               true));
     } else {
@@ -517,7 +535,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The target pose.
    * @return Whether the robot is at a target pose.
    */
-  public boolean atPose(Pose2d pose) {
+   public boolean atPose(Pose2d pose) {
     return atPose(pose, Translation.TOLERANCE, Rotation.TOLERANCE);
   }
 
@@ -647,6 +665,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
+          log("at driveTo pose", atPose(targetPose));
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -660,8 +679,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             () ->
                 atPose(
                     target.get(),
-                    Translation.TOLERANCE.times(1 / 3.0),
-                    Rotation.TOLERANCE.times(1 / 3.0)))
+                    Translation.TOLERANCE,
+                    Rotation.TOLERANCE))
         .andThen(stop())
         .withName("drive to pose");
   }
@@ -854,6 +873,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
     }
+
+    translationController.setPID(translationP.get(), translationI.get(), translationD.get());
+    rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

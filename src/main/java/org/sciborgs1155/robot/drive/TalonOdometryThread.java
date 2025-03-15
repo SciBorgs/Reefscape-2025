@@ -86,8 +86,9 @@ public class TalonOdometryThread extends Thread {
 
   @Override
   public void run() {
-    Tracer.startTrace("odometry thjred");
     while (true) {
+      Tracer.startTrace("odometry thjred");
+
       try {
         if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {
           BaseStatusSignal.waitForAll(2.0 * ODOMETRY_PERIOD.in(Seconds), talonSignals);
@@ -123,8 +124,8 @@ public class TalonOdometryThread extends Thread {
         for (int i = 0; i < timestampQueues.size(); i++) {
           timestampQueues.get(i).offer(timestamp);
         }
-        Tracer.endTrace();
       } finally {
+        Tracer.endTrace();
         Drive.lock.unlock();
       }
     }

@@ -29,6 +29,8 @@ public final class DriveConstants {
     OPEN_LOOP_VELOCITY;
   }
 
+  public static record FFConstants(double kS, double kV, double kA) {}
+
   // The angle between the velocity and the displacement from a target, above which the robot will
   // not use assisted driving to the target. (the driver must be driving in the general direction of
   // the assisted driving target.)
@@ -116,9 +118,7 @@ public final class DriveConstants {
     public static final double I = 0.0;
     public static final double D = 0.05;
 
-    public static final Distance TOLERANCE = Centimeters.of(5);
-
-    public static final double PRECISION = 5;
+    public static final Distance TOLERANCE = Centimeters.of(1);
   }
 
   public static final class Rotation {
@@ -127,8 +127,6 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Angle TOLERANCE = Degrees.of(3);
-
-    public static final double PRECISION = 3;
   }
 
   public static final class ModuleConstants {
@@ -148,11 +146,17 @@ public final class DriveConstants {
         public static final double D = 0.0;
       }
 
-      public static final class FF {
-        public static final double S = 0.022436;
-        public static final double V = 2.1154;
-        public static final double A = 0.45287;
-      }
+      // public static final class FF {
+      //   public static final double S = 0.022436;
+      //   public static final double V = 2.1154;
+      //   public static final double A = 0.45287;
+      // }
+      public static final FFConstants FRONT_RIGHT_FF = new FFConstants(0.21459, 2.0025, 0.094773);
+      public static final FFConstants FRONT_LEFT_FF = new FFConstants(0.23328, 2.0243, 0.045604);
+      public static final FFConstants REAR_LEFT_FF = new FFConstants(0.14362, 2.0942, 0.21547);
+      public static final FFConstants REAR_RIGHT_FF = new FFConstants(0.15099, 1.9379, 0.30998);
+
+      public static final List<FFConstants> FF_CONSTANTS = List.of(FRONT_LEFT_FF, FRONT_RIGHT_FF, REAR_LEFT_FF, REAR_RIGHT_FF);
     }
 
     static final class Turning {

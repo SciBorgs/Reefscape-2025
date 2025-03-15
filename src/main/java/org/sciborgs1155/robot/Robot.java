@@ -150,12 +150,12 @@ public class Robot extends CommandRobot implements Logged {
     configureBindings();
 
     // Wait to set thread priority so that vendor threads can initialize
-    Commands.sequence(
-            Commands.waitSeconds(10),
-            // Danger: may result in other threads (logging, vendor status frames) being delayed
-            Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
-        .ignoringDisable(true)
-        .schedule();
+    // Commands.sequence(
+    //         Commands.waitSeconds(10),
+    //         // Danger: may result in other threads (logging, vendor status frames) being delayed
+    //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
+    //     .ignoringDisable(true)
+    //     .schedule();
   }
 
   /** Configures basic behavior for different periods during the game. */

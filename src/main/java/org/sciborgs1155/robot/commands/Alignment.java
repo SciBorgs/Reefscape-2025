@@ -1,11 +1,8 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
-import static org.sciborgs1155.robot.Constants.strafe;
-import static org.sciborgs1155.robot.FieldConstants.TO_THE_LEFT;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -68,7 +65,7 @@ public class Alignment implements Logged {
    */
   public Command reef(Level level, Branch branch) {
     Supplier<Pose2d> goal = branch::pose;
-    return Commands.sequence(
+    return Commands.deferredProxy(() -> Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
             pathfind(goal).withName("").asProxy(),
             Commands.parallel(
@@ -86,7 +83,7 @@ public class Alignment implements Logged {
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding));
+                    alternateAlliancePathfinding)));
   }
 
   /**
@@ -120,6 +117,7 @@ public class Alignment implements Logged {
         Set.of(drive, elevator));
   }
 
+  /** THIS COMMAND IS UNDEFERRED. */ 
   public Command alignTo(Supplier<Pose2d> goal) {
     return Commands.runOnce(() -> log("goal pose", goal.get()))
         .asProxy()
@@ -147,9 +145,7 @@ public class Alignment implements Logged {
                 () ->
                     Face.nearest(drive.pose())
                         .branch(side)
-                        .pose()
-                        .transformBy(strafe(TO_THE_LEFT.times(-1)))
-                        .transformBy(advance(Inches.of(-1.25)))));
+                        .pose()));
   }
 
   /**
@@ -175,9 +171,7 @@ public class Alignment implements Logged {
    * @param goal The field pose to pathfind to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Supplier<Pose2d> goal) {
-    return Commands.defer(
-            () -> {
+  public Command pathfind(Supplier<Pose2d> goal) { 
               Pose2d realGoal = goal.get();
               return drive
                   .run(
@@ -199,9 +193,8 @@ public class Alignment implements Logged {
                       () ->
                           !FaultLogger.report(
                               allianceFromPose(realGoal) != allianceFromPose(drive.pose()),
-                              alternateAlliancePathfinding));
-            },
-            Set.of(drive))
+                              alternateAlliancePathfinding))
+            
         .withName("pathfind");
   }
 
