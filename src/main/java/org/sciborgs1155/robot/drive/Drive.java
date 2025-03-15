@@ -47,6 +47,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -435,19 +436,18 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean isSkidding() {
-    List<Double> sorted =
+    DoubleStream diffs =
         Arrays.stream(moduleStates())
-            .map(
-                c ->
-                    Constants.fromPolarCoords(c.speedMetersPerSecond, c.angle)
+            .mapToDouble(
+                s ->
+                    Constants.fromPolarCoords(s.speedMetersPerSecond, s.angle)
                         .minus(
                             VecBuilder.fill(
                                 robotRelativeChassisSpeeds().vxMetersPerSecond,
-                                robotRelativeChassisSpeeds().vyMetersPerSecond)))
-            .map(c -> c.norm())
-            .sorted((a, b) -> a > b ? 1 : -1)
-            .collect(Collectors.toList());
-    return sorted.get(0) - sorted.get(sorted.size() - 1) > SKIDDING_THRESHOLD.in(MetersPerSecond);
+                                robotRelativeChassisSpeeds().vyMetersPerSecond))
+                        .norm());
+    return diffs.max().getAsDouble() - diffs.min().getAsDouble()
+        > SKIDDING_THRESHOLD.in(MetersPerSecond);
   }
 
   /**
