@@ -4,15 +4,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.ArrayList;
+import java.util.List;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.Robot;
@@ -156,11 +155,11 @@ public class Dashboard {
     return new Trigger(() -> "elevator".equals(entryRequest.getString("")));
   }
 
-  /** Returns a list of Branches that the branch entry states is available.*/
+  /** Returns a list of Branches that the branch entry states is available. */
   public static List<Branch> getAvailableBranchEntry() {
     List<Branch> availableBranches = new ArrayList<>();
     String entry = entryAvailableBranches.getString(" ");
-    for (int i = 0; i < entry.length(); i++){
+    for (int i = 0; i < entry.length(); i++) {
       if (!(entry.charAt(i) == ' ')) {
         availableBranches.add(branches[i]);
       }
