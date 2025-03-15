@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -207,8 +206,6 @@ public class Robot extends CommandRobot implements Logged {
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
     addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
-
-    // addPeriodic(() -> log("", PERIOD), PERIOD);
   }
 
   /** Configures trigger -> command bindings. */

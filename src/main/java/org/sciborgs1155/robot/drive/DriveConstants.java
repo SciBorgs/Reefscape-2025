@@ -41,7 +41,7 @@ public final class DriveConstants {
   public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
 
   // The control loop used by all of the modules when driving
-  public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;
+  public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
 
   // Rate at which sensors update periodicially
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
@@ -63,7 +63,7 @@ public final class DriveConstants {
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(6);
   public static final LinearAcceleration MAX_SKID_ACCEL =
-      MetersPerSecondPerSecond.of(7); // TODO: Tune
+      MetersPerSecondPerSecond.of(38); // TODO: Tune
   public static final LinearAcceleration MAX_TILT_ACCEL =
       MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final AngularVelocity MAX_ANGULAR_SPEED =
@@ -156,7 +156,8 @@ public final class DriveConstants {
       public static final FFConstants REAR_LEFT_FF = new FFConstants(0.14362, 2.0942, 0.21547);
       public static final FFConstants REAR_RIGHT_FF = new FFConstants(0.15099, 1.9379, 0.30998);
 
-      public static final List<FFConstants> FF_CONSTANTS = List.of(FRONT_LEFT_FF, FRONT_RIGHT_FF, REAR_LEFT_FF, REAR_RIGHT_FF);
+      public static final List<FFConstants> FF_CONSTANTS =
+          List.of(FRONT_LEFT_FF, FRONT_RIGHT_FF, REAR_LEFT_FF, REAR_RIGHT_FF);
     }
 
     static final class Turning {
