@@ -380,7 +380,7 @@ public class Robot extends CommandRobot implements Logged {
         .and(driver.y())
         .whileTrue(
             Commands.deferredProxy(
-                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
+                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getAvailableBranchEntry().get(0)))
                 .alongWith(
                     leftLED.blink(Color.kAqua),
                     rightLED.blink(Color.kAqua),

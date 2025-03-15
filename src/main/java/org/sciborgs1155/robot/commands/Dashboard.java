@@ -4,6 +4,9 @@ import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -21,7 +24,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  */
 public class Dashboard {
   private static NetworkTable base;
-  private static NetworkTableEntry entryTargetBranch;
+  private static NetworkTableEntry entryAvailableBranches;
   private static NetworkTableEntry entryTargetLevel;
   private static NetworkTableEntry entryProcessor;
   private static NetworkTableEntry entryTargetAlgae;
@@ -51,8 +54,8 @@ public class Dashboard {
     base = NetworkTableInstance.getDefault().getTable("Dashboard");
 
     // Scoring
-    entryTargetBranch = base.getEntry("branch");
-    entryTargetBranch.setString("");
+    entryAvailableBranches = base.getEntry("availableBranches");
+    entryAvailableBranches.setString("");
 
     entryTargetLevel = base.getEntry("level");
     entryTargetLevel.setInteger(0);
@@ -153,10 +156,16 @@ public class Dashboard {
     return new Trigger(() -> "elevator".equals(entryRequest.getString("")));
   }
 
-  /** Returns the Branch that the branch entry is set to. Returns null if not found. */
-  public static Branch getBranchEntry() {
-    int index = (" ABCDEFGHIJKL".indexOf(entryTargetBranch.getString(" ")) - 1);
-    return index == -1 ? null : branches[index];
+  /** Returns a list of Branches that the branch entry states is available.*/
+  public static List<Branch> getAvailableBranchEntry() {
+    List<Branch> availableBranches = new ArrayList<>();
+    String entry = entryAvailableBranches.getString(" ");
+    for (int i = 0; i < entry.length(); i++){
+      if (!(entry.charAt(i) == ' ')) {
+        availableBranches.add(branches[i]);
+      }
+    }
+    return availableBranches;
   }
 
   /** Returns the Level that the level entry is set to. Returns null if not found. */
