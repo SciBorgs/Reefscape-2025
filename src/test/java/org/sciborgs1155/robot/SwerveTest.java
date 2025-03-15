@@ -60,15 +60,13 @@ public class SwerveTest {
   public void reachesRobotVelocity() {
     double xVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
     double yVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
+
     run(
-        drive.run(
-            () ->
-                drive.setChassisSpeeds(
-                    new ChassisSpeeds(xVelocitySetpoint, yVelocitySetpoint, 0),
-                    ControlMode.CLOSED_LOOP_VELOCITY)));
+        drive.drive(
+            () -> xVelocitySetpoint, () -> yVelocitySetpoint, () -> Rotation2d.kZero, () -> 0));
     fastForward(500);
 
-    ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
+    ChassisSpeeds chassisSpeed = drive.fieldRelativeChassisSpeeds();
 
     assertEquals(xVelocitySetpoint, chassisSpeed.vxMetersPerSecond, DELTA);
     assertEquals(yVelocitySetpoint, chassisSpeed.vyMetersPerSecond, DELTA);
@@ -82,7 +80,8 @@ public class SwerveTest {
             () ->
                 drive.setChassisSpeeds(
                     new ChassisSpeeds(0, 0, omegaRadiansPerSecond),
-                    ControlMode.CLOSED_LOOP_VELOCITY)));
+                    ControlMode.CLOSED_LOOP_VELOCITY,
+                    () -> 0)));
     fastForward();
 
     ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
@@ -110,7 +109,8 @@ public class SwerveTest {
                     drive.setChassisSpeeds(
                         ChassisSpeeds.fromFieldRelativeSpeeds(
                             xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
-                        ControlMode.CLOSED_LOOP_VELOCITY))
+                        ControlMode.CLOSED_LOOP_VELOCITY,
+                        () -> 0))
             .withName(name);
 
     run(c);
@@ -141,7 +141,7 @@ public class SwerveTest {
 
     runToCompletion(
         drive
-            .assistedDrive(input::getX, input::getY, () -> 0, target)
+            .assistedDrive(input::getX, input::getY, () -> 0, target, () -> 0)
             .until(
                 () ->
                     target.getTranslation().minus(drive.pose().getTranslation()).getNorm()

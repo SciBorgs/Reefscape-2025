@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.Queue;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.FFConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
@@ -52,11 +53,12 @@ public class TalonModule implements ModuleIO {
       int turnPort,
       int sensorID,
       Rotation2d angularOffset,
+      FFConstants ff,
       String name,
       boolean invert) {
     // drive motor
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
-    driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
+    driveFF = new SimpleMotorFeedforward(ff.kS(), ff.kV(), ff.kA());
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
 
