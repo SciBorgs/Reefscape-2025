@@ -78,10 +78,12 @@ public class Alignment implements Logged {
                 leds.error(
                     () ->
                         drive
-                            .pose()
-                            .relativeTo(goal.get())
-                            .getTranslation()
-                            .getDistance(new Translation2d())),
+                                .pose()
+                                .relativeTo(goal.get())
+                                .getTranslation()
+                                .getDistance(new Translation2d())
+                            * 3,
+                    0.02 * 3),
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
@@ -141,10 +143,12 @@ public class Alignment implements Logged {
                             leds.error(
                                 () ->
                                     drive
-                                        .pose()
-                                        .relativeTo(goal.get())
-                                        .getTranslation()
-                                        .getDistance(new Translation2d()))))
+                                            .pose()
+                                            .relativeTo(goal.get())
+                                            .getTranslation()
+                                            .getDistance(new Translation2d())
+                                        * 3,
+                                0.02 * 3)))
                 .onlyWhile(
                     () ->
                         !FaultLogger.report(

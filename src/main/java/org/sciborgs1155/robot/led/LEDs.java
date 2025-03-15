@@ -7,9 +7,9 @@ import java.util.function.DoubleSupplier;
 
 /** Used to tell multiple LEDStrip to do things in a cleaner way. */
 public class LEDs implements AutoCloseable {
-  private final LEDStrip leftStrip;
-  private final LEDStrip middleStrip;
-  private final LEDStrip rightStrip;
+  public final LEDStrip leftStrip;
+  public final LEDStrip middleStrip;
+  public final LEDStrip rightStrip;
 
   public LEDs(LEDStrip leftStrip, LEDStrip middleStrip, LEDStrip rightStrip) {
     this.leftStrip = leftStrip;
@@ -47,8 +47,10 @@ public class LEDs implements AutoCloseable {
   }
 
   /** Sets all the LEDs based on an error. */
-  public Command error(DoubleSupplier error) {
-    return leftStrip.error(error).alongWith(middleStrip.error(error), rightStrip.error(error));
+  public Command error(DoubleSupplier error, double tolerance) {
+    return leftStrip
+        .error(error, tolerance)
+        .alongWith(middleStrip.error(error, tolerance), rightStrip.error(error, tolerance));
   }
 
   @Override

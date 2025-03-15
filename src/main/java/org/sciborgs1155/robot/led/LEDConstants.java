@@ -9,6 +9,4 @@ public class LEDConstants {
   public static final int LED_LENGTH = 120;
   // The distance between two LEDs on the LED Strip.
   public static final Distance LED_SPACING = Meters.of(0.01);
-  // The tolerance for the error pattern.
-  public static final double ERROR_TOLERANCE = 0.02;
 }

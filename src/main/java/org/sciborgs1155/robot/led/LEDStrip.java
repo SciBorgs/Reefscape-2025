@@ -96,13 +96,14 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Sets the LEDPattern based on an error.
+   * Sets the LEDPattern based on an error. When the error is within tolerance, LEDs blink blue.
    *
    * @param percentError The error. 1 is a really bad error while 0 is no error.
+   * @param tolerance The allowed tolerance in error.
    */
-  public Command error(DoubleSupplier error) {
+  public Command error(DoubleSupplier error, double tolerance) {
     return set(errorSolid(error))
-        .until(() -> error.getAsDouble() < ERROR_TOLERANCE)
+        .until(() -> error.getAsDouble() < tolerance)
         .andThen(blink(Color.kAqua));
   }
 
