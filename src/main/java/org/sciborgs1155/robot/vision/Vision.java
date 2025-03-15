@@ -122,25 +122,13 @@ public class Vision implements Logged {
     List<PoseEstimate> estimates = new ArrayList<>();
     for (int i = 0; i < estimators.length; i++) {
       if (camerasEnabled.get(cameras[i].getName())) {
-        var reefTags = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
-        var allUnreadChanges = cameras[i].getAllUnreadResults();
-        List<PhotonPipelineResult> unreadChanges =
-            Set.of("back left", "back right").contains(cameras[i].getName())
-                ? allUnreadChanges.stream()
-                    .filter(
-                        change ->
-                            change.getTargets().stream()
-                                .map(target -> reefTags.contains(target.fiducialId))
-                                .reduce(true, (a, b) -> a && b))
-                    .toList()
-                : allUnreadChanges;
+        var unreadChanges = cameras[i].getAllUnreadResults();
+
+        String name = cameras[i].getName();
+
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();
-
-        if (cameras[i].getName() != "back middle") {
-          unreadChanges.forEach(r -> r.targets.forEach(t -> t.pitch *= -1));
-        }
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
@@ -148,7 +136,41 @@ public class Vision implements Logged {
         for (int j = 0; j < unreadLength; j++) {
           var change = unreadChanges.get(j);
 
+          // only reef tags
+          if (Set.of("back left", "back right").contains(name)) {
+            change.targets =
+                change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+            change.multitagResult =
+                change.multitagResult.filter(
+                    r ->
+                        r.fiducialIDsUsed.stream()
+                            .map(id -> REEF_TAGS.contains((int) id))
+                            .reduce(true, (a, b) -> a && b));
+          }
+
+          // negate pich
+          if (cameras[i].getName() != "back middle") {
+            change.targets.stream()
+                .forEach(
+                    t -> {
+                      t.pitch = -t.pitch;
+                    });
+            change.multitagResult =
+                change.multitagResult.filter(
+                    r ->
+                        r.fiducialIDsUsed.stream()
+                            .map(id -> REEF_TAGS.contains((int) id))
+                            .reduce(true, (a, b) -> a && b));
+          }
+
+          // remove ambiguity
+          change.targets =
+              change.targets.stream().filter(t -> t.poseAmbiguity < MAX_AMBIGUITY).toList();
+          change.multitagResult =
+              change.multitagResult.filter(r -> r.estimatedPose.ambiguity < MAX_AMBIGUITY);
+
           estimate = estimators[i].update(change);
+
           log("estimates present " + i, estimate.isPresent());
           estimate
               .filter(
