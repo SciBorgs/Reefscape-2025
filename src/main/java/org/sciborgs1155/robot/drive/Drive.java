@@ -101,17 +101,25 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
-  public final DoubleEntry translationP = Tuning.entry("Robot/Drive/Tuning/translation p", Translation.P);
-  public final DoubleEntry translationI = Tuning.entry("Robot/Drive/Tuning/translation i", Translation.I);
-  public final DoubleEntry translationD = Tuning.entry("Robot/Drive/Tuning/translation d", Translation.D);
+  public final DoubleEntry translationP =
+      Tuning.entry("Robot/Drive/Tuning/translation p", Translation.P);
+  public final DoubleEntry translationI =
+      Tuning.entry("Robot/Drive/Tuning/translation i", Translation.I);
+  public final DoubleEntry translationD =
+      Tuning.entry("Robot/Drive/Tuning/translation d", Translation.D);
 
   public final DoubleEntry rotationP = Tuning.entry("Robot/Drive/Tuning/rotation p", Rotation.P);
   public final DoubleEntry rotationI = Tuning.entry("Robot/Drive/Tuning/rotation i", Rotation.I);
   public final DoubleEntry rotationD = Tuning.entry("Robot/Drive/Tuning/rotation d", Rotation.D);
 
-  public final DoubleEntry maxAccel = Tuning.entry("Robot/Drive/Tuning/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxSkidAccel = Tuning.entry("Robot/Drive/Tuning/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxTiltAccel = Tuning.entry("Robot/Drive/Tuning/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
+  public final DoubleEntry maxAccel =
+      Tuning.entry("Robot/Drive/Tuning/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
+  public final DoubleEntry maxSkidAccel =
+      Tuning.entry(
+          "Robot/Drive/Tuning/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
+  public final DoubleEntry maxTiltAccel =
+      Tuning.entry(
+          "Robot/Drive/Tuning/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -562,21 +570,25 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         VecBuilder.fill(desired.vxMetersPerSecond, desired.vyMetersPerSecond)
             .minus(currentVelocity)
             .times(1 / PERIOD.in(Seconds));
-            // Vector<N2> limitedVelocity =
-            // currentVelocity.plus(
-            //     currentVelocity.norm() > 1e-6
-            //         ? forwardAccelerationLimit(
-            //             skidAccelerationLimit(
-            //                 tiltAccelerationLimit(
-            //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
-            //                     elevatorHeight.getAsDouble())))
-            //         : accel);
+    // Vector<N2> limitedVelocity =
+    // currentVelocity.plus(
+    //     currentVelocity.norm() > 1e-6
+    //         ? forwardAccelerationLimit(
+    //             skidAccelerationLimit(
+    //                 tiltAccelerationLimit(
+    //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
+    //                     elevatorHeight.getAsDouble())))
+    //         : accel);
     Vector<N2> limitedVelocity =
-        currentVelocity.plus(forwardAccelerationLimit(desiredAcceleration).times(PERIOD.in(Seconds)));
+        currentVelocity.plus(
+            forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration))
+                .times(PERIOD.in(Seconds)));
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    log("forward accel limit", forwardAccelerationLimit(desiredAcceleration).norm());
+    log(
+        "forward accel limit",
+        forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration)).norm());
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -603,16 +615,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         VecBuilder.fill(
             fieldRelativeChassisSpeeds().vxMetersPerSecond,
             fieldRelativeChassisSpeeds().vyMetersPerSecond);
-    double limit =
-        maxAccel.get()
-            * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
+    double limit = maxAccel.get() * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
     log("limit", limit);
     Vector<N2> proj = desiredAccel.projection(currVel);
     if (proj.norm() > limit) {
-      Vector<N2> parl = proj.unit().times(limit);
-      Vector<N2> perp = desiredAccel.minus(parl);
-      log("end", parl.plus(perp).norm());
-      return parl.plus(perp);
+      Vector<N2> parallel = proj.unit().times(limit);
+      Vector<N2> perpendicular = desiredAccel.minus(parallel);
+      log("end", parallel.plus(perpendicular).norm());
+      return parallel.plus(perpendicular);
     }
     return desiredAccel;
   }
@@ -644,9 +654,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel) {
     return desiredAccel.norm() == 0
         ? desiredAccel
-        : desiredAccel
-            .unit()
-            .times(Math.min(desiredAccel.norm(), maxSkidAccel.get()));
+        : desiredAccel.unit().times(Math.min(desiredAccel.norm(), maxSkidAccel.get()));
   }
 
   /**
@@ -757,8 +765,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                                 robotRelativeChassisSpeeds().vxMetersPerSecond,
                                 robotRelativeChassisSpeeds().vyMetersPerSecond))
                         .norm());
-    return diffs.max().getAsDouble() - diffs.min().getAsDouble()
-        > SKIDDING_THRESHOLD.in(MetersPerSecond);
+    // var hi = diffs.max().orElse(0);
+
+    var hi2 = diffs.min().orElse(0);
+
+    return false;
+    // return diffs.max().orElse(0) - diffs.min().orElse(0)
+    //     > SKIDDING_THRESHOLD.in(MetersPerSecond);
   }
 
   /**

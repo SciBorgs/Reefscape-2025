@@ -100,11 +100,6 @@ public class Autos {
       Elevator elevator) {
     return Commands.sequence(
         alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
-        scoral
-            .score()
-            .asProxy()
-            .deadlineFor(elevator.scoreLevel(Level.L4).asProxy())
-            .withTimeout(0.5),
         // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
@@ -114,7 +109,7 @@ public class Autos {
         // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)
-            .withTimeout(5)
+            .withTimeout(4)
             .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
