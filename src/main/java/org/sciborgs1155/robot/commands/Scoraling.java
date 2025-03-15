@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.commands;
 
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
@@ -12,23 +13,20 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
-import org.sciborgs1155.robot.led.LEDStrip;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Scoraling implements Logged {
   private final Hopper hopper;
   private final Scoral scoral;
   private final Elevator elevator;
-  private final LEDStrip leftStrip;
-  private final LEDStrip rightStrip;
+  private final LEDs leds;
 
-  public Scoraling(
-      Hopper hopper, Scoral scoral, Elevator elevator, LEDStrip leftStrip, LEDStrip rightStrip) {
+  public Scoraling(Hopper hopper, Scoral scoral, Elevator elevator, LEDs leds) {
     this.hopper = hopper;
     this.scoral = scoral;
     this.elevator = elevator;
-    this.leftStrip = leftStrip;
-    this.rightStrip = rightStrip;
+    this.leds = leds;
 
     /*
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
@@ -103,6 +101,7 @@ public class Scoraling implements Logged {
     return hopper
         .intake()
         .alongWith(scoral.intake())
+        .andThen(leds.blink(Color.kGold).onlyIf(() -> !scoral.beambreak.get()))
         // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }

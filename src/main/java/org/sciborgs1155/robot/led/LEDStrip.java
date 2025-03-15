@@ -167,6 +167,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     };
   }
 
+  /** Sets a solid color of a range from red to green, given an error double supplier. */
   private static LEDPattern errorSolid(DoubleSupplier error) {
     return (reader, writer) -> {
       Color color =

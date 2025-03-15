@@ -50,7 +50,6 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
@@ -58,7 +57,6 @@ import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
-import org.sciborgs1155.robot.commands.LEDing;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
@@ -66,7 +64,7 @@ import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
-import org.sciborgs1155.robot.led.LEDStrip;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
@@ -130,16 +128,13 @@ public class Robot extends CommandRobot implements Logged {
         default -> Arm.none();
       };
 
-  private final LEDStrip leftLED = new LEDStrip(0, 37, false);
-  private final LEDStrip middleLED = new LEDStrip(38, 59, true);
-  private final LEDStrip rightLED = new LEDStrip(60, 103, true);
-  private final LEDing leding = new LEDing(leftLED, middleLED, rightLED);
+  private final LEDs leds = LEDs.create();
 
-  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leds);
   private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
-  @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
+  @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
   @Log.NT
   private final SendableChooser<Command> autos =
@@ -249,10 +244,7 @@ public class Robot extends CommandRobot implements Logged {
     scoral.blocked.onTrue(rumble(RumbleType.kBothRumble, 0.5));
     hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
-    autonomous()
-        .whileTrue(
-            Commands.deferredProxy(autos::getSelected)
-                .alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
 
     teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
 
@@ -285,58 +277,11 @@ public class Robot extends CommandRobot implements Logged {
 
     // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
-    driver
-        .a()
-        .whileTrue(
-            align
-                .source()
-                .alongWith(leftLED.blink(Color.kAqua).alongWith(rightLED.blink(Color.kAqua))));
+    driver.a().whileTrue(align.source());
 
-    driver
-        .x()
-        .whileTrue(
-            align
-                .nearReef(Side.LEFT)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () ->
-                            1
-                                / (calculateAlignment(
-                                    Face.nearest(drive.pose())
-                                        .branch(Side.LEFT)
-                                        .pose()
-                                        .getTranslation()))),
-                    rightLED.progressGradient(
-                        () ->
-                            1
-                                / (calculateAlignment(
-                                    Face.nearest(drive.pose())
-                                        .branch(Side.LEFT)
-                                        .pose()
-                                        .getTranslation())))));
+    driver.x().whileTrue(align.nearReef(Side.LEFT));
 
-    driver
-        .b()
-        .whileTrue(
-            align
-                .nearReef(Side.RIGHT)
-                .alongWith(
-                    leftLED.progressGradient(
-                        () ->
-                            1
-                                / (calculateAlignment(
-                                    Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT)
-                                        .pose()
-                                        .getTranslation()))),
-                    rightLED.progressGradient(
-                        () ->
-                            1
-                                / (calculateAlignment(
-                                    Face.nearest(drive.pose())
-                                        .branch(Side.RIGHT)
-                                        .pose()
-                                        .getTranslation())))));
+    driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
@@ -352,7 +297,7 @@ public class Robot extends CommandRobot implements Logged {
             elevator
                 .scoreLevel(Level.L3_ALGAE)
                 .alongWith(
-                    leding.progressGradient(
+                    leds.progressGradient(
                         () -> elevator.position() / ElevatorConstants.MAX_EXTENSION.in(Meters),
                         elevator::atGoal)));
 
@@ -378,14 +323,11 @@ public class Robot extends CommandRobot implements Logged {
         .whileTrue(
             Commands.deferredProxy(
                     () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
-                .alongWith(
-                    leftLED.blink(Color.kAqua),
-                    rightLED.blink(Color.kAqua),
-                    middleLED.solid(Color.kAqua)));
+                .alongWith(leds.blink(Color.kAqua)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
-    scoral.blocked.onFalse(leftLED.blink(Color.kLime).alongWith(rightLED.blink(Color.kLime)));
+    scoral.blocked.onFalse(leds.blink(Color.kLime));
   }
 
   @Log.NT
@@ -420,11 +362,7 @@ public class Robot extends CommandRobot implements Logged {
 
   public Command systemsCheck() {
     return Test.toCommand(
-            Test.fromCommand(
-                middleLED
-                    .blink(Color.kRed)
-                    .alongWith(leftLED.blink(Color.kRed), rightLED.blink(Color.kRed))
-                    .withTimeout(0.5)),
+            Test.fromCommand(leds.blink(Color.kRed).withTimeout(0.5)),
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
@@ -435,11 +373,7 @@ public class Robot extends CommandRobot implements Logged {
             drive.systemsCheck(),
             Test.fromCommand(
                 scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
-            Test.fromCommand(
-                middleLED
-                    .solid(Color.kLime)
-                    .alongWith(leftLED.solid(Color.kLime), rightLED.solid(Color.kLime))
-                    .withTimeout(0.5)))
+            Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }
 
