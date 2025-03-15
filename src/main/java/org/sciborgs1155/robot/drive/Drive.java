@@ -53,6 +53,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,6 +62,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
@@ -602,6 +604,33 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       values[i] = modules.get(i).drivePosition();
     }
     return values;
+  }
+
+  /**
+   * @return If the robot is skidding.
+   */
+  @Log.NT
+  public boolean isSkidding() {
+    DoubleStream diffs =
+        Arrays.stream(moduleStates())
+            .mapToDouble(
+                s ->
+                    Constants.fromPolarCoords(s.speedMetersPerSecond, s.angle)
+                        .minus(
+                            VecBuilder.fill(
+                                robotRelativeChassisSpeeds().vxMetersPerSecond,
+                                robotRelativeChassisSpeeds().vyMetersPerSecond))
+                        .norm());
+    return diffs.max().getAsDouble() - diffs.min().getAsDouble()
+        > SKIDDING_THRESHOLD.in(MetersPerSecond);
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Log.NT
+  public boolean isColliding() {
+    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
   /** Resets all drive encoders to read a position of 0. */
