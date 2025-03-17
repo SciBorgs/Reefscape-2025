@@ -54,6 +54,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -611,7 +612,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean isSkidding() {
-    DoubleStream diffs =
+    DoubleSummaryStatistics diffs =
         Arrays.stream(moduleStates())
             .mapToDouble(
                 s ->
@@ -620,9 +621,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                             VecBuilder.fill(
                                 robotRelativeChassisSpeeds().vxMetersPerSecond,
                                 robotRelativeChassisSpeeds().vyMetersPerSecond))
-                        .norm());
-    return diffs.max().getAsDouble() - diffs.min().getAsDouble()
+                        .norm()).summaryStatistics();
+    return diffs.getMax() - diffs.getMin()
         > SKIDDING_THRESHOLD.in(MetersPerSecond);
+
   }
 
   /**

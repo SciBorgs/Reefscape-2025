@@ -26,17 +26,30 @@ public class RepulsorFieldPlanner {
       this.positive = positive;
     }
 
+    /**
+     * @param position The current position.
+     * @param target The goal position.
+     * @return The force at a certain position.
+     */
     public abstract Force getForceAtPosition(Translation2d position, Translation2d target);
 
+    /**
+     * @param dist The distance from the position to the obstacle.
+     * @return The force magnitude from that position
+     */
     protected double distToForceMag(double dist) {
-      var forceMag = strength / (0.00001 + Math.abs(dist * dist));
-      forceMag *= positive ? 1 : -1;
-      return forceMag;
+      double forceMag = strength / (0.00001 + Math.pow(dist, 2));
+      return forceMag * (positive ? 1 : -1);
     }
 
+    /**
+     * @param dist The distance from the position to the obstacle
+     * @param falloff The falloff.
+     * @return The force magnitude from the position, with subtracted falloff.
+     */
     protected double distToForceMag(double dist, double falloff) {
-      var original = strength / (0.00001 + Math.abs(dist * dist));
-      var falloffMag = strength / (0.00001 + Math.abs(falloff * falloff));
+      double original = strength / (0.00001 + Math.pow(dist, 2));
+      double falloffMag = strength / (0.00001 + Math.pow(falloff, 2));
       return Math.max(original - falloffMag, 0) * (positive ? 1 : -1);
     }
   }
@@ -51,26 +64,27 @@ public class RepulsorFieldPlanner {
     }
 
     public Force getForceAtPosition(Translation2d position, Translation2d target) {
-      var dist = loc.getDistance(position);
+      double dist = loc.getDistance(position);
       if (dist > 4) {
         return new Force();
       }
-      var outwardsMag = distToForceMag(loc.getDistance(position) - radius);
-      var initial = new Force(outwardsMag, position.minus(loc).getAngle());
+      // Distance from the position to the outer radius of the target.
+      double outwardsMag = distToForceMag(loc.getDistance(position) - radius);
+
+      // initial calculated force; vector from the obstacle to the position.
+      Force initial = new Force(outwardsMag, position.minus(loc).getAngle());
+
       // theta = angle between position->target vector and obstacle->position vector
-      var theta = target.minus(position).getAngle().minus(position.minus(loc).getAngle());
+      Rotation2d theta = target.minus(position).getAngle().minus(position.minus(loc).getAngle());
+
+      // TODO divide magnitude by 2 and multiply by ????
       double mag = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
 
-      // if (theta.getRadians() > 0) {
       return initial
-          .rotateBy(Rotation2d.kCCW_90deg)
-          .div(initial.getNorm())
-          .times(mag)
-          .plus(initial);
-      // } else {
-      //     return
-      // initial.rotateBy(Rotation2d.kCW_90deg).div(initial.getNorm()).times(mag).plus(initial);
-      // }
+          .rotateBy(Rotation2d.kCCW_90deg) // rotate left 90 degrees
+          .div(initial.getNorm()) // normalize
+          .times(mag) // set magnitude
+          .plus(initial); // add initial force
     }
   }
 
