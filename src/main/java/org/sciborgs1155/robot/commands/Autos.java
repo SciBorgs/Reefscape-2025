@@ -40,7 +40,7 @@ public class Autos {
         drive::pose,
         drive::resetOdometry,
         drive::robotRelativeChassisSpeeds,
-        (s, g) -> drive.setChassisSpeeds(s, ControlMode.CLOSED_LOOP_VELOCITY),
+        (s, g) -> drive.setChassisSpeeds(s, ControlMode.CLOSED_LOOP_VELOCITY, elevator::position),
         new PPHolonomicDriveController(
             new PIDConstants(Translation.P, Translation.I, Translation.D),
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
@@ -78,7 +78,9 @@ public class Autos {
         drive.run(
             () ->
                 drive.setChassisSpeeds(
-                    new ChassisSpeeds(0.5, 0, 0), ControlMode.OPEN_LOOP_VELOCITY)));
+                    new ChassisSpeeds(0.5, 0, 0),
+                    ControlMode.OPEN_LOOP_VELOCITY,
+                    elevator::position)));
     chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
 
     return chooser;
@@ -98,11 +100,6 @@ public class Autos {
       Elevator elevator) {
     return Commands.sequence(
         alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
-        scoral
-            .score()
-            .asProxy()
-            .deadlineFor(elevator.scoreLevel(Level.L4).asProxy())
-            .withTimeout(0.5),
         // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
@@ -112,7 +109,7 @@ public class Autos {
         // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)
-            .withTimeout(5)
+            .withTimeout(4)
             .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()

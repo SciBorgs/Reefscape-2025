@@ -122,8 +122,6 @@ public class FieldConstants {
     }
   }
 
-  public static final Distance TO_THE_LEFT = Inches.of(0);
-
   // Poses for scoraling.
   // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
   // There are two reef branches per side, so the more counter-clockwise one is 1, and the
@@ -147,7 +145,7 @@ public class FieldConstants {
 
     private Branch(Pose2d pose) {
       this.pose =
-          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1)))
+          pose.transformBy(Constants.strafe(Inches.of(-2)))
               .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 

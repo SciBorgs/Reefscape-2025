@@ -47,15 +47,19 @@
     {
       "axisConfig": [
         {
-          "decKey": 74,
-          "incKey": 76
+          "decKey": 83,
+          "incKey": 87
         },
         {
-          "decKey": 73,
-          "incKey": 75
+          "decKey": 65,
+          "incKey": 68
+        },
+        {
+          "decKey": 75,
+          "incKey": 74
         }
       ],
-      "axisCount": 2,
+      "axisCount": 3,
       "buttonCount": 4,
       "buttonKeys": [
         77,

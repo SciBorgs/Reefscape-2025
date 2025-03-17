@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
@@ -148,6 +147,14 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
+
+    // Wait to set thread priority so that vendor threads can initialize
+    // Commands.sequence(
+    //         Commands.waitSeconds(10),
+    //         // Danger: may result in other threads (logging, vendor status frames) being delayed
+    //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
+    //     .ignoringDisable(true)
+    //     .schedule();
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -155,11 +162,11 @@ public class Robot extends CommandRobot implements Logged {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     Monologue.setupMonologue(this, "/Robot", false, true);
+    SignalLogger.enableAutoLogging(true);
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
     addPeriodic(vision::logCamEnabled, 1);
 
-    SmartDashboard.putData(CommandScheduler.getInstance());
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
@@ -199,8 +206,6 @@ public class Robot extends CommandRobot implements Logged {
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
     addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
-
-    // addPeriodic(() -> log("", PERIOD), PERIOD);
   }
 
   /** Configures trigger -> command bindings. */
@@ -240,7 +245,7 @@ public class Robot extends CommandRobot implements Logged {
             .scale(TELEOP_ANGULAR_SPEED.in(RadiansPerSecond))
             .rateLimit(MAX_ANGULAR_ACCEL.in(RadiansPerSecond.per(Second)));
 
-    drive.setDefaultCommand(drive.drive(x, y, omega).withName("joysticks"));
+    drive.setDefaultCommand(drive.drive(x, y, omega, elevator::position).withName("joysticks"));
 
     // leftLED.setDefaultCommand(leftLED.rainbow());
     // middleLED.setDefaultCommand(middleLED.solid(Color.kYellow));
@@ -254,9 +259,13 @@ public class Robot extends CommandRobot implements Logged {
             Commands.deferredProxy(autos::getSelected)
                 .alongWith(leftLED.autos(), rightLED.autos(), middleLED.autos()));
 
-    teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+    if (TUNING) {
+      SignalLogger.enableAutoLogging(false);
 
-    disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+      // manual .start() call is blocking, for up to 100ms
+      teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+      disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+    }
 
     test().whileTrue(systemsCheck());
 
