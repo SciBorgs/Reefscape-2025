@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot;
 
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -33,6 +34,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -53,10 +55,14 @@ import monologue.Logged;
 import monologue.Monologue;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeReefSimulation;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Constants.Field.Source;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
@@ -155,7 +161,6 @@ public class Robot extends CommandRobot implements Logged {
     super(PERIOD.in(Seconds));
     configureGameBehavior();
     configureBindings();
-    SimulatedArena.getInstance();
   }
 
   /** Configures basic behavior for different periods during the game. */
@@ -195,6 +200,8 @@ public class Robot extends CommandRobot implements Logged {
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
 
+    SimulatedArena.getInstance().resetFieldForAuto();
+
     RobotController.setBrownoutVoltage(6.0);
 
     Pathfinding.setPathfinder(new LocalADStar());
@@ -204,7 +211,7 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(drive.pose()), PERIOD.in(Seconds));
+      addPeriodic(() -> vision.simulationPeriodic(maplePose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
@@ -222,22 +229,22 @@ public class Robot extends CommandRobot implements Logged {
   }
 
   @Log
-  public Pose3d[] pieces() {
+  public Pose3d[] algae() {
     return SimulatedArena.getInstance().getGamePiecesArrayByType("Algae");
   }
 
-  public Command dropAlgae() {
-    return Commands.runOnce(() -> SimulatedArena.getInstance().addGamePieceProjectile(new ReefscapeAlgaeOnFly(drive.pose().getTranslation(), new Translation2d(), drive.fieldRelativeChassisSpeeds(), new Rotation2d(), Meters.of(3), MetersPerSecond.of(0), Radians.of(0))));
+  @Log
+  public Pose3d[] coral() {
+    return SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
   }
 
-  public Command clean() {
-    return Commands.runOnce(() -> SimulatedArena.getInstance().clearGamePieces());
+  public Command dropCoral() {
+    return Commands.runOnce(() -> SimulatedArena.getInstance().addGamePieceProjectile(new ReefscapeCoralOnFly(Source.LEFT.pose.getTranslation().plus(new Translation2d(.4, -.4)), new Translation2d(), new ChassisSpeeds(), new Rotation2d(-Math.PI / 4), Meters.of(1.2), MetersPerSecond.of(-3), Radians.of(Math.PI / 4))));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.a().toggleOnTrue(dropAlgae().andThen(Commands.waitSeconds(.05)).repeatedly());
-    operator.b().onTrue(clean());
+    operator.a().onTrue(dropCoral());
     InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
 
