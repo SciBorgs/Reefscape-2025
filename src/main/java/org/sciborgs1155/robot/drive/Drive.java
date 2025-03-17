@@ -353,7 +353,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                   vOmega.getAsDouble(),
                   heading().plus(allianceRotation())),
               ControlMode.OPEN_LOOP_VELOCITY,
-              elevatorHeight);
+              elevatorHeight.getAsDouble());
         });
   }
 
@@ -426,7 +426,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       vOmega.getAsDouble(),
                       heading().plus(allianceRotation())),
               ControlMode.CLOSED_LOOP_VELOCITY,
-              elevatorHeight);
+              elevatorHeight.getAsDouble());
         })
         .repeatedly();
   }
@@ -559,8 +559,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param mode The control loop used to achieve those speeds.
    * @param elevatorHeight A supplier for the current height of the elevator.
    */
-  public void setChassisSpeeds(
-      ChassisSpeeds desired, ControlMode mode, DoubleSupplier elevatorHeight) {
+  public void setChassisSpeeds(ChassisSpeeds desired, ControlMode mode, double elevatorHeight) {
     Vector<N2> currentVelocity =
         VecBuilder.fill(
             robotRelativeChassisSpeeds().vxMetersPerSecond,
@@ -701,7 +700,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                   velocities.get(2) / RADIUS.in(Meters),
                   pose().getRotation()),
               ControlMode.CLOSED_LOOP_VELOCITY,
-              () -> 0);
+              0);
         })
         .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
         .andThen(stop())
@@ -721,7 +720,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         this::pose,
         this::robotRelativeChassisSpeeds,
         (ChassisSpeeds a, DriveFeedforwards b) ->
-            setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY, elevatorHeight),
+            setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY, elevatorHeight.getAsDouble()),
         new PPHolonomicDriveController(
             new PIDConstants(Translation.P, Translation.I, Translation.D),
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
@@ -850,7 +849,26 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             rotationController.calculate(heading().minus(rotation).getRadians(), 0),
             heading()),
         DRIVE_MODE,
-        elevatorHeight);
+        elevatorHeight.getAsDouble());
+  }
+
+  public void addOnSample(
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      DoubleSupplier omega,
+      SwerveSample sample,
+      DoubleSupplier elevatorHeight) {
+    Vector<N2> driverSpeeds = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+    Vector<N2> sampleSpeeds = VecBuilder.fill(sample.vx, sample.vy);
+    Vector<N2> speeds =
+        driverSpeeds.norm() > 1e-3 && driverSpeeds.dot(sampleSpeeds) > 0
+            ? sampleSpeeds.projection(driverSpeeds)
+            : VecBuilder.fill(0, 0);
+    setChassisSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds.get(0), speeds.get(1), omega.getAsDouble(), heading()),
+        DRIVE_MODE,
+        elevatorHeight.getAsDouble());
   }
 
   /**
@@ -943,8 +961,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Stops the drivetrain. */
   public Command stop() {
-    return runOnce(
-        () -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY, () -> 0));
+    return runOnce(() -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY, 0));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement. */
@@ -968,8 +985,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public Test systemsCheck() {
     ChassisSpeeds speeds = new ChassisSpeeds(1, 1, 0);
     Command testCommand =
-        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY, () -> 0))
-            .withTimeout(0.75);
+        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY, 0)).withTimeout(0.75);
     Function<ModuleIO, TruthAssertion> speedCheck =
         m ->
             tAssert(

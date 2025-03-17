@@ -6,10 +6,12 @@ import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
@@ -193,6 +195,29 @@ public class Alignment implements Logged {
                     allianceFromPose(realGoal) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
+  }
+
+  public Command freeDrive(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
+    return drive.run(
+        () -> {
+          Tracer.startTrace("repulsor pathfinding");
+          planner.setGoal(
+              drive
+                  .pose()
+                  .getTranslation()
+                  .plus(new Translation2d(x.getAsDouble(), y.getAsDouble())));
+          drive.addOnSample(
+              x,
+              y,
+              omega,
+              planner.getCmd(
+                  drive.pose(),
+                  drive.fieldRelativeChassisSpeeds(),
+                  DriveConstants.MAX_SPEED.in(MetersPerSecond),
+                  true),
+              elevator::position);
+          Tracer.endTrace();
+        });
   }
 
   // @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);

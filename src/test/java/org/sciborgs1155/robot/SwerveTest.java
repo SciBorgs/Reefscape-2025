@@ -81,7 +81,7 @@ public class SwerveTest {
                 drive.setChassisSpeeds(
                     new ChassisSpeeds(0, 0, omegaRadiansPerSecond),
                     ControlMode.CLOSED_LOOP_VELOCITY,
-                    () -> 0)));
+                    0)));
     fastForward();
 
     ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
@@ -110,7 +110,7 @@ public class SwerveTest {
                         ChassisSpeeds.fromFieldRelativeSpeeds(
                             xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
                         ControlMode.CLOSED_LOOP_VELOCITY,
-                        () -> 0))
+                        0))
             .withName(name);
 
     run(c);
