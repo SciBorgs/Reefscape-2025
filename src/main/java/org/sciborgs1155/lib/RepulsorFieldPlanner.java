@@ -13,7 +13,6 @@ import java.util.Optional;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import org.sciborgs1155.robot.drive.DriveConstants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner implements Logged {
@@ -28,6 +27,8 @@ public class RepulsorFieldPlanner implements Logged {
     }
 
     /**
+     * Finds the Force from this obstacle to a position.
+     *
      * @param position The current position.
      * @param target The goal position.
      * @return The force at a certain position.
@@ -65,11 +66,12 @@ public class RepulsorFieldPlanner implements Logged {
     }
 
     public Force getForceAtPosition(Translation2d position, Translation2d target) {
+      // displacement from obstacle
       double dist = loc.getDistance(position);
       if (dist > 4) {
         return new Force();
       }
-      // Distance from the position to the outer radius of the target.
+      // distance from the position to the outer radius of the target.
       double outwardsMag = distToForceMag(loc.getDistance(position) - radius);
 
       // initial calculated force; vector from the obstacle to the position.
@@ -78,7 +80,7 @@ public class RepulsorFieldPlanner implements Logged {
       // theta = angle between position->target vector and obstacle->position vector
       Rotation2d theta = target.minus(position).getAngle().minus(position.minus(loc).getAngle());
 
-      // TODO divide magnitude by 2 and multiply by ????
+      // divide magnitude by 2 and multiply by the sign of theta
       double mag = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
 
       return initial
@@ -89,26 +91,31 @@ public class RepulsorFieldPlanner implements Logged {
     }
   }
 
-  static class SnowmanObstacle extends Obstacle {
+  static class CircleObstacle extends Obstacle {
     Translation2d loc;
     double radius = 0.5;
 
-    public SnowmanObstacle(Translation2d loc, double strength, double radius, boolean positive) {
+    public CircleObstacle(Translation2d loc, double strength, double radius, boolean positive) {
       super(strength, positive);
       this.loc = loc;
       this.radius = radius;
     }
 
     public Force getForceAtPosition(Translation2d position, Translation2d target) {
-      var targetToLoc = loc.minus(target);
-      var targetToLocAngle = targetToLoc.getAngle();
-      // 1 meter away from loc, opposite target.
-      var sidewaysCircle = new Translation2d(1, targetToLoc.getAngle()).plus(loc);
-      // var dist = loc.getDistance(position);
-      // var sidewaysDist = sidewaysCircle.getDistance(position);
-      var sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position));
-      var outwardsMag = distToForceMag(Math.max(0.01, loc.getDistance(position) - radius));
-      var initial =
+      // displacement from obstacle
+      Translation2d targetToLoc = loc.minus(target);
+
+      // 1 meter from loc, direction is away from target
+      Translation2d sidewaysCircle = new Translation2d(1, targetToLoc.getAngle()).plus(loc);
+
+      // force magnitude from the sidewaysCircle to the position
+      double sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position));
+
+      // force magnitude from the outward radius of the obstacle.
+      double outwardsMag = distToForceMag(Math.max(0.01, loc.getDistance(position) - radius));
+
+      // initial force from the obstacle.
+      Force initial =
           new Force(
               outwardsMag,
               position.minus(loc).getNorm() > 1e-4
@@ -116,11 +123,15 @@ public class RepulsorFieldPlanner implements Logged {
                   : Rotation2d.kZero);
 
       // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
-      var sidewaysTheta =
+      Rotation2d sidewaysTheta =
           target.minus(position).getAngle().minus(position.minus(sidewaysCircle).getAngle());
 
+      // sideways force calculations to go AROUND objects. sine sign is used to figure out which way
+      // to go around
       double sideways = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
-      var sidewaysAngle = targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg);
+      Rotation2d sidewaysAngle = targetToLoc.getAngle().rotateBy(Rotation2d.kCCW_90deg);
+
+      // adds sideways to force for resultant force
       return new Force(sideways, sidewaysAngle).plus(initial);
     }
   }
@@ -155,9 +166,9 @@ public class RepulsorFieldPlanner implements Logged {
 
   public static final List<Obstacle> FIELD_OBSTACLES =
       List.of(
-          new SnowmanObstacle(
+          new CircleObstacle(
               new Translation2d(4.49, 4), 0.6, Units.inchesToMeters(65.5 / 2.0), true),
-          new SnowmanObstacle(
+          new CircleObstacle(
               new Translation2d(13.08, 4), 0.6, Units.inchesToMeters(65.5 / 2.0), true));
   static final double FIELD_LENGTH = 16.42;
   static final double FIELD_WIDTH = 8.16;
@@ -181,8 +192,6 @@ public class RepulsorFieldPlanner implements Logged {
   private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
   private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
 
-  private int pathfindingStatus = 0;
-
   private SwerveSample prevSample;
 
   public RepulsorFieldPlanner() {
@@ -192,45 +201,6 @@ public class RepulsorFieldPlanner implements Logged {
       arrows.add(new Pose2d());
     }
     this.prevSample = sample(Translation2d.kZero, Rotation2d.kZero, 0, 0, 0);
-    // {
-    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useGoalInArrows");
-    //   topic.publish().set(useGoalInArrows);
-    //   NetworkTableListener.createListener(
-    //       topic,
-    //       EnumSet.of(Kind.kValueAll),
-    //       (event) -> {
-    //         useGoalInArrows = event.valueData.value.getBoolean();
-    //         updateArrows();
-    //       });
-    //   topic.subscribe(useGoalInArrows);
-    // }
-    // {
-    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useObstaclesInArrows");
-    //   topic.publish().set(useObstaclesInArrows);
-    //   NetworkTableListener.createListener(
-    //       topic,
-    //       EnumSet.of(Kind.kValueAll),
-    //       (event) -> {
-    //         useObstaclesInArrows = event.valueData.value.getBoolean();
-    //         updateArrows();
-    //       });
-    //   topic.subscribe(useObstaclesInArrows);
-    // }
-    // {
-    //   var topic = NetworkTableInstance.getDefault().getBooleanTopic("useWallsInArrows");
-    //   topic.publish().set(useWallsInArrows);
-    //   NetworkTableListener.createListener(
-    //       topic,
-    //       EnumSet.of(Kind.kValueAll),
-    //       (event) -> {
-    //         useWallsInArrows = event.valueData.value.getBoolean();
-    //         updateArrows();
-    //       });
-    //   topic.subscribe(useWallsInArrows);
-    // }
-    // NetworkTableInstance.getDefault()
-    //     .startEntryDataLog(
-    //         DataLogManager.getLog(), "SmartDashboard/Alerts", "SmartDashboard/Alerts");
   }
 
   @IgnoreLogged private boolean useGoalInArrows = false;
@@ -335,12 +305,6 @@ public class RepulsorFieldPlanner implements Logged {
     //     new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
     // double currentSpeed =
     //     Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    if (pathfindingStatus != 0) {
-      pathfindingStatus--;
-      return prevSample;
-    } else {
-      pathfindingStatus = DriveConstants.PATHFINDING_PERIOD;
-    }
 
     double stepSize_m = maxSpeed * 0.02; // TODO
     if (goalOpt.isEmpty()) {
