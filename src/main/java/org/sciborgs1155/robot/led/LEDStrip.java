@@ -172,7 +172,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
     return (reader, writer) -> {
       Color color =
           Color.fromHSV(
-              (int) MathUtil.clamp(Math.round((1 - error.getAsDouble()) * 50), 0, 50), 255, 255);
+              (int) MathUtil.clamp(Math.round((1 - error.getAsDouble()) * 45), 0, 50), 255, 255);
       int bufLen = reader.getLength();
       for (int i = 0; i < bufLen; i++) {
         writer.setLED(i, color);

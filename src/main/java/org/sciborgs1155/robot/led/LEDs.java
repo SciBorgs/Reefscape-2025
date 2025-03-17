@@ -20,7 +20,7 @@ public class LEDs implements AutoCloseable {
   public static LEDs create() {
     LEDStrip leftLED = new LEDStrip(0, 37, false);
     LEDStrip middleLED = new LEDStrip(38, 59, true);
-    LEDStrip rightLED = new LEDStrip(60, 103, true);
+    LEDStrip rightLED = new LEDStrip(60, 97, true);
     return new LEDs(leftLED, middleLED, rightLED);
   }
 
