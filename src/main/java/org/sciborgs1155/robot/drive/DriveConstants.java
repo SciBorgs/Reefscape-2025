@@ -103,7 +103,8 @@ public final class DriveConstants {
           .withTrackLengthTrackWidth(TRACK_WIDTH, TRACK_WIDTH)
           .withBumperSize(BUMPER_LENGTH, BUMPER_LENGTH);
 
-  public static final SwerveDriveSimulation driveSim = new SwerveDriveSimulation(SIM_DRIVE_CONFIG, STARTING_POSE);
+  public static final SwerveDriveSimulation driveSim =
+      new SwerveDriveSimulation(SIM_DRIVE_CONFIG, STARTING_POSE);
 
   public static final RobotConfig ROBOT_CONFIG =
       new RobotConfig(

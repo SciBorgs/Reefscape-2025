@@ -9,6 +9,7 @@ import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
@@ -34,7 +35,10 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
+
+    hopper.blocked.negate().and(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
+
+    // scoral.blocked.onTrue(Commands.runOnce(() -> stop = true));
   }
 
   @Log.NT private boolean stop = false;
@@ -53,9 +57,12 @@ public class Scoraling implements Logged {
         .andThen(
             elevator
                 .retract()
-                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
+                .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers().alongWith(Commands.defer(() -> Robot.dropCoral(), Set.of()))))
                 .until(() -> stop)
-                .finallyDo(() -> stop = false))
+                .finallyDo(() -> {
+                  stop = false;
+                  System.out.println("fin! 2");
+              }))
         .withName("intakingHPS");
   }
 

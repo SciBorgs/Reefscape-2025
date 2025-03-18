@@ -70,9 +70,6 @@
   },
   "NetworkTables": {
     "transitory": {
-      "CameraPublisher": {
-        "open": true
-      },
       "Robot": {
         "align": {
           "open": true

@@ -1,6 +1,5 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
@@ -20,6 +19,7 @@ import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.intakeSim;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
@@ -29,7 +29,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,11 +52,11 @@ import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
+import org.dyn4j.geometry.Triangle;
+import org.dyn4j.geometry.Vector2;
+import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeReefSimulation;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
@@ -238,12 +237,29 @@ public class Robot extends CommandRobot implements Logged {
     return SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
   }
 
-  public Command dropCoral() {
-    return Commands.runOnce(() -> SimulatedArena.getInstance().addGamePieceProjectile(new ReefscapeCoralOnFly(Source.LEFT.pose.getTranslation().plus(new Translation2d(.4, -.4)), new Translation2d(), new ChassisSpeeds(), new Rotation2d(-Math.PI / 4), Meters.of(1.2), MetersPerSecond.of(-3), Radians.of(Math.PI / 4))));
+  public static Command dropCoral() {
+    if (Robot.isReal()) {
+      return Commands.none();
+    }
+
+    return Commands.runOnce(
+        () ->
+            SimulatedArena.getInstance()
+                .addGamePieceProjectile(
+                    new ReefscapeCoralOnFly(
+                        Source.LEFT.pose.getTranslation().plus(new Translation2d(.4, -.4)),
+                        new Translation2d(),
+                        new ChassisSpeeds(),
+                        new Rotation2d(-Math.PI / 4),
+                        Meters.of(1.2),
+                        MetersPerSecond.of(-3),
+                        Radians.of(Math.PI / 4))));
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
+    operator.b().onTrue(Autos.RB4(align, scoraling, drive::resetOdometry, scoral, elevator));
+
     operator.a().onTrue(dropCoral());
     InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();

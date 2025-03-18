@@ -1,0 +1,7 @@
+package org.sciborgs1155.robot.scoral;
+
+public interface ScoralIO extends AutoCloseable {
+    void set(double power);
+
+    boolean hasCoral();
+}
