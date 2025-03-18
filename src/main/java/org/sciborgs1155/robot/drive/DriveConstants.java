@@ -59,7 +59,7 @@ public final class DriveConstants {
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
-  public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
+  public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.74);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(6);
   public static final LinearAcceleration MAX_SKID_ACCEL =
       MetersPerSecondPerSecond.of(38); // TODO: Tune

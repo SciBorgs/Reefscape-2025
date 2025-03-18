@@ -248,7 +248,7 @@ public class Alignment implements Logged {
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
     return pathfind(() -> drive.pose())
-        .withTimeout(1)
+        .withTimeout(5)
         .andThen(Commands.print("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }

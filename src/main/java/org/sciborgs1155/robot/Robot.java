@@ -148,6 +148,7 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
 
+    align.warmupCommand().schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
     //         Commands.waitSeconds(10),
@@ -155,12 +156,12 @@ public class Robot extends CommandRobot implements Logged {
     //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
     //     .ignoringDisable(true)
     //     .schedule();
+    
   }
 
   @Override
   public void robotInit() {
     // Warmup pathfinding commands, as the first run could have significant delays.
-    PathfindingCommand.warmupCommand().schedule();
     align.warmupCommand().schedule();
   }
 
@@ -336,7 +337,7 @@ public class Robot extends CommandRobot implements Logged {
 
     // OPERATOR
     operator
-        .x()
+        .leftTrigger()
         .whileTrue(
             elevator
                 .scoreLevel(Level.L3_ALGAE)
@@ -348,7 +349,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
-    // operator.x().whileTrue(scoral.score(Level.L3));
+    operator.x().whileTrue(scoral.scoreSlow());
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
