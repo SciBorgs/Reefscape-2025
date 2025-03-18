@@ -852,6 +852,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         elevatorHeight.getAsDouble());
   }
 
+  /**
+   * Adds on a Choreo {@link SwerveSample} to the drive's desired velocity such that it does not
+   * interfere (as much) with driving.
+   *
+   * @param vx Driver's inputted vx.
+   * @param vy Driver's inputted vy.
+   * @param omega Driver's inputted omega.
+   * @param sample The swerve sample being added on.
+   * @param elevatorHeight A supplier for the height of the elevator.
+   */
   public void addOnSample(
       DoubleSupplier vx,
       DoubleSupplier vy,
@@ -862,7 +872,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     Vector<N2> sampleSpeeds = VecBuilder.fill(sample.vx, sample.vy);
     Vector<N2> speeds =
         driverSpeeds.norm() > 1e-3 && driverSpeeds.dot(sampleSpeeds) > 0
-            ? sampleSpeeds.projection(driverSpeeds)
+            ? sampleSpeeds.plus(driverSpeeds).projection(driverSpeeds)
             : VecBuilder.fill(0, 0);
     setChassisSpeeds(
         ChassisSpeeds.fromFieldRelativeSpeeds(

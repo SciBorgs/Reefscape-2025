@@ -126,7 +126,9 @@ public class RepulsorFieldPlanner implements Logged {
 
       // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
       Rotation2d sidewaysTheta =
-          target.minus(position).getAngle().minus(position.minus(sidewaysCircle).getAngle());
+          target.minus(position).getNorm() > 1e-4
+              ? target.minus(position).getAngle().minus(position.minus(sidewaysCircle).getAngle())
+              : Rotation2d.kZero;
 
       // sideways force calculations to go AROUND objects. sine sign is used to figure out which way
       // to go around
