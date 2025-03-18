@@ -46,6 +46,7 @@ import monologue.Monologue;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
@@ -166,6 +167,7 @@ public class Robot extends CommandRobot implements Logged {
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
     addPeriodic(vision::logCamEnabled, 1);
+    addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
 
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
