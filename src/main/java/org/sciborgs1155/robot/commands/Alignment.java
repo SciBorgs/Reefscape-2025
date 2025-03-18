@@ -197,6 +197,15 @@ public class Alignment implements Logged {
         .withName("pathfind");
   }
 
+  /**
+   * Moves the robot (unobtrusively) around while slowing down when about to ram into a field
+   * element.
+   *
+   * @param x Driver's vx input.
+   * @param y Driver's vy input.
+   * @param omega Driver's omega input.
+   * @return A command to drive without worry of ramming into things.
+   */
   public Command freeDrive(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
     return drive.run(
         () -> {
