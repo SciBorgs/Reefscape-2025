@@ -1,18 +1,20 @@
 package org.sciborgs1155.lib;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotBase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
+import org.sciborgs1155.robot.Constants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner implements Logged {
@@ -187,52 +189,64 @@ public class RepulsorFieldPlanner implements Logged {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }
 
-  private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
-  private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
-  private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
-  private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
+  // private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
+  // private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
+  // private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
+  // private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
 
   private SwerveSample prevSample;
 
   public RepulsorFieldPlanner() {
     fixedObstacles.addAll(FIELD_OBSTACLES);
     fixedObstacles.addAll(WALLS);
-    for (int i = 0; i < ARROWS_SIZE; i++) {
-      arrows.add(Pose2d.kZero);
-    }
+    // for (int i = 0; i < ARROWS_SIZE; i++) {
+    //   // arrows.add(new Pose2d());
+    // }
     this.prevSample = sample(Translation2d.kZero, Rotation2d.kZero, 0, 0, 0);
   }
 
   @IgnoreLogged private boolean useGoalInArrows = false;
   @IgnoreLogged private boolean useObstaclesInArrows = true;
   @IgnoreLogged private boolean useWallsInArrows = true;
-  private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
+
+  // private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
 
   // A grid of arrows drawn in AScope
-  void updateArrows() {
-    for (int x = 0; x <= ARROWS_X; x++) {
-      for (int y = 0; y <= ARROWS_Y; y++) {
-        var translation =
-            new Translation2d(x * FIELD_LENGTH / ARROWS_X, y * FIELD_WIDTH / ARROWS_Y);
-        var force = Force.kZero;
-        if (useObstaclesInArrows)
-          force = force.plus(getObstacleForce(translation, goal().getTranslation()));
-        if (useWallsInArrows)
-          force = force.plus(getWallForce(translation, goal().getTranslation()));
-        if (useGoalInArrows) {
-          force = force.plus(getGoalForce(translation, goal().getTranslation()));
-        }
-        if (force.getNorm() < 1e-6) {
-          arrows.set(x * (ARROWS_Y + 1) + y, arrowBackstage);
-        } else {
-          var rotation = force.getAngle();
 
-          arrows.set(x * (ARROWS_Y + 1) + y, new Pose2d(translation, rotation));
-        }
-      }
-    }
-  }
+  // TODO removed all of ts since it wasn't being used???? for some reason lmao
 
+  /** Updates the grid of vectors // */
+  // void updateArrows() {
+  //   for (int x = 0; x <= ARROWS_X; x++) {
+  //     for (int y = 0; y <= ARROWS_Y; y++) {
+  //       Translation2d position =
+  //           new Translation2d(x * FIELD_LENGTH / ARROWS_X, y * FIELD_WIDTH / ARROWS_Y);
+  //       Force force = Force.kZero;
+  //       if (useObstaclesInArrows)
+  //         force = force.plus(getObstacleForce(position, goal().getTranslation()));
+  //       if (useWallsInArrows)
+  //         force = force.plus(getWallForce(position, goal().getTranslation()));
+  //       if (useGoalInArrows) {
+  //         force = force.plus(getGoalForce(position, goal().getTranslation()));
+  //       }
+  //       if (force.getNorm() < 1e-6) {
+  //         arrows.set(x * (ARROWS_Y + 1) + y, arrowBackstage);
+  //       } else {
+  //         var rotation = force.getAngle();
+
+  //         arrows.set(x * (ARROWS_Y + 1) + y, new Pose2d(position, rotation));
+  //       }
+  //     }
+  //   }
+  // }
+
+  /**
+   * Force towards the goal.
+   *
+   * @param curLocation Location of the robot.
+   * @param goal Position of the goal.
+   * @return The force to the goal.
+   */
   Force getGoalForce(Translation2d curLocation, Translation2d goal) {
     var displacement = goal.minus(curLocation);
     if (displacement.getNorm() == 0) {
@@ -244,6 +258,13 @@ public class RepulsorFieldPlanner implements Logged {
     return new Force(mag, direction);
   }
 
+  /**
+   * Force from the walls.
+   *
+   * @param curLocation Location of the robot.
+   * @param target Position of the goal.
+   * @return The force from the walls.
+   */
   Force getWallForce(Translation2d curLocation, Translation2d target) {
     var force = Force.kZero;
     for (Obstacle obs : WALLS) {
@@ -252,6 +273,13 @@ public class RepulsorFieldPlanner implements Logged {
     return force;
   }
 
+  /**
+   * Force from obstacles.
+   *
+   * @param curLocation Location of the robot.
+   * @param target Position of the goal.
+   * @return The force from the obstacles.
+   */
   Force getObstacleForce(Translation2d curLocation, Translation2d target) {
     var force = Force.kZero;
     for (Obstacle obs : FIELD_OBSTACLES) {
@@ -260,6 +288,13 @@ public class RepulsorFieldPlanner implements Logged {
     return force;
   }
 
+  /**
+   * Complete force from obstacles, goal and walls.
+   *
+   * @param curLocation Location of the robot.
+   * @param target Position of the goal.
+   * @return The total resultant force from field elements.
+   */
   Force getForce(Translation2d curLocation, Translation2d target) {
     var goalForce =
         getGoalForce(curLocation, target)
@@ -268,6 +303,16 @@ public class RepulsorFieldPlanner implements Logged {
     return goalForce;
   }
 
+  /**
+   * Creates a {@link SwerveSample} from relevant values.
+   *
+   * @param trans Position of the robot.
+   * @param rot Heading of the robot.
+   * @param vx x-component of the field relative robot velocity.
+   * @param vy y-component of the field relative robot velocity.
+   * @param omega Rotational velocity of the robot.
+   * @return A Choreo SwerveSample.
+   */
   public static SwerveSample sample(
       Translation2d trans, Rotation2d rot, double vx, double vy, double omega) {
     return new SwerveSample(
@@ -285,11 +330,24 @@ public class RepulsorFieldPlanner implements Logged {
         new double[4]);
   }
 
+  /**
+   * Changes the goal of the robot.
+   *
+   * @param goal The new goal of the pathfinder.
+   */
   public void setGoal(Translation2d goal) {
     this.goalOpt = Optional.of(goal);
     // updateArrows();
   }
 
+  /**
+   * @param pose The current pose of the robot.
+   * @param currentSpeeds The current {@link ChassisSpeeds} of the robot.
+   * @param maxSpeed The desired maximum speed of the robot.
+   * @param useGoal Whether or not to use the given goal.
+   * @return A {@link SwerveSample} representing the next desired robot swerve state to get to the
+   *     goal. Includes obstacle avoidance.
+   */
   public SwerveSample getCmd(
       Pose2d pose, ChassisSpeeds currentSpeeds, double maxSpeed, boolean useGoal) {
     return getCmd(pose, currentSpeeds, maxSpeed, useGoal, pose.getRotation());
@@ -301,36 +359,45 @@ public class RepulsorFieldPlanner implements Logged {
       double maxSpeed,
       boolean useGoal,
       Rotation2d goalRotation) {
-    // Translation2d speedPerSec =
-    //     new Translation2d(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
-    // double currentSpeed =
-    //     Math.hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+    // Distance travelled in one period
+    double stepSize_m = maxSpeed * Constants.PERIOD.in(Seconds);
 
-    double stepSize_m = maxSpeed * 0.02; // TODO
     if (goalOpt.isEmpty()) {
+      // Tells the robot to stop moving if there is no goal.
       return sample(pose.getTranslation(), pose.getRotation(), 0, 0, 0);
     } else {
-      var startTime = System.nanoTime();
-      var goal = goalOpt.get();
-      var curTrans = pose.getTranslation();
-      var err = curTrans.minus(goal);
+      long startTime = System.nanoTime();
+
+      // sets the goal the position and the error
+      Translation2d goal = goalOpt.get();
+      Translation2d position = pose.getTranslation();
+      Translation2d err = position.minus(goal);
       if (useGoal && err.getNorm() < stepSize_m * 1.5) {
+        // Tells the robot to stop moving if it's already there.
         return sample(goal, goalRotation, 0, 0, 0);
       } else {
-        var obstacleForce = getObstacleForce(curTrans, goal).plus(getWallForce(curTrans, goal));
-        var netForce = obstacleForce;
-        if (useGoal) {
-          netForce = getGoalForce(curTrans, goal).plus(netForce);
-          // log("forceLog", netForce.getNorm());
-          // Calculate how quickly to move in this direction
-          var closeToGoalMax = maxSpeed * Math.min(err.getNorm() / 2, 1);
+        // Add in all forces, ternary operator for the useGoal -> getGoalForce
+        Force netForce =
+            getObstacleForce(position, goal)
+                .plus(getWallForce(position, goal))
+                .plus(useGoal ? getGoalForce(position, goal) : Force.kZero);
 
-          stepSize_m = Math.min(maxSpeed, closeToGoalMax) * 0.02;
-        }
-        var step = new Translation2d(stepSize_m, netForce.getAngle());
-        var intermediateGoal = curTrans.plus(step);
+        // Change stepSize_m if we are using goal
+        stepSize_m =
+            useGoal
+                ? Math.min(maxSpeed, maxSpeed * Math.min(err.getNorm() / 2, 1)) * 0.02
+                : stepSize_m;
+
+        // Next desired displacement from the max speed and angle of the net force
+        Translation2d step = new Translation2d(stepSize_m, netForce.getAngle());
+
+        // Next desired position
+        var intermediateGoal = position.plus(step);
+
         var endTime = System.nanoTime();
         log("repulsorTimeS", (endTime - startTime) / 1e9);
+
+        // set the previous sample as the current sample
         prevSample =
             sample(intermediateGoal, goalRotation, step.getX() / 0.02, step.getY() / 0.02, 0);
         return prevSample;
