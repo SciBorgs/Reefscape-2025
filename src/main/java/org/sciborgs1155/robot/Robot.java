@@ -24,8 +24,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.pathplanner.lib.pathfinding.LocalADStar;
-import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -191,8 +189,6 @@ public class Robot extends CommandRobot implements Logged {
 
     RobotController.setBrownoutVoltage(6.0);
 
-    Pathfinding.setPathfinder(new LocalADStar());
-
     if (isReal()) {
       pdh.clearStickyFaults();
       pdh.setSwitchableChannel(true);
@@ -203,6 +199,8 @@ public class Robot extends CommandRobot implements Logged {
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
     addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
+
+    // addPeriodic(() -> log("", PERIOD), PERIOD);
   }
 
   /** Configures trigger -> command bindings. */
@@ -263,20 +261,39 @@ public class Robot extends CommandRobot implements Logged {
     test().whileTrue(systemsCheck());
 
     Dashboard.cameraFR()
-        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name())))
-        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name())));
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
+                .ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
+                .ignoringDisable(true));
     Dashboard.cameraFL()
-        .onTrue(Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name())))
-        .onFalse(Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name())));
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name()))
+                .ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name()))
+                .ignoringDisable(true));
     Dashboard.cameraBR()
-        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name())))
-        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name())));
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name()))
+                .ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name()))
+                .ignoringDisable(true));
     Dashboard.cameraBL()
-        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())))
-        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name())));
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())).ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name()))
+                .ignoringDisable(true));
     Dashboard.cameraBM()
-        .onTrue(Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name())))
-        .onFalse(Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name())));
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name()))
+                .ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name()))
+                .ignoringDisable(true));
 
     // DRIVER
     driver
