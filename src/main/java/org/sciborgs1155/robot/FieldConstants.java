@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -56,12 +55,11 @@ public class FieldConstants {
           Rotation2d.fromRotations(0));
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-              CENTER_REEF
-                  .getMeasureX()
-                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-              Rotation2d.fromRotations(0))
-          .transformBy(strafe(Inches.of(3)));
+          CENTER_REEF
+              .getMeasureX()
+              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+          Rotation2d.fromRotations(0));
 
   // Reef faces
 

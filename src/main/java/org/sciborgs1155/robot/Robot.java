@@ -21,7 +21,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -36,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
@@ -45,9 +45,10 @@ import monologue.Logged;
 import monologue.Monologue;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
@@ -158,6 +159,13 @@ public class Robot extends CommandRobot implements Logged {
     //     .schedule();
   }
 
+  @Override
+  public void robotPeriodic() {
+    Tracer.startTrace("commands");
+    CommandScheduler.getInstance().run();
+    Tracer.endTrace();
+  }
+
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
@@ -167,7 +175,7 @@ public class Robot extends CommandRobot implements Logged {
     addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
     addPeriodic(vision::logCamEnabled, 1);
-    addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
+    // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
 
     // Log PDH
     SmartDashboard.putData("PDH", pdh);
@@ -272,12 +280,16 @@ public class Robot extends CommandRobot implements Logged {
     test().whileTrue(systemsCheck());
 
     Dashboard.cameraFR()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
-                .ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
-                .ignoringDisable(true));
+        .whileTrue(Commands.run(() -> FaultLogger.report("FR cam", "enabled", FaultType.WARNING)))
+        .onTrue(Commands.run(() -> FaultLogger.report("FR cam", "enabled", FaultType.WARNING)))
+        .onFalse(Commands.run(() -> FaultLogger.report("FR cam", "disabled", FaultType.WARNING)));
+    // Dashboard.cameraFR()
+    //     .onTrue(
+    //         Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
+    //             .ignoringDisable(true))
+    //     .onFalse(
+    //         Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
+    //             .ignoringDisable(true));
     Dashboard.cameraFL()
         .onTrue(
             Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name()))
@@ -393,7 +405,7 @@ public class Robot extends CommandRobot implements Logged {
     operator.x().whileTrue(scoral.score(Level.L3));
     operator.rightBumper().whileTrue(scoral.algae());
 
-    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator.povRight().whileTrue(elevator.scoreLevel(Level.L2));
