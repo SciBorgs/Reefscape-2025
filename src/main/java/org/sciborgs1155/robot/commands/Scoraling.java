@@ -130,4 +130,8 @@ public class Scoraling implements Logged {
             scoral.blocked, "scoral beambreak blocked", () -> "" + scoral.blocked.getAsBoolean());
     return new Test(testCommand, Set.of(hasCoral));
   }
+
+  public boolean hasCoral() {
+    return scoral.blocked.getAsBoolean();
+  }
 }

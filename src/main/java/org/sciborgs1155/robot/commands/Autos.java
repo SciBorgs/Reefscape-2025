@@ -14,15 +14,17 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
-import java.util.Arrays;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.Supplier;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.Fault;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -70,9 +72,8 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption(
-        "B4 - alignment", RB4(alignment, scoraling, drive::resetOdometry, scoral, elevator));
-    chooser.addOption("P4", RP4(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption("B4", B4(alignment, scoraling));
+    chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption(
         "line",
         drive.run(
@@ -81,134 +82,73 @@ public class Autos {
                     new ChassisSpeeds(0.5, 0, 0),
                     ControlMode.OPEN_LOOP_VELOCITY,
                     elevator.position())));
-    chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
+    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
 
     return chooser;
   }
 
-  public static Command sequence(Command... commands) {
-    return Arrays.stream(commands)
-        .map(c -> (Command) c.asProxy())
+  /**
+   * A smart auto which utilizes alignment for planning. It will dynamically replan based on whether
+   * is has a coral or not; see alignSource() and alignReef().
+   *
+   * @param branches an <i>ordered</i> list representing what branches to score in auto. May be any
+   *     length greater than or equal to 1.
+   */
+  public static Command alignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
+    if (branches.isEmpty()) {
+      FaultLogger.report(
+          new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.ERROR));
+      return Commands.none();
+    }
+
+    return branches.stream()
+        .map(
+            b ->
+                Commands.sequence(
+                    alignReef(b, alignment, scoraling), alignSource(alignment, scoraling, 1)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 
-  public static Command RB4(
-      Alignment alignment,
-      Scoraling scoraling,
-      Consumer<Pose2d> resetOdometry,
-      org.sciborgs1155.robot.scoral.Scoral scoral,
-      Elevator elevator) {
-    return Commands.sequence(
-        alignment.reef(Level.L4, Branch.I).withTimeout(6).asProxy(),
-        // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(5)
-            .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
-        // .onlyIf(() -> scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.K)
-            .withTimeout(6)
-            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(8)
-            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
-        // .asProxy().onlyIf(() ->
-        // scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.L)
-            .withTimeout(6)
-            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(8)
-            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
-        // scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.J)
-            .asProxy()
-            .withTimeout(6)
-            .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+  /**
+   * Aligns to the reef with appropriate timeouts. It will end if it does not possess a coral.
+   *
+   * @param branch the branch to score on.
+   */
+  public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
+    return alignment.reef(Level.L4, branch).withTimeout(7).onlyIf(scoraling::hasCoral);
   }
 
-  public static Command test(
-      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
-    return Commands.sequence(alignment.reef(Level.L4, Branch.G).withTimeout(4).asProxy());
-    // .onlyIf(() -> !scoraling.scoralBeambreak()),
-    //   alignment
-    //       .source()
-    //       .asProxy()
-    //       .withTimeout(5)
-    //       .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()));
-    // .onlyIf(() -> scoraling.scoralBeambreak()),
-    //   alignment
-    //       .reef(Level.L4, Branch.K)
-    //       .withTimeout(5)
-    //       .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-    //   alignment
-    //       .source()
-    //       .asProxy()
-    //       .withTimeout(8)
-    //       .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
-    //   // .asProxy().onlyIf(() ->
-    //   // scoraling.scoralBeambreak()),
-    //   alignment
-    //       .reef(Level.L4, Branch.L)
-    //       .withTimeout(5)
-    //       .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-    //   alignment
-    //       .source()
-    //       .asProxy()
-    //       .withTimeout(8)
-    //       .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
-    // scoraling.scoralBeambreak()),
-    //   alignment
-    //       .reef(Level.L4, Branch.J)
-    //       .asProxy()
-    //       .withTimeout(5)
-    //       .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+  /**
+   * Aligns to the source with appropriate timeouts. It will end if it already has a coral. It will
+   * retry intaking a specified number of times.
+   *
+   * @param retries the number of times to retry (0 indicates to only run the command once)
+   */
+  public static Command alignSource(Alignment alignment, Scoraling scoraling, int retries) {
+    Supplier<Command> attempt =
+        () ->
+            alignment
+                .source()
+                .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
+                .withTimeout(5);
+
+    Command source = attempt.get();
+
+    for (int i = 0; i < retries; i++) {
+      source = Commands.sequence(source, alignment.backUp().asProxy(), attempt.get());
+    }
+
+    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral))
+        .onlyIf(() -> !scoraling.hasCoral());
   }
 
-  public static Command RP4(
-      Alignment alignment, Scoraling scoraling, Consumer<Pose2d> resetOdometry) {
-    return Commands.sequence(
-        alignment.reef(Level.L4, Branch.E).withTimeout(4).asProxy(),
-        // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(5)
-            .andThen(scoraling.hpsIntake().withTimeout(1).asProxy()),
-        // .onlyIf(() -> scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.D)
-            .withTimeout(5)
-            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(8)
-            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
-        // .asProxy().onlyIf(() ->
-        // scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.C)
-            .withTimeout(5)
-            .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
-        alignment
-            .source()
-            .asProxy()
-            .withTimeout(8)
-            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)), // .asProxy().onlyIf(() ->
-        // scoraling.scoralBeambreak()),
-        alignment
-            .reef(Level.L4, Branch.B)
-            .asProxy()
-            .withTimeout(5)
-            .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
+  /** Runas a "bottom" side auto with 4 L4 coral scored. */
+  public static Command B4(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(alignment, scoraling, List.of(Branch.I, Branch.K, Branch.L, Branch.J));
+  }
+
+  /** runs a proceser side auto with 4 L4 coral scored. */
+  public static Command P4(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(alignment, scoraling, List.of(Branch.E, Branch.D, Branch.C, Branch.B));
   }
 }
