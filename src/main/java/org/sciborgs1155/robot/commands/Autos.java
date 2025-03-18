@@ -101,16 +101,12 @@ public class Autos {
       return Commands.none();
     }
 
-    Command auto = Commands.none();
-    for (int i = 0; i < branches.size(); i++) {
-      auto =
-          Commands.sequence(
-              auto,
-              alignReef(branches.get(i), alignment, scoraling),
-              alignSource(alignment, scoraling, 1));
-    }
-
-    return auto;
+    return branches.stream()
+        .map(
+            b ->
+                Commands.sequence(
+                    alignReef(b, alignment, scoraling), alignSource(alignment, scoraling, 1)))
+        .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 
   /**
@@ -119,11 +115,7 @@ public class Autos {
    * @param branch the branch to score on.
    */
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
-    return alignment
-        .reef(Level.L4, branch)
-        .withTimeout(7)
-        .onlyIf(() -> scoraling.hasCoral())
-        .asProxy();
+    return alignment.reef(Level.L4, branch).withTimeout(7).onlyIf(scoraling::hasCoral);
   }
 
   /**
