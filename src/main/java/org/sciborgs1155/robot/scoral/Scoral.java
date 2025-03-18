@@ -8,6 +8,8 @@ import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -18,6 +20,7 @@ import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
@@ -26,6 +29,8 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
 
   public final Beambreak beambreak;
   public final Trigger blocked;
+
+  private DoubleEntry outtakeSpeed = Tuning.entry("score power", SCORE_POWER);
 
   /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {
@@ -36,6 +41,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public static Scoral none() {
     return new Scoral(SimpleMotor.none(), Beambreak.none());
   }
+
 
   /** Creates a SimpleMotor with the appropriate configurations for a Scoral with hardware. */
   private static SimpleMotor realMotor() {
@@ -56,14 +62,17 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     setDefaultCommand(stop());
   }
 
+  public Command tuningScore() {
+    return run(() -> motor.set(outtakeSpeed.getAsDouble())).withName("tune score");
+  }
+
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command score() {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
   }
 
   public Command score(Level level) {
-    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.4 * SCORE_POWER))
-        .withName("score level");
+    return run(() -> motor.set((level == Level.L4 ? 0.4 : 0.8) * SCORE_POWER));
   }
 
   public Command scoreSlow() {

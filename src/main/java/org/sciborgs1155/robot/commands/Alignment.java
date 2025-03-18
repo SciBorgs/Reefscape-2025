@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -90,6 +91,7 @@ public class Alignment implements Logged {
                         .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
                     // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
                     backUp().asProxy())))
+        .asProxy()
         .withName("align to reef")
         .onlyWhile(
             () ->
@@ -99,8 +101,24 @@ public class Alignment implements Logged {
   }
 
   public Command backUp() {
-    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(0.2))));
+    return Commands.defer(
+        () -> {
+          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(-0.2)));
+          return drive.driveTo(backPose);
+        },
+        Set.of(drive));
   }
+
+
+  public Command goForward() {
+    return Commands.defer(
+        () -> {
+          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(0.2)));
+          return drive.driveTo(backPose);
+        },
+        Set.of(drive));
+  }
+
 
   /**
    * Pathfinds and aligns to a designated source.
@@ -132,13 +150,14 @@ public class Alignment implements Logged {
 
   public Command alignTo(Supplier<Pose2d> goal) {
     return Commands.runOnce(() -> log("goal pose", goal.get()))
-        .asProxy()
         .andThen(
             pathfind(goal)
+                .asProxy()
                 .andThen(
                     drive
                         .driveTo(goal)
-                        .alongWith(
+                        .asProxy()
+                        .deadlineFor(
                             leds.error(
                                 () ->
                                     drive
@@ -180,7 +199,7 @@ public class Alignment implements Logged {
         .until(scoral.blocked.negate())
         .deadlineFor(
             Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                .andThen(scoral.score(level)));
+                .andThen(scoral.scoreSlow()));
   }
 
   /**

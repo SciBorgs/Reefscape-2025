@@ -708,6 +708,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         .withName("drive to pose");
   }
 
+  public Command driveTo(Pose2d goal) {
+    return driveTo(() -> goal);
+  }
+
   /**
    * Follows a given pathplanner path.
    *

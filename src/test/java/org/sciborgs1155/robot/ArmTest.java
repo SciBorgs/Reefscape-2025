@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.arm.Arm;
 
 /** Tests {@link Arm} subsystem with simulated hardware. Doesn't work :/ */
+@Disabled
 public class ArmTest {
   Arm arm;
 

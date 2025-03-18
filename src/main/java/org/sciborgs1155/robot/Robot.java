@@ -24,7 +24,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -156,7 +155,7 @@ public class Robot extends CommandRobot implements Logged {
     //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
     //     .ignoringDisable(true)
     //     .schedule();
-    
+
   }
 
   @Override

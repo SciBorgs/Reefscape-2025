@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
 import edu.wpi.first.wpilibj.util.Color;
@@ -73,7 +74,7 @@ public class Scoraling implements Logged {
     return elevator
         .scoreLevel(level)
         .alongWith(
-            Commands.waitUntil(elevator::atGoal).andThen(scoral.score(level)),
+            Commands.waitUntil(elevator::atGoal).andThen(scoral.score()),
             leds.progressGradient(
                 () -> 1 - elevator.position() / level.extension.in(Meters), elevator::atGoal))
         .withName("scoraling");
@@ -98,6 +99,12 @@ public class Scoraling implements Logged {
   /** A command which halts both the hopper and the scoral. */
   public Command stop() {
     return hopper.stop().alongWith(scoral.stop()).withName("stopping");
+  }
+
+  public Command retryIntake() {
+    return
+      elevator.scoreLevel(Level.L1).withTimeout(Seconds.of(0.2)).asProxy()
+      .alongWith(runRollersBack().asProxy().until(hopper.blocked.negate()));
   }
 
   /**

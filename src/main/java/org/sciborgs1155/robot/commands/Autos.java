@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -83,6 +84,7 @@ public class Autos {
                     ControlMode.OPEN_LOOP_VELOCITY,
                     elevator.position())));
     // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption("test drive to", drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
 
     return chooser;
   }
@@ -104,8 +106,8 @@ public class Autos {
     return branches.stream()
         .map(
             b ->
-                Commands.sequence(
-                    alignReef(b, alignment, scoraling), alignSource(alignment, scoraling, 1)))
+                Commands.sequence(alignSource(alignment, scoraling, 1),
+                alignReef(b, alignment, scoraling)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 
@@ -135,7 +137,12 @@ public class Autos {
     Command source = attempt.get();
 
     for (int i = 0; i < retries; i++) {
-      source = Commands.sequence(source, alignment.backUp().asProxy(), attempt.get());
+      source = Commands.sequence(source, 
+          Commands.parallel(
+            alignment.goForward().asProxy(),
+            scoraling.retryIntake()
+          ),
+          attempt.get());
     }
 
     return Commands.race(source, Commands.waitUntil(scoraling::hasCoral))
