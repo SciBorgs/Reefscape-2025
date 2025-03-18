@@ -99,7 +99,7 @@ public class Autos {
       org.sciborgs1155.robot.scoral.Scoral scoral,
       Elevator elevator) {
     return Commands.sequence(
-        alignment.reef(Level.L4, Branch.I).withTimeout(4).asProxy(),
+        alignment.reef(Level.L4, Branch.I).withTimeout(6).asProxy(),
         // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
@@ -109,7 +109,7 @@ public class Autos {
         // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)
-            .withTimeout(4)
+            .withTimeout(6)
             .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
@@ -120,7 +120,7 @@ public class Autos {
         // scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.L)
-            .withTimeout(5)
+            .withTimeout(6)
             .asProxy(), // .onlyIf(() -> !scoraling.scoralBeambreak()),
         alignment
             .source()
@@ -131,7 +131,7 @@ public class Autos {
         alignment
             .reef(Level.L4, Branch.J)
             .asProxy()
-            .withTimeout(5)
+            .withTimeout(6)
             .asProxy()); // .onlyIf(() -> !scoraling.scoralBeambreak());
   }
 

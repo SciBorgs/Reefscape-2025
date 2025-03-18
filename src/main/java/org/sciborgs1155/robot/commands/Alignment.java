@@ -203,14 +203,13 @@ public class Alignment implements Logged {
                   elevator::position);
               Tracer.endTrace();
             })
-        .until(() -> drive.atTranslation(goal.get().getTranslation(), Meters.of(6)))
+        .until(() -> drive.atTranslation(goal.get().getTranslation(), Meters.of(1)))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
-    // return Commands.none();
   }
 
   /**
@@ -231,6 +230,7 @@ public class Alignment implements Logged {
                   .pose()
                   .getTranslation()
                   .plus(new Translation2d(x.getAsDouble(), y.getAsDouble())));
+          // TODO this makes no sense! -- siggy
           drive.addOnSample(
               x,
               y,
