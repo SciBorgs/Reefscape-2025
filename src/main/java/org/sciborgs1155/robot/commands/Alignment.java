@@ -29,12 +29,14 @@ import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Alignment implements Logged {
   @IgnoreLogged private final Drive drive;
   @IgnoreLogged private final Elevator elevator;
   @IgnoreLogged private final Scoral scoral;
+  @IgnoreLogged private final LEDs leds;
 
   @Log.NT private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
@@ -50,10 +52,11 @@ public class Alignment implements Logged {
    * @param drive The operated drivetrain.
    * @param elevator The operated elevator.
    */
-  public Alignment(Drive drive, Elevator elevator, Scoral scoral) {
+  public Alignment(Drive drive, Elevator elevator, Scoral scoral, LEDs leds) {
     this.drive = drive;
     this.elevator = elevator;
     this.scoral = scoral;
+    this.leds = leds;
   }
 
   /**
@@ -71,6 +74,15 @@ public class Alignment implements Logged {
             pathfind(goal).withName("").asProxy(),
             Commands.parallel(
                 elevator.scoreLevel(level).asProxy(),
+                leds.error(
+                    () ->
+                        drive
+                                .pose()
+                                .relativeTo(goal.get())
+                                .getTranslation()
+                                .getDistance(new Translation2d())
+                            * 3,
+                    0.02 * 3),
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
@@ -121,7 +133,19 @@ public class Alignment implements Logged {
         .asProxy()
         .andThen(
             pathfind(goal)
-                .andThen(drive.driveTo(goal))
+                .andThen(
+                    drive
+                        .driveTo(goal)
+                        .alongWith(
+                            leds.error(
+                                () ->
+                                    drive
+                                            .pose()
+                                            .relativeTo(goal.get())
+                                            .getTranslation()
+                                            .getDistance(new Translation2d())
+                                        * 3,
+                                0.02 * 3)))
                 .onlyWhile(
                     () ->
                         !FaultLogger.report(
