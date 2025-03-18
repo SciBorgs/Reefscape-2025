@@ -88,15 +88,18 @@ public class Alignment implements Logged {
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
                         .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
-                    drive
-                        .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
-                        .asProxy())))
+                    // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
+                    backUp().asProxy())))
         .withName("align to reef")
         .onlyWhile(
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding));
+  }
+
+  public Command backUp() {
+    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(0.2))));
   }
 
   /**
@@ -127,7 +130,6 @@ public class Alignment implements Logged {
         .asProxy();
   }
 
-  /** THIS COMMAND IS UNDEFERRED. */
   public Command alignTo(Supplier<Pose2d> goal) {
     return Commands.runOnce(() -> log("goal pose", goal.get()))
         .asProxy()

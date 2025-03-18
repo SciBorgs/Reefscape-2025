@@ -14,7 +14,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import java.util.*;
+import java.util.function.Supplier;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
@@ -83,7 +83,7 @@ public class Autos {
                     ControlMode.OPEN_LOOP_VELOCITY,
                     elevator.position())));
     // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
-    
+
     return chooser;
   }
 
@@ -121,7 +121,7 @@ public class Autos {
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
     return alignment
         .reef(Level.L4, branch)
-        .withTimeout(5)
+        .withTimeout(7)
         .onlyIf(() -> scoraling.hasCoral())
         .asProxy();
   }
@@ -133,18 +133,21 @@ public class Autos {
    * @param retries the number of times to retry (0 indicates to only run the command once)
    */
   public static Command alignSource(Alignment alignment, Scoraling scoraling, int retries) {
-    Command source =
-        alignment.source().andThen(scoraling.hpsIntake().withTimeout(2.5)).withTimeout(5);
+    Supplier<Command> attempt =
+        () ->
+            alignment
+                .source()
+                .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
+                .withTimeout(5);
+
+    Command source = attempt.get();
 
     for (int i = 0; i < retries; i++) {
-      source =
-          source.andThen(
-              alignment.source().andThen(scoraling.hpsIntake().withTimeout(2.5)).withTimeout(5));
+      source = Commands.sequence(source, alignment.backUp().asProxy(), attempt.get());
     }
 
-    source = Commands.race(source, Commands.waitUntil(() -> scoraling.hasCoral()));
-
-    return source.onlyIf(() -> !scoraling.hasCoral()).asProxy();
+    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral))
+        .onlyIf(() -> !scoraling.hasCoral());
   }
 
   /** Runas a "bottom" side auto with 4 L4 coral scored. */
