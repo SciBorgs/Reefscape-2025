@@ -78,6 +78,7 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
@@ -906,6 +907,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     // update our heading in reality / sim
     if (Robot.isReal()) {
       lock.lock();
+      Tracer.startTrace("drive pd");
       try {
         double[] timestamps = modules.get(2).timestamps();
 
@@ -955,6 +957,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+    Tracer.endTrace();
   }
 
   @Override
