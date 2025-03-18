@@ -21,6 +21,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -45,7 +46,6 @@ import monologue.Logged;
 import monologue.Monologue;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tracer;
@@ -279,23 +279,19 @@ public class Robot extends CommandRobot implements Logged {
 
     test().whileTrue(systemsCheck());
 
-    Dashboard.cameraFR()
-        .whileTrue(Commands.run(() -> FaultLogger.report("FR cam", "enabled", FaultType.WARNING)))
-        .onTrue(Commands.run(() -> FaultLogger.report("FR cam", "enabled", FaultType.WARNING)))
-        .onFalse(Commands.run(() -> FaultLogger.report("FR cam", "disabled", FaultType.WARNING)));
-    // Dashboard.cameraFR()
-    //     .onTrue(
-    //         Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
-    //             .ignoringDisable(true))
-    //     .onFalse(
-    //         Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
-    //             .ignoringDisable(true));
     Dashboard.cameraFL()
         .onTrue(
             Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name()))
                 .ignoringDisable(true))
         .onFalse(
             Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name()))
+                .ignoringDisable(true));
+    Dashboard.cameraFR()
+        .onTrue(
+            Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
+                .ignoringDisable(true))
+        .onFalse(
+            Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
                 .ignoringDisable(true));
     Dashboard.cameraBR()
         .onTrue(

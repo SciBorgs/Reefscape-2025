@@ -198,6 +198,10 @@ public class Vision implements Logged {
     camerasEnabled.put(name, true);
   }
 
+  public boolean getCameraStatus(String name) {
+    return camerasEnabled.get(name);
+  }
+
   /**
    * Returns the poses of all currently visible tags.
    *
