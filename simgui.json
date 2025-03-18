@@ -62,6 +62,16 @@
         "window": {
           "visible": true
         }
+      },
+      "/Robot/elevator/measurement/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -71,20 +81,11 @@
         "open": true
       },
       "Robot": {
-        "align": {
-          "open": true
-        },
-        "open": true,
         "scoraling": {
-          "elevator": {
-            "open": true
-          },
-          "open": true,
           "scoral": {
             "beambreak": {
               "open": true
-            },
-            "open": true
+            }
           }
         }
       }

@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,6 +28,8 @@ public final class DriveConstants {
     OPEN_LOOP_VELOCITY;
   }
 
+  public static record FFConstants(double kS, double kV, double kA) {}
+
   // The angle between the velocity and the displacement from a target, above which the robot will
   // not use assisted driving to the target. (the driver must be driving in the general direction of
   // the assisted driving target.)
@@ -39,7 +40,7 @@ public final class DriveConstants {
   public static final double ASSISTED_ROTATING_THRESHOLD = 0.02;
 
   // The control loop used by all of the modules when driving
-  public static final ControlMode DRIVE_MODE = ControlMode.CLOSED_LOOP_VELOCITY;
+  public static final ControlMode DRIVE_MODE = ControlMode.OPEN_LOOP_VELOCITY;
 
   // Rate at which sensors update periodicially
   public static final Time SENSOR_PERIOD = Seconds.of(0.02);
@@ -59,7 +60,11 @@ public final class DriveConstants {
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(16.0);
+  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(6);
+  public static final LinearAcceleration MAX_SKID_ACCEL =
+      MetersPerSecondPerSecond.of(38); // TODO: Tune
+  public static final LinearAcceleration MAX_TILT_ACCEL =
+      MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final AngularVelocity MAX_ANGULAR_SPEED =
       RadiansPerSecond.of(MAX_SPEED.in(MetersPerSecond) / RADIUS.in(Meters));
   public static final AngularAcceleration MAX_ANGULAR_ACCEL =
@@ -89,20 +94,23 @@ public final class DriveConstants {
               1),
           MODULE_OFFSET);
 
-  public static final PathConstraints PATH_CONSTRAINTS =
-      new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
+  // public static final PathConstraints PATH_CONSTRAINTS =
+  //     new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
 
   // How many ticks before it pathfinds again.
   public static final int PATHFINDING_PERIOD = 1;
+  // The difference in the fastest and slowest module beyond which implies skidding.
+  public static final LinearVelocity SKIDDING_THRESHOLD =
+      MetersPerSecond.of(3); // 3 is random, change
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
       List.of(
-          Rotation2d.fromRadians(0), // front left
-          Rotation2d.fromRadians(0), // front right
-          Rotation2d.fromRadians(0), // rear left
-          Rotation2d.fromRadians(0) // rear right
+          Rotation2d.kZero, // front left
+          Rotation2d.kZero, // front right
+          Rotation2d.kZero, // rear left
+          Rotation2d.kZero // rear right
           );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
@@ -112,9 +120,7 @@ public final class DriveConstants {
     public static final double I = 0.0;
     public static final double D = 0.05;
 
-    public static final Distance TOLERANCE = Centimeters.of(5);
-
-    public static final double PRECISION = 5;
+    public static final Distance TOLERANCE = Centimeters.of(1);
   }
 
   public static final class Rotation {
@@ -123,8 +129,6 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Angle TOLERANCE = Degrees.of(3);
-
-    public static final double PRECISION = 3;
   }
 
   public static final class ModuleConstants {
@@ -144,11 +148,18 @@ public final class DriveConstants {
         public static final double D = 0.0;
       }
 
-      public static final class FF {
-        public static final double S = 0.022436;
-        public static final double V = 2.1154;
-        public static final double A = 0.45287;
-      }
+      // public static final class FF {
+      //   public static final double S = 0.022436;
+      //   public static final double V = 2.1154;
+      //   public static final double A = 0.45287;
+      // }
+      public static final FFConstants FRONT_RIGHT_FF = new FFConstants(0.21459, 2.0025, 0.094773);
+      public static final FFConstants FRONT_LEFT_FF = new FFConstants(0.23328, 2.0243, 0.045604);
+      public static final FFConstants REAR_LEFT_FF = new FFConstants(0.14362, 2.0942, 0.21547);
+      public static final FFConstants REAR_RIGHT_FF = new FFConstants(0.15099, 1.9379, 0.30998);
+
+      public static final List<FFConstants> FF_CONSTANTS =
+          List.of(FRONT_LEFT_FF, FRONT_RIGHT_FF, REAR_LEFT_FF, REAR_RIGHT_FF);
     }
 
     static final class Turning {

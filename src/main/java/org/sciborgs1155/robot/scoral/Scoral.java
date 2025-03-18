@@ -24,7 +24,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor motor;
 
-  private final Beambreak beambreak;
+  public final Beambreak beambreak;
   public final Trigger blocked;
 
   /** Creates a Scoral based on if it is utilizing hardware. */
@@ -62,7 +62,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   public Command score(Level level) {
-    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.6 * SCORE_POWER))
+    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.4 * SCORE_POWER))
         .withName("score level");
   }
 

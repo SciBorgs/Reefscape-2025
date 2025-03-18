@@ -55,7 +55,7 @@ public class DriveCommands {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                  drive.drive(() -> 0, () -> 0, () -> speed);
+                  drive.drive(() -> 0, () -> 0, () -> speed, () -> 0);
                 },
                 drive)),
 
@@ -108,7 +108,7 @@ public class DriveCommands {
 
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
-    Rotation2d lastAngle = new Rotation2d();
+    Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
   }
 }

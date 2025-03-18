@@ -14,6 +14,8 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -40,7 +42,7 @@ public class Autos {
         drive::pose,
         drive::resetOdometry,
         drive::robotRelativeChassisSpeeds,
-        (s, g) -> drive.setChassisSpeeds(s, ControlMode.CLOSED_LOOP_VELOCITY),
+        (s, g) -> drive.setChassisSpeeds(s, ControlMode.CLOSED_LOOP_VELOCITY, elevator.position()),
         new PPHolonomicDriveController(
             new PIDConstants(Translation.P, Translation.I, Translation.D),
             new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
@@ -70,8 +72,18 @@ public class Autos {
 
     SendableChooser<Command> chooser = AutoBuilder.buildAutoChooser();
     chooser.addOption("no auto", Commands.none());
-    chooser.addOption("B4 - alignment", B4(alignment, scoraling));
-    chooser.addOption("P4 - alignment", P4(alignment, scoraling));
+    chooser.addOption("B4", B4(alignment, scoraling));
+    chooser.addOption("P4", P4(alignment, scoraling));
+    chooser.addOption(
+        "line",
+        drive.run(
+            () ->
+                drive.setChassisSpeeds(
+                    new ChassisSpeeds(0.5, 0, 0),
+                    ControlMode.OPEN_LOOP_VELOCITY,
+                    elevator.position())));
+    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
+    
     return chooser;
   }
 

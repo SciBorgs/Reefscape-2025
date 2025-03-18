@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -56,12 +55,11 @@ public class FieldConstants {
           Rotation2d.fromRotations(0));
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-              CENTER_REEF
-                  .getMeasureX()
-                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-              Rotation2d.fromRotations(0))
-          .transformBy(strafe(Inches.of(3)));
+          CENTER_REEF
+              .getMeasureX()
+              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+          Rotation2d.fromRotations(0));
 
   // Reef faces
 
@@ -122,8 +120,6 @@ public class FieldConstants {
     }
   }
 
-  public static final Distance TO_THE_LEFT = Inches.of(0);
-
   // Poses for scoraling.
   // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
   // There are two reef branches per side, so the more counter-clockwise one is 1, and the
@@ -147,7 +143,7 @@ public class FieldConstants {
 
     private Branch(Pose2d pose) {
       this.pose =
-          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1)))
+          pose.transformBy(Constants.strafe(Inches.of(-2)))
               .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
@@ -208,9 +204,9 @@ public class FieldConstants {
   }
 
   public static enum Cage {
-    LEFT(new Pose2d()),
-    MID(new Pose2d()),
-    RIGHT(new Pose2d());
+    LEFT(Pose2d.kZero),
+    MID(Pose2d.kZero),
+    RIGHT(Pose2d.kZero);
 
     private final Pose2d pose;
 
@@ -285,11 +281,11 @@ public class FieldConstants {
   }
 
   // We don't have these poses. do NOT use them.
-  public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
+  public static final Pose2d PROCESSOR = allianceReflect(Pose2d.kZero);
 
-  public static final Pose2d CAGE_1 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_2 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_3 = allianceReflect(new Pose2d());
+  public static final Pose2d CAGE_1 = allianceReflect(Pose2d.kZero);
+  public static final Pose2d CAGE_2 = allianceReflect(Pose2d.kZero);
+  public static final Pose2d CAGE_3 = allianceReflect(Pose2d.kZero);
 
   public static Pose2d nearestCage(Pose2d pose) {
     return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
