@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotBase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -190,9 +189,9 @@ public class RepulsorFieldPlanner implements Logged {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }
 
-  private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
-  private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
-  private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
+  // private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
+  // private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
+  // private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
   // private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
 
   private SwerveSample prevSample;

@@ -40,7 +40,7 @@ public class AlignTest {
     elevator = Elevator.create();
     scoral = Scoral.create();
     drive.resetEncoders();
-    drive.resetOdometry(new Pose2d());
+    drive.resetOdometry(Pose2d.kZero);
     align = new Alignment(drive, elevator, scoral);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.notifyNewData();
