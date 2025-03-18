@@ -245,6 +245,14 @@ public class Alignment implements Logged {
         });
   }
 
+  // * Warms up the pathfind command by telling drive to drive to itself. */
+  public Command warmupCommand() {
+    return pathfind(() -> drive.pose())
+        .withTimeout(1)
+        .andThen(Commands.print("[Alignment] Finished warmup"))
+        .ignoringDisable(true);
+  }
+
   // @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
   // @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
   // @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
