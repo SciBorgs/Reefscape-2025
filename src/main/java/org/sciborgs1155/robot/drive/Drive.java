@@ -97,7 +97,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   // Gyro
   private final GyroIO gyro;
-  private static Rotation2d simRotation = new Rotation2d();
+  private static Rotation2d simRotation = Rotation2d.kZero;
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
@@ -910,18 +910,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             };
         double[][] allGyro = gyro.odometryData();
 
+        SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+        Rotation2d angle = Rotation2d.kZero;
         for (int i = 0; i < timestamps.length; i++) {
-          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = allPositions[m][i];
           }
 
-          odometry.updateWithTime(
-              timestamps[i],
-              new Rotation2d(Units.rotationsToRadians(allGyro[0][i])),
-              modulePositions);
+          angle = Rotation2d.fromRotations(allGyro[0][i]);
+          odometry.updateWithTime(timestamps[i], angle, modulePositions);
           lastPositions = modulePositions;
-          lastHeading = new Rotation2d(Units.rotationsToRadians(allGyro[0][i]));
+          lastHeading = angle;
         }
       } catch (Exception e) {
         e.printStackTrace();

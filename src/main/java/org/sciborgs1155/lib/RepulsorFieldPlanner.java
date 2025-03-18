@@ -198,7 +198,7 @@ public class RepulsorFieldPlanner implements Logged {
     fixedObstacles.addAll(FIELD_OBSTACLES);
     fixedObstacles.addAll(WALLS);
     for (int i = 0; i < ARROWS_SIZE; i++) {
-      arrows.add(new Pose2d());
+      arrows.add(Pose2d.kZero);
     }
     this.prevSample = sample(Translation2d.kZero, Rotation2d.kZero, 0, 0, 0);
   }
@@ -287,7 +287,7 @@ public class RepulsorFieldPlanner implements Logged {
 
   public void setGoal(Translation2d goal) {
     this.goalOpt = Optional.of(goal);
-    updateArrows();
+    // updateArrows();
   }
 
   public SwerveSample getCmd(

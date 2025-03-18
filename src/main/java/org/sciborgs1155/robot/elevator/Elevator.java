@@ -238,7 +238,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         BASE_FROM_CHASSIS.plus(
             new Translation3d(
                 Math.sin(7 * Math.PI / 180) * hardware.position() / 2, 0, hardware.position() / 2)),
-        new Rotation3d());
+        Rotation3d.kZero);
   }
 
   @Log.NT
@@ -247,7 +247,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         CARRIAGE_FROM_CHASSIS.plus(
             new Translation3d(
                 Math.sin(7 * Math.PI / 180) * hardware.position(), 0, hardware.position())),
-        new Rotation3d());
+        Rotation3d.kZero);
   }
 
   /**

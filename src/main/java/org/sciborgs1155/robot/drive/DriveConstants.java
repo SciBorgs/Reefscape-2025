@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Constants.Robot.MOI;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -95,8 +94,8 @@ public final class DriveConstants {
               1),
           MODULE_OFFSET);
 
-  public static final PathConstraints PATH_CONSTRAINTS =
-      new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
+  // public static final PathConstraints PATH_CONSTRAINTS =
+  //     new PathConstraints(MAX_SPEED, MAX_ACCEL, MAX_ANGULAR_SPEED, MAX_ANGULAR_ACCEL);
 
   // How many ticks before it pathfinds again.
   public static final int PATHFINDING_PERIOD = 1;
@@ -108,10 +107,10 @@ public final class DriveConstants {
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
   public static final List<Rotation2d> ANGULAR_OFFSETS =
       List.of(
-          Rotation2d.fromRadians(0), // front left
-          Rotation2d.fromRadians(0), // front right
-          Rotation2d.fromRadians(0), // rear left
-          Rotation2d.fromRadians(0) // rear right
+          Rotation2d.kZero, // front left
+          Rotation2d.kZero, // front right
+          Rotation2d.kZero, // rear left
+          Rotation2d.kZero // rear right
           );
 
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
