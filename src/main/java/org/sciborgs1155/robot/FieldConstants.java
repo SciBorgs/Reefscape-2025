@@ -281,13 +281,13 @@ public class FieldConstants {
   }
 
   // We don't have these poses. do NOT use them.
-  public static final Pose2d PROCESSOR = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d PROCESSOR = allianceReflect(Pose2d.kZero);
 
-  public static final Pose2d CAGE_1 = allianceReflect(Pose2d.kZero);
-  public static final Pose2d CAGE_2 = allianceReflect(Pose2d.kZero);
-  public static final Pose2d CAGE_3 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_1 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_2 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_3 = allianceReflect(Pose2d.kZero);
 
-  public static Pose2d nearestCage(Pose2d pose) {
-    return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
-  }
+  // public static Pose2d nearestCage(Pose2d pose) {
+  //   return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
+  // }
 }

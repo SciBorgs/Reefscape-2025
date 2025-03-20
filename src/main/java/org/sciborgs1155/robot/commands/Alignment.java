@@ -85,10 +85,10 @@ public class Alignment implements Logged {
                 leds.error(
                     () ->
                         drive
-                                .pose()
-                                .relativeTo(goal.get())
-                                .getTranslation()
-                                .getDistance(new Translation2d()),
+                            .pose()
+                            .relativeTo(goal.get())
+                            .getTranslation()
+                            .getDistance(new Translation2d()),
                     0.02 * 3)))
         .asProxy()
         .withName("align to reef")
@@ -96,16 +96,16 @@ public class Alignment implements Logged {
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                alternateAlliancePathfinding));
+                    alternateAlliancePathfinding));
   }
 
   public Command moveRobotRelative(Transform2d transform) {
     return Commands.defer(
         () -> {
-            Pose2d goal = drive.pose().transformBy(transform);
-            return drive.driveTo(goal);
-        }
-        , Set.of(drive));
+          Pose2d goal = drive.pose().transformBy(transform);
+          return drive.driveTo(goal);
+        },
+        Set.of(drive));
   }
 
   /**

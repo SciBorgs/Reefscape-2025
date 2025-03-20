@@ -147,6 +147,7 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
 
+    // Warmup pathfinding commands, as the first run could have significant delays.
     align.warmupCommand().schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
@@ -156,12 +157,6 @@ public class Robot extends CommandRobot implements Logged {
     //     .ignoringDisable(true)
     //     .schedule();
 
-  }
-
-  @Override
-  public void robotInit() {
-    // Warmup pathfinding commands, as the first run could have significant delays.
-    align.warmupCommand().schedule();
   }
 
   @Override

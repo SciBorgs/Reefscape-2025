@@ -88,6 +88,14 @@
             }
           }
         }
+      },
+      "Tracer": {
+        "robot main": {
+          "open": true
+        }
+      },
+      "notfound": {
+        "open": true
       }
     }
   },

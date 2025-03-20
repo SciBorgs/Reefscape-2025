@@ -103,24 +103,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   public final DoubleEntry translationP =
-      Tuning.entry("Robot/Drive/Tuning/translation p", Translation.P);
+      Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
   public final DoubleEntry translationI =
-      Tuning.entry("Robot/Drive/Tuning/translation i", Translation.I);
+      Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
   public final DoubleEntry translationD =
-      Tuning.entry("Robot/Drive/Tuning/translation d", Translation.D);
+      Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
 
-  public final DoubleEntry rotationP = Tuning.entry("Robot/Drive/Tuning/rotation p", Rotation.P);
-  public final DoubleEntry rotationI = Tuning.entry("Robot/Drive/Tuning/rotation i", Rotation.I);
-  public final DoubleEntry rotationD = Tuning.entry("Robot/Drive/Tuning/rotation d", Rotation.D);
+  public final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+  public final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+  public final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
 
   public final DoubleEntry maxAccel =
-      Tuning.entry("Robot/Drive/Tuning/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
+      Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
   public final DoubleEntry maxSkidAccel =
       Tuning.entry(
-          "Robot/Drive/Tuning/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
+          "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
   public final DoubleEntry maxTiltAccel =
       Tuning.entry(
-          "Robot/Drive/Tuning/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
+          "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -909,9 +909,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
+    Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
       lock.lock();
-      Tracer.startTrace("drive pd");
       try {
         double[] timestamps = modules.get(2).timestamps();
 
@@ -957,8 +957,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       modules2d[i].setPose(pose().transformBy(transform));
     }
 
-    translationController.setPID(translationP.get(), translationI.get(), translationD.get());
-    rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
+    if (TUNING) {
+      translationController.setPID(translationP.get(), translationI.get(), translationD.get());
+      rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
+    }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
     Tracer.endTrace();
