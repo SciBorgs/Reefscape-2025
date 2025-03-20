@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -72,8 +73,14 @@ public class Alignment implements Logged {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
-            pathfind(goal).withName("").asProxy(),
-            Commands.parallel(
+            pathfind(goal).withName("go to reef").asProxy(),
+            Commands.deadline(
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    Commands.waitUntil(elevator::atGoal)
+                        .withTimeout(1.5)
+                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+                    moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
                 elevator.scoreLevel(level).asProxy(),
                 leds.error(
                     () ->
@@ -81,42 +88,24 @@ public class Alignment implements Logged {
                                 .pose()
                                 .relativeTo(goal.get())
                                 .getTranslation()
-                                .getDistance(new Translation2d())
-                            * 3,
-                    0.02 * 3),
-                Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(4),
-                    Commands.waitUntil(elevator::atGoal)
-                        .withTimeout(1.5)
-                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
-                    // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
-                    backUp().asProxy())))
+                                .getDistance(new Translation2d()),
+                    0.02 * 3)))
         .asProxy()
         .withName("align to reef")
         .onlyWhile(
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding));
+                alternateAlliancePathfinding));
   }
 
-  public Command backUp() {
-    return Commands.defer(
-            () -> {
-              Pose2d backPose = drive.pose().transformBy(advance(Meters.of(-0.2)));
-              return drive.driveTo(backPose);
-            },
-            Set.of(drive))
-        .withName("backing up");
-  }
-
-  public Command goForward() {
+  public Command moveRobotRelative(Transform2d transform) {
     return Commands.defer(
         () -> {
-          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(0.2)));
-          return drive.driveTo(backPose);
-        },
-        Set.of(drive));
+            Pose2d goal = drive.pose().transformBy(transform);
+            return drive.driveTo(goal);
+        }
+        , Set.of(drive));
   }
 
   /**

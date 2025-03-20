@@ -2,6 +2,8 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
@@ -142,7 +144,7 @@ public class Autos {
       source =
           Commands.sequence(
               source,
-              Commands.parallel(alignment.goForward().asProxy(), scoraling.retryIntake()),
+              Commands.parallel(alignment.moveRobotRelative(advance(Meters.of(0.2))).asProxy(), scoraling.retryIntake()),
               attempt.get());
     }
 
