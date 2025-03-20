@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -73,7 +72,14 @@ public class Alignment implements Logged {
     return Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
             pathfind(goal).withName("").asProxy(),
-            Commands.parallel(
+            Commands.deadline(
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    Commands.waitUntil(elevator::atGoal)
+                        .withTimeout(1.5)
+                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
+                    // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
+                    backUp().asProxy()),
                 elevator.scoreLevel(level).asProxy(),
                 leds.error(
                     () ->
@@ -83,14 +89,7 @@ public class Alignment implements Logged {
                                 .getTranslation()
                                 .getDistance(new Translation2d())
                             * 3,
-                    0.02 * 3),
-                Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(4),
-                    Commands.waitUntil(elevator::atGoal)
-                        .withTimeout(1.5)
-                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
-                    // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
-                    backUp().asProxy())))
+                    0.02 * 3)))
         .asProxy()
         .withName("align to reef")
         .onlyWhile(
@@ -101,24 +100,12 @@ public class Alignment implements Logged {
   }
 
   public Command backUp() {
-    return Commands.defer(
-        () -> {
-          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(-0.2)));
-          return drive.driveTo(backPose);
-        },
-        Set.of(drive));
+    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(-0.2))));
   }
-
 
   public Command goForward() {
-    return Commands.defer(
-        () -> {
-          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(0.2)));
-          return drive.driveTo(backPose);
-        },
-        Set.of(drive));
+    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(0.2))));
   }
-
 
   /**
    * Pathfinds and aligns to a designated source.

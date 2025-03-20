@@ -102,9 +102,11 @@ public class Scoraling implements Logged {
   }
 
   public Command retryIntake() {
-    return
-      elevator.scoreLevel(Level.L1).withTimeout(Seconds.of(0.2)).asProxy()
-      .alongWith(runRollersBack().asProxy().until(hopper.blocked.negate()));
+    return elevator
+        .scoreLevel(Level.L1)
+        .withTimeout(Seconds.of(0.2))
+        .asProxy()
+        .alongWith(runRollersBack().asProxy().until(hopper.blocked.negate()));
   }
 
   /**
