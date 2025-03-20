@@ -88,7 +88,7 @@ public class Alignment implements Logged {
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
-                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
+                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
                     // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
                     backUp().asProxy())))
         .asProxy()
@@ -102,13 +102,13 @@ public class Alignment implements Logged {
 
   public Command backUp() {
     return Commands.defer(
-        () -> {
-          Pose2d backPose = drive.pose().transformBy(advance(Meters.of(-0.2)));
-          return drive.driveTo(backPose);
-        },
-        Set.of(drive));
+            () -> {
+              Pose2d backPose = drive.pose().transformBy(advance(Meters.of(-0.2)));
+              return drive.driveTo(backPose);
+            },
+            Set.of(drive))
+        .withName("backing up");
   }
-
 
   public Command goForward() {
     return Commands.defer(
@@ -118,7 +118,6 @@ public class Alignment implements Logged {
         },
         Set.of(drive));
   }
-
 
   /**
    * Pathfinds and aligns to a designated source.
