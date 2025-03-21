@@ -59,7 +59,7 @@ public final class DriveConstants {
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
-  public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.74);
+  public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(40);
   public static final LinearAcceleration MAX_SKID_ACCEL =
       MetersPerSecondPerSecond.of(38); // TODO: Tune
@@ -116,7 +116,7 @@ public final class DriveConstants {
   public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
   public static final class Translation {
-    public static final double P = 4.0;
+    public static final double P = 3.0;
     public static final double I = 0.0;
     public static final double D = 0.05;
 

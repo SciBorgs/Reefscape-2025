@@ -143,7 +143,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           translationI.get(),
           translationD.get(),
           new TrapezoidProfile.Constraints(
-              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
+              MAX_SPEED.in(MetersPerSecond), 12));
 
   @Log.NT
   private final PIDController rotationController =
@@ -690,7 +690,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
-          log("at driveTo pose", atPose(targetPose));
+          log("driveTo goal", targetPose);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
