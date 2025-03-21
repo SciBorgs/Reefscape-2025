@@ -566,10 +566,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             robotRelativeChassisSpeeds().vxMetersPerSecond,
             robotRelativeChassisSpeeds().vyMetersPerSecond);
 
-    Vector<N2> desiredAcceleration =
+    Vector<N2> deltaV =
         VecBuilder.fill(desired.vxMetersPerSecond, desired.vyMetersPerSecond)
-            .minus(currentVelocity)
-            .times(1 / PERIOD.in(Seconds));
+            .minus(currentVelocity);
     // Vector<N2> limitedVelocity =
     // currentVelocity.plus(
     //     currentVelocity.norm() > 1e-6
@@ -580,15 +579,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
     Vector<N2> limitedVelocity =
-        currentVelocity.plus(
-            forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration))
-                .times(PERIOD.in(Seconds)));
+        currentVelocity.plus(forwardAccelerationLimit(skidAccelerationLimit(deltaV)));
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    log(
-        "forward accel limit",
-        forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration)).norm());
+    log("forward accel limit", forwardAccelerationLimit(skidAccelerationLimit(deltaV)).norm());
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -610,26 +605,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param desiredAccel The desired field-relative acceleration vector.
    * @return The adjusted acceleration vector after applying forward acceleration limits.
    */
-  private Vector<N2> forwardAccelerationLimit(Vector<N2> desiredAccel) {
+  private Vector<N2> forwardAccelerationLimit(Vector<N2> deltaV) {
     Vector<N2> currVel =
         VecBuilder.fill(
             fieldRelativeChassisSpeeds().vxMetersPerSecond,
             fieldRelativeChassisSpeeds().vyMetersPerSecond);
     double limit =
-        maxAccel.get() * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
-    log("curr vel", currVel.norm());
-    log("max speed", MAX_SPEED.in(MetersPerSecond));
-    log("accel/limit", limit);
-    Vector<N2> proj = desiredAccel.projection(currVel);
+        maxAccel.get()
+            * PERIOD.in(Seconds)
+            * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
+    log("accel limit", limit);
+    Vector<N2> proj = deltaV.projection(currVel);
     if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
-      Vector<N2> perpendicular = desiredAccel.minus(proj);
-      log("accel/parallel", parallel.norm());
-      log("accel/perpendicular", perpendicular.norm());
-      log("accel/end", parallel.plus(perpendicular).norm());
+      Vector<N2> perpendicular = deltaV.minus(proj);
       return parallel.plus(perpendicular);
     }
-    return desiredAccel;
+    return deltaV;
   }
 
   // /**
@@ -656,10 +648,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param desiredAccel The desired field-relative acceleration vector.
    * @return The adjusted acceleration vector after applying skid acceleration limits.
    */
-  private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel) {
-    return desiredAccel.norm() == 0
-        ? desiredAccel
-        : desiredAccel.unit().times(Math.min(desiredAccel.norm(), maxSkidAccel.get()));
+  private Vector<N2> skidAccelerationLimit(Vector<N2> deltaV) {
+    return deltaV.norm() == 0
+        ? deltaV
+        : deltaV.unit().times(Math.min(deltaV.norm(), maxSkidAccel.get() * PERIOD.in(Seconds)));
   }
 
   /**
