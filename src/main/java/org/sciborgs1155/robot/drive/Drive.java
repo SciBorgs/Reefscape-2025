@@ -620,7 +620,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     Vector<N2> proj = desiredAccel.projection(currVel);
     if (proj.norm() > limit) {
       Vector<N2> parallel = proj.unit().times(limit);
-      Vector<N2> perpendicular = desiredAccel.minus(parallel);
+      Vector<N2> perpendicular = desiredAccel.minus(proj);
       log("end", parallel.plus(perpendicular).norm());
       return parallel.plus(perpendicular);
     }
