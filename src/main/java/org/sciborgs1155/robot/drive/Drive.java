@@ -615,13 +615,18 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         VecBuilder.fill(
             fieldRelativeChassisSpeeds().vxMetersPerSecond,
             fieldRelativeChassisSpeeds().vyMetersPerSecond);
-    double limit = maxAccel.get() * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
-    log("limit", limit);
+    double limit =
+        maxAccel.get() * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
+    log("curr vel", currVel.norm());
+    log("max speed", MAX_SPEED.in(MetersPerSecond));
+    log("accel/limit", limit);
     Vector<N2> proj = desiredAccel.projection(currVel);
-    if (proj.norm() > limit) {
+    if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
       Vector<N2> perpendicular = desiredAccel.minus(proj);
-      log("end", parallel.plus(perpendicular).norm());
+      log("accel/parallel", parallel.norm());
+      log("accel/perpendicular", perpendicular.norm());
+      log("accel/end", parallel.plus(perpendicular).norm());
       return parallel.plus(perpendicular);
     }
     return desiredAccel;

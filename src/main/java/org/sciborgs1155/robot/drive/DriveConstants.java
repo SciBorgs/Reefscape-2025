@@ -60,7 +60,7 @@ public final class DriveConstants {
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(4.74);
-  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(6);
+  public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(40);
   public static final LinearAcceleration MAX_SKID_ACCEL =
       MetersPerSecondPerSecond.of(38); // TODO: Tune
   public static final LinearAcceleration MAX_TILT_ACCEL =
