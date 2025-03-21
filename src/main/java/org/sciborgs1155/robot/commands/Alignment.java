@@ -194,20 +194,17 @@ public class Alignment implements Logged {
    * Pathfinds around obstacles and drives to a certain pose on the field.
    *
    * @param goal The field pose to pathfind to.
+   * @param maxSpeed The maximum speed the path will command the drivetrain to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Supplier<Pose2d> goal) {
+  public Command pathfind(Supplier<Pose2d> goal, double maxSpeed) {
     return drive
         .run(
             () -> {
               Tracer.startTrace("repulsor pathfinding");
               planner.setGoal(goal.get().getTranslation());
               drive.goToSample(
-                  planner.getCmd(
-                      drive.pose(),
-                      drive.fieldRelativeChassisSpeeds(),
-                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                      true),
+                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), maxSpeed, true),
                   goal.get().getRotation(),
                   elevator::position);
               Tracer.endTrace();
@@ -219,6 +216,16 @@ public class Alignment implements Logged {
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
+  public Command pathfind(Supplier<Pose2d> goal) {
+    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond));
   }
 
   /**
@@ -256,9 +263,9 @@ public class Alignment implements Logged {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(() -> drive.pose())
-        .withTimeout(5)
-        .andThen(Commands.print("[Alignment] Finished warmup"))
+    return pathfind(() -> drive.pose(), 0)
+        .withTimeout(3)
+        .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }
 
