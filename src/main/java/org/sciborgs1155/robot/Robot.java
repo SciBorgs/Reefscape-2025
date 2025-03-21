@@ -351,16 +351,12 @@ public class Robot extends CommandRobot implements Logged {
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
-    scoral.blocked.onFalse(leds.blink(Color.kLime));
+    scoral.blocked.onChange(leds.blink(Color.kLime));
   }
 
   @Log.NT
   public boolean isBlueAlliance() {
     return alliance() == Alliance.Blue;
-  }
-
-  private double calculateAlignment(Translation2d target) {
-    return drive.pose().getTranslation().minus(target).getNorm();
   }
 
   /**
