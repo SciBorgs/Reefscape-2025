@@ -189,6 +189,7 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
                       filteredEstimates.add(f.estimatedPose);
+                     log(name + "filtered pose", f.estimatedPose) ;
                       FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
                     }
                     return valid;

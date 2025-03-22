@@ -344,8 +344,9 @@ public class Robot extends CommandRobot implements Logged {
 
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
-    operator.leftBumper().whileTrue(scoral.tuningScore());
+    operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.algae());
+    operator.x().whileTrue(scoral.scoreSlow());
 
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
