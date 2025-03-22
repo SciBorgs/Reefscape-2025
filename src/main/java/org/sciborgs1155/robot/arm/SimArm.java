@@ -20,7 +20,7 @@ public class SimArm implements ArmIO {
           MIN_ANGLE.in(Radians),
           MAX_ANGLE.in(Radians),
           true,
-          STARTING_ANGLE.in(Radians));
+          DEFAULT_ANGLE.in(Radians));
 
   @Override
   public double position() {

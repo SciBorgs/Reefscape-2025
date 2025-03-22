@@ -1,7 +1,6 @@
 package org.sciborgs1155.robot.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
-import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.Ports.Hopper.*;
 
@@ -12,18 +11,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
-import java.util.Set;
 import monologue.Logged;
-import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
-import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
 
 public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   private final SimpleMotor motor;
   private final Beambreak beambreak;
-  public final Trigger beambreakTrigger;
+  public final Trigger blocked;
 
   /** Creates a Hopper based on whether it is utilizing hardware. */
   public static Hopper create() {
@@ -48,7 +44,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   public Hopper(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    this.beambreakTrigger = new Trigger(beambreak::get);
+    this.blocked = new Trigger(beambreak::get).negate();
 
     setDefaultCommand(stop());
   }
@@ -93,23 +89,6 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   @Override
   public void periodic() {
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-  }
-
-  /**
-   * Sets the hopper to intake, expecting a coral. Can also be used to test beambreak.
-   *
-   * @return Command to set the hopper to intake and check whether it has a coral.
-   */
-  public Test intakeTest() {
-    Command testCommand = intake().until(beambreakTrigger.negate()).withTimeout(5);
-    Set<Assertion> assertions =
-        Set.of(
-            tAssert(
-                beambreakTrigger.negate(),
-                "Hopper syst check (beambreak broken)",
-                () -> "broken: " + beambreakTrigger.negate()));
-
-    return new Test(testCommand, assertions);
   }
 
   @Override
