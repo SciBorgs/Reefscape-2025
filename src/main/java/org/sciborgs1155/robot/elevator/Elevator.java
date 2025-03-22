@@ -10,13 +10,9 @@ import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,6 +41,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
 
   private final SysIdRoutine sysIdRoutine;
+  private double lastGoal = MIN_EXTENSION.in(Meters);
 
   /**
    * @return Creates a Real or Sim elevator based on {@link Robot#isReal()}.
@@ -62,19 +59,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  @Log.NT
-  private final ProfiledPIDController pid =
-      new ProfiledPIDController(
-          kP,
-          kI,
-          kD,
-          new TrapezoidProfile.Constraints(
-              MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
-
-  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
-
-  @Log.NT
-  private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+  @Log.NT private final ElevatorVisualizer goal = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
   @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
@@ -88,10 +73,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     setDefaultCommand(retract());
 
     this.hardware = hardware;
-
-    pid.setTolerance(POSITION_TOLERANCE.in(Meters));
-    pid.reset(hardware.position());
-    pid.setGoal(MIN_EXTENSION.in(Meters));
 
     sysIdRoutine =
         new SysIdRoutine(
@@ -173,7 +154,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
             .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
             .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
-            .add(() -> pid.getGoal().position))
+            .add(() -> lastGoal))
         .withName("manual elevator");
   }
 
@@ -184,7 +165,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to the desired height.
    */
   public Command goTo(DoubleSupplier height) {
-    return run(() -> update(height.getAsDouble())).finallyDo(() -> hardware.setVoltage(0));
+    lastGoal = height.getAsDouble();
+    return run(() -> hardware.setGoal(lastGoal)).finallyDo(() -> hardware.setVoltage(0));
   }
 
   public Command goTo(double height) {
@@ -220,27 +202,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * @return Desired position of the elevator in meters
-   */
-  @Log.NT
-  public double positionSetpoint() {
-    return pid.getSetpoint().position;
-  }
-
-  /**
-   * @return Desired velocity of the elevator in meters per second.
-   */
-  @Log.NT
-  public double velocitySetpoint() {
-    return pid.getSetpoint().velocity;
-  }
-
-  /**
    * @return Whether or not the elevator is at its desired state.
    */
   @Log.NT
   public boolean atGoal() {
-    return pid.atGoal();
+    return atPosition(lastGoal);
   }
 
   @Log.NT
@@ -261,25 +227,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         Rotation3d.kZero);
   }
 
-  /**
-   * Method to set voltages to the hardware based off feedforward and feedback. Control should only
-   * be used in a command.
-   *
-   * @param position Goal height for the elevator to achieve.
-   */
-  private void update(double position) {
-    double goal =
-        Double.isNaN(position)
-            ? MIN_EXTENSION.in(Meters)
-            : MathUtil.clamp(position, MIN_EXTENSION.in(Meters), MAX_EXTENSION.in(Meters));
-    double lastVelocity = pid.getSetpoint().velocity;
-    double feedback = pid.calculate(hardware.position(), goal);
-    double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
-
-    log("elverootr voltager", feedforward + feedback);
-    hardware.setVoltage(feedforward + feedback);
-  }
-
   public boolean atPosition(double position) {
     return Meters.of(position).minus(Meters.of(position())).magnitude()
         < POSITION_TOLERANCE.in(Meters);
@@ -291,15 +238,8 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * lengths.
    */
   public void periodic() {
-    setpoint.setLength(positionSetpoint());
+    goal.setLength(lastGoal);
     measurement.setLength(position());
-
-    if (TUNING) {
-      ff.setKs(S.get());
-      ff.setKg(G.get());
-      ff.setKv(V.get());
-      ff.setKa(A.get());
-    }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }

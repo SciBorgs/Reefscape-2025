@@ -351,7 +351,6 @@ public final class Tuning {
   public static void updateDoubles(List<DoubleEntry> entryList) {
     for (int i = 0; i < entryList.size(); i++) {
       String topicName = entryList.get(i).getTopic().getName();
-
       /* For the circumstance that the given key doesn't exist */
       if (!doubleHash.containsKey(topicName)) {
 

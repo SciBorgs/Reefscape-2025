@@ -9,6 +9,13 @@ public interface ElevatorIO extends AutoCloseable {
   public void setVoltage(double voltage);
 
   /**
+   * Sets elevator position, and moves to it.
+   *
+   * @param position Position to command the elevator to, in meters.
+   */
+  public void setGoal(double position);
+
+  /**
    * Returns height of the elevator.
    *
    * @return The encoder value in meters.
