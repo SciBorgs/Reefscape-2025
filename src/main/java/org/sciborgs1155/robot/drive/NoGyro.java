@@ -23,6 +23,11 @@ public class NoGyro implements GyroIO {
   }
 
   @Override
+  public double[][] odometryData() {
+    return new double[20][20];
+  }
+
+  @Override
   public Vector<N2> acceleration() {
     return VecBuilder.fill(0, 0);
   }

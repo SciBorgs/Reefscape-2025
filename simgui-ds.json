@@ -1,5 +1,5 @@
 {
-  "Keyboard 1 Settings": {
+  "Keyboard 0 Settings": {
     "window": {
       "visible": true
     }
@@ -8,12 +8,12 @@
     {
       "axisConfig": [
         {
-          "decKey": 65,
-          "incKey": 68
+          "decKey": 83,
+          "incKey": 87
         },
         {
-          "decKey": 87,
-          "incKey": 83
+          "decKey": 65,
+          "incKey": 68
         },
         {
           "decKey": 69,
@@ -22,7 +22,7 @@
           "keyRate": 0.009999999776482582
         }
       ],
-      "axisCount": 3,
+      "axisCount": 5,
       "buttonCount": 4,
       "buttonKeys": [
         90,
@@ -47,15 +47,19 @@
     {
       "axisConfig": [
         {
-          "decKey": 74,
-          "incKey": 76
+          "decKey": 83,
+          "incKey": 87
         },
         {
-          "decKey": 73,
-          "incKey": 75
+          "decKey": 65,
+          "incKey": 68
+        },
+        {
+          "decKey": 75,
+          "incKey": 74
         }
       ],
-      "axisCount": 2,
+      "axisCount": 3,
       "buttonCount": 4,
       "buttonKeys": [
         77,
@@ -95,9 +99,7 @@
     }
   ],
   "robotJoysticks": [
-    {
-      "guid": "Keyboard1"
-    },
+    {},
     {
       "guid": "Keyboard0"
     }

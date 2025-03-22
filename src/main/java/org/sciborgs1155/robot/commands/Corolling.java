@@ -9,7 +9,6 @@ import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.coroller.Coroller;
 
 public class Corolling {
-
   private Arm arm;
   private Coroller roller;
 
@@ -25,6 +24,7 @@ public class Corolling {
    */
   public Command intake() {
     return arm.goTo(INTAKE_ANGLE)
+        .asProxy()
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(INTAKE_ANGLE.in(Radians)))
                 .andThen(roller.intake().asProxy().withTimeout(1)))

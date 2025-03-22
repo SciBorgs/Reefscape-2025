@@ -19,17 +19,20 @@ import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 public class SimModule implements ModuleIO {
   private final DCMotorSim drive =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(Driving.FF.V, Driving.FF.A), DCMotor.getKrakenX60(1));
+          LinearSystemId.createDCMotorSystem(
+              Driving.FRONT_LEFT_FF.kV(), Driving.FRONT_LEFT_FF.kA()),
+          DCMotor.getKrakenX60(1));
 
   private final PIDController driveFeedback =
       new PIDController(Driving.PID.P, Driving.PID.I, Driving.PID.D);
 
   private final SimpleMotorFeedforward driveFF =
-      new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
+      new SimpleMotorFeedforward(
+          Driving.FRONT_LEFT_FF.kS(), Driving.FRONT_LEFT_FF.kV(), Driving.FRONT_LEFT_FF.kA());
 
   private final DCMotorSim turn =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A), DCMotor.getNeo550(1));
+          LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A), DCMotor.getKrakenX60(1));
 
   private final PIDController turnFeedback =
       new PIDController(Turning.PID.P, Turning.PID.I, Turning.PID.D);
@@ -133,6 +136,19 @@ public class SimModule implements ModuleIO {
 
     setDriveVoltage(voltage);
     setTurnVoltage(turnVolts);
+  }
+
+  @Override
+  public double[][] moduleOdometryData() {
+    return new double[][] {};
+  }
+
+  public SwerveModulePosition[] odometryData() {
+    return new SwerveModulePosition[] {};
+  }
+
+  public double[] timestamps() {
+    return new double[] {};
   }
 
   @Override

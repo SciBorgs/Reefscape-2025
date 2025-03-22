@@ -1,4 +1,11 @@
 {
+  "HALProvider": {
+    "Addressable LEDs": {
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -10,14 +17,16 @@
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
-      "/Robot/elevator/measurement/mech": "Mechanism2d",
-      "/Robot/elevator/measurementVisualizer/mech": "Mechanism2d",
-      "/Robot/elevator/pid": "ProfiledPIDController",
-      "/Robot/elevator/setpoint/mech": "Mechanism2d",
-      "/Robot/elevator/setpointVisualizer/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
+      "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
+      "/SmartDashboard/arm dynamic backward": "Command",
+      "/SmartDashboard/arm dynamic forward": "Command",
+      "/SmartDashboard/arm quasistatic backward": "Command",
+      "/SmartDashboard/arm quasistatic forward": "Command",
       "/SmartDashboard/elevator dynamic backward": "Command",
       "/SmartDashboard/elevator dynamic forward": "Command",
       "/SmartDashboard/elevator quasistatic backward": "Command",
@@ -32,13 +41,23 @@
       "/SmartDashboard/translation quasistatic forward": "Command"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/autos": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Robot/drive/field2d": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+        "bottom": 1638,
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
         "window": {
           "visible": true
         }
@@ -57,18 +76,30 @@
   },
   "NetworkTables": {
     "transitory": {
-      "Dashboard": {
+      "CameraPublisher": {
         "open": true
       },
       "Robot": {
-        "elevator": {
+        "scoraling": {
+          "scoral": {
+            "beambreak": {
+              "open": true
+            }
+          }
+        }
+      },
+      "Tracer": {
+        "robot main": {
           "open": true
-        },
+        }
+      },
+      "notfound": {
         "open": true
       }
     }
   },
   "NetworkTables Info": {
+<<<<<<< HEAD
     "Clients": {
       "open": true
     },
@@ -129,5 +160,8 @@
         "name": "Elevator"
       }
     }
+=======
+    "visible": true
+>>>>>>> dev
   }
 }
