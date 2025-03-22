@@ -25,7 +25,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -54,7 +53,6 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
@@ -130,7 +128,7 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDs leds = LEDs.create();
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leds);
-  private final Corolling corolling = new Corolling(arm, coroller);
+  // private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral, leds);
@@ -147,6 +145,7 @@ public class Robot extends CommandRobot implements Logged {
     configureGameBehavior();
     configureBindings();
 
+    // Warmup pathfinding commands, as the first run could have significant delays.
     align.warmupCommand().schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
@@ -156,12 +155,6 @@ public class Robot extends CommandRobot implements Logged {
     //     .ignoringDisable(true)
     //     .schedule();
 
-  }
-
-  @Override
-  public void robotInit() {
-    // Warmup pathfinding commands, as the first run could have significant delays.
-    align.warmupCommand().schedule();
   }
 
   @Override
@@ -207,7 +200,8 @@ public class Robot extends CommandRobot implements Logged {
     }
 
     // Configure pose estimation updates from vision every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
+    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -329,7 +323,6 @@ public class Robot extends CommandRobot implements Logged {
 
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
-    driver.povRight().whileTrue(corolling.intake());
 
     driver.povUp().whileTrue(coroller.intake());
     driver.povDown().whileTrue(coroller.outtake());
@@ -347,8 +340,7 @@ public class Robot extends CommandRobot implements Logged {
 
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
-    operator.leftBumper().whileTrue(scoral.score());
-    operator.x().whileTrue(scoral.scoreSlow());
+    operator.leftBumper().whileTrue(scoral.tuningScore());
     operator.rightBumper().whileTrue(scoral.algae());
 
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
@@ -401,10 +393,6 @@ public class Robot extends CommandRobot implements Logged {
   @Log.NT
   public boolean isBlueAlliance() {
     return alliance() == Alliance.Blue;
-  }
-
-  private double calculateAlignment(Translation2d target) {
-    return drive.pose().getTranslation().minus(target).getNorm();
   }
 
   /**

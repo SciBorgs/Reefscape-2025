@@ -11,10 +11,29 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static org.sciborgs1155.robot.Constants.TUNING;
-import static org.sciborgs1155.robot.arm.ArmConstants.*;
+import static org.sciborgs1155.robot.arm.ArmConstants.ARM_LENGTH;
+import static org.sciborgs1155.robot.arm.ArmConstants.AXLE_FROM_CHASSIS;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_FINAL_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_LIMIT;
+import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ACCEL;
+import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.MAX_VELOCITY;
+import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.POSITION_TOLERANCE;
+import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
+import static org.sciborgs1155.robot.arm.ArmConstants.kA;
+import static org.sciborgs1155.robot.arm.ArmConstants.kD;
+import static org.sciborgs1155.robot.arm.ArmConstants.kG;
+import static org.sciborgs1155.robot.arm.ArmConstants.kI;
+import static org.sciborgs1155.robot.arm.ArmConstants.kP;
+import static org.sciborgs1155.robot.arm.ArmConstants.kS;
+import static org.sciborgs1155.robot.arm.ArmConstants.kV;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -29,20 +48,16 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-
-import java.security.KeyStore.Entry;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
-import org.sciborgs1155.lib.BetterArmFeedforward;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tuning;
@@ -65,7 +80,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
               MAX_VELOCITY.in(RadiansPerSecond), MAX_ACCEL.in(RadiansPerSecondPerSecond)));
 
   /** Arm feed forward controller. */
-  private final BetterArmFeedforward ff = new BetterArmFeedforward(kS, kG, kV, kA);
+  private final ArmFeedforward ff = new ArmFeedforward(kS, kG, kV, kA);
 
   /** Routine for recording and analyzing motor data. */
   private final SysIdRoutine sysIdRoutine;
@@ -85,12 +100,10 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
               10,
               new Color8Bit(Color.kSkyBlue)));
 
-  private final DoubleEntry S = Tuning.entry("/Robot/tuningArm/kS", kS);
-  private final DoubleEntry G = Tuning.entry("/Robot/tuningArm/kG", kG);
-  private final DoubleEntry V = Tuning.entry("/Robot/tuningArm/kV", kV);
-  private final DoubleEntry A = Tuning.entry("/Robot/tuningArm/kA", kA);
-
-  
+  private final DoubleEntry S = Tuning.entry("/Robot/tuning/arm/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/tuning/arm/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/tuning/arm/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/tuning/arm/kA", kA);
 
   /**
    * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
@@ -140,7 +153,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
     Tuning.changes(S).onTrue(runOnce(() -> ff.setKa(S.get())).asProxy());
     Tuning.changes(V).onTrue(runOnce(() -> ff.setKa(V.get())).asProxy());
     Tuning.changes(G).onTrue(runOnce(() -> ff.setKa(G.get())).asProxy());
-
   }
 
   /**

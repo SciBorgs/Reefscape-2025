@@ -6,10 +6,12 @@ import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -71,24 +73,22 @@ public class Alignment implements Logged {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
-            pathfind(goal).withName("").asProxy(),
+            pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
-                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
-                    // .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
-                    backUp().asProxy()),
+                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+                    moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
                 elevator.scoreLevel(level).asProxy(),
                 leds.error(
                     () ->
                         drive
-                                .pose()
-                                .relativeTo(goal.get())
-                                .getTranslation()
-                                .getDistance(new Translation2d())
-                            * 3,
+                            .pose()
+                            .relativeTo(goal.get())
+                            .getTranslation()
+                            .getDistance(Translation2d.kZero),
                     0.02 * 3)))
         .asProxy()
         .withName("align to reef")
@@ -99,12 +99,13 @@ public class Alignment implements Logged {
                     alternateAlliancePathfinding));
   }
 
-  public Command backUp() {
-    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(-0.2))));
-  }
-
-  public Command goForward() {
-    return drive.driveTo(() -> drive.pose().transformBy(advance(Meters.of(0.2))));
+  public Command moveRobotRelative(Transform2d transform) {
+    return Commands.defer(
+        () -> {
+          Pose2d goal = drive.pose().transformBy(transform);
+          return drive.driveTo(goal);
+        },
+        Set.of(drive));
   }
 
   /**
@@ -148,10 +149,7 @@ public class Alignment implements Logged {
                             leds.error(
                                 () ->
                                     drive
-                                            .pose()
-                                            .relativeTo(goal.get())
-                                            .getTranslation()
-                                            .getDistance(new Translation2d())
+                                            .pose().getTranslation().getDistance(goal.get().getTranslation())
                                         * 3,
                                 0.02 * 3)))
                 .onlyWhile(
@@ -193,20 +191,17 @@ public class Alignment implements Logged {
    * Pathfinds around obstacles and drives to a certain pose on the field.
    *
    * @param goal The field pose to pathfind to.
+   * @param maxSpeed The maximum speed the path will command the drivetrain to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Supplier<Pose2d> goal) {
+  public Command pathfind(Supplier<Pose2d> goal, double maxSpeed) {
     return drive
         .run(
             () -> {
               Tracer.startTrace("repulsor pathfinding");
               planner.setGoal(goal.get().getTranslation());
               drive.goToSample(
-                  planner.getCmd(
-                      drive.pose(),
-                      drive.fieldRelativeChassisSpeeds(),
-                      DriveConstants.MAX_SPEED.in(MetersPerSecond),
-                      true),
+                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), maxSpeed, true),
                   goal.get().getRotation(),
                   elevator::position);
               Tracer.endTrace();
@@ -218,6 +213,16 @@ public class Alignment implements Logged {
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
         .withName("pathfind");
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
+  public Command pathfind(Supplier<Pose2d> goal) {
+    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond));
   }
 
   /**
@@ -255,9 +260,9 @@ public class Alignment implements Logged {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(() -> drive.pose())
-        .withTimeout(5)
-        .andThen(Commands.print("[Alignment] Finished warmup"))
+    return pathfind(() -> drive.pose(), 0)
+        .withTimeout(3)
+        .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }
 

@@ -11,6 +11,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -31,7 +32,6 @@ import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.BetterElevatorFeedForward;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
@@ -71,8 +71,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Log.NT
-  private final BetterElevatorFeedForward ff = new BetterElevatorFeedForward(kS, kG, kV, kA);
+  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
@@ -80,10 +79,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
-  private final DoubleEntry S = Tuning.entry("/Robot/tuningElevator/kS", kS);
-  private final DoubleEntry G = Tuning.entry("/Robot/tuningElevator/kG", kG);
-  private final DoubleEntry V = Tuning.entry("/Robot/tuningElevator/kV", kV);
-  private final DoubleEntry A = Tuning.entry("/Robot/tuningElevator/kA", kA);
+  private final DoubleEntry S = Tuning.entry("/Robot/tuning/elevator/kS", kS);
+  private final DoubleEntry G = Tuning.entry("/Robot/tuning/elevator/kG", kG);
+  private final DoubleEntry V = Tuning.entry("/Robot/tuning/elevator/kV", kV);
+  private final DoubleEntry A = Tuning.entry("/Robot/tuning/elevator/kA", kA);
 
   public Elevator(ElevatorIO hardware) {
     setDefaultCommand(retract());
@@ -106,16 +105,28 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     if (TUNING) {
       SmartDashboard.putData(
           "elevator quasistatic forward",
-          sysIdRoutine.quasistatic(Direction.kForward).withName("elevator quasistatic forward"));
+          sysIdRoutine
+              .quasistatic(Direction.kForward)
+              .until(() -> atPosition(Level.L4.extension.in(Meters)))
+              .withName("elevator quasistatic forward"));
       SmartDashboard.putData(
           "elevator quasistatic backward",
-          sysIdRoutine.quasistatic(Direction.kReverse).withName("elevator quasistatic backward"));
+          sysIdRoutine
+              .quasistatic(Direction.kReverse)
+              .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
+              .withName("elevator quasistatic backward"));
       SmartDashboard.putData(
           "elevator dynamic forward",
-          sysIdRoutine.dynamic(Direction.kForward).withName("elevator dynamic forward"));
+          sysIdRoutine
+              .dynamic(Direction.kForward)
+              .until(() -> atPosition(Level.L4.extension.in(Meters)))
+              .withName("elevator dynamic forward"));
       SmartDashboard.putData(
           "elevator dynamic backward",
-          sysIdRoutine.dynamic(Direction.kReverse).withName("elevator dynamic backward"));
+          sysIdRoutine
+              .dynamic(Direction.kReverse)
+              .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
+              .withName("elevator dynamic backward"));
     }
   }
 

@@ -102,25 +102,25 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
-  public final DoubleEntry translationP =
-      Tuning.entry("Robot/Drive/Tuning/translation p", Translation.P);
-  public final DoubleEntry translationI =
-      Tuning.entry("Robot/Drive/Tuning/translation i", Translation.I);
-  public final DoubleEntry translationD =
-      Tuning.entry("Robot/Drive/Tuning/translation d", Translation.D);
+  private final DoubleEntry translationP =
+      Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
+  private final DoubleEntry translationI =
+      Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
+  private final DoubleEntry translationD =
+      Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
 
-  public final DoubleEntry rotationP = Tuning.entry("Robot/Drive/Tuning/rotation p", Rotation.P);
-  public final DoubleEntry rotationI = Tuning.entry("Robot/Drive/Tuning/rotation i", Rotation.I);
-  public final DoubleEntry rotationD = Tuning.entry("Robot/Drive/Tuning/rotation d", Rotation.D);
+  private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+  private final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+  private final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
 
-  public final DoubleEntry maxAccel =
-      Tuning.entry("Robot/Drive/Tuning/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxSkidAccel =
+  private final DoubleEntry maxAccel =
+      Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
+  private final DoubleEntry maxSkidAccel =
       Tuning.entry(
-          "Robot/Drive/Tuning/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxTiltAccel =
+          "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
+  private final DoubleEntry maxTiltAccel =
       Tuning.entry(
-          "Robot/Drive/Tuning/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
+          "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -142,8 +142,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           translationP.get(),
           translationI.get(),
           translationD.get(),
-          new TrapezoidProfile.Constraints(
-              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
+          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
 
   @Log.NT
   private final PIDController rotationController =
@@ -254,12 +253,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     gyro.reset();
-    odometry =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            lastHeading,
-            lastPositions,
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+    odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -275,24 +269,40 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     if (TUNING) {
       SmartDashboard.putData(
           "translation quasistatic forward",
-          translationCharacterization.quasistatic(Direction.kForward));
+          translationCharacterization
+              .quasistatic(Direction.kForward)
+              .withName("translation quasistatic forward"));
       SmartDashboard.putData(
-          "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
+          "translation dynamic forward",
+          translationCharacterization
+              .dynamic(Direction.kForward)
+              .withName("translation dynamic forward"));
       SmartDashboard.putData(
           "translation quasistatic backward",
           translationCharacterization.quasistatic(Direction.kReverse));
       SmartDashboard.putData(
-          "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
+          "translation dynamic backward",
+          translationCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("translation quasistatic backward"));
       SmartDashboard.putData(
           "rotation quasistatic forward",
           rotationalCharacterization.quasistatic(Direction.kForward));
       SmartDashboard.putData(
-          "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
+          "rotation dynamic forward",
+          rotationalCharacterization
+              .dynamic(Direction.kForward)
+              .withName("rotation quasistatic forward"));
       SmartDashboard.putData(
           "rotation quasistatic backward",
-          rotationalCharacterization.quasistatic(Direction.kReverse));
+          rotationalCharacterization
+              .quasistatic(Direction.kReverse)
+              .withName("rotation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+          "rotation dynamic backward",
+          rotationalCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("rotation dynamic backward"));
     }
   }
 
@@ -566,10 +576,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             robotRelativeChassisSpeeds().vxMetersPerSecond,
             robotRelativeChassisSpeeds().vyMetersPerSecond);
 
-    Vector<N2> desiredAcceleration =
+    Vector<N2> deltaV =
         VecBuilder.fill(desired.vxMetersPerSecond, desired.vyMetersPerSecond)
-            .minus(currentVelocity)
-            .times(1 / PERIOD.in(Seconds));
+            .minus(currentVelocity);
     // Vector<N2> limitedVelocity =
     // currentVelocity.plus(
     //     currentVelocity.norm() > 1e-6
@@ -580,15 +589,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
     Vector<N2> limitedVelocity =
-        currentVelocity.plus(
-            forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration))
-                .times(PERIOD.in(Seconds)));
+        currentVelocity.plus(forwardAccelerationLimit(skidAccelerationLimit(deltaV)));
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    log(
-        "forward accel limit",
-        forwardAccelerationLimit(skidAccelerationLimit(desiredAcceleration)).norm());
+    log("forward accel limit", forwardAccelerationLimit(skidAccelerationLimit(deltaV)).norm());
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -598,7 +603,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
         kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(newSpeeds, Constants.PERIOD.in(Seconds))),
+            ChassisSpeeds.discretize(
+                kinematics.toChassisSpeeds(states), Constants.PERIOD.in(Seconds))),
         mode);
   }
 
@@ -610,21 +616,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param desiredAccel The desired field-relative acceleration vector.
    * @return The adjusted acceleration vector after applying forward acceleration limits.
    */
-  private Vector<N2> forwardAccelerationLimit(Vector<N2> desiredAccel) {
+  private Vector<N2> forwardAccelerationLimit(Vector<N2> deltaV) {
     Vector<N2> currVel =
         VecBuilder.fill(
             fieldRelativeChassisSpeeds().vxMetersPerSecond,
             fieldRelativeChassisSpeeds().vyMetersPerSecond);
-    double limit = maxAccel.get() * (1 - (currVel.norm() / MAX_SPEED.in(MetersPerSecond)));
-    log("limit", limit);
-    Vector<N2> proj = desiredAccel.projection(currVel);
-    if (proj.norm() > limit) {
+    double limit =
+        maxAccel.get()
+            * PERIOD.in(Seconds)
+            * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
+    log("accel limit", limit);
+    Vector<N2> proj = deltaV.projection(currVel);
+    if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
-      Vector<N2> perpendicular = desiredAccel.minus(parallel);
-      log("end", parallel.plus(perpendicular).norm());
+      Vector<N2> perpendicular = deltaV.minus(proj);
       return parallel.plus(perpendicular);
     }
-    return desiredAccel;
+    return deltaV;
   }
 
   // /**
@@ -651,10 +659,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param desiredAccel The desired field-relative acceleration vector.
    * @return The adjusted acceleration vector after applying skid acceleration limits.
    */
-  private Vector<N2> skidAccelerationLimit(Vector<N2> desiredAccel) {
-    return desiredAccel.norm() == 0
-        ? desiredAccel
-        : desiredAccel.unit().times(Math.min(desiredAccel.norm(), maxSkidAccel.get()));
+  private Vector<N2> skidAccelerationLimit(Vector<N2> deltaV) {
+    return deltaV.norm() == 0
+        ? deltaV
+        : deltaV.unit().times(Math.min(deltaV.norm(), maxSkidAccel.get() * PERIOD.in(Seconds)));
   }
 
   /**
@@ -693,7 +701,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
-          log("at driveTo pose", atPose(targetPose));
+          log("driveTo goal", targetPose);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -893,6 +901,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public void updateEstimates(PoseEstimate... poses) {
     Pose3d[] loggedEstimates = new Pose3d[poses.length];
+
     for (int i = 0; i < poses.length; i++) {
       loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
       odometry.addVisionMeasurement(
@@ -909,9 +918,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
+    Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
       lock.lock();
-      Tracer.startTrace("drive pd");
       try {
         double[] timestamps = modules.get(2).timestamps();
 
@@ -957,8 +966,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       modules2d[i].setPose(pose().transformBy(transform));
     }
 
-    translationController.setPID(translationP.get(), translationI.get(), translationD.get());
-    rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
+    if (TUNING) {
+      translationController.setPID(translationP.get(), translationI.get(), translationD.get());
+      rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
+    }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
     Tracer.endTrace();

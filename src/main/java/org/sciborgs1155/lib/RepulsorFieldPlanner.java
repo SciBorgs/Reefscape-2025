@@ -18,7 +18,6 @@ import org.sciborgs1155.robot.Constants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner implements Logged {
-
   abstract static class Obstacle {
     double strength = 1.0;
     boolean positive = true;
@@ -184,13 +183,14 @@ public class RepulsorFieldPlanner implements Logged {
           new VerticalObstacle(FIELD_LENGTH, 0.5, false));
 
   private List<Obstacle> fixedObstacles = new ArrayList<>();
-  @Log.NT private Optional<Translation2d> goalOpt = Optional.empty();
+  private Optional<Translation2d> goalOpt = Optional.empty();
 
   @Log.NT
   public Pose2d goal() {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }
 
+  // A grid of arrows drawn in AScope
   // private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
   // private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
   // private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
@@ -212,10 +212,6 @@ public class RepulsorFieldPlanner implements Logged {
   @IgnoreLogged private boolean useWallsInArrows = true;
 
   // private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
-
-  // A grid of arrows drawn in AScope
-
-  // TODO removed all of ts since it wasn't being used???? for some reason lmao
 
   /** Updates the grid of vectors // */
   // void updateArrows() {
@@ -374,6 +370,7 @@ public class RepulsorFieldPlanner implements Logged {
       Translation2d goal = goalOpt.get();
       Translation2d position = pose.getTranslation();
       Translation2d err = position.minus(goal);
+
       if (useGoal && err.getNorm() < stepSize_m * 1.5) {
         // Tells the robot to stop moving if it's already there.
         return sample(goal, goalRotation, 0, 0, 0);

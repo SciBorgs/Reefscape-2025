@@ -6,9 +6,11 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -72,7 +75,7 @@ public class Vision implements Logged {
       PhotonPoseEstimator estimator =
           new PhotonPoseEstimator(
               VisionConstants.TAG_LAYOUT,
-              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+              PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
               configs[i].robotToCam());
 
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -148,7 +151,7 @@ public class Vision implements Logged {
                             .reduce(true, (a, b) -> a && b));
           }
 
-          // negate pich
+          // negate pitch
           if (cameras[i].getName() != "back middle") {
             change.targets.stream()
                 .forEach(
@@ -171,14 +174,21 @@ public class Vision implements Logged {
 
           estimate = estimators[i].update(change);
 
-          log("estimates present " + i, estimate.isPresent());
+          log(name + " estimates present", estimate.isPresent());
           estimate
               .filter(
-                  f ->
-                      FieldConstants.inField(f.estimatedPose)
-                          && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                          && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                          && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+                  f -> {
+                    boolean valid =
+                        FieldConstants.inField(f.estimatedPose)
+                            && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                            && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                            && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
+                    if (!valid) {
+                      log(name + " rejected estimate", f.estimatedPose);
+                      FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
+                    }
+                    return valid;
+                  })
               .ifPresent(
                   e ->
                       estimates.add(
@@ -200,6 +210,12 @@ public class Vision implements Logged {
 
   public boolean getCameraStatus(String name) {
     return camerasEnabled.get(name);
+  }
+
+  public void feedEstimatorHeading(Rotation2d heading) {
+    for (PhotonPoseEstimator estimator : estimators) {
+      estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
+    }
   }
 
   /**
@@ -229,32 +245,28 @@ public class Vision implements Logged {
       Pose2d estimatedPose, PhotonPipelineResult pipelineResult) {
     var estStdDevs = VisionConstants.SINGLE_TAG_STD_DEVS;
     var targets = pipelineResult.getTargets();
-    int numTags = 0;
     double avgDist = 0;
     double avgWeight = 0;
     for (var tgt : targets) {
       var tagPose = TAG_LAYOUT.getTagPose(tgt.getFiducialId());
       if (tagPose.isEmpty()) continue;
-      numTags++;
       avgDist +=
           tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
       avgWeight += TAG_WEIGHTS[tgt.getFiducialId() - 1];
     }
-    if (numTags == 0) return estStdDevs;
+    if (targets.size() == 0) return estStdDevs;
 
-    avgDist /= numTags;
-    avgWeight /= numTags;
+    avgDist /= targets.size();
+    avgWeight /= targets.size();
 
     // Decrease std devs if multiple targets are visible
-    if (numTags > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
+    if (targets.size() > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
     // Increase std devs based on (average) distance
-    if (numTags == 1 && avgDist > 4)
+    if (targets.size() == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
-    estStdDevs = estStdDevs.times(avgWeight);
-
-    return estStdDevs;
+    return estStdDevs.times(avgWeight);
   }
 
   public Transform3d[] cameraTransforms() {

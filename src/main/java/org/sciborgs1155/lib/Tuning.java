@@ -1,5 +1,8 @@
 package org.sciborgs1155.lib;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+import static org.sciborgs1155.robot.Constants.PERIOD;
+
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanTopic;
@@ -14,14 +17,9 @@ import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import static edu.wpi.first.units.Units.Milliseconds;
-import static org.sciborgs1155.robot.Constants.PERIOD;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.sciborgs1155.robot.Constants;
 
 /**
@@ -55,7 +53,10 @@ public final class Tuning {
   private static HashMap<String, Boolean> prevBoolean = new HashMap<>();
 
   public static Trigger changes(DoubleEntry entry) {
-    return new Trigger(Constants.TUNING ? () -> System.currentTimeMillis() - entry.getLastChange() <= PERIOD.in(Milliseconds) : () -> false);
+    return new Trigger(
+        Constants.TUNING
+            ? () -> System.currentTimeMillis() - entry.getLastChange() <= PERIOD.in(Milliseconds)
+            : () -> false);
   }
 
   /**

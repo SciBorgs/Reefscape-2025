@@ -21,7 +21,6 @@ import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor motor;
@@ -69,12 +68,8 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
   }
 
-  public Command score(Level level) {
-    return run(() -> motor.set((level == Level.L4 ? 0.4 : 0.8) * SCORE_POWER));
-  }
-
   public Command scoreSlow() {
-    return run(() -> motor.set(SCORE_POWER / 5)).withName("score");
+    return run(() -> motor.set(SCORE_POWER / 2)).withName("score slow");
   }
 
   public Command algae() {

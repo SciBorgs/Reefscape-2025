@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.DoubleSupplier;
-import org.sciborgs1155.lib.Tracer;
 
 /**
  * A class for faster Talon Odometry using a faster thread.
@@ -87,8 +86,6 @@ public class TalonOdometryThread extends Thread {
   @Override
   public void run() {
     while (true) {
-      Tracer.startTrace("odometry thjred");
-
       try {
         if (TalonOdometryThread.isCANFD && talonSignals.length > 0) {
           BaseStatusSignal.waitForAll(2.0 * ODOMETRY_PERIOD.in(Seconds), talonSignals);
@@ -125,7 +122,6 @@ public class TalonOdometryThread extends Thread {
           timestampQueues.get(i).offer(timestamp);
         }
       } finally {
-        Tracer.endTrace();
         Drive.lock.unlock();
       }
     }
