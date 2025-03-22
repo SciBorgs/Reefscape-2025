@@ -38,10 +38,7 @@ import java.util.function.Supplier;
  * }
  * </code></pre>
  *
- * Thanks to 5160.
- *
- * @see
- *     https://github.com/frc-5160-the-chargers/FRC2025/blob/main/src/main/java/frc/chargers/utils/Tracer.java
+ * @see https://github.com/wpilibsuite/allwpilib/pull/7099
  */
 public class Tracer {
   private static final class TraceStartData {

@@ -102,23 +102,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
-  public final DoubleEntry translationP =
+  private final DoubleEntry translationP =
       Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
-  public final DoubleEntry translationI =
+  private final DoubleEntry translationI =
       Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
-  public final DoubleEntry translationD =
+  private final DoubleEntry translationD =
       Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
 
-  public final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
-  public final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
-  public final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
+  private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+  private final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+  private final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
 
-  public final DoubleEntry maxAccel =
+  private final DoubleEntry maxAccel =
       Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxSkidAccel =
+  private final DoubleEntry maxSkidAccel =
       Tuning.entry(
           "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
-  public final DoubleEntry maxTiltAccel =
+  private final DoubleEntry maxTiltAccel =
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
@@ -142,8 +142,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           translationP.get(),
           translationI.get(),
           translationD.get(),
-          new TrapezoidProfile.Constraints(
-              MAX_SPEED.in(MetersPerSecond), 12));
+          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
 
   @Log.NT
   private final PIDController rotationController =
@@ -254,12 +253,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     gyro.reset();
-    odometry =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            lastHeading,
-            lastPositions,
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+    odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -275,24 +269,40 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     if (TUNING) {
       SmartDashboard.putData(
           "translation quasistatic forward",
-          translationCharacterization.quasistatic(Direction.kForward));
+          translationCharacterization
+              .quasistatic(Direction.kForward)
+              .withName("translation quasistatic forward"));
       SmartDashboard.putData(
-          "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
+          "translation dynamic forward",
+          translationCharacterization
+              .dynamic(Direction.kForward)
+              .withName("translation dynamic forward"));
       SmartDashboard.putData(
           "translation quasistatic backward",
           translationCharacterization.quasistatic(Direction.kReverse));
       SmartDashboard.putData(
-          "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
+          "translation dynamic backward",
+          translationCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("translation quasistatic backward"));
       SmartDashboard.putData(
           "rotation quasistatic forward",
           rotationalCharacterization.quasistatic(Direction.kForward));
       SmartDashboard.putData(
-          "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
+          "rotation dynamic forward",
+          rotationalCharacterization
+              .dynamic(Direction.kForward)
+              .withName("rotation quasistatic forward"));
       SmartDashboard.putData(
           "rotation quasistatic backward",
-          rotationalCharacterization.quasistatic(Direction.kReverse));
+          rotationalCharacterization
+              .quasistatic(Direction.kReverse)
+              .withName("rotation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+          "rotation dynamic backward",
+          rotationalCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("rotation dynamic backward"));
     }
   }
 
@@ -593,7 +603,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
         kinematics.toSwerveModuleStates(
-            ChassisSpeeds.discretize(newSpeeds, Constants.PERIOD.in(Seconds))),
+            ChassisSpeeds.discretize(
+                kinematics.toChassisSpeeds(states), Constants.PERIOD.in(Seconds))),
         mode);
   }
 

@@ -182,7 +182,7 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
-                      log(name + " estimate rejected", f.estimatedPose);
+                      log(name + " rejected estimate", f.estimatedPose);
                       FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
                     }
                     return valid;

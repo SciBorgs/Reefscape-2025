@@ -7,7 +7,6 @@ import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -112,8 +111,6 @@ public final class DriveConstants {
           Rotation2d.kZero, // rear left
           Rotation2d.kZero // rear right
           );
-
-  public static final Rotation3d GYRO_OFFSET = new Rotation3d(0, 0, Math.PI);
 
   public static final class Translation {
     public static final double P = 3.0;

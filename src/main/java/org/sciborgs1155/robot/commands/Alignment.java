@@ -88,7 +88,7 @@ public class Alignment implements Logged {
                             .pose()
                             .relativeTo(goal.get())
                             .getTranslation()
-                            .getDistance(new Translation2d()),
+                            .getDistance(Translation2d.kZero),
                     0.02 * 3)))
         .asProxy()
         .withName("align to reef")
@@ -152,7 +152,7 @@ public class Alignment implements Logged {
                                             .pose()
                                             .relativeTo(goal.get())
                                             .getTranslation()
-                                            .getDistance(new Translation2d())
+                                            .getDistance(Translation2d.kZero)
                                         * 3,
                                 0.02 * 3)))
                 .onlyWhile(
