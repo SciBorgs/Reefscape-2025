@@ -29,10 +29,13 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
+
+import java.security.KeyStore.Entry;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import monologue.Annotations.Log;
@@ -87,6 +90,8 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   private final DoubleEntry V = Tuning.entry("/Robot/tuningArm/kV", kV);
   private final DoubleEntry A = Tuning.entry("/Robot/tuningArm/kA", kA);
 
+  
+
   /**
    * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and
    * simulated if it isn't.
@@ -130,6 +135,12 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
       SmartDashboard.putData("arm dynamic forward", dynamicForward());
       SmartDashboard.putData("arm dynamic backward", dynamicBack());
     }
+
+    Tuning.changes(A).onTrue(runOnce(() -> ff.setKa(A.get())).asProxy());
+    Tuning.changes(S).onTrue(runOnce(() -> ff.setKa(S.get())).asProxy());
+    Tuning.changes(V).onTrue(runOnce(() -> ff.setKa(V.get())).asProxy());
+    Tuning.changes(G).onTrue(runOnce(() -> ff.setKa(G.get())).asProxy());
+
   }
 
   /**
@@ -281,13 +292,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   @Override
   public void periodic() {
     armLigament.setAngle(Math.toDegrees(position()));
-
-    if (TUNING) {
-      ff.setKa(A.get());
-      ff.setKg(G.get());
-      ff.setKs(S.get());
-      ff.setKv(V.get());
-    }
   }
 
   @Override

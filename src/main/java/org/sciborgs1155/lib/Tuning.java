@@ -13,9 +13,16 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringEntry;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import static edu.wpi.first.units.Units.Milliseconds;
+import static org.sciborgs1155.robot.Constants.PERIOD;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.sciborgs1155.robot.Constants;
 
 /**
  * Tuning creates an entry with a specified topic and configurable value in Network Tables.
@@ -46,6 +53,10 @@ public final class Tuning {
   private static HashMap<String, Long> prevInt = new HashMap<>();
   private static HashMap<String, String> prevString = new HashMap<>();
   private static HashMap<String, Boolean> prevBoolean = new HashMap<>();
+
+  public static Trigger changes(DoubleEntry entry) {
+    return new Trigger(Constants.TUNING ? () -> System.currentTimeMillis() - entry.getLastChange() <= PERIOD.in(Milliseconds) : () -> false);
+  }
 
   /**
    * Logs a DoubleEntry on Network Tables.
