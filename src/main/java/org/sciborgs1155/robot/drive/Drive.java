@@ -228,7 +228,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     gyro.reset();
-    odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, STARTING_POSE);
+    odometry =
+        new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, SIM_STARTING_POSE);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);

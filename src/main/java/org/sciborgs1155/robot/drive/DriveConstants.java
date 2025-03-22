@@ -65,7 +65,8 @@ public final class DriveConstants {
   // Robot width with bumpers
   public static final Distance CHASSIS_WIDTH = Inches.of(32.645);
   // Robot starting position in sim
-  public static final Pose2d STARTING_POSE = new Pose2d(3, 3, new Rotation2d());
+  public static final Pose2d SIM_STARTING_POSE =
+      new Pose2d(9.68, 3.03, new Rotation2d(Degrees.of(32.54)));
 
   // Maximum achievable translational and rotation velocities and accelerations of the robot.
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5.74);
@@ -85,6 +86,7 @@ public final class DriveConstants {
     new Translation2d(WHEEL_BASE.div(-2), TRACK_WIDTH.div(-2)) // rear right
   };
 
+  /** Simulation constants that are used for the creation of the maplesim drivetrain. */
   public static final DriveTrainSimulationConfig SIM_DRIVE_CONFIG =
       DriveTrainSimulationConfig.Default()
           .withGyro(COTS.ofPigeon2())
@@ -103,8 +105,12 @@ public final class DriveConstants {
           .withTrackLengthTrackWidth(TRACK_WIDTH, TRACK_WIDTH)
           .withBumperSize(BUMPER_LENGTH, BUMPER_LENGTH);
 
+  /**
+   * Simulates a drivetrain modeled on real life. In sim, this pose should be treated as the actual
+   * robot pose, that the odometry should attempt to model.
+   */
   public static final SwerveDriveSimulation driveSim =
-      new SwerveDriveSimulation(SIM_DRIVE_CONFIG, STARTING_POSE);
+      new SwerveDriveSimulation(SIM_DRIVE_CONFIG, SIM_STARTING_POSE);
 
   public static final RobotConfig ROBOT_CONFIG =
       new RobotConfig(

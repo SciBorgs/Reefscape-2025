@@ -108,7 +108,7 @@ public class Autos {
             .source()
             .asProxy()
             .withTimeout(5)
-            .andThen(scoraling.hpsIntake().asProxy()),
+            .andThen(scoraling.hpsIntake().asProxy().withTimeout(5)),
         // .onlyIf(() -> scoraling.scoralBeambreak()),
         alignment
             .reef(Level.L4, Branch.K)

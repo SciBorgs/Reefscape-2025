@@ -20,18 +20,21 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.commands.Alignment;
+import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class AlignTest {
-
   Drive drive;
   Elevator elevator;
   Scoral scoral;
+  Hopper hopper;
   Alignment align;
+  Scoraling scoraling;
 
   @BeforeEach
   public void setup() {
@@ -39,9 +42,12 @@ public class AlignTest {
     drive = Drive.create();
     elevator = Elevator.create();
     scoral = Scoral.create();
+    hopper = Hopper.create();
+    scoraling = new Scoraling(hopper, scoral, elevator);
+
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
-    align = new Alignment(drive, elevator, scoral);
+    align = new Alignment(drive, elevator, scoral, scoraling);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.notifyNewData();
   }

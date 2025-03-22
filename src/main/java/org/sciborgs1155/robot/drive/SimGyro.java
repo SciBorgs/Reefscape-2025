@@ -36,7 +36,5 @@ public class SimGyro implements GyroIO {
   public void reset() {}
 
   @Override
-  public void close() throws Exception {
-    throw new UnsupportedOperationException("Unimplemented method 'close'");
-  }
+  public void close() throws Exception {}
 }

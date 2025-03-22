@@ -33,7 +33,17 @@ public class Beambreak implements Logged {
    * Generates a beambreak that does not contain hardware. This beambreak will always return true.
    */
   public static Beambreak none() {
-    return new Beambreak(() -> true, () -> {});
+    return none(true);
+  }
+
+  /**
+   * Generates a beambreak that does not contain hardware. This beambreak always returns a default
+   * value.
+   *
+   * @param defaultValue the value the beambreak always returns
+   */
+  public static Beambreak none(boolean defaultValue) {
+    return new Beambreak(() -> defaultValue, () -> {});
   }
 
   /**

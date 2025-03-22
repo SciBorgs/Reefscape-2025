@@ -28,7 +28,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
 
   /** Creates a hopper sans hardware or simulation. */
   public static Hopper none() {
-    return new Hopper(SimpleMotor.none(), Beambreak.none());
+    return new Hopper(SimpleMotor.none(), Beambreak.none(false));
   }
 
   /** Generates a simple motor with the appropriate configurations as real hardware. */

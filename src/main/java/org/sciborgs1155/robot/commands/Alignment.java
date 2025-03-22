@@ -11,10 +11,8 @@ import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Logged;
 import org.sciborgs1155.lib.FaultLogger;
@@ -34,7 +32,7 @@ import org.sciborgs1155.robot.scoral.Scoral;
 public class Alignment implements Logged {
   @IgnoreLogged private final Drive drive;
   @IgnoreLogged private final Elevator elevator;
-  @IgnoreLogged private final Scoral scoral;
+  @IgnoreLogged private final Scoraling scoraling;
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
@@ -50,10 +48,10 @@ public class Alignment implements Logged {
    * @param drive The operated drivetrain.
    * @param elevator The operated elevator.
    */
-  public Alignment(Drive drive, Elevator elevator, Scoral scoral) {
+  public Alignment(Drive drive, Elevator elevator, Scoral scoral, Scoraling scoraling) {
     this.drive = drive;
     this.elevator = elevator;
-    this.scoral = scoral;
+    this.scoraling = scoraling;
   }
 
   /**
@@ -73,9 +71,7 @@ public class Alignment implements Logged {
                 elevator.scoreLevel(level).asProxy(),
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
-                    Commands.waitUntil(elevator::atGoal)
-                        .withTimeout(1.5)
-                        .andThen(scoral.score(level).asProxy().until(scoral.blocked.negate())),
+                    scoraling.scoralWithoutElevator(level).until(scoraling.hasCoral().negate()),
                     drive
                         .driveTo(() -> goal.get().transformBy(advance(Meters.of(-0.2))))
                         .asProxy())))
@@ -105,16 +101,7 @@ public class Alignment implements Logged {
    */
   public Command source() {
     return Commands.defer(
-        () ->
-            alignTo(
-                    () ->
-                        drive
-                            .pose()
-                            .nearest(
-                                Arrays.stream(Source.values())
-                                    .map(s -> s.pose())
-                                    .collect(Collectors.toList())))
-                .deadlineFor(elevator.retract()),
+        () -> alignTo(() -> Source.nearest(drive.pose())).deadlineFor(elevator.retract()),
         Set.of(drive, elevator));
   }
 
@@ -161,10 +148,8 @@ public class Alignment implements Logged {
   public Command safeReef(Level level, Branch branch) {
     return pathfind(branch::pose)
         .andThen(elevator.scoreLevel(level))
-        .until(scoral.blocked.negate())
-        .deadlineFor(
-            Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                .andThen(scoral.score(level)));
+        .until(scoraling.hasCoral().negate())
+        .deadlineFor(scoraling.scoralWithoutElevator(level));
   }
 
   /**

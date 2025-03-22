@@ -11,6 +11,7 @@ import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -122,7 +123,14 @@ public class FieldConstants {
     }
   }
 
-  public static final Distance TO_THE_LEFT = Inches.of(0);
+  public static final Distance TO_THE_LEFT = Inches.of(2);
+
+  public static Pose2d moveLeft(Pose2d pose) {
+    return pose.transformBy(
+        new Transform2d(
+            new Translation2d(TO_THE_LEFT.in(Meters), Rotation2d.fromDegrees(90)),
+            Rotation2d.kZero));
+  }
 
   // Poses for scoraling.
   // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
@@ -152,7 +160,7 @@ public class FieldConstants {
     }
 
     public Pose2d pose() {
-      return allianceReflect(pose);
+      return moveLeft(allianceReflect(pose));
     }
 
     // /**
@@ -281,6 +289,11 @@ public class FieldConstants {
 
     public Pose2d pose() {
       return allianceReflect(pose);
+    }
+
+    public static Pose2d nearest(Pose2d pose) {
+      return pose.nearest(
+          Arrays.stream(Source.values()).map(s -> s.pose()).collect(Collectors.toList()));
     }
   }
 

@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
@@ -10,6 +11,8 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -36,6 +39,10 @@ public class ElevatorConstants {
 
   public static final Translation3d BASE_FROM_CHASSIS = new Translation3d(-0.04, -0.2, .125);
   public static final Translation3d CARRIAGE_FROM_CHASSIS = new Translation3d(.015, -0.2, .1);
+  public static final Transform3d CORAL_FROM_CARRIAGE =
+      new Transform3d(
+          new Translation3d(.05, .14, .58),
+          new Rotation3d(Degrees.of(0), Degrees.of(35), Degrees.of(0)));
 
   public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(2.8);

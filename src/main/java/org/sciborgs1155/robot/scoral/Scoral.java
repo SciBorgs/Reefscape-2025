@@ -31,36 +31,40 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public Scoral(ScoralIO hardware) {
     this.hardware = hardware;
 
-    this.blocked = new Trigger(Robot.isReal() ? () -> !hardware.hasCoral() : () -> hardware.hasCoral()); // it spontaneously negated.... in real life
+    this.blocked =
+        new Trigger(
+            Robot.isReal()
+                ? () -> !hardware.hasCoral()
+                : () -> hardware.hasCoral()); // it spontaneously negated.... in real life
 
     setDefaultCommand(stop());
   }
 
   /** Runs the motor to move a coral out of the scoral outwards. */
   public Command score() {
-    return run(() -> hardware.set(SCORE_POWER)).withName("score");
+    return run(() -> hardware.set(SCORE_POWER, true)).withName("score");
   }
 
   public Command score(Level level) {
-    return run(() -> hardware.set(level == Level.L4 ? SCORE_POWER : 0.6 * SCORE_POWER))
+    return run(() -> hardware.set(level == Level.L4 ? SCORE_POWER : 0.6 * SCORE_POWER, true))
         .withName("score level");
   }
 
   public Command scoreSlow() {
-    return run(() -> hardware.set(SCORE_POWER / 5)).withName("score");
+    return run(() -> hardware.set(SCORE_POWER / 5, true)).withName("score");
   }
 
   public Command algae() {
-    return run(() -> hardware.set(-SCORE_POWER)).withName("algaeing");
+    return run(() -> hardware.set(-SCORE_POWER, false)).withName("algaeing");
   }
 
   public Command intake() {
-    return run(() -> hardware.set(INTAKE_POWER * 0.6)).withName("intake");
+    return run(() -> hardware.set(INTAKE_POWER * 0.6, false)).withName("intake");
   }
 
   /** Stops the motor */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("stop");
+    return run(() -> hardware.set(0, false)).withName("stop");
   }
 
   @Override

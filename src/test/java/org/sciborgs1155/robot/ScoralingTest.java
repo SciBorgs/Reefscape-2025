@@ -40,7 +40,7 @@ public class ScoralingTest {
     leftLED = new LEDStrip(0, 59, false);
     rightLED = new LEDStrip(60, 119, true);
 
-    scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
+    scoraling = new Scoraling(hopper, scoral, elevator);
   }
 
   @AfterEach

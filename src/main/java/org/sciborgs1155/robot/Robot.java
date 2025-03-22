@@ -2,7 +2,6 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
@@ -31,9 +30,7 @@ import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -48,20 +45,16 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
+import java.util.List;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
-import org.dyn4j.geometry.Triangle;
-import org.dyn4j.geometry.Vector2;
-import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.robot.Constants.Field.Source;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
@@ -143,11 +136,11 @@ public class Robot extends CommandRobot implements Logged {
   private final LEDStrip middleLED = new LEDStrip(38, 59, true);
   private final LEDStrip rightLED = new LEDStrip(60, 103, true);
 
-  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leftLED, rightLED);
+  private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator);
   private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
-  @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral);
+  @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral, scoraling);
 
   @Log.NT
   private final SendableChooser<Command> autos =
@@ -210,7 +203,6 @@ public class Robot extends CommandRobot implements Logged {
       pdh.setSwitchableChannel(true);
     } else {
       DriverStation.silenceJoystickConnectionWarning(true);
-      addPeriodic(() -> vision.simulationPeriodic(maplePose()), PERIOD.in(Seconds));
     }
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
@@ -220,47 +212,38 @@ public class Robot extends CommandRobot implements Logged {
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
+    vision.simulationPeriodic(maplePose());
   }
 
+  /**
+   * Gives the pose as modeled by the maplesim drivetrain. It should be the trusted pose in sim that
+   * odometry tries to follow.
+   */
   @Log
-  public Pose2d maplePose() {
+  public static Pose2d maplePose() {
     return driveSim.getSimulatedDriveTrainPose();
   }
 
+  /** Logs all algae to be visualized in advantagescope */
   @Log
   public Pose3d[] algae() {
     return SimulatedArena.getInstance().getGamePiecesArrayByType("Algae");
   }
 
+  /** Logs all coral to be visualized in advantagescope */
   @Log
   public Pose3d[] coral() {
-    return SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
-  }
-
-  public static Command dropCoral() {
-    if (Robot.isReal()) {
-      return Commands.none();
-    }
-
-    return Commands.runOnce(
-        () ->
-            SimulatedArena.getInstance()
-                .addGamePieceProjectile(
-                    new ReefscapeCoralOnFly(
-                        Source.LEFT.pose.getTranslation().plus(new Translation2d(.4, -.4)),
-                        new Translation2d(),
-                        new ChassisSpeeds(),
-                        new Rotation2d(-Math.PI / 4),
-                        Meters.of(1.2),
-                        MetersPerSecond.of(-3),
-                        Radians.of(Math.PI / 4))));
+    List<Pose3d> coral = SimulatedArena.getInstance().getGamePiecesByType("Coral");
+    coral.add(scoraling.heldCoral());
+    return coral.toArray(Pose3d[]::new);
   }
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    operator.b().onTrue(Autos.RB4(align, scoraling, drive::resetOdometry, scoral, elevator));
+    autonomous()
+        .onTrue(
+            Commands.runOnce(() -> intakeSim.addGamePieceToIntake()).unless(() -> Robot.isReal()));
 
-    operator.a().onTrue(dropCoral());
     InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
 
