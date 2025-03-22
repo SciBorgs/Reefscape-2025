@@ -6,11 +6,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,6 +29,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -44,6 +43,7 @@ public class Vision implements Logged {
   private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
+  @Log.NT private final List<Pose3d> filteredEstimates;
 
   private VisionSystemSim visionSim;
 
@@ -68,6 +68,7 @@ public class Vision implements Logged {
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
     lastResults = new PhotonPipelineResult[configs.length];
+    filteredEstimates = new ArrayList<>();
     camerasEnabled = new HashMap<>();
 
     for (int i = 0; i < configs.length; i++) {
@@ -75,7 +76,7 @@ public class Vision implements Logged {
       PhotonPoseEstimator estimator =
           new PhotonPoseEstimator(
               VisionConstants.TAG_LAYOUT,
-              PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
+              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
               configs[i].robotToCam());
 
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -122,7 +123,10 @@ public class Vision implements Logged {
    *     used for estimation.
    */
   public PoseEstimate[] estimatedGlobalPoses() {
+    Tracer.startTrace("get vision poses");
     List<PoseEstimate> estimates = new ArrayList<>();
+    filteredEstimates.clear();
+
     for (int i = 0; i < estimators.length; i++) {
       if (camerasEnabled.get(cameras[i].getName())) {
         var unreadChanges = cameras[i].getAllUnreadResults();
@@ -184,7 +188,7 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
-                      log(name + " rejected estimate", f.estimatedPose);
+                      filteredEstimates.add(f.estimatedPose);
                       FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
                     }
                     return valid;
@@ -197,6 +201,7 @@ public class Vision implements Logged {
         }
       }
     }
+    Tracer.endTrace();
     return estimates.toArray(PoseEstimate[]::new);
   }
 
@@ -212,10 +217,15 @@ public class Vision implements Logged {
     return camerasEnabled.get(name);
   }
 
-  public void feedEstimatorHeading(Rotation2d heading) {
-    for (PhotonPoseEstimator estimator : estimators) {
-      estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
-    }
+  // public void feedEstimatorHeading(Rotation2d heading) {
+  //   for (PhotonPoseEstimator estimator : estimators) {
+  //     estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
+  //   }
+  // }
+
+  public void setPoseStrategy(PoseStrategy strategy) {
+    estimators[0].setPrimaryStrategy(strategy);
+    estimators[1].setPrimaryStrategy(strategy);
   }
 
   /**

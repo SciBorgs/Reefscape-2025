@@ -43,6 +43,7 @@ import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
 import monologue.Monologue;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
@@ -200,7 +201,7 @@ public class Robot extends CommandRobot implements Logged {
     }
 
     // Configure pose estimation updates from vision every tick
-    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
+    // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
@@ -259,8 +260,11 @@ public class Robot extends CommandRobot implements Logged {
     scoral.blocked.onTrue(rumble(RumbleType.kBothRumble, 0.5));
     hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
-    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
-
+    disabled()
+        .onTrue(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
+        .onFalse(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
+    autonomous()
+        .whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
 

@@ -85,11 +85,12 @@ public class Alignment implements Logged {
                 leds.error(
                     () ->
                         drive
-                            .pose()
-                            .relativeTo(goal.get())
-                            .getTranslation()
-                            .getDistance(Translation2d.kZero),
-                    0.02 * 3)))
+                                .pose()
+                                .relativeTo(goal.get())
+                                .getTranslation()
+                                .getDistance(Translation2d.kZero)
+                            * 3.5,
+                    0.02 * 3.5)))
         .asProxy()
         .withName("align to reef")
         .onlyWhile(
@@ -153,8 +154,8 @@ public class Alignment implements Logged {
                                             .relativeTo(goal.get())
                                             .getTranslation()
                                             .getDistance(Translation2d.kZero)
-                                        * 3,
-                                0.02 * 3)))
+                                        * 3.5,
+                                0.02 * 3.5)))
                 .onlyWhile(
                     () ->
                         !FaultLogger.report(
@@ -225,7 +226,7 @@ public class Alignment implements Logged {
    * @return A Command to pathfind to an onfield pose.
    */
   public Command pathfind(Supplier<Pose2d> goal) {
-    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond));
+    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond) * 0.7);
   }
 
   /**
