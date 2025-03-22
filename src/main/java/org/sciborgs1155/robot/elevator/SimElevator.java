@@ -94,4 +94,39 @@ public class SimElevator implements ElevatorIO {
 
     setVoltage(feedforward + feedback);
   }
+
+  @Override
+  public void setS(double s) {
+    ff.setKs(s);
+  }
+
+  @Override
+  public void setV(double v) {
+    ff.setKv(v);
+  }
+
+  @Override
+  public void setA(double a) {
+    ff.setKa(a);
+  }
+
+  @Override
+  public void setG(double g) {
+    ff.setKg(g);
+  }
+
+  @Override
+  public void setP(double p) {
+    pid.setP(p);
+  }
+
+  @Override
+  public void setI(double i) {
+    pid.setI(i);
+  }
+
+  @Override
+  public void setD(double d) {
+    pid.setD(d);
+  }
 }

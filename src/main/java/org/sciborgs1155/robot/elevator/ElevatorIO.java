@@ -28,4 +28,18 @@ public interface ElevatorIO extends AutoCloseable {
    * @return The encoder value in meters per second.
    */
   public double velocity();
+
+  public void setS(double s);
+
+  public void setV(double v);
+
+  public void setA(double a);
+
+  public void setG(double g);
+
+  public void setP(double p);
+
+  public void setI(double i);
+
+  public void setD(double d);
 }

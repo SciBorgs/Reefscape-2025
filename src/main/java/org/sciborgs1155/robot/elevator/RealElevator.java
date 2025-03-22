@@ -21,9 +21,9 @@ public class RealElevator implements ElevatorIO {
 
   private final MotionMagicVoltage profile = new MotionMagicVoltage(MIN_EXTENSION.in(Meters));
 
-  public RealElevator() {
-    TalonFXConfiguration talonConfig = new TalonFXConfiguration();
+  TalonFXConfiguration talonConfig = new TalonFXConfiguration();
 
+  public RealElevator() {
     follower.setControl(new Follower(FRONT_LEADER, true));
 
     talonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -51,6 +51,11 @@ public class RealElevator implements ElevatorIO {
     TalonUtils.addMotor(follower);
     register(leader);
     register(follower);
+  }
+
+  public void updateConfig() {
+    leader.getConfigurator().apply(talonConfig);
+    follower.getConfigurator().apply(talonConfig);
   }
 
   @Override
@@ -96,5 +101,47 @@ public class RealElevator implements ElevatorIO {
   public void close() throws Exception {
     leader.close();
     follower.close();
+  }
+
+  @Override
+  public void setS(double s) {
+    talonConfig.Slot0.kS = s;
+    updateConfig();
+  }
+
+  @Override
+  public void setV(double v) {
+    talonConfig.Slot0.kV = v;
+    updateConfig();
+  }
+
+  @Override
+  public void setA(double a) {
+    talonConfig.Slot0.kA = a;
+    updateConfig();
+  }
+
+  @Override
+  public void setG(double g) {
+    talonConfig.Slot0.kG = g;
+    updateConfig();
+  }
+
+  @Override
+  public void setP(double p) {
+    talonConfig.Slot0.kP = p;
+    updateConfig();
+  }
+
+  @Override
+  public void setI(double i) {
+    talonConfig.Slot0.kI = i;
+    updateConfig();
+  }
+
+  @Override
+  public void setD(double d) {
+    talonConfig.Slot0.kD = d;
+    updateConfig();
   }
 }

@@ -108,6 +108,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
               .dynamic(Direction.kReverse)
               .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
               .withName("elevator dynamic backward"));
+
+      Tuning.changes(S).onTrue(runOnce(() -> hardware.setS(S.get())).asProxy());
+      Tuning.changes(V).onTrue(runOnce(() -> hardware.setV(V.get())).asProxy());
+      Tuning.changes(A).onTrue(runOnce(() -> hardware.setA(A.get())).asProxy());
+      Tuning.changes(G).onTrue(runOnce(() -> hardware.setG(G.get())).asProxy());
     }
   }
 

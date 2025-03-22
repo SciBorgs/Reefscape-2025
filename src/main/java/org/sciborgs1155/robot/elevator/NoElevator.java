@@ -40,4 +40,25 @@ public class NoElevator implements ElevatorIO {
 
   @Override
   public void setGoal(double meters) {}
+
+  @Override
+  public void setS(double s) {}
+
+  @Override
+  public void setV(double v) {}
+
+  @Override
+  public void setA(double a) {}
+
+  @Override
+  public void setG(double g) {}
+
+  @Override
+  public void setP(double p) {}
+
+  @Override
+  public void setI(double i) {}
+
+  @Override
+  public void setD(double d) {}
 }
