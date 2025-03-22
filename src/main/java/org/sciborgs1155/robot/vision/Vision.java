@@ -75,7 +75,7 @@ public class Vision implements Logged {
       PhotonPoseEstimator estimator =
           new PhotonPoseEstimator(
               VisionConstants.TAG_LAYOUT,
-              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+              PoseStrategy.PNP_DISTANCE_TRIG_SOLVE,
               configs[i].robotToCam());
 
       estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
