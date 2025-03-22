@@ -901,6 +901,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public void updateEstimates(PoseEstimate... poses) {
     Pose3d[] loggedEstimates = new Pose3d[poses.length];
+
     for (int i = 0; i < poses.length; i++) {
       loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
       odometry.addVisionMeasurement(
