@@ -3,6 +3,8 @@ package org.sciborgs1155.lib;
 import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -11,13 +13,10 @@ import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.robot.Constants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
-public class RepulsorFieldPlanner implements Logged {
+public class RepulsorFieldPlanner {
   abstract static class Obstacle {
     double strength = 1.0;
     boolean positive = true;
@@ -185,7 +184,7 @@ public class RepulsorFieldPlanner implements Logged {
   private List<Obstacle> fixedObstacles = new ArrayList<>();
   private Optional<Translation2d> goalOpt = Optional.empty();
 
-  @Log.NT
+  @Logged
   public Pose2d goal() {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }
@@ -207,9 +206,9 @@ public class RepulsorFieldPlanner implements Logged {
     this.prevSample = sample(Translation2d.kZero, Rotation2d.kZero, 0, 0, 0);
   }
 
-  @IgnoreLogged private boolean useGoalInArrows = false;
-  @IgnoreLogged private boolean useObstaclesInArrows = true;
-  @IgnoreLogged private boolean useWallsInArrows = true;
+  @NotLogged private boolean useGoalInArrows = false;
+  @NotLogged private boolean useObstaclesInArrows = true;
+  @NotLogged private boolean useWallsInArrows = true;
 
   // private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
 
@@ -394,7 +393,6 @@ public class RepulsorFieldPlanner implements Logged {
         var intermediateGoal = position.plus(step);
 
         var endTime = System.nanoTime();
-        log("repulsorTimeS", (endTime - startTime) / 1e9);
 
         // set the previous sample as the current sample
         prevSample =

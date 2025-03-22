@@ -1,11 +1,16 @@
 package org.sciborgs1155.robot.led;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.Ports.LEDs.*;
-import static org.sciborgs1155.robot.led.LEDConstants.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
+import org.sciborgs1155.robot.Constants;
+import static org.sciborgs1155.robot.Ports.LEDs.LED_PORT;
+import static org.sciborgs1155.robot.led.LEDConstants.LED_LENGTH;
+import static org.sciborgs1155.robot.led.LEDConstants.LED_SPACING;
 
 import edu.wpi.first.math.MathUtil;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -14,13 +19,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import monologue.Logged;
-import org.sciborgs1155.robot.Constants;
 
-public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
+public class LEDStrip extends SubsystemBase implements AutoCloseable {
   private static final AddressableLED led = new AddressableLED(LED_PORT);
   private static final AddressableLEDBuffer allBuffer = new AddressableLEDBuffer(LED_LENGTH);
   private static boolean ledInitalized = false;
@@ -181,9 +181,7 @@ public class LEDStrip extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Override
-  public void periodic() {
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-  }
+  public void periodic() {}
 
   @Override
   public void close() throws Exception {

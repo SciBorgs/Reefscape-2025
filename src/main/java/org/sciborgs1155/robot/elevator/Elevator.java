@@ -1,15 +1,20 @@
 package org.sciborgs1155.robot.elevator;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
+import java.util.Set;
+import java.util.function.DoubleSupplier;
+
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.*;
+import org.sciborgs1155.robot.Constants;
 import static org.sciborgs1155.robot.Constants.TUNING;
+import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -18,6 +23,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -26,22 +32,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.DoubleSupplier;
-import monologue.Annotations.Log;
-import monologue.Logged;
-import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tuning;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
-public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
+public class Elevator extends SubsystemBase implements AutoCloseable {
   private final ElevatorIO hardware;
 
   private final SysIdRoutine sysIdRoutine;
@@ -62,7 +54,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     return new Elevator(new NoElevator());
   }
 
-  @Log.NT
+  @Logged
   private final ProfiledPIDController pid =
       new ProfiledPIDController(
           kP,
@@ -71,12 +63,10 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_VELOCITY.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Log.NT private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
+  @Logged private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Log.NT
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
-  @Log.NT
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
   private final DoubleEntry S = Tuning.entry("/Robot/tuning/elevator/kS", kS);
@@ -206,7 +196,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Position of the elevator in meters.
    */
-  @Log.NT
+  @Logged
   public double position() {
     return hardware.position();
   }
@@ -214,7 +204,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Velocity of the elevator in meters per second.
    */
-  @Log.NT
+  @Logged
   public double velocity() {
     return hardware.velocity();
   }
@@ -222,7 +212,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Desired position of the elevator in meters
    */
-  @Log.NT
+  @Logged
   public double positionSetpoint() {
     return pid.getSetpoint().position;
   }
@@ -230,7 +220,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Desired velocity of the elevator in meters per second.
    */
-  @Log.NT
+  @Logged
   public double velocitySetpoint() {
     return pid.getSetpoint().velocity;
   }
@@ -238,12 +228,12 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return Whether or not the elevator is at its desired state.
    */
-  @Log.NT
+  @Logged
   public boolean atGoal() {
     return pid.atGoal();
   }
 
-  @Log.NT
+  @Logged
   public Pose3d stage1() {
     return new Pose3d(
         BASE_FROM_CHASSIS.plus(
@@ -252,7 +242,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
         Rotation3d.kZero);
   }
 
-  @Log.NT
+  @Logged
   public Pose3d carriage() {
     return new Pose3d(
         CARRIAGE_FROM_CHASSIS.plus(
@@ -276,7 +266,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
     double feedback = pid.calculate(hardware.position(), goal);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
-    log("elverootr voltager", feedforward + feedback);
     hardware.setVoltage(feedforward + feedback);
   }
 
@@ -301,7 +290,6 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
       ff.setKa(A.get());
     }
 
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   /**

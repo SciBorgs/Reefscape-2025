@@ -1,28 +1,30 @@
 package org.sciborgs1155.robot.scoral;
 
-import static edu.wpi.first.units.Units.Amps;
+import java.util.Set;
+
+import org.sciborgs1155.lib.Assertion;
 import static org.sciborgs1155.lib.Assertion.tAssert;
-import static org.sciborgs1155.robot.Ports.Scoral.*;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
+import org.sciborgs1155.lib.Beambreak;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.lib.Test;
+import static org.sciborgs1155.robot.Ports.Scoral.BEAMBREAK;
+import static org.sciborgs1155.robot.Ports.Scoral.ROLLER;
+import org.sciborgs1155.robot.Robot;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.INTAKE_POWER;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.SCORE_POWER;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.STATOR_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.networktables.DoubleEntry;
+
+import static edu.wpi.first.units.Units.Amps;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.Optional;
-import java.util.Set;
-import monologue.Logged;
-import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.Beambreak;
-import org.sciborgs1155.lib.SimpleMotor;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tuning;
-import org.sciborgs1155.robot.Robot;
 
-public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
+public class Scoral extends SubsystemBase implements AutoCloseable {
   private final SimpleMotor motor;
 
   public final Beambreak beambreak;
@@ -80,9 +82,7 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   @Override
-  public void periodic() {
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-  }
+  public void periodic() {}
 
   /**
    * Sets the scoral to intake, expecting a coral. Can also be used to test beambreak.

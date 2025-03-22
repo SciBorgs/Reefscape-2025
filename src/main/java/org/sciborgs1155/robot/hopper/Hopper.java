@@ -1,22 +1,22 @@
 package org.sciborgs1155.robot.hopper;
 
-import static edu.wpi.first.units.Units.Amps;
+import org.sciborgs1155.lib.Beambreak;
+import org.sciborgs1155.lib.SimpleMotor;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import static org.sciborgs1155.robot.Ports.Hopper.*;
+import static org.sciborgs1155.robot.Ports.Hopper.BEAMBREAK;
+import static org.sciborgs1155.robot.Ports.Hopper.MOTOR;
+import org.sciborgs1155.robot.Robot;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import static edu.wpi.first.units.Units.Amps;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.Optional;
-import monologue.Logged;
-import org.sciborgs1155.lib.Beambreak;
-import org.sciborgs1155.lib.SimpleMotor;
-import org.sciborgs1155.robot.Robot;
 
-public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
+public class Hopper extends SubsystemBase implements AutoCloseable {
   private final SimpleMotor motor;
   private final Beambreak beambreak;
   public final Trigger blocked;
@@ -87,9 +87,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable, Logged {
   }
 
   @Override
-  public void periodic() {
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-  }
+  public void periodic() {}
 
   @Override
   public void close() throws Exception {

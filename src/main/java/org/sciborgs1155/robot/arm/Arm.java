@@ -1,37 +1,11 @@
 package org.sciborgs1155.robot.arm;
 
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.robot.Constants.TUNING;
-import static org.sciborgs1155.robot.arm.ArmConstants.ARM_LENGTH;
-import static org.sciborgs1155.robot.arm.ArmConstants.AXLE_FROM_CHASSIS;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_FINAL_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_LIMIT;
-import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ACCEL;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.MAX_VELOCITY;
-import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.POSITION_TOLERANCE;
-import static org.sciborgs1155.robot.arm.ArmConstants.SUPPLY_LIMIT;
-import static org.sciborgs1155.robot.arm.ArmConstants.kA;
-import static org.sciborgs1155.robot.arm.ArmConstants.kD;
-import static org.sciborgs1155.robot.arm.ArmConstants.kG;
-import static org.sciborgs1155.robot.arm.ArmConstants.kI;
-import static org.sciborgs1155.robot.arm.ArmConstants.kP;
-import static org.sciborgs1155.robot.arm.ArmConstants.kS;
-import static org.sciborgs1155.robot.arm.ArmConstants.kV;
+import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -54,8 +28,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.InputStream;
@@ -65,12 +37,12 @@ import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple Arm subsystem used for climbing and intaking coral from the ground. */
-public class Arm extends SubsystemBase implements Logged, AutoCloseable {
+public class Arm extends SubsystemBase implements AutoCloseable {
   /** Interface for interacting with the motor itself. */
   private final ArmIO hardware;
 
   /** Trapezoid profile feedback (PID) controller */
-  @Log.NT
+  @Logged
   private final ProfiledPIDController fb =
       new ProfiledPIDController(
           kP,
@@ -86,7 +58,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine sysIdRoutine;
 
   /** Arm visualization software. */
-  @Log.NT private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
+  @Logged private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
   private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
 
@@ -158,7 +130,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return The position in radians.
    */
-  @Log.NT
+  @Logged
   public double position() {
     return hardware.position();
   }
@@ -170,7 +142,7 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return pose of the arm centered
    */
-  @Log.NT
+  @Logged
   public Pose3d pose() {
     return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI / 2));
   }
@@ -182,17 +154,17 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return The position in radians/sec.
    */
-  @Log.NT
+  @Logged
   public double velocity() {
     return hardware.velocity();
   }
 
-  @Log.NT
+  @Logged
   public double positionSetpoint() {
     return fb.getSetpoint().position;
   }
 
-  @Log.NT
+  @Logged
   public double velocitySetpoint() {
     return fb.getSetpoint().velocity;
   }
@@ -201,7 +173,6 @@ public class Arm extends SubsystemBase implements Logged, AutoCloseable {
    * @param radians The position, in radians.
    * @return True if the arm's position is close enough to a given position, False if it isn't.
    */
-  @Log.NT
   public boolean atPosition(double radians) {
     return Math.abs(radians - position()) < POSITION_TOLERANCE.in(Radians);
   }
