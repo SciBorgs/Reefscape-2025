@@ -97,6 +97,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   private LinearAcceleration maxAccel;
 
+  @Log.NT
   private double visionFOM;
 
   // Movement automation
