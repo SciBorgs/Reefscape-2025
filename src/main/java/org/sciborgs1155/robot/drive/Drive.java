@@ -622,12 +622,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
-    Vector<N2> limitedVelocity =
-        currentVelocity.plus(forwardAccelerationLimit(skidAccelerationLimit(deltaV)));
+    Vector<N2> limitedVelocity = currentVelocity.plus((skidAccelerationLimit(deltaV)));
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    log("forward accel limit", forwardAccelerationLimit(skidAccelerationLimit(deltaV)).norm());
+    log("forward accel limit", (skidAccelerationLimit(deltaV)).norm());
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(

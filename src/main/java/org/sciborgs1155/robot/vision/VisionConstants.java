@@ -86,7 +86,7 @@ public class VisionConstants {
   public static final Matrix<N3, N1> MULTIPLE_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 4);
 
   public static final double MAX_HEIGHT = 0.305;
-  public static final double MAX_ANGLE = 0.5;
+  public static final double MAX_ANGLE = 1;
   public static final double MAX_AMBIGUITY = 0.2;
 
   // Total of 22 AprilTags

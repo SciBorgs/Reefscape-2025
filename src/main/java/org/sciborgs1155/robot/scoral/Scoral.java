@@ -28,8 +28,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   public final Beambreak beambreak;
   public final Trigger blocked;
 
-  private DoubleEntry outtakeSpeed = Tuning.entry("score power", SCORE_POWER);
-
   /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {
     return Robot.isReal() ? new Scoral(realMotor(), Beambreak.real(BEAMBREAK)) : none();
@@ -57,10 +55,6 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     this.blocked = new Trigger(beambreak::get); // it spontaneously negated....
 
     setDefaultCommand(stop());
-  }
-
-  public Command tuningScore() {
-    return run(() -> motor.set(outtakeSpeed.getAsDouble())).withName("tune score");
   }
 
   /** Runs the motor to move a coral out of the scoral outwards. */
