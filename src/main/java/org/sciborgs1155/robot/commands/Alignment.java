@@ -150,12 +150,9 @@ public class Alignment implements Logged {
                             leds.error(
                                 () ->
                                     drive
-                                            .pose()
-                                            .relativeTo(goal.get())
-                                            .getTranslation()
-                                            .getDistance(Translation2d.kZero)
-                                        * 3.5,
-                                0.02 * 3.5)))
+                                            .pose().getTranslation().getDistance(goal.get().getTranslation())
+                                        * 3,
+                                0.02 * 3)))
                 .onlyWhile(
                     () ->
                         !FaultLogger.report(
