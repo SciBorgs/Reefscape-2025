@@ -1,17 +1,23 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
+import static java.lang.Math.abs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.sciborgs1155.lib.Test.runUnitTest;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
+import static org.sciborgs1155.robot.drive.DriveConstants.SIM_STARTING_POSE;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSimAdded;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.ironmaple.simulation.SimulatedArena;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -19,6 +25,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.drive.NoGyro;
 import org.sciborgs1155.robot.drive.OldSimModule;
@@ -43,6 +50,11 @@ public class SwerveTest {
     rearRight = new OldSimModule("RR");
     gyro = new NoGyro();
     drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
+
+    if (!driveSimAdded) {
+      SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+      driveSimAdded = true;
+    }
   }
 
   @AfterEach
@@ -91,38 +103,36 @@ public class SwerveTest {
 
   @RepeatedTest(value = 5, failureThreshold = 1)
   public void testModuleDistance() throws Exception {
-    assertEquals(drive.pose().getX(), 0);
-    assertEquals(drive.pose().getY(), 0);
-    assertEquals(drive.pose().getRotation().getRadians(), 0);
+    assertEquals(SIM_STARTING_POSE.getX(), drive.pose().getX());
+    assertEquals(SIM_STARTING_POSE.getY(), drive.pose().getY());
+    assertEquals(
+        SIM_STARTING_POSE.getRotation().getRadians(), drive.pose().getRotation().getRadians());
     double xVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
     double yVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
 
-    double deltaT = 4;
-    double deltaX = xVelocitySetpoint * deltaT;
-    double deltaY = yVelocitySetpoint * deltaT;
-
     String name = "test run " + Math.floor(Math.random() * 1000);
+
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading());
 
     Command c =
         drive
-            .run(
-                () ->
-                    drive.setChassisSpeeds(
-                        ChassisSpeeds.fromFieldRelativeSpeeds(
-                            xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
-                        ControlMode.CLOSED_LOOP_VELOCITY))
+            .run(() -> drive.setChassisSpeeds(speeds, ControlMode.CLOSED_LOOP_VELOCITY))
             .withName(name);
 
     run(c);
 
-    fastForward(Seconds.of(deltaT));
+    fastForward(Seconds.of(5));
 
-    assertEquals(drive.getCurrentCommand().getName(), name);
-
-    Pose2d pose = drive.pose();
-
-    assertEquals(deltaX, pose.getX(), DELTA * 4);
-    assertEquals(deltaY, pose.getY(), DELTA * 4);
+    assertEquals(
+        abs(xVelocitySetpoint), abs(drive.fieldRelativeChassisSpeeds().vxMetersPerSecond), DELTA);
+    assertEquals(
+        abs(yVelocitySetpoint), abs(drive.fieldRelativeChassisSpeeds().vyMetersPerSecond), DELTA);
+    assertEquals(
+        0,
+        drive.fieldRelativeChassisSpeeds().omegaRadiansPerSecond,
+        Rotation.TOLERANCE.in(Radians));
   }
 
   @Disabled

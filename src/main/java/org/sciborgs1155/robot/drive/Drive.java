@@ -65,7 +65,6 @@ import java.util.stream.Stream;
 import monologue.Annotations.IgnoreLogged;
 import monologue.Annotations.Log;
 import monologue.Logged;
-import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
@@ -161,7 +160,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               true));
     } else {
       SwerveModuleSimulation[] modules = driveSim.getModules();
-      SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
 
       return new Drive(
           new SimGyro(driveSim.getGyroSimulation()),

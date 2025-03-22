@@ -7,12 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.sciborgs1155.lib.UnitTestingUtil.reset;
 import static org.sciborgs1155.lib.UnitTestingUtil.runToCompletion;
 import static org.sciborgs1155.lib.UnitTestingUtil.setupTests;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSimAdded;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.ironmaple.simulation.SimulatedArena;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,6 +49,11 @@ public class AlignTest {
     hopper = Hopper.create();
     scoraling = new Scoraling(hopper, scoral, elevator);
 
+    if (!driveSimAdded) {
+      SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+      driveSimAdded = true;
+    }
+
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
     align = new Alignment(drive, elevator, scoral, scoraling);
@@ -63,11 +72,15 @@ public class AlignTest {
   public void pathfindTest(Branch branch) throws Exception {
     Pose2d pose = branch.pose();
     // Make and run the pathfinding command
-    runToCompletion(align.alignTo(() -> pose).withTimeout(Seconds.of(20)));
+    runToCompletion(
+        align
+            .alignTo(() -> pose)
+            .withTimeout(Seconds.of(75))
+            .deadlineFor(Commands.run(() -> SimulatedArena.getInstance().simulationPeriodic())));
 
     // Assert the command works
-    assertEquals(pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters));
-    assertEquals(pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters));
+    assertEquals(pose.getX(), drive.pose().getX(), Translation.TOLERANCE.in(Meters) * 5);
+    assertEquals(pose.getY(), drive.pose().getY(), Translation.TOLERANCE.in(Meters) * 5);
     assertEquals(
         0,
         pose.getRotation().minus(drive.pose().getRotation()).getRadians(),

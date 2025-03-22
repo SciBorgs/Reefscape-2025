@@ -18,6 +18,7 @@ import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSimAdded;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.intakeSim;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
@@ -191,6 +192,10 @@ public class Robot extends CommandRobot implements Logged {
 
     // Configure pose estimation updates from vision every tick
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD.in(Seconds));
+
+    if (!driveSimAdded) {
+      SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+    }
 
     SimulatedArena.getInstance().resetFieldForAuto();
 

@@ -105,6 +105,9 @@ public final class DriveConstants {
           .withTrackLengthTrackWidth(TRACK_WIDTH, TRACK_WIDTH)
           .withBumperSize(BUMPER_LENGTH, BUMPER_LENGTH);
 
+  /** Used in unit tests to prevent already made exceptions */
+  public static boolean driveSimAdded = false;
+
   /**
    * Simulates a drivetrain modeled on real life. In sim, this pose should be treated as the actual
    * robot pose, that the odometry should attempt to model.
