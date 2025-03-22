@@ -819,6 +819,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public boolean isColliding() {
+    log("accel", gyro.acceleration().norm());
     return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
@@ -860,6 +861,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
+  @Log.NT
   private double odomFOM() {
     return 1
         - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding

@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.advance;
 
@@ -74,6 +75,7 @@ public class Autos {
     chooser.addOption(
         "test drive to",
         drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
+    chooser.addOption("wheel characterization", DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(5)).asProxy());
 
     return chooser;
   }
