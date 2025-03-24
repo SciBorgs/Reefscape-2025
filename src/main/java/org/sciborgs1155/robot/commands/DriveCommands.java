@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -11,6 +12,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 
 /**
  * Source:
@@ -18,8 +20,8 @@ import org.sciborgs1155.robot.drive.DriveConstants;
  * https://docs.advantagekit.org/getting-started/template-projects/spark-swerve-template/#wheel-radius-characterization
  */
 public class DriveCommands {
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+  private static final double WHEEL_RADIUS_MAX_VELOCITY = 1; // Rad/Sec
+  private static final double WHEEL_RADIUS_RAMP_RATE = 0.25; // Rad/Sec^2
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
@@ -55,7 +57,8 @@ public class DriveCommands {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                  drive.drive(() -> 0, () -> 0, () -> speed, () -> 0);
+                  drive.setChassisSpeeds(
+                      new ChassisSpeeds(0, 0, speed), ControlMode.CLOSED_LOOP_VELOCITY, 0);
                 },
                 drive)),
 

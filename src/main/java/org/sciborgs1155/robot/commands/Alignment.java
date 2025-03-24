@@ -150,7 +150,9 @@ public class Alignment implements Logged {
                             leds.error(
                                 () ->
                                     drive
-                                            .pose().getTranslation().getDistance(goal.get().getTranslation())
+                                            .pose()
+                                            .getTranslation()
+                                            .getDistance(goal.get().getTranslation())
                                         * 3,
                                 0.02 * 3)))
                 .onlyWhile(

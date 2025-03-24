@@ -189,7 +189,7 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
                       filteredEstimates.add(f.estimatedPose);
-                     log(name + "filtered pose", f.estimatedPose) ;
+                      log(name + "filtered pose", f.estimatedPose);
                       FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
                     }
                     return valid;
@@ -225,8 +225,11 @@ public class Vision implements Logged {
   // }
 
   public void setPoseStrategy(PoseStrategy strategy) {
-    estimators[0].setPrimaryStrategy(strategy);
-    estimators[1].setPrimaryStrategy(strategy);
+    for (int i = 0; i < estimators.length; i++) {
+      if (Set.of("front left", "front right").contains(cameras[i].getName())) {
+        estimators[i].setPrimaryStrategy(strategy);
+      }
+    }
   }
 
   /**

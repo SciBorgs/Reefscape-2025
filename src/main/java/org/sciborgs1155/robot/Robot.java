@@ -261,10 +261,11 @@ public class Robot extends CommandRobot implements Logged {
     hopper.blocked.onFalse(rumble(RumbleType.kBothRumble, 0.5));
 
     disabled()
-        .onTrue(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
+        .onTrue(
+            Commands.runOnce(
+                () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
-    autonomous()
-        .whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
+    autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
 

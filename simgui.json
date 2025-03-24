@@ -21,6 +21,7 @@
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/arm dynamic backward": "Command",
