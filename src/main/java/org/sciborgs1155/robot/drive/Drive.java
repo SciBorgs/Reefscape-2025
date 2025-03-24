@@ -59,6 +59,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -81,6 +82,7 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.Arrays;
@@ -89,6 +91,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -119,6 +122,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   private final ModuleIO rearRight;
 
   @NotLogged private final List<ModuleIO> modules;
+
+  private final BooleanSupplier[] modulesStalling;
 
   // Gyro
   private final GyroIO gyro;
@@ -240,6 +245,18 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     modules2d = new FieldObject2d[modules.size()];
     lastPositions = modulePositions();
     lastHeading = gyro.rotation2d();
+
+    modulesStalling =
+        modules.stream()
+            .map(
+                m ->
+                    new Trigger(
+                            () ->
+                                Math.abs(m.desiredState().speedMetersPerSecond) > 0.3
+                                    && Math.abs(m.state().speedMetersPerSecond) < 0.1)
+                        .debounce(0.2, DebounceType.kRising)
+                        .debounce(0.04, DebounceType.kFalling))
+            .toArray(BooleanSupplier[]::new);
 
     translationCharacterization =
         new SysIdRoutine(
@@ -613,7 +630,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
-    Vector<N2> limitedVelocity = currentVelocity.plus((skidAccelerationLimit(deltaV)));
+    Vector<N2> limitedVelocity = currentVelocity.plus(skidAccelerationLimit(deltaV));
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
@@ -811,6 +828,13 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   @Logged
   public boolean isColliding() {
     return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+  }
+
+  @Log.NT
+  public boolean isStalling() {
+    return Arrays.stream(modulesStalling)
+        .map(bs -> bs.getAsBoolean())
+        .reduce(false, (a, b) -> a || b);
   }
 
   /** Resets all drive encoders to read a position of 0. */

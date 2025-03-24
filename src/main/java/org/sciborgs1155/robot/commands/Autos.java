@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.advance;
 
@@ -62,10 +63,6 @@ public class Autos {
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
-    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
-    chooser.addOption(
-        "test drive to",
-        drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
     chooser.setDefaultOption(
         "line",
         drive.run(
@@ -74,6 +71,13 @@ public class Autos {
                     new ChassisSpeeds(0.5, 0, 0),
                     ControlMode.OPEN_LOOP_VELOCITY,
                     elevator.position())));
+    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
+    chooser.addOption(
+        "test drive to",
+        drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
+    chooser.addOption(
+        "wheel characteirzatiion",
+        DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(8)));
     return chooser;
   }
 

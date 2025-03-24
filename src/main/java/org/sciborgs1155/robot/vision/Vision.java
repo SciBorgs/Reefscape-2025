@@ -1,17 +1,12 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.vision.VisionConstants.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import java.util.*;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -25,6 +20,30 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.HEIGHT;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_AMBIGUITY;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_HEIGHT;
+import static org.sciborgs1155.robot.vision.VisionConstants.REEF_TAGS;
+import static org.sciborgs1155.robot.vision.VisionConstants.TAG_LAYOUT;
+import static org.sciborgs1155.robot.vision.VisionConstants.TAG_WEIGHTS;
+import static org.sciborgs1155.robot.vision.VisionConstants.WIDTH;
+
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 @Logged
 public class Vision {
@@ -142,16 +161,16 @@ public class Vision {
           var change = unreadChanges.get(j);
 
           // only reef tags
-          if (Set.of("back left", "back right").contains(name)) {
-            change.targets =
-                change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
-            change.multitagResult =
-                change.multitagResult.filter(
-                    r ->
-                        r.fiducialIDsUsed.stream()
-                            .map(id -> REEF_TAGS.contains((int) id))
-                            .reduce(true, (a, b) -> a && b));
-          }
+          // if (Set.of("back left", "back right").contains(name)) {
+          change.targets =
+              change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+          change.multitagResult =
+              change.multitagResult.filter(
+                  r ->
+                      r.fiducialIDsUsed.stream()
+                          .map(id -> REEF_TAGS.contains((int) id))
+                          .reduce(true, (a, b) -> a && b));
+          // }
 
           // negate pitch
           if (cameras[i].getName() != "back middle") {
@@ -228,8 +247,11 @@ public class Vision {
   // }
 
   public void setPoseStrategy(PoseStrategy strategy) {
-    // estimators[0].setPrimaryStrategy(strategy);
-    // estimators[1].setPrimaryStrategy(strategy);
+    for (int i = 0; i < estimators.length; i++) {
+      if (Set.of("front left", "front right").contains(cameras[i].getName())) {
+        estimators[i].setPrimaryStrategy(strategy);
+      }
+    }
   }
 
   /**
