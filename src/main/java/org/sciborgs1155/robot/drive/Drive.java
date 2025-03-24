@@ -125,6 +125,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
+  private Vector<N2> desiredAcceleration = VecBuilder.fill(0, 0);
+
   // Odometry and pose estimation
   // private final BetterSwerveDrivePoseEstimator odometry;
   private final FOMPoseEstimator poseEstimator;
@@ -624,9 +626,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
-    Vector<N2> limitedVelocity = currentVelocity.plus((skidAccelerationLimit(deltaV)));
-    // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
-    // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
+    Vector<N2> limitedDeltaV = skidAccelerationLimit(deltaV);
+
+    Vector<N2> limitedVelocity = currentVelocity.plus(limitedDeltaV);
+    desiredAcceleration = limitedDeltaV.div(PERIOD.in(Seconds));
 
     log("forward accel limit", (skidAccelerationLimit(deltaV)).norm());
 
@@ -822,7 +825,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public boolean isColliding() {
     log("accel", gyro.acceleration().norm());
-    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+    return gyro.acceleration().norm() - desiredAcceleration.norm()
+        > COLLISION_THRESHOLD.in(MetersPerSecondPerSecond);
   }
 
   /** Resets all drive encoders to read a position of 0. */

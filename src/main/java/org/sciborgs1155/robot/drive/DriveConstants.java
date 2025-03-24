@@ -99,11 +99,10 @@ public final class DriveConstants {
   // How many ticks before it pathfinds again.
   public static final int PATHFINDING_PERIOD = 1;
   // The difference in the fastest and slowest module beyond which implies skidding.
-  public static final LinearVelocity SKIDDING_THRESHOLD =
-      MetersPerSecond.of(0.2); // TODO tune
+  public static final LinearVelocity SKIDDING_THRESHOLD = MetersPerSecond.of(0.2); // TODO tune
 
-  public static final LinearAcceleration COLLISION_THRESHOLD = 
-    MetersPerSecondPerSecond.of(20); // TODO tune
+  public static final LinearAcceleration COLLISION_THRESHOLD =
+      MetersPerSecondPerSecond.of(20); // TODO tune
 
   // angular offsets of the modules, since we use absolute encoders
   // ignored (used as 0) in simulation because the simulated robot doesn't have offsets
