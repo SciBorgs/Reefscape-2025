@@ -56,7 +56,7 @@ public class FOMPoseEstimator {
     xEstimates[0] = new Estimate(odometryEstimate.getX(), odometryFOM.get(0));
     yEstimates[0] = new Estimate(odometryEstimate.getY(), odometryFOM.get(1));
     thetaEstimates[0] =
-        new Estimate(odometryEstimate.getRotation().getRadians(), odometryFOM.get(0));
+        new Estimate(odometryEstimate.getRotation().getRadians(), odometryFOM.get(2));
 
     for (int i = 0; i < visionEstimates.length; i++) {
       PoseEstimate visionEstimate = visionEstimates[i];
