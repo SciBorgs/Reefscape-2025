@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
   private final ElevatorIO hardware;
 
   private final SysIdRoutine sysIdRoutine;
-  private double lastGoal = MIN_EXTENSION.in(Meters);
+  @Log.NT private double lastGoal = MIN_EXTENSION.in(Meters);
 
   /**
    * @return Creates a Real or Sim elevator based on {@link Robot#isReal()}.
@@ -170,8 +170,11 @@ public class Elevator extends SubsystemBase implements Logged, AutoCloseable {
    * @return A command which drives the elevator to the desired height.
    */
   public Command goTo(DoubleSupplier height) {
-    lastGoal = height.getAsDouble();
-    return run(() -> hardware.setGoal(lastGoal)).finallyDo(() -> hardware.setVoltage(0));
+    return run(() -> {
+          lastGoal = height.getAsDouble();
+          hardware.setGoal(lastGoal);
+        })
+        .finallyDo(() -> hardware.setVoltage(0));
   }
 
   public Command goTo(double height) {

@@ -30,8 +30,8 @@ public class RealElevator implements ElevatorIO {
     talonConfig.Feedback.SensorToMechanismRatio = CONVERSION_FACTOR;
     talonConfig.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
 
-    talonConfig.MotionMagic.MotionMagicAcceleration =
-        MAX_ACCEL.baseUnitMagnitude() / CONVERSION_FACTOR; // must be in rot/s^2
+    talonConfig.MotionMagic.MotionMagicAcceleration = 10;
+    // MAX_ACCEL.baseUnitMagnitude() / CONVERSION_FACTOR; // must be in rot/s^2
     talonConfig.MotionMagic.MotionMagicExpo_kA = 3;
     talonConfig.MotionMagic.MotionMagicJerk = 0 / CONVERSION_FACTOR;
 
@@ -69,7 +69,8 @@ public class RealElevator implements ElevatorIO {
   }
 
   public void setGoal(double position) {
-    leader.setControl(profile.withPosition(position / CONVERSION_FACTOR).withSlot(0));
+    System.out.println("internal goal: " + position * CONVERSION_FACTOR);
+    leader.setControl(profile.withPosition(position * CONVERSION_FACTOR).withSlot(0));
   }
 
   @Override
