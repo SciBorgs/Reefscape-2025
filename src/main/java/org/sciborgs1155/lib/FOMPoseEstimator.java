@@ -73,8 +73,9 @@ public class FOMPoseEstimator {
 
       xEstimates[i + 1] = new Estimate(visionPose.getX(), visionFOMs.get(0, 0));
 
-      yEstimates[i + 1] = new Estimate(visionPose.getX(), visionFOMs.get(1, 0));
-      thetaEstimates[i + 1] = new Estimate(visionPose.getX(), visionFOMs.get(2, 0));
+      yEstimates[i + 1] = new Estimate(visionPose.getY(), visionFOMs.get(1, 0));
+      thetaEstimates[i + 1] =
+          new Estimate(visionPose.getRotation().getRadians(), visionFOMs.get(2, 0));
     }
 
     robotPose =
