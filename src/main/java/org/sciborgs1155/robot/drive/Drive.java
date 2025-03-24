@@ -770,8 +770,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns the position of each module in radians. */
-  public double[] 
-  getWheelRadiusCharacterizationPositions() {
+  public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
     for (int i = 0; i < 4; i++) {
       values[i] = modules.get(i).drivePosition();

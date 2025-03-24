@@ -1,6 +1,3 @@
-
-
-
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -13,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.drive.Drive;
@@ -112,11 +108,14 @@ public class DriveCommands {
                       //         + " meters, "
                       //         + formatter.format(Units.metersToInches(wheelRadius))
                       //         + " inches");
-                      FaultLogger.report("wheel chara", "\tWheel Radius: "
+                      FaultLogger.report(
+                          "wheel chara",
+                          "\tWheel Radius: "
                               + formatter.format(wheelRadius)
                               + " meters, "
                               + formatter.format(Units.metersToInches(wheelRadius))
-                              + " inches", FaultType.INFO);
+                              + " inches",
+                          FaultType.INFO);
                     })));
   }
 
