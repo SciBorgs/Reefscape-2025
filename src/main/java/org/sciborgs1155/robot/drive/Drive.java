@@ -129,7 +129,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // private final BetterSwerveDrivePoseEstimator odometry;
   private final FOMPoseEstimator poseEstimator;
 
-  private final Supplier<Vector<N3>> odometryFOM;
+  public Vector<N3> odometryFOM() {
+    return VecBuilder.fill(1, 1, Math.PI / 6)
+        .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
+  }
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -144,8 +147,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private Rotation2d lastHeading;
 
   public static final ReentrantLock lock = new ReentrantLock();
-
-  @Log.NT private double visionFOM;
 
   // Movement automation
   @Log.NT
@@ -339,8 +340,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               .dynamic(Direction.kReverse)
               .withName("rotation dynamic backward"));
     }
-
-    this.odometryFOM = () -> VecBuilder.fill(odomFOM(), odomFOM(), odomFOM()); // TODO
   }
 
   /**
@@ -939,31 +938,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /**
-   * Updates pose estimate based on vision-provided {@link EstimatedRobotPose}s.
+   * Updates pose estimate based on wheel odometry and vision-provided {@link EstimatedRobotPose}s.
    *
    * @param poses The pose estimates based on vision data.
    */
-  public void updateEstimates(PoseEstimate... poses) {
-    Pose3d[] loggedEstimates = new Pose3d[poses.length];
-
-    for (int i = 0; i < poses.length; i++) {
-      loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
-      field2d
-          .getObject("Cam " + i + " Est Pose")
-          .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
-    }
-
-    log("estimated poses", loggedEstimates);
-  }
-
-  @Override
-  public void periodic() {
-    // odometry.addVisionMeasurement(
-    //   poses[i].estimatedPose().estimatedPose.toPose2d(),
-    //   poses[i].estimatedPose().timestampSeconds,
-    //   poses[i].standardDev());
-
-    // update our heading in reality / sim
+  public void updatePoseEstimate(PoseEstimate... poses) {
     Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
       lock.lock();
@@ -995,6 +974,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           lastPositions = modulePositions;
           lastHeading = angle;
         }
+
+        poseEstimator.update(odometryUpdates, odometryFOM(), poses);
+
       } catch (Exception e) {
         e.printStackTrace();
       } finally {
@@ -1004,6 +986,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       poseEstimator.updateNoVision(simRotation, modulePositions());
       lastPositions = modulePositions();
     }
+
+    Pose3d[] loggedEstimates = new Pose3d[poses.length];
+
+    for (int i = 0; i < poses.length; i++) {
+      loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
+      field2d
+          .getObject("Cam " + i + " Est Pose")
+          .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
+    }
+
+    log("estimated poses", loggedEstimates);
+
+    Tracer.endTrace();
+  }
+
+  @Override
+  public void periodic() {
+    // update our heading in reality / sim
 
     // update our simulated field poses
     field2d.setRobotPose(pose());
@@ -1020,7 +1020,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     }
 
     log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-    Tracer.endTrace();
   }
 
   @Override
