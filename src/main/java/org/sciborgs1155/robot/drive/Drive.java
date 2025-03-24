@@ -31,6 +31,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -63,6 +64,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -291,6 +293,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 Commands.waitSeconds(4)
                     .andThen(() -> maxAccel.set(MAX_ACCEL.in(MetersPerSecondPerSecond))))
             .asProxy());
+
+    Function<ModuleIO, BooleanSupplier> stalling = 
+      m -> 
+         new Trigger(() -> m.desiredState().speedMetersPerSecond > 0.3 && m.state().speedMetersPerSecond < 0.1)
+         .debounce(0.2, DebounceType.kRising).debounce(0.08, DebounceType.kFalling);
+         
 
     FaultLogger.register(
         this::isColliding,
