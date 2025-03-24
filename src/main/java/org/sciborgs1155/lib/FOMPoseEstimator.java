@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.function.Function;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class FOMPoseEstimator {
@@ -88,10 +88,11 @@ public class FOMPoseEstimator {
     return robotPose;
   }
 
-  private static double newEstimate(Estimate... estimates) {
-    Stream<Estimate> stream = Arrays.stream(estimates);
-    return stream.mapToDouble(e -> 1 / Math.pow(e.FOM, 2) * e.measurement).sum()
-        / stream.mapToDouble(e -> 1 / Math.pow(e.FOM, 2)).sum();
+  public static double newEstimate(Estimate... estimates) {
+    Function<Estimate, Double> inverseSquare =
+        e -> e.FOM == 0 ? Double.MAX_VALUE : 1 / Math.pow(e.FOM, 2);
+    return Arrays.stream(estimates).mapToDouble(e -> inverseSquare.apply(e) * e.measurement).sum()
+        / Arrays.stream(estimates).mapToDouble(e -> inverseSquare.apply(e)).sum();
   }
 
   public void resetPose(Pose2d pose) {
