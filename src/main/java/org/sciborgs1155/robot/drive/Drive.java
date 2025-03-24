@@ -31,6 +31,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -75,7 +76,9 @@ import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.FOMPoseEstimator.OdometryUpdate;
 import org.sciborgs1155.lib.BetterSwerveDrivePoseEstimator;
+import org.sciborgs1155.lib.FOMPoseEstimator;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
@@ -125,7 +128,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
   // Odometry and pose estimation
-  private final BetterSwerveDrivePoseEstimator odometry;
+  // private final BetterSwerveDrivePoseEstimator odometry;
+  private final FOMPoseEstimator poseEstimator;
+
+  private final Supplier<Vector<N3>> odometryFOM;
 
   @Log.NT private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
@@ -260,14 +266,11 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 this,
                 "rotation"));
 
-    odometry =
-        new BetterSwerveDrivePoseEstimator(
+    poseEstimator =
+        new FOMPoseEstimator(
+          new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
             kinematics,
-            gyro.rotation2d(),
-            modulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
-            this::odomFOM,
-            () -> visionFOM);
+            modulePositions());
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -338,6 +341,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               .dynamic(Direction.kReverse)
               .withName("rotation dynamic backward"));
     }
+
+    this.odometryFOM = () -> VecBuilder.fill(odomFOM(), odomFOM(), odomFOM()); // TODO
   }
 
   /**
@@ -347,12 +352,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   @Log.NT
   public Pose2d pose() {
-    return odometry.getEstimatedPosition();
+    return poseEstimator.pose();
   }
 
   /** Returns a Pose3D of the estimated pose of the robot. */
   public Pose3d pose3d() {
-    return new Pose3d(odometry.getEstimatedPosition());
+    return new Pose3d(pose());
   }
 
   /**
@@ -371,7 +376,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(lastHeading, lastPositions, pose);
+    poseEstimator.resetPose(pose);
   }
 
   /**
@@ -945,30 +950,22 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     for (int i = 0; i < poses.length; i++) {
       loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
-      odometry.addVisionMeasurement(
-          poses[i].estimatedPose().estimatedPose.toPose2d(),
-          poses[i].estimatedPose().timestampSeconds,
-          poses[i].standardDev());
       field2d
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
-    visionFOM =
-        1
-            - Arrays.stream(poses)
-                .mapToDouble(
-                    pose ->
-                        pose.estimatedPose().targetsUsed.stream()
-                            .mapToDouble(a -> a.poseAmbiguity)
-                            .min()
-                            .orElse(1))
-                .min()
-                .orElse(1);
+    
     log("estimated poses", loggedEstimates);
   }
 
   @Override
   public void periodic() {
+    // odometry.addVisionMeasurement(
+    //   poses[i].estimatedPose().estimatedPose.toPose2d(),
+    //   poses[i].estimatedPose().timestampSeconds,
+    //   poses[i].standardDev());
+
+
     // update our heading in reality / sim
     Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
@@ -987,15 +984,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             };
         double[][] allGyro = gyro.odometryData();
 
-        SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
-        Rotation2d angle = Rotation2d.kZero;
+        OdometryUpdate[] odometryUpdates = new OdometryUpdate[timestamps.length];
+
         for (int i = 0; i < timestamps.length; i++) {
+          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = allPositions[m][i];
           }
 
-          angle = Rotation2d.fromRotations(allGyro[0][i]);
-          odometry.updateWithTime(timestamps[i], angle, modulePositions);
+          Rotation2d angle = Rotation2d.fromRotations(allGyro[0][i]);
+
+          odometryUpdates[i] = new OdometryUpdate(timestamps[i], angle, modulePositions);
           lastPositions = modulePositions;
           lastHeading = angle;
         }
@@ -1005,7 +1004,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         lock.unlock();
       }
     } else {
-      odometry.update(simRotation, modulePositions());
+      poseEstimator.updateNoVision(
+        simRotation, 
+        modulePositions()
+        );
       lastPositions = modulePositions();
     }
 

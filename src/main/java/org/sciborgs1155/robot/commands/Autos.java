@@ -75,7 +75,9 @@ public class Autos {
     chooser.addOption(
         "test drive to",
         drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
-    chooser.addOption("wheel characterization", DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(5)).asProxy());
+    chooser.addOption(
+        "wheel characterization",
+        DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(5)).asProxy());
 
     return chooser;
   }
