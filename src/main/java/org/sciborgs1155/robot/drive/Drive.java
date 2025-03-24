@@ -1,14 +1,32 @@
 package org.sciborgs1155.robot.drive;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
+import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.photonvision.EstimatedRobotPose;
+import org.sciborgs1155.lib.Assertion;
+import org.sciborgs1155.lib.Assertion.EqualityAssertion;
+import org.sciborgs1155.lib.Assertion.TruthAssertion;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.lib.Assertion.tAssert;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
+import org.sciborgs1155.lib.Tuning;
+import org.sciborgs1155.robot.Constants;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
@@ -26,9 +44,11 @@ import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
 import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_CANCODER;
 import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
 import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
+import org.sciborgs1155.robot.Robot;
 import static org.sciborgs1155.robot.drive.DriveConstants.ANGULAR_OFFSETS;
 import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_DRIVING_THRESHOLD;
 import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_ROTATING_THRESHOLD;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import static org.sciborgs1155.robot.drive.DriveConstants.DRIVE_MODE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SKID_ACCEL;
@@ -37,11 +57,13 @@ import static org.sciborgs1155.robot.drive.DriveConstants.MAX_TILT_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
 import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
+import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
 import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
+import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
-import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -50,6 +72,8 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -75,6 +99,12 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleEntry;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -85,34 +115,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.photonvision.EstimatedRobotPose;
-import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.Assertion.EqualityAssertion;
-import org.sciborgs1155.lib.Assertion.TruthAssertion;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tracer;
-import org.sciborgs1155.lib.Tuning;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
-import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
-import org.sciborgs1155.robot.drive.DriveConstants.Translation;
-import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
 public class Drive extends SubsystemBase implements AutoCloseable {
   // Modules
@@ -830,7 +832,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
-  @Log.NT
+  @Logged
   public boolean isStalling() {
     return Arrays.stream(modulesStalling)
         .map(bs -> bs.getAsBoolean())
