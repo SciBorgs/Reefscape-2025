@@ -144,7 +144,7 @@ public class Vision implements Logged {
           var change = unreadChanges.get(j);
 
           // only reef tags
-          if (Set.of("back left", "back right").contains(name)) {
+          // if (Set.of("back left", "back right").contains(name)) {
             change.targets =
                 change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
             change.multitagResult =
@@ -153,7 +153,7 @@ public class Vision implements Logged {
                         r.fiducialIDsUsed.stream()
                             .map(id -> REEF_TAGS.contains((int) id))
                             .reduce(true, (a, b) -> a && b));
-          }
+          // }
 
           // negate pitch
           if (cameras[i].getName() != "back middle") {

@@ -1,3 +1,6 @@
+
+
+
 package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
@@ -10,6 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -94,18 +100,23 @@ public class DriveCommands {
                       double wheelRadius = (state.gyroDelta * DRIVE_BASE_RADIUS) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
-                      System.out.println(
-                          "********** Wheel Radius Characterization Results **********");
-                      System.out.println(
-                          "\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
-                      System.out.println(
-                          "\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
-                      System.out.println(
-                          "\tWheel Radius: "
+                      // System.out.println(
+                      //     "********** Wheel Radius Characterization Results **********");
+                      // System.out.println(
+                      //     "\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
+                      // System.out.println(
+                      //     "\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
+                      // System.out.println(
+                      //     "\tWheel Radius: "
+                      //         + formatter.format(wheelRadius)
+                      //         + " meters, "
+                      //         + formatter.format(Units.metersToInches(wheelRadius))
+                      //         + " inches");
+                      FaultLogger.report("wheel chara", "\tWheel Radius: "
                               + formatter.format(wheelRadius)
                               + " meters, "
                               + formatter.format(Units.metersToInches(wheelRadius))
-                              + " inches");
+                              + " inches", FaultType.INFO);
                     })));
   }
 

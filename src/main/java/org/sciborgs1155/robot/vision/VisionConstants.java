@@ -49,8 +49,8 @@ public class VisionConstants {
           "back middle",
           new Transform3d(
               Inches.of(-8.358).in(Meters),
-              Inches.of(3.354).in(Meters),
-              Inches.of(12.341).in(Meters),
+              Inches.of(3.354).in(Meters), // 4.65??
+              Inches.of(12.341).in(Meters), // 15.375
               //   new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
@@ -98,8 +98,10 @@ public class VisionConstants {
   // Processor | Red Side: 3 | Blue Side: 16
 
   public static final double[] TAG_WEIGHTS = {
-    0.25, 0.25, 0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 0.25, 0.25, 0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
   };
 
   public static final Set<Integer> REEF_TAGS = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
 }
+
+
