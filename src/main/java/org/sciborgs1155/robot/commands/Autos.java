@@ -62,7 +62,11 @@ public class Autos {
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
+    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
     chooser.addOption(
+        "test drive to",
+        drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
+    chooser.setDefaultOption(
         "line",
         drive.run(
             () ->
@@ -70,11 +74,6 @@ public class Autos {
                     new ChassisSpeeds(0.5, 0, 0),
                     ControlMode.OPEN_LOOP_VELOCITY,
                     elevator.position())));
-    // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
-    chooser.addOption(
-        "test drive to",
-        drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
-
     return chooser;
   }
 

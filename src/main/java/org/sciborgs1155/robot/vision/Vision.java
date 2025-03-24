@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.vision;
 
 import static org.sciborgs1155.robot.vision.VisionConstants.*;
 
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -26,6 +27,7 @@ import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
+@Logged
 public class Vision {
   public static record CameraConfig(String name, Transform3d robotToCam) {}
 
@@ -42,14 +44,12 @@ public class Vision {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return Robot.isReal()
-        ? new Vision(
-            FRONT_LEFT_CAMERA,
-            FRONT_RIGHT_CAMERA,
-            BACK_MIDDLE_CAMERA,
-            BACK_LEFT_CAMERA,
-            BACK_RIGHT_CAMERA)
-        : new Vision();
+    return new Vision(
+        FRONT_LEFT_CAMERA,
+        FRONT_RIGHT_CAMERA,
+        BACK_MIDDLE_CAMERA,
+        BACK_LEFT_CAMERA,
+        BACK_RIGHT_CAMERA);
   }
 
   public static Vision none() {
@@ -171,8 +171,9 @@ public class Vision {
               change.multitagResult.filter(r -> r.estimatedPose.ambiguity < MAX_AMBIGUITY);
 
           estimate = estimators[i].update(change);
-
-          log(name + " estimates present", estimate.isPresent());
+          Epilogue.getConfig()
+              .backend
+              .log("Robot/vision/ " + name + " estimates present", estimate.isPresent());
           estimate
               .filter(
                   f -> {
@@ -183,8 +184,12 @@ public class Vision {
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
                       filteredEstimates.add(f.estimatedPose);
-                      log(name + "filtered pose", f.estimatedPose);
-                      FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
+                      Epilogue.getConfig()
+                          .backend
+                          .log(
+                              "Robot/vision/ " + name + " filtered pose",
+                              f.estimatedPose,
+                              Pose3d.struct);
                     }
                     return valid;
                   })
@@ -219,8 +224,8 @@ public class Vision {
   // }
 
   public void setPoseStrategy(PoseStrategy strategy) {
-    estimators[0].setPrimaryStrategy(strategy);
-    estimators[1].setPrimaryStrategy(strategy);
+    // estimators[0].setPrimaryStrategy(strategy);
+    // estimators[1].setPrimaryStrategy(strategy);
   }
 
   /**
@@ -228,7 +233,6 @@ public class Vision {
    *
    * @return An array of Pose3ds.
    */
-  @Log.NT
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())

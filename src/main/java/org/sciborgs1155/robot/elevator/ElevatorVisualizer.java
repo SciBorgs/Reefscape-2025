@@ -1,15 +1,13 @@
 package org.sciborgs1155.robot.elevator;
 
+import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
 import edu.wpi.first.epilogue.Logged;
-import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-
-
 
 public class ElevatorVisualizer {
   @Logged private final Mechanism2d mech;

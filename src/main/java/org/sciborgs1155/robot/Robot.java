@@ -54,6 +54,7 @@ import org.sciborgs1155.robot.vision.Vision;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
+@Logged
 public class Robot extends CommandRobot {
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
@@ -69,36 +70,42 @@ public class Robot extends CommandRobot {
         default -> Drive.none();
       };
 
+  @Logged
   private final Vision vision =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
+  @Logged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Elevator.create();
         default -> Elevator.none();
       };
 
+  @Logged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Scoral.create();
         default -> Scoral.none();
       };
 
+  @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Hopper.create();
         default -> Hopper.none();
       };
 
+  @Logged
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Coroller.create();
         default -> Coroller.none();
       };
 
+  @Logged
   private final Arm arm =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Arm.create();
@@ -122,6 +129,8 @@ public class Robot extends CommandRobot {
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
     super(PERIOD.in(Seconds));
+    Epilogue.bind(this);
+
     configureGameBehavior();
     configureBindings();
 
@@ -148,14 +157,9 @@ public class Robot extends CommandRobot {
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
-    Epilogue.bind(this);
-    Epilogue.configure(
-        config -> {
-          config.minimumImportance = Logged.Importance.CRITICAL;
-        });
     SignalLogger.enableAutoLogging(true);
     addPeriodic(FaultLogger::update, 2);
-    addPeriodic(vision::logCamEnabled, 1);
+    // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
 
     // Log PDH
@@ -200,7 +204,6 @@ public class Robot extends CommandRobot {
   private void configureBindings() {
     InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
-
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(raw_x, raw_y)

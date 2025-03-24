@@ -1,9 +1,7 @@
 package org.sciborgs1155.robot.coroller;
 
-import org.sciborgs1155.lib.SimpleMotor;
+import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import org.sciborgs1155.robot.Ports.GroundIntake;
-import org.sciborgs1155.robot.Robot;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.INTAKE_POWER;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.OUTTAKE_POWER;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.STRATOR_LIMIT;
@@ -12,10 +10,11 @@ import static org.sciborgs1155.robot.coroller.CorollerConstants.SUPPLY_LIMIT;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-import static edu.wpi.first.units.Units.Amps;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.sciborgs1155.lib.SimpleMotor;
+import org.sciborgs1155.robot.Ports.GroundIntake;
+import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
 public class Coroller extends SubsystemBase implements AutoCloseable {

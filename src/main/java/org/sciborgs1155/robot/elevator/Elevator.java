@@ -1,19 +1,11 @@
 package org.sciborgs1155.robot.elevator;
 
-import java.util.Set;
-import java.util.function.DoubleSupplier;
-
+import static edu.wpi.first.units.Units.*;
 import static org.sciborgs1155.lib.Assertion.eAssert;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.lib.*;
-import org.sciborgs1155.robot.Constants;
 import static org.sciborgs1155.robot.Constants.TUNING;
-import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -23,7 +15,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -32,7 +23,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Set;
+import java.util.function.DoubleSupplier;
+import org.sciborgs1155.lib.*;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
+@Logged
 public class Elevator extends SubsystemBase implements AutoCloseable {
   private final ElevatorIO hardware;
 
@@ -289,7 +288,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       ff.setKv(V.get());
       ff.setKa(A.get());
     }
-
   }
 
   /**

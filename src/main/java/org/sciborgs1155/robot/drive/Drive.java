@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.eAssert;
@@ -45,7 +46,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -88,7 +88,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   // Gyro
   private final GyroIO gyro;
-  private static Rotation2d simRotation = Rotation2d.kZero;
+  @Logged private static Rotation2d simRotation = Rotation2d.kZero;
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
@@ -115,7 +115,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   private SwerveModulePosition[] lastPositions;
   private Rotation2d lastHeading;
   public static final ReentrantLock lock = new ReentrantLock();
-  private static final TimeUnit Seconds = null;
 
   @Logged private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
