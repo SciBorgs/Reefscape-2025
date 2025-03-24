@@ -11,7 +11,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -22,7 +25,6 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
@@ -105,10 +107,15 @@ public class Vision {
     }
   }
 
-  // @Logged
-  // public Collection<Boolean> logCamEnabled() {
-  //   return camerasEnabled.values();
-  // }
+  @Logged
+  public boolean[] logCamEnabled() {
+    boolean[] booleanArray = new boolean[camerasEnabled.values().size()];
+    int i = 0;
+    for (Boolean value : camerasEnabled.values()) {
+      booleanArray[i++] = value != null && value;
+    }
+    return booleanArray;
+  }
 
   /**
    * Returns a list of all currently visible pose estimates and their standard deviation vectors.

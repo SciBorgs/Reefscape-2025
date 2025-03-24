@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
-import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -39,7 +39,7 @@ public class Alignment {
   @NotLogged private final Scoral scoral;
   @NotLogged private final LEDs leds;
 
-  @Logged private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+  private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
   private Fault alternateAlliancePathfinding =
       new Fault(
@@ -71,7 +71,9 @@ public class Alignment {
   public Command reef(Level level, Branch branch) {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
-            Commands.runOnce(() -> goal.get()).asProxy(),
+            Commands.runOnce(
+                    () -> Epilogue.getConfig().backend.log("goal pose", goal.get(), Pose2d.struct))
+                .asProxy(),
             pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
                 Commands.sequence(
@@ -138,7 +140,8 @@ public class Alignment {
 
   public Command alignTo(Supplier<Pose2d> goal) {
     return Commands.runOnce(
-        () ->
+            () -> Epilogue.getConfig().backend.log("goal pose", goal.get(), Pose2d.struct))
+        .andThen(
             pathfind(goal)
                 .asProxy()
                 .andThen(
@@ -267,24 +270,4 @@ public class Alignment {
         .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }
-
-  //    public Pose2d abl = Face.AB.left.withLevel(Level.L4);
-  //    public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
-  //    public Pose2d efl = Face.EF.left.withLevel(Level.L4);
-  //    public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
-  //    public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
-  //    public Pose2d kll = Face.KL.left.withLevel(Level.L4);
-  //    public Pose2d abr = Face.AB.right.withLevel(Level.L4);
-  //    public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
-  //    public Pose2d efr = Face.EF.right.withLevel(Level.L4);
-  //    public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
-  //    public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
-  //    public Pose2d klr = Face.KL.right.withLevel(Level.L4);
-
-  //    public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
-  //    public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
-  //    public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
-  //    public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
-  //    public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
-  //    public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }

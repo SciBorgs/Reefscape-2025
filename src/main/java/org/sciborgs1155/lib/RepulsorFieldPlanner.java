@@ -3,6 +3,7 @@ package org.sciborgs1155.lib;
 import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -393,6 +394,7 @@ public class RepulsorFieldPlanner {
         var intermediateGoal = position.plus(step);
 
         var endTime = System.nanoTime();
+        Epilogue.getConfig().backend.log("repulsorTimeS", (endTime - startTime));
 
         // set the previous sample as the current sample
         prevSample =

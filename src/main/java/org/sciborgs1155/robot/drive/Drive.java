@@ -14,9 +14,32 @@ import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
-import static org.sciborgs1155.robot.Ports.Drive.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
+import static org.sciborgs1155.robot.drive.DriveConstants.ANGULAR_OFFSETS;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_DRIVING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_ROTATING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.DRIVE_MODE;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SKID_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_TILT_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
+import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
+import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -27,6 +50,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -35,7 +59,11 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -58,6 +86,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
@@ -66,10 +95,15 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.photonvision.EstimatedRobotPose;
-import org.sciborgs1155.lib.*;
+import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
+import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -583,6 +617,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
+    Epilogue.getConfig().backend.log("forward accel limit", (skidAccelerationLimit(deltaV).norm()));
+
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
             limitedVelocity.get(0), limitedVelocity.get(1), desired.omegaRadiansPerSecond);
@@ -613,6 +649,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         maxAccel.get()
             * PERIOD.in(Seconds)
             * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
+    Epilogue.getConfig().backend.log("accel limit", limit);
     Vector<N2> proj = deltaV.projection(currVel);
     if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
@@ -688,6 +725,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
+          Epilogue.getConfig().backend.log("driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -898,6 +936,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
+    Epilogue.getConfig().backend.log("estimated poses", loggedEstimates, Pose3d.struct);
   }
 
   @Override
@@ -955,6 +994,12 @@ public class Drive extends SubsystemBase implements AutoCloseable {
       translationController.setPID(translationP.get(), translationI.get(), translationD.get());
       rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
     }
+
+    Epilogue.getConfig()
+        .backend
+        .log(
+            "command",
+            Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
 
     Tracer.endTrace();
   }
