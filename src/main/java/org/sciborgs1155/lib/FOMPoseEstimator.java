@@ -13,45 +13,41 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
-
 public class FOMPoseEstimator {
   private Pose2d robotPose;
   private final SwerveDrivePoseEstimator odometry;
 
   public static record Estimate(double measurement, double FOM) {}
 
-  public static record OdometryUpdate(double timestamp, Rotation2d angle, SwerveModulePosition[] modulePositions) {}
+  public static record OdometryUpdate(
+      double timestamp, Rotation2d angle, SwerveModulePosition[] modulePositions) {}
 
-  public FOMPoseEstimator(Pose2d initialPose, SwerveDriveKinematics kinematics, SwerveModulePosition[] modulePositions) {
+  public FOMPoseEstimator(
+      Pose2d initialPose,
+      SwerveDriveKinematics kinematics,
+      SwerveModulePosition[] modulePositions) {
     this.robotPose = initialPose;
     // this.odometry = odometry;
-    this.odometry = new SwerveDrivePoseEstimator(
-        kinematics, 
-        initialPose.getRotation(), 
-        modulePositions,
-        initialPose);
+    this.odometry =
+        new SwerveDrivePoseEstimator(
+            kinematics, initialPose.getRotation(), modulePositions, initialPose);
   }
 
-  public void updateNoVision(Rotation2d angle,
-  SwerveModulePosition[] modulePositions) {
+  public void updateNoVision(Rotation2d angle, SwerveModulePosition[] modulePositions) {
     odometry.update(angle, modulePositions);
     robotPose = odometry.getEstimatedPosition();
   }
 
   public void update(
-      OdometryUpdate[] odometryUpdates,
-      Vector<N3> odometryFOM,
-      PoseEstimate... visionEstimates) {
+      OdometryUpdate[] odometryUpdates, Vector<N3> odometryFOM, PoseEstimate... visionEstimates) {
     Pose2d lastOdometryPose = odometry.getEstimatedPosition();
 
     for (OdometryUpdate update : odometryUpdates) {
-        odometry.updateWithTime(
-            update.timestamp,
-            update.angle,
-            update.modulePositions);
+      odometry.updateWithTime(update.timestamp, update.angle, update.modulePositions);
     }
 
-    Pose2d odometryEstimate = robotPose.plus(odometry.getEstimatedPosition().minus(lastOdometryPose));
+    Pose2d odometryEstimate =
+        robotPose.plus(odometry.getEstimatedPosition().minus(lastOdometryPose));
 
     Estimate[] xEstimates = new Estimate[visionEstimates.length + 1];
     Estimate[] yEstimates = new Estimate[visionEstimates.length + 1];

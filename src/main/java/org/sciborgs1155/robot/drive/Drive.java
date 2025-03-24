@@ -31,7 +31,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -76,9 +75,8 @@ import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
 import org.sciborgs1155.lib.Assertion.TruthAssertion;
-import org.sciborgs1155.lib.FOMPoseEstimator.OdometryUpdate;
-import org.sciborgs1155.lib.BetterSwerveDrivePoseEstimator;
 import org.sciborgs1155.lib.FOMPoseEstimator;
+import org.sciborgs1155.lib.FOMPoseEstimator.OdometryUpdate;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
@@ -268,7 +266,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     poseEstimator =
         new FOMPoseEstimator(
-          new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
             kinematics,
             modulePositions());
 
@@ -954,7 +952,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
-    
+
     log("estimated poses", loggedEstimates);
   }
 
@@ -964,7 +962,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //   poses[i].estimatedPose().estimatedPose.toPose2d(),
     //   poses[i].estimatedPose().timestampSeconds,
     //   poses[i].standardDev());
-
 
     // update our heading in reality / sim
     Tracer.startTrace("drive pd");
@@ -1004,10 +1001,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         lock.unlock();
       }
     } else {
-      poseEstimator.updateNoVision(
-        simRotation, 
-        modulePositions()
-        );
+      poseEstimator.updateNoVision(simRotation, modulePositions());
       lastPositions = modulePositions();
     }
 
