@@ -2,10 +2,13 @@ package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
@@ -57,8 +60,8 @@ public class Constants {
             pose.getTranslation()
                 .rotateAround(
                     new Translation2d(FieldConstants.LENGTH.div(2), FieldConstants.WIDTH.div(2)),
-                    Rotation2d.fromRotations(0.5)),
-            pose.getRotation().plus(Rotation2d.fromRotations(0.5)));
+                    Rotation2d.k180deg),
+            pose.getRotation().plus(Rotation2d.k180deg));
   }
 
   /**
@@ -70,7 +73,7 @@ public class Constants {
    */
   public static Transform2d strafe(Distance distance) {
     return new Transform2d(
-        new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(-90)), Rotation2d.kZero);
+        new Translation2d(distance.in(Meters), Rotation2d.kCW_90deg), Rotation2d.kZero);
   }
 
   /**
@@ -82,12 +85,23 @@ public class Constants {
    */
   public static Transform2d advance(Distance distance) {
     return new Transform2d(
-        new Translation2d(distance.in(Meters), Rotation2d.fromDegrees(0)), Rotation2d.kZero);
+        new Translation2d(distance.in(Meters), Rotation2d.kZero), Rotation2d.kZero);
   }
 
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = false;
+
+  /**
+   * Creates a Vector from polar coordinates.
+   *
+   * @param magnitude The magnitude of the vector.
+   * @param direction The direction of the vector.
+   * @return A Vector from the given polar coordinates.
+   */
+  public static Vector<N2> fromPolarCoords(double magnitude, Rotation2d direction) {
+    return VecBuilder.fill(magnitude * direction.getCos(), magnitude * direction.getSin());
+  }
 
   /** Describes physical properites of the robot. */
   public static class Robot {
@@ -95,8 +109,7 @@ public class Constants {
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
 
     public static final Distance SIDE_LENGTH = Inches.of(28);
-
-    public static final Distance BUMPER_LENGTH = Inches.of(28 + 3);
+    public static final Distance BUMPER_LENGTH = SIDE_LENGTH.plus(Inches.of(3));
   }
 
   public static final Time PERIOD = Seconds.of(0.02); // roborio tickrate (s)

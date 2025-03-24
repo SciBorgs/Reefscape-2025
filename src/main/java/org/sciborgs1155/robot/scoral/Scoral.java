@@ -19,12 +19,11 @@ import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
   private final SimpleMotor motor;
 
-  private final Beambreak beambreak;
+  public final Beambreak beambreak;
   public final Trigger blocked;
 
   /** Creates a Scoral based on if it is utilizing hardware. */
@@ -61,13 +60,8 @@ public class Scoral extends SubsystemBase implements Logged, AutoCloseable {
     return run(() -> motor.set(SCORE_POWER)).withName("score");
   }
 
-  public Command score(Level level) {
-    return run(() -> motor.set(level == Level.L4 ? SCORE_POWER : 0.6 * SCORE_POWER))
-        .withName("score level");
-  }
-
   public Command scoreSlow() {
-    return run(() -> motor.set(SCORE_POWER / 5)).withName("score");
+    return run(() -> motor.set(SCORE_POWER / 2)).withName("score slow");
   }
 
   public Command algae() {

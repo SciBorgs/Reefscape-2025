@@ -28,6 +28,9 @@ public class RealElevator implements ElevatorIO {
     leader.getConfigurator().apply(talonConfig);
     follower.getConfigurator().apply(talonConfig);
 
+    leader.setPosition(0);
+    follower.setPosition(0);
+
     TalonUtils.addMotor(leader);
     TalonUtils.addMotor(follower);
     register(leader);

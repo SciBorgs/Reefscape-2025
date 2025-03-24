@@ -29,7 +29,7 @@ public class NoModule implements ModuleIO {
 
   @Override
   public Rotation2d rotation() {
-    return new Rotation2d();
+    return Rotation2d.kZero;
   }
 
   @Override

@@ -1,11 +1,4 @@
 {
-  "HALProvider": {
-    "Addressable LEDs": {
-      "window": {
-        "visible": true
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -20,74 +13,8 @@
       "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
-      "/SmartDashboard/Alerts": "Alerts",
-      "/SmartDashboard/Scheduler": "Scheduler",
-      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
-      "/SmartDashboard/arm dynamic backward": "Command",
-      "/SmartDashboard/arm dynamic forward": "Command",
-      "/SmartDashboard/arm quasistatic backward": "Command",
-      "/SmartDashboard/arm quasistatic forward": "Command",
-      "/SmartDashboard/elevator dynamic backward": "Command",
-      "/SmartDashboard/elevator dynamic forward": "Command",
-      "/SmartDashboard/elevator quasistatic backward": "Command",
-      "/SmartDashboard/elevator quasistatic forward": "Command",
-      "/SmartDashboard/rotation dynamic backward": "Command",
-      "/SmartDashboard/rotation dynamic forward": "Command",
-      "/SmartDashboard/rotation quasistatic backward": "Command",
-      "/SmartDashboard/rotation quasistatic forward": "Command",
-      "/SmartDashboard/translation dynamic backward": "Command",
-      "/SmartDashboard/translation dynamic forward": "Command",
-      "/SmartDashboard/translation quasistatic backward": "Command",
-      "/SmartDashboard/translation quasistatic forward": "Command"
-    },
-    "windows": {
-      "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/drive/field2d": {
-        "bottom": 1638,
-        "builtin": "2025 Reefscape",
-        "height": 8.051901817321777,
-        "left": 534,
-        "right": 3466,
-        "top": 291,
-        "width": 17.54825210571289,
-        "window": {
-          "visible": true
-        }
-      }
-    }
-  },
-  "NetworkTables": {
-    "transitory": {
-      "CameraPublisher": {
-        "open": true
-      },
-      "Robot": {
-        "align": {
-          "open": true
-        },
-        "open": true,
-        "scoraling": {
-          "elevator": {
-            "open": true
-          },
-          "open": true,
-          "scoral": {
-            "beambreak": {
-              "open": true
-            },
-            "open": true
-          }
-        }
-      }
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     }
   },
   "NetworkTables Info": {

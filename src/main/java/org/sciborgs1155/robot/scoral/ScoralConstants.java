@@ -7,7 +7,8 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 
 public class ScoralConstants {
-  public static final double SCORE_POWER = 0.85;
+  public static final double SCORE_POWER = 0.3;
+
   public static final double INTAKE_POWER = 0.4;
 
   public static final Current STATOR_LIMIT = Amps.of(55);

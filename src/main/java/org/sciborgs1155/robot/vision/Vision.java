@@ -28,6 +28,8 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -41,19 +43,21 @@ public class Vision implements Logged {
   private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
+  @Log.NT private final List<Pose3d> filteredEstimates;
 
   private VisionSystemSim visionSim;
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return Robot.isReal()
-        ? new Vision(
-            FRONT_LEFT_CAMERA,
-            FRONT_RIGHT_CAMERA,
-            BACK_MIDDLE_CAMERA,
-            BACK_LEFT_CAMERA,
-            BACK_RIGHT_CAMERA)
-        : new Vision();
+    // return Robot.isReal()
+    // ? new Vision(
+    return new Vision(
+        FRONT_LEFT_CAMERA,
+        FRONT_RIGHT_CAMERA,
+        BACK_MIDDLE_CAMERA,
+        BACK_LEFT_CAMERA,
+        BACK_RIGHT_CAMERA);
+    // : new Vision();
   }
 
   public static Vision none() {
@@ -65,6 +69,7 @@ public class Vision implements Logged {
     estimators = new PhotonPoseEstimator[configs.length];
     simCameras = new PhotonCameraSim[configs.length];
     lastResults = new PhotonPipelineResult[configs.length];
+    filteredEstimates = new ArrayList<>();
     camerasEnabled = new HashMap<>();
 
     for (int i = 0; i < configs.length; i++) {
@@ -119,28 +124,19 @@ public class Vision implements Logged {
    *     used for estimation.
    */
   public PoseEstimate[] estimatedGlobalPoses() {
+    Tracer.startTrace("get vision poses");
     List<PoseEstimate> estimates = new ArrayList<>();
+    filteredEstimates.clear();
+
     for (int i = 0; i < estimators.length; i++) {
       if (camerasEnabled.get(cameras[i].getName())) {
-        var reefTags = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
-        var allUnreadChanges = cameras[i].getAllUnreadResults();
-        List<PhotonPipelineResult> unreadChanges =
-            Set.of("back left", "back right").contains(cameras[i].getName())
-                ? allUnreadChanges.stream()
-                    .filter(
-                        change ->
-                            change.getTargets().stream()
-                                .map(target -> reefTags.contains(target.fiducialId))
-                                .reduce(true, (a, b) -> a && b))
-                    .toList()
-                : allUnreadChanges;
+        var unreadChanges = cameras[i].getAllUnreadResults();
+
+        String name = cameras[i].getName();
+
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();
-
-        if (cameras[i].getName() != "back middle") {
-          unreadChanges.forEach(r -> r.targets.forEach(t -> t.pitch *= -1));
-        }
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
@@ -148,15 +144,57 @@ public class Vision implements Logged {
         for (int j = 0; j < unreadLength; j++) {
           var change = unreadChanges.get(j);
 
+          // only reef tags
+          if (Set.of("back left", "back right").contains(name)) {
+            change.targets =
+                change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+            change.multitagResult =
+                change.multitagResult.filter(
+                    r ->
+                        r.fiducialIDsUsed.stream()
+                            .map(id -> REEF_TAGS.contains((int) id))
+                            .reduce(true, (a, b) -> a && b));
+          }
+
+          // negate pitch
+          if (cameras[i].getName() != "back middle") {
+            change.targets.stream()
+                .forEach(
+                    t -> {
+                      t.pitch = -t.pitch;
+                    });
+            change.multitagResult =
+                change.multitagResult.filter(
+                    r ->
+                        r.fiducialIDsUsed.stream()
+                            .map(id -> REEF_TAGS.contains((int) id))
+                            .reduce(true, (a, b) -> a && b));
+          }
+
+          // remove ambiguity
+          change.targets =
+              change.targets.stream().filter(t -> t.poseAmbiguity < MAX_AMBIGUITY).toList();
+          change.multitagResult =
+              change.multitagResult.filter(r -> r.estimatedPose.ambiguity < MAX_AMBIGUITY);
+
           estimate = estimators[i].update(change);
-          log("estimates present " + i, estimate.isPresent());
+
+          log(name + " estimates present", estimate.isPresent());
           estimate
               .filter(
-                  f ->
-                      FieldConstants.inField(f.estimatedPose)
-                          && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                          && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                          && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE)
+                  f -> {
+                    boolean valid =
+                        FieldConstants.inField(f.estimatedPose)
+                            && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
+                            && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
+                            && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
+                    if (!valid) {
+                      filteredEstimates.add(f.estimatedPose);
+                      log(name + "filtered pose", f.estimatedPose);
+                      FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
+                    }
+                    return valid;
+                  })
               .ifPresent(
                   e ->
                       estimates.add(
@@ -165,6 +203,7 @@ public class Vision implements Logged {
         }
       }
     }
+    Tracer.endTrace();
     return estimates.toArray(PoseEstimate[]::new);
   }
 
@@ -176,6 +215,23 @@ public class Vision implements Logged {
     camerasEnabled.put(name, true);
   }
 
+  public boolean getCameraStatus(String name) {
+    return camerasEnabled.get(name);
+  }
+
+  // public void feedEstimatorHeading(Rotation2d heading) {
+  //   for (PhotonPoseEstimator estimator : estimators) {
+  //     estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
+  //   }
+  // }
+
+  public void setPoseStrategy(PoseStrategy strategy) {
+    if (Robot.isReal()) {
+      estimators[0].setPrimaryStrategy(strategy);
+      estimators[1].setPrimaryStrategy(strategy);
+    }
+  }
+
   /**
    * Returns the poses of all currently visible tags.
    *
@@ -185,6 +241,7 @@ public class Vision implements Logged {
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())
+        .filter(t -> t.getPoseAmbiguity() < MAX_AMBIGUITY)
         .map(PhotonTrackedTarget::getFiducialId)
         .map(TAG_LAYOUT::getTagPose)
         .map(Optional::get)
@@ -202,32 +259,28 @@ public class Vision implements Logged {
       Pose2d estimatedPose, PhotonPipelineResult pipelineResult) {
     var estStdDevs = VisionConstants.SINGLE_TAG_STD_DEVS;
     var targets = pipelineResult.getTargets();
-    int numTags = 0;
     double avgDist = 0;
     double avgWeight = 0;
     for (var tgt : targets) {
       var tagPose = TAG_LAYOUT.getTagPose(tgt.getFiducialId());
       if (tagPose.isEmpty()) continue;
-      numTags++;
       avgDist +=
           tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
       avgWeight += TAG_WEIGHTS[tgt.getFiducialId() - 1];
     }
-    if (numTags == 0) return estStdDevs;
+    if (targets.size() == 0) return estStdDevs;
 
-    avgDist /= numTags;
-    avgWeight /= numTags;
+    avgDist /= targets.size();
+    avgWeight /= targets.size();
 
     // Decrease std devs if multiple targets are visible
-    if (numTags > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
+    if (targets.size() > 1) estStdDevs = VisionConstants.MULTIPLE_TAG_STD_DEVS;
     // Increase std devs based on (average) distance
-    if (numTags == 1 && avgDist > 4)
+    if (targets.size() == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
-    estStdDevs = estStdDevs.times(avgWeight);
-
-    return estStdDevs;
+    return estStdDevs.times(avgWeight);
   }
 
   public Transform3d[] cameraTransforms() {

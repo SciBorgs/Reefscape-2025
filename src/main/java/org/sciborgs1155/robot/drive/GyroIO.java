@@ -1,7 +1,9 @@
 package org.sciborgs1155.robot.drive;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.numbers.N2;
 
 /** Generalized gyroscope. Pigeon2, Navx, and SimGyro are to be implemented. */
 public interface GyroIO extends AutoCloseable {
@@ -24,6 +26,9 @@ public interface GyroIO extends AutoCloseable {
    * [timestamps]]
    */
   double[][] odometryData();
+
+  /** Returns the acceleration of the robot as a Vector. */
+  Vector<N2> acceleration();
 
   /** Resets heading to 0 */
   void reset();
