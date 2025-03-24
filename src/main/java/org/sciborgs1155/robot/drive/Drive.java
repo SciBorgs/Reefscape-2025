@@ -102,6 +102,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final GyroIO gyro;
   private static Rotation2d simRotation = Rotation2d.kZero;
 
+  private Vector<N2> desiredAcceleration = VecBuilder.fill(0, 0);
+
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   private final DoubleEntry translationP =
@@ -605,10 +607,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param elevatorHeight A supplier for the current height of the elevator.
    */
   public void setChassisSpeeds(ChassisSpeeds desired, ControlMode mode, double elevatorHeight) {
+    ChassisSpeeds currentSpeeds = robotRelativeChassisSpeeds();
+
     Vector<N2> currentVelocity =
-        VecBuilder.fill(
-            robotRelativeChassisSpeeds().vxMetersPerSecond,
-            robotRelativeChassisSpeeds().vyMetersPerSecond);
+        VecBuilder.fill(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
 
     Vector<N2> deltaV =
         VecBuilder.fill(desired.vxMetersPerSecond, desired.vyMetersPerSecond)
@@ -622,7 +624,12 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
     //                     elevatorHeight.getAsDouble())))
     //         : accel);
-    Vector<N2> limitedVelocity = currentVelocity.plus((skidAccelerationLimit(deltaV)));
+
+    Vector<N2> limitedDeltaV = skidAccelerationLimit(deltaV);
+
+    Vector<N2> limitedVelocity = currentVelocity.plus(limitedDeltaV);
+    desiredAcceleration = limitedDeltaV.div(PERIOD.in(Seconds));
+
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
@@ -820,7 +827,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public boolean isColliding() {
     log("accel", gyro.acceleration().norm());
-    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+    return gyro.acceleration().norm() - desiredAcceleration.norm()
+        > COLLISION_THRESHOLD.in(MetersPerSecondPerSecond);
   }
 
   /** Resets all drive encoders to read a position of 0. */

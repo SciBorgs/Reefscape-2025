@@ -50,14 +50,14 @@ public class Vision implements Logged {
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
     // return Robot.isReal()
-        // ? new Vision(
-        return new Vision(
-            FRONT_LEFT_CAMERA,
-            FRONT_RIGHT_CAMERA,
-            BACK_MIDDLE_CAMERA,
-            BACK_LEFT_CAMERA,
-            BACK_RIGHT_CAMERA);
-        // : new Vision();
+    // ? new Vision(
+    return new Vision(
+        FRONT_LEFT_CAMERA,
+        FRONT_RIGHT_CAMERA,
+        BACK_MIDDLE_CAMERA,
+        BACK_LEFT_CAMERA,
+        BACK_RIGHT_CAMERA);
+    // : new Vision();
   }
 
   public static Vision none() {
@@ -190,7 +190,7 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
                       filteredEstimates.add(f.estimatedPose);
-                     log(name + "filtered pose", f.estimatedPose) ;
+                      log(name + "filtered pose", f.estimatedPose);
                       FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
                     }
                     return valid;

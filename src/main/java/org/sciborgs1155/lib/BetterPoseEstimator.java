@@ -283,14 +283,14 @@ public class BetterPoseEstimator<T> {
 
     // Normalize FOM values to a 0-1 range if necessary
     visionFOMvalue = Math.max(0, Math.min(visionFOMvalue, 1));
-    odometryFOMvalue = 0;//Math.max(0, Math.min(odometryFOMvalue, 1)) / 20;
+    odometryFOMvalue = 0; // Math.max(0, Math.min(odometryFOMvalue, 1)) / 20;
 
     // Compute a dynamic weight for the Kalman gain
     double totalFOM = visionFOMvalue + odometryFOMvalue;
     double visionWeight = 1;
-        // (totalFOM > 0)
-        //     ? (visionFOMvalue / totalFOM)
-        //     : 1; // Default to equal trust if both FOMs are zero
+    // (totalFOM > 0)
+    //     ? (visionFOMvalue / totalFOM)
+    //     : 1; // Default to equal trust if both FOMs are zero
 
     // Compute twist from vision pose
     var twist = visionSample.get().log(visionRobotPoseMeters);
