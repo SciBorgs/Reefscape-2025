@@ -81,12 +81,24 @@
         "open": true
       },
       "Robot": {
+        "open": true,
         "scoraling": {
           "scoral": {
             "beambreak": {
               "open": true
             }
           }
+        },
+        "vision": {
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "VisionSystemSim-main": {
+          "Sim Field": {
+            "open": true
+          },
+          "open": true
         }
       },
       "Tracer": {
