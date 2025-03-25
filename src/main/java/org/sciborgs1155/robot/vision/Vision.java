@@ -1,26 +1,5 @@
 package org.sciborgs1155.robot.vision;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.Tracer;
-import org.sciborgs1155.robot.FieldConstants;
-import org.sciborgs1155.robot.Robot;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
@@ -45,6 +24,26 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.Tracer;
+import org.sciborgs1155.robot.FieldConstants;
+import org.sciborgs1155.robot.Robot;
 
 @Logged
 public class Vision {

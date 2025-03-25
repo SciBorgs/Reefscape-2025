@@ -1,10 +1,6 @@
 package org.sciborgs1155.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.sciborgs1155.robot.Constants;
+import static edu.wpi.first.units.Units.Seconds;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.epilogue.Epilogue;
@@ -15,7 +11,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.Seconds;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.sciborgs1155.robot.Constants;
 
 // Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner {
