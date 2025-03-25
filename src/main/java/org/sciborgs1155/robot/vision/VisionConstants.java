@@ -42,13 +42,13 @@ public class VisionConstants {
               new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-160)))));
 
-  public static final CameraConfig BACK_MIDDLE_CAMERA = // LIMELIGHT
+  public static final CameraConfig BACK_MIDDLE_CAMERA =
       new CameraConfig(
           "back middle",
           new Transform3d(
-              Inches.of(-9.340270).in(Meters),
-              Inches.of(4.449673).in(Meters),
-              Inches.of(12.249288).in(Meters),
+              Inches.of(-9.340270).in(Meters), // -10
+              Inches.of(4.449673).in(Meters), // 3.354
+              Inches.of(12.249288).in(Meters), // 12.341
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
 

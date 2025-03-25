@@ -153,6 +153,6 @@ public class Autos {
   }
 
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(alignment, scoraling, List.of(Branch.I, Branch.J, Branch.A, Branch.B));
+    return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
   }
 }
