@@ -636,7 +636,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    Epilogue.getConfig().backend.log("forward accel limit", (skidAccelerationLimit(deltaV).norm()));
+    Epilogue.getConfig().backend.log("/Robot/Drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -668,7 +668,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         maxAccel.get()
             * PERIOD.in(Seconds)
             * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
-    Epilogue.getConfig().backend.log("accel limit", limit);
+    Epilogue.getConfig().backend.log("/Robot/Drive/accel limit", limit);
     Vector<N2> proj = deltaV.projection(currVel);
     if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
@@ -744,7 +744,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
-          Epilogue.getConfig().backend.log("driveTo goal", targetPose, Pose2d.struct);
+          Epilogue.getConfig().backend.log("/Robot/Drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -962,7 +962,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
-    Epilogue.getConfig().backend.log("estimated poses", loggedEstimates, Pose3d.struct);
+    Epilogue.getConfig().backend.log("/Robot/Drive/estimated poses", loggedEstimates, Pose3d.struct);
   }
 
   @Override
@@ -1024,7 +1024,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "command",
+            "/Robot/Drive/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
 
     Tracer.endTrace();

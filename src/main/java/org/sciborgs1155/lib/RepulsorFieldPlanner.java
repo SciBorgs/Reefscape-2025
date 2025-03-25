@@ -1,6 +1,10 @@
 package org.sciborgs1155.lib;
 
-import static edu.wpi.first.units.Units.Seconds;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.sciborgs1155.robot.Constants;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.epilogue.Epilogue;
@@ -11,10 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.sciborgs1155.robot.Constants;
+import static edu.wpi.first.units.Units.Seconds;
 
 // Taken straight from 6995's code. Praise be to 6995!!
 public class RepulsorFieldPlanner {
@@ -394,7 +395,7 @@ public class RepulsorFieldPlanner {
         var intermediateGoal = position.plus(step);
 
         var endTime = System.nanoTime();
-        Epilogue.getConfig().backend.log("repulsorTimeS", (endTime - startTime));
+        Epilogue.getConfig().backend.log("/lib/repulsorTimeS", (endTime - startTime));
 
         // set the previous sample as the current sample
         prevSample =

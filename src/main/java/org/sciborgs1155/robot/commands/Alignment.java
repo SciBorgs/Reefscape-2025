@@ -1,37 +1,38 @@
 package org.sciborgs1155.robot.commands;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static org.sciborgs1155.robot.Constants.advance;
-import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
-
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
 import org.sciborgs1155.lib.Tracer;
+import static org.sciborgs1155.robot.Constants.advance;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.FieldConstants.Source;
+import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
+
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Alignment {
   @NotLogged private final Drive drive;
@@ -72,7 +73,7 @@ public class Alignment {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
             Commands.runOnce(
-                    () -> Epilogue.getConfig().backend.log("goal pose", goal.get(), Pose2d.struct))
+                    () -> Epilogue.getConfig().backend.log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
             pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
@@ -140,7 +141,7 @@ public class Alignment {
 
   public Command alignTo(Supplier<Pose2d> goal) {
     return Commands.runOnce(
-            () -> Epilogue.getConfig().backend.log("goal pose", goal.get(), Pose2d.struct))
+            () -> Epilogue.getConfig().backend.log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
         .andThen(
             pathfind(goal)
                 .asProxy()

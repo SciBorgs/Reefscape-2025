@@ -87,11 +87,7 @@
       }
     },
     "transitory": {
-      "Epilogue": {
-        "open": true
-      },
       "Robot": {
-        "open": true,
         "align": {
           "open": true,
           "planner": {
@@ -107,7 +103,6 @@
             "open": true
           }
         },
-        "open": true,
         "scoraling": {
           "scoral": {
             "beambreak": {

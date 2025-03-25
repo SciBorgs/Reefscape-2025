@@ -186,7 +186,7 @@ public class Robot extends CommandRobot {
               Epilogue.getConfig()
                   .backend
                   .log(
-                      "camera transforms",
+                      "/Robot/camera transforms",
                       Arrays.stream(vision.cameraTransforms())
                           .map(
                               t ->
@@ -208,8 +208,6 @@ public class Robot extends CommandRobot {
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
     Pose3d[] test = new Pose3d[3];
 
-    Epilogue.getConfig().backend.log("test", test, Pose3d.struct);
-
     RobotController.setBrownoutVoltage(6.0);
 
     if (isReal()) {
@@ -226,8 +224,8 @@ public class Robot extends CommandRobot {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
-    InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
+    InputStream raw_x = InputStream.of(driver::getLeftY).log("/Robot/raw x").negate();
+    InputStream raw_y = InputStream.of(driver::getLeftX).log("/Robot/raw y").negate();
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(raw_x, raw_y)
@@ -244,10 +242,10 @@ public class Robot extends CommandRobot {
     // Split x and y components of translation input
     InputStream x =
         r.scale(theta.map(Math::cos))
-            .log("final x"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+            .log("/Robot/final x"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
     InputStream y =
         r.scale(theta.map(Math::sin))
-            .log("final y"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+            .log("/Robot/final y"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
 
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =

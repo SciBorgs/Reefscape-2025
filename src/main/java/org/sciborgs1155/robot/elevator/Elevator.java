@@ -292,7 +292,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     double feedback = pid.calculate(hardware.position(), goal);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
-    Epilogue.getConfig().backend.log("elevator voltage", feedback + feedforward);
+    Epilogue.getConfig().backend.log("/Robot/Elevator/elevator voltage", feedback + feedforward);
     hardware.setVoltage(feedforward + feedback);
   }
 
@@ -319,7 +319,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "commmand",
+            "/Robot/Elevator/commmand",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
