@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.*;
 import static org.sciborgs1155.robot.Constants.PERIOD;
@@ -126,6 +127,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final DoubleEntry maxTiltAccel =
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
+
+  private final Trigger skidReset = autonomous().and(this::isStalling);
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -282,6 +285,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
     TalonOdometryThread.getInstance().start();
+
+    skidReset.onTrue(stop().withTimeout(PERIOD));
 
     if (TUNING) {
       SmartDashboard.putData(
