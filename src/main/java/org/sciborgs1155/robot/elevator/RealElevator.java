@@ -69,8 +69,8 @@ public class RealElevator implements ElevatorIO {
   }
 
   public void setGoal(double position) {
-    System.out.println("internal goal: " + position * CONVERSION_FACTOR);
-    leader.setControl(profile.withPosition(position * CONVERSION_FACTOR).withSlot(0));
+    System.out.println("internal goal: " + position);
+    leader.setControl(profile.withPosition(position).withSlot(0));
   }
 
   @Override
