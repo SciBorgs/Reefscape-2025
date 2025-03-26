@@ -21,9 +21,12 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,7 +65,7 @@ public class Vision {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return Robot.isReal() ? new Vision(FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA) : new Vision();
+    return Robot.isReal() ? new Vision(FRONT_LEFT_CAMERA, FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA) : new Vision();
   }
 
   public static Vision none() {
@@ -235,11 +238,11 @@ public class Vision {
     return camerasEnabled.get(name);
   }
 
-  // public void feedEstimatorHeading(Rotation2d heading) {
-  //   for (PhotonPoseEstimator estimator : estimators) {
-  //     estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
-  //   }
-  // }
+  public void feedEstimatorHeading(Rotation2d heading) {
+    for (PhotonPoseEstimator estimator : estimators) {
+      estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
+    }
+  }
 
   public void setPoseStrategy(PoseStrategy strategy) {
     for (int i = 0; i < estimators.length; i++) {
