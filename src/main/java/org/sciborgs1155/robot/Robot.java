@@ -326,6 +326,8 @@ public class Robot extends CommandRobot implements Logged {
 
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
+    driver.povRight().onTrue(Commands.runOnce(drive::resetGyro));
+
     // B for dashboard select
     driver.povLeft().onTrue(drive.zeroHeading());
 

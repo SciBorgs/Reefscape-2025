@@ -135,8 +135,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   // private final BetterSwerveDrivePoseEstimator odometry;
   private final FOMPoseEstimator poseEstimator;
 
-  public Vector<N3> odometryFOM() {
-    return VecBuilder.fill(1, 1, Math.PI / 6)
+  public Vector<N2> odometryFOM() {
+    return VecBuilder.fill(1, 1)
         .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
   }
 
@@ -401,6 +401,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public void resetOdometry(Pose2d pose) {
     poseEstimator.resetPose(pose);
+  }
+
+  public void resetGyro() {
+    gyro.reset();
   }
 
   /**
