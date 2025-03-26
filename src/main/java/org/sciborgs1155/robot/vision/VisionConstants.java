@@ -52,26 +52,28 @@ public class VisionConstants {
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
 
-  public static final CameraConfig FRONT_LEFT_CAMERA =
-      new CameraConfig(
-          "front left",
-          new Transform3d(
-              Inches.of(12.931292).in(Meters),
-              Inches.of(10.883863).in(Meters),
-              Inches.of(8.739474).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-35)))));
-
-  public static final CameraConfig FRONT_RIGHT_CAMERA =
-      new CameraConfig(
-          "front right",
-          new Transform3d(
-              Inches.of(12.931292).in(Meters),
-              Inches.of(-10.883863).in(Meters),
-              Inches.of(8.739474).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(35)))));
-
+                  public static final CameraConfig FRONT_LEFT_CAMERA =
+                  new CameraConfig(
+                      "front left",
+                      new Transform3d(
+                          Inches.of(13.249431).in(Meters),
+                          Inches.of(10.943149).in(Meters),
+                          Inches.of(3.875).in(Meters), // TODO get new
+                          //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
+                          new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
+                              .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-30)))));
+            
+              public static final CameraConfig FRONT_RIGHT_CAMERA =
+                  new CameraConfig(
+                      "front right",
+                      new Transform3d(
+                          Inches.of(13.295385).in(Meters),
+                          Inches.of(-10.916667).in(Meters),
+                          Inches.of(9.375).in(Meters),
+                          //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
+                          new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
+                              .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(30)))));
+            
   // ThriftyCam constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
