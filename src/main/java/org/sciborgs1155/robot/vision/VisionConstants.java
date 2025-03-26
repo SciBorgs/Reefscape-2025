@@ -21,66 +21,6 @@ public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-
-
-      /*
-       *  public static final CameraConfig BACK_LEFT_CAMERA =
-      new CameraConfig(
-          "back left",
-          new Transform3d(
-              Inches.of(-13.2278115).in(Meters),
-              Inches.of(12.049788).in(Meters),
-              Inches.of(9.375).in(Meters),
-              //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(108.25))));
-              new Rotation3d(Radians.zero(), Degrees.of(-25), Radians.zero())
-                  .rotateBy(new Rotation3d(Radians.zero(), Radians.zero(), Degrees.of(108.25)))));
-
-  public static final CameraConfig BACK_RIGHT_CAMERA =
-      new CameraConfig(
-          "back right",
-          new Transform3d(
-              Inches.of(-13.2278115).in(Meters),
-              Inches.of(-12.049788).in(Meters),
-              Inches.of(9.375).in(Meters),
-              //   new Rotation3d(0, Math.toRadians(-25), Math.toRadians(-108.25))));
-              new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-108.25)))));
-
-  public static final CameraConfig BACK_MIDDLE_CAMERA =
-      new CameraConfig(
-          "back middle",
-          new Transform3d(
-              Inches.of(-8.358).in(Meters),
-              Inches.of(3.354).in(Meters), // 4.65??
-              Inches.of(12.341).in(Meters), // 15.375
-              //   new Rotation3d(Math.toRadians(0), Math.toRadians(-15), Math.toRadians(165))));
-              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
-
-  public static final CameraConfig FRONT_LEFT_CAMERA =
-      new CameraConfig(
-          "front left",
-          new Transform3d(
-              Inches.of(13.249431).in(Meters),
-              Inches.of(10.943149).in(Meters),
-              Inches.of(3.875).in(Meters), // TODO get new
-              //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
-              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-30)))));
-
-  public static final CameraConfig FRONT_RIGHT_CAMERA =
-      new CameraConfig(
-          "front right",
-          new Transform3d(
-              Inches.of(13.295385).in(Meters),
-              Inches.of(-10.916667).in(Meters),
-              Inches.of(9.375).in(Meters),
-              //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
-              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(30)))));
-
-       */
-  // WARNING: EMPTY TRANSFORMS WILL CRASH CODE UPON TAG DETECTION
   public static final CameraConfig BACK_LEFT_CAMERA =
       new CameraConfig(
           "back left",
@@ -111,27 +51,26 @@ public class VisionConstants {
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
 
-                  public static final CameraConfig FRONT_LEFT_CAMERA =
-                  new CameraConfig(
-                      "front left",
-                      new Transform3d(
-                          Inches.of(13.249431).in(Meters),
-                          Inches.of(10.943149).in(Meters),
-                          Inches.of(3.875).in(Meters), // TODO get new
-                          //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(-30))));
-                          new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                              .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-30)))));
-            
-              public static final CameraConfig FRONT_RIGHT_CAMERA =
-                  new CameraConfig(
-                      "front right",
-                      new Transform3d(
-                          Inches.of(13.295385).in(Meters),
-                          Inches.of(-10.916667).in(Meters),
-                          Inches.of(9.375).in(Meters),
-                          //   new Rotation3d(0, Math.toRadians(-15), Math.toRadians(30))));
-                          new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                              .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(30)))));
+ public static final CameraConfig FRONT_LEFT_CAMERA =
+      new CameraConfig(
+          "front left",
+          new Transform3d(
+              Inches.of(12.931292).in(Meters),
+              Inches.of(10.883863).in(Meters),
+              Inches.of(8.739474).in(Meters),
+              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-35)))));
+
+  public static final CameraConfig FRONT_RIGHT_CAMERA =
+      new CameraConfig(
+          "front right",
+          new Transform3d(
+              Inches.of(12.931292).in(Meters),
+              Inches.of(-10.883863).in(Meters),
+              Inches.of(8.739474).in(Meters),
+              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
+                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(35)))));
+
             
   // ThriftyCam constants for our configuration
   public static final int WIDTH = 1280;
