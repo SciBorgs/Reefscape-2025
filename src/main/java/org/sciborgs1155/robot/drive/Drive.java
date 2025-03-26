@@ -49,6 +49,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -136,7 +137,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final FOMPoseEstimator poseEstimator;
 
   public Vector<N3> odometryFOM() {
-    return VecBuilder.fill(1, 1, Math.PI / 6)
+    return VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 0 : Math.PI / 6)
         .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
   }
 
