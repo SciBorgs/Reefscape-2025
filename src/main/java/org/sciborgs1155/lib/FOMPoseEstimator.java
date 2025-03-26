@@ -1,16 +1,13 @@
 package org.sciborgs1155.lib;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -42,28 +39,24 @@ public class FOMPoseEstimator {
   }
 
   public void update(
-      OdometryUpdate[] odometryUpdates, Vector<N2> odometryFOM, PoseEstimate... visionEstimates) {
-    Translation2d lastOdometryTranslation = odometry.getEstimatedPosition().getTranslation();
+      OdometryUpdate[] odometryUpdates, Vector<N3> odometryFOM, PoseEstimate... visionEstimates) {
+    Pose2d lastOdometryPose = odometry.getEstimatedPosition();
 
     for (OdometryUpdate update : odometryUpdates) {
       odometry.updateWithTime(update.timestamp, update.angle, update.modulePositions);
     }
 
-    Pose2d rawOdometryEstimate = odometry.getEstimatedPosition();
-
     Pose2d odometryEstimate =
-        new Pose2d(
-            robotPose
-                .getTranslation()
-                .plus(rawOdometryEstimate.getTranslation().minus(lastOdometryTranslation)),
-            rawOdometryEstimate.getRotation());
-    // robotPose.plus(odometry.getEstimatedPosition().minus(lastOdometryPose));
+        robotPose.plus(odometry.getEstimatedPosition().minus(lastOdometryPose));
 
     Estimate[] xEstimates = new Estimate[visionEstimates.length + 1];
     Estimate[] yEstimates = new Estimate[visionEstimates.length + 1];
+    Estimate[] thetaEstimates = new Estimate[visionEstimates.length + 1];
 
     xEstimates[0] = new Estimate(odometryEstimate.getX(), odometryFOM.get(0));
     yEstimates[0] = new Estimate(odometryEstimate.getY(), odometryFOM.get(1));
+    thetaEstimates[0] =
+        new Estimate(odometryEstimate.getRotation().getRadians(), odometryFOM.get(2));
 
     for (int i = 0; i < visionEstimates.length; i++) {
       PoseEstimate visionEstimate = visionEstimates[i];
@@ -75,20 +68,21 @@ public class FOMPoseEstimator {
               .mapToDouble(t -> t.poseAmbiguity)
               .min()
               .orElse(1);
-      Matrix<N3, N1> visionFOMsMatrix =
+      Matrix<N3, N1> visionFOMs =
           stdevs.times(minAmbiguity == 1 ? Double.MAX_VALUE : 1 / (1 - minAmbiguity));
-
-      Vector<N2> visionFOMs =
-          VecBuilder.fill(visionFOMsMatrix.get(0, 0), visionFOMsMatrix.get(1, 0));
 
       xEstimates[i + 1] = new Estimate(visionPose.getX(), visionFOMs.get(0, 0));
 
       yEstimates[i + 1] = new Estimate(visionPose.getY(), visionFOMs.get(1, 0));
+      thetaEstimates[i + 1] =
+          new Estimate(visionPose.getRotation().getRadians(), visionFOMs.get(2, 0));
     }
 
     robotPose =
         new Pose2d(
-            newEstimate(xEstimates), newEstimate(yEstimates), odometryEstimate.getRotation());
+            newEstimate(xEstimates),
+            newEstimate(yEstimates),
+            Rotation2d.fromRadians(newEstimate(thetaEstimates)));
   }
 
   public Pose2d pose() {
