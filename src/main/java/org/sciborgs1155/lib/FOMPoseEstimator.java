@@ -69,7 +69,7 @@ public class FOMPoseEstimator {
               .min()
               .orElse(1);
       Matrix<N3, N1> visionFOMs =
-          stdevs.times(minAmbiguity == 1 ? Double.MAX_VALUE : 1 / (1 - minAmbiguity));
+          stdevs.times(minAmbiguity == 1 ? 1e20 : 1 / (1 - minAmbiguity));
 
       xEstimates[i + 1] = new Estimate(visionPose.getX(), visionFOMs.get(0, 0));
 
@@ -91,7 +91,7 @@ public class FOMPoseEstimator {
 
   public static double newEstimate(Estimate... estimates) {
     Function<Estimate, Double> inverseSquare =
-        e -> e.FOM == 0 ? Double.MAX_VALUE : 1 / Math.pow(e.FOM, 2);
+        e -> e.FOM == 0 ? 1e20 : 1 / Math.pow(e.FOM, 2);
     return Arrays.stream(estimates).mapToDouble(e -> inverseSquare.apply(e) * e.measurement).sum()
         / Arrays.stream(estimates).mapToDouble(e -> inverseSquare.apply(e)).sum();
   }
