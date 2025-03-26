@@ -88,6 +88,16 @@ public class Constants {
         new Translation2d(distance.in(Meters), Rotation2d.kZero), Rotation2d.kZero);
   }
 
+  /**
+   * A transform that will rotate the pose.
+   *
+   * @param rotation The rotation to rotate the pose.
+   * @return A transform that rotates a pose by a certain Rotation2d.
+   */
+  public static Transform2d rotate(Rotation2d rotation) {
+    return new Transform2d(Translation2d.kZero, rotation);
+  }
+
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = false;

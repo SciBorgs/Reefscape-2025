@@ -143,6 +143,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine translationCharacterization;
   private final SysIdRoutine rotationalCharacterization;
 
+  private Pose2d goalPose = Pose2d.kZero;
+
   // Movement automation
   @Log.NT
   private final ProfiledPIDController translationController =
@@ -336,6 +338,19 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   @Log.NT
   public Pose2d pose() {
     return odometry.getEstimatedPosition();
+  }
+
+  /**
+   * Returns the pose that driveTo() has last attempted to go to.
+   *
+   * @return
+   */
+  public Pose2d goalPose() {
+    return goalPose;
+  }
+
+  public boolean atGoal() {
+    return atPose(goalPose);
   }
 
   /** Returns a Pose3D of the estimated pose of the robot. */
@@ -722,6 +737,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
+          goalPose = targetPose;
           log("driveTo goal", targetPose);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(

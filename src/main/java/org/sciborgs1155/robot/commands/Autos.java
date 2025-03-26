@@ -3,7 +3,9 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.Constants.rotate;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -120,8 +122,15 @@ public class Autos {
   public static Command alignSource(Alignment alignment, Scoraling scoraling, int retries) {
     Supplier<Command> attempt =
         () ->
-            alignment
-                .source()
+            (alignment
+                    .source()
+                    .until(alignment::stalling)
+                    .andThen(
+                        alignment
+                            .moveRobotRelative(rotate(Rotation2d.kCW_90deg))
+                            .onlyIf(alignment::stalling)))
+                .repeatedly()
+                .until(alignment::atGoal)
                 .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
                 .withTimeout(5);
 
