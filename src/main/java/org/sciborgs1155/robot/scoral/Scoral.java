@@ -86,7 +86,7 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/Scoral/command",
+            "/Robot/scoral/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 

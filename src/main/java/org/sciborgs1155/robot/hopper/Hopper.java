@@ -92,7 +92,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/Hopper/command",
+            "/Robot/hopper/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 

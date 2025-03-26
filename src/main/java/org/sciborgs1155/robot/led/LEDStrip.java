@@ -186,7 +186,7 @@ public class LEDStrip extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/Leds/command",
+            "/Robot/LEDs/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 

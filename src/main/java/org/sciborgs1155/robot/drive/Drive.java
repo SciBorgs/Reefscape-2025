@@ -636,7 +636,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     Epilogue.getConfig()
         .backend
-        .log("/Robot/Drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
+        .log("/Robot/drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -668,7 +668,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         maxAccel.get()
             * PERIOD.in(Seconds)
             * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
-    Epilogue.getConfig().backend.log("/Robot/Drive/accel limit", limit);
+    Epilogue.getConfig().backend.log("/Robot/drive/accel limit", limit);
     Vector<N2> proj = deltaV.projection(currVel);
     if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
@@ -744,7 +744,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
-          Epilogue.getConfig().backend.log("/Robot/Drive/driveTo goal", targetPose, Pose2d.struct);
+          Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -964,7 +964,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     }
     Epilogue.getConfig()
         .backend
-        .log("/Robot/Drive/estimated poses", loggedEstimates, Pose3d.struct);
+        .log("/Robot/drive/estimated poses", loggedEstimates, Pose3d.struct);
   }
 
   @Override
@@ -1026,7 +1026,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/Drive/command",
+            "/Robot/drive/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
 
     Tracer.endTrace();
