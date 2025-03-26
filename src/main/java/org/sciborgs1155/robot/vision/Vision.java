@@ -49,15 +49,9 @@ public class Vision implements Logged {
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    // return Robot.isReal()
-    // ? new Vision(
-    return new Vision(
-        FRONT_LEFT_CAMERA,
-        FRONT_RIGHT_CAMERA,
-        BACK_MIDDLE_CAMERA,
-        BACK_LEFT_CAMERA,
-        BACK_RIGHT_CAMERA);
-    // : new Vision();
+    return Robot.isReal()
+        ? new Vision(FRONT_RIGHT_CAMERA, FRONT_LEFT_CAMERA, BACK_MIDDLE_CAMERA)
+        : new Vision();
   }
 
   public static Vision none() {
@@ -226,9 +220,10 @@ public class Vision implements Logged {
   // }
 
   public void setPoseStrategy(PoseStrategy strategy) {
-    if (Robot.isReal()) {
-      estimators[0].setPrimaryStrategy(strategy);
-      estimators[1].setPrimaryStrategy(strategy);
+    for (int i = 0; i < estimators.length; i++) {
+      if (Set.of("front left", "front right").contains(cameras[i].getName())) {
+        estimators[i].setPrimaryStrategy(strategy);
+      }
     }
   }
 

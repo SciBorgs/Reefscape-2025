@@ -90,7 +90,7 @@ public class Constants {
 
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
-  public static boolean TUNING = false;
+  public static boolean TUNING = true;
 
   /**
    * Creates a Vector from polar coordinates.

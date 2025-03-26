@@ -63,7 +63,7 @@ public class Autos {
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
-    chooser.addOption(
+    chooser.setDefaultOption(
         "line",
         drive.run(
             () ->
@@ -76,9 +76,8 @@ public class Autos {
         "test drive to",
         drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
     chooser.addOption(
-        "wheel characterization",
-        DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(5)).asProxy());
-
+        "wheel characteirzatiion",
+        DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(8)));
     return chooser;
   }
 
@@ -154,6 +153,6 @@ public class Autos {
   }
 
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(alignment, scoraling, List.of(Branch.I, Branch.J, Branch.A, Branch.B));
+    return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
   }
 }

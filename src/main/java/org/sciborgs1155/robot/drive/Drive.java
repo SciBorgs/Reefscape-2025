@@ -101,6 +101,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   @IgnoreLogged private final List<ModuleIO> modules;
 
+  private final BooleanSupplier[] modulesStalling;
+
   // Gyro
   private final GyroIO gyro;
   private static Rotation2d simRotation = Rotation2d.kZero;
@@ -233,6 +235,18 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     lastPositions = modulePositions();
     lastHeading = gyro.rotation2d();
 
+    modulesStalling =
+        modules.stream()
+            .map(
+                m ->
+                    new Trigger(
+                            () ->
+                                Math.abs(m.desiredState().speedMetersPerSecond) > 0.3
+                                    && Math.abs(m.state().speedMetersPerSecond) < 0.1)
+                        .debounce(0.2, DebounceType.kRising)
+                        .debounce(0.04, DebounceType.kFalling))
+            .toArray(BooleanSupplier[]::new);
+
     translationCharacterization =
         new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -294,11 +308,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     .andThen(() -> maxAccel.set(MAX_ACCEL.in(MetersPerSecondPerSecond))))
             .asProxy());
 
-    Function<ModuleIO, BooleanSupplier> stalling = 
-      m -> 
-         new Trigger(() -> m.desiredState().speedMetersPerSecond > 0.3 && m.state().speedMetersPerSecond < 0.1)
-         .debounce(0.2, DebounceType.kRising).debounce(0.08, DebounceType.kFalling);
-         
+    Function<ModuleIO, BooleanSupplier> stalling =
+        m ->
+            new Trigger(
+                    () ->
+                        m.desiredState().speedMetersPerSecond > 0.3
+                            && m.state().speedMetersPerSecond < 0.1)
+                .debounce(0.2, DebounceType.kRising)
+                .debounce(0.08, DebounceType.kFalling);
 
     FaultLogger.register(
         this::isColliding,
@@ -837,6 +854,13 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         > COLLISION_THRESHOLD.in(MetersPerSecondPerSecond);
   }
 
+  @Log.NT
+  public boolean isStalling() {
+    return Arrays.stream(modulesStalling)
+        .map(bs -> bs.getAsBoolean())
+        .reduce(false, (a, b) -> a || b);
+  }
+
   /** Resets all drive encoders to read a position of 0. */
   public void resetEncoders() {
     modules.forEach(ModuleIO::resetEncoders);
@@ -860,7 +884,6 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns the module positions. */
-  @Log.NT
   public SwerveModulePosition[] modulePositions() {
     return modules.stream().map(ModuleIO::position).toArray(SwerveModulePosition[]::new);
   }
