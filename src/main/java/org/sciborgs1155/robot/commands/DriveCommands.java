@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Set;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.drive.Drive;
@@ -57,13 +56,13 @@ public class DriveCommands {
                 }),
 
             // Turn in place, accelerating up to full speed
-            Commands.defer(
+            Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
                   drive.setChassisSpeeds(
                       new ChassisSpeeds(0, 0, speed), ControlMode.CLOSED_LOOP_VELOCITY, 0);
                 },
-                Set.of(drive))),
+                drive)),
 
         // Measurement sequence
         Commands.sequence(
