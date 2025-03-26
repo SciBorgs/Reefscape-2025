@@ -29,6 +29,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.kV;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -91,14 +92,16 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Logged private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
+  @Logged
   private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
 
+  @Logged
   private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
 
-  private final DoubleEntry S = Tuning.entry("/Robot/tuning/elevator/kS", kS);
-  private final DoubleEntry G = Tuning.entry("/Robot/tuning/elevator/kG", kG);
-  private final DoubleEntry V = Tuning.entry("/Robot/tuning/elevator/kV", kV);
-  private final DoubleEntry A = Tuning.entry("/Robot/tuning/elevator/kA", kA);
+  @NotLogged private final DoubleEntry S = Tuning.entry("/Robot/tuning/elevator/kS", kS);
+  @NotLogged private final DoubleEntry G = Tuning.entry("/Robot/tuning/elevator/kG", kG);
+  @NotLogged private final DoubleEntry V = Tuning.entry("/Robot/tuning/elevator/kV", kV);
+  @NotLogged private final DoubleEntry A = Tuning.entry("/Robot/tuning/elevator/kA", kA);
 
   public Elevator(ElevatorIO hardware) {
     setDefaultCommand(retract());
@@ -319,7 +322,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/elevator/commmand",
+            "/Robot/elevator/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 

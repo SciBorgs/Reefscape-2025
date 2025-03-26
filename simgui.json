@@ -87,6 +87,12 @@
       }
     },
     "transitory": {
+      "Epilogue": {
+        "Stats": {
+          "open": true
+        },
+        "open": true
+      },
       "Robot": {
         "align": {
           "open": true,
@@ -103,6 +109,10 @@
             "open": true
           }
         },
+        "drive": {
+          "open": true
+        },
+        "open": true,
         "scoraling": {
           "scoral": {
             "beambreak": {

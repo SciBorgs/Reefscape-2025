@@ -131,20 +131,34 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
+  @NotLogged
   private final DoubleEntry translationP =
       Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
+
+  @NotLogged
   private final DoubleEntry translationI =
       Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
+
+  @NotLogged
   private final DoubleEntry translationD =
       Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
 
+  @NotLogged
   private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+
+  @NotLogged
   private final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+
+  @NotLogged
   private final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
 
+  @NotLogged
   private final DoubleEntry maxAccel =
       Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
-  private final DoubleEntry maxSkidAccel;
+
+  @NotLogged private final DoubleEntry maxSkidAccel;
+
+  @NotLogged
   private final DoubleEntry maxTiltAccel =
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));

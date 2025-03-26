@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -72,10 +73,10 @@ public class Arm extends SubsystemBase implements AutoCloseable {
               10,
               new Color8Bit(Color.kSkyBlue)));
 
-  private final DoubleEntry S = Tuning.entry("/Robot/tuning/arm/kS", kS);
-  private final DoubleEntry G = Tuning.entry("/Robot/tuning/arm/kG", kG);
-  private final DoubleEntry V = Tuning.entry("/Robot/tuning/arm/kV", kV);
-  private final DoubleEntry A = Tuning.entry("/Robot/tuning/arm/kA", kA);
+  @NotLogged private final DoubleEntry S = Tuning.entry("/Robot/tuning/arm/kS", kS);
+  @NotLogged private final DoubleEntry G = Tuning.entry("/Robot/tuning/arm/kG", kG);
+  @NotLogged private final DoubleEntry V = Tuning.entry("/Robot/tuning/arm/kV", kV);
+  @NotLogged private final DoubleEntry A = Tuning.entry("/Robot/tuning/arm/kA", kA);
 
   /**
    * Returns a new {@link Arm} subsystem, which will have real hardware if the robot is real, and

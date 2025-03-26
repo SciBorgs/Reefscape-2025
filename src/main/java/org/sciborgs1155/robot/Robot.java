@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -176,8 +175,6 @@ public class Robot extends CommandRobot {
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
 
-    // Log PDH
-    SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
 
     if (TUNING) {
@@ -206,7 +203,6 @@ public class Robot extends CommandRobot {
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
-    Pose3d[] test = new Pose3d[3];
 
     RobotController.setBrownoutVoltage(6.0);
 
