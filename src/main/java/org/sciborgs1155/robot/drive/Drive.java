@@ -137,7 +137,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final FOMPoseEstimator poseEstimator;
 
   public Vector<N3> odometryFOM() {
-    return VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 0 : Math.PI / 6)
+    return VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 0 : Double.MAX_VALUE)
         .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
   }
 
