@@ -55,7 +55,7 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
   public Scoral(SimpleMotor motor, Beambreak beambreak) {
     this.motor = motor;
     this.beambreak = beambreak;
-    this.blocked = new Trigger(beambreak::get); // it spontaneously negated....
+    this.blocked = new Trigger(beambreak::get).debounce(0.2); // it spontaneously negated....
 
     setDefaultCommand(stop());
   }
