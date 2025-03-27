@@ -108,7 +108,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING -> Hopper.none(); // Hopper.create();
         default -> Hopper.none();
       };
 
@@ -174,7 +174,6 @@ public class Robot extends CommandRobot {
     Epilogue.bind(this);
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
-    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD.in(Seconds));
     FaultLogger.register(pdh);
 
     if (TUNING) {
@@ -202,7 +201,7 @@ public class Robot extends CommandRobot {
 
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
+    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.heading())), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
