@@ -2,8 +2,8 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.REEF_ADJUSTMENT_TIME;
+import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.advance;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -110,7 +110,10 @@ public class Autos {
    * @param branch the branch to score on.
    */
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
-    return alignment.slowReef(Level.L4, branch).withTimeout(7 + REEF_ADJUSTMENT_TIME.in(Seconds)).onlyIf(scoraling::hasCoral);
+    return alignment
+        .slowReef(Level.L4, branch)
+        .withTimeout(7 + REEF_ADJUSTMENT_TIME.in(Seconds))
+        .onlyIf(scoraling::hasCoral);
   }
 
   /**

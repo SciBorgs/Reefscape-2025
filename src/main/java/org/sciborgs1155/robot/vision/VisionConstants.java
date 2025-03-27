@@ -51,7 +51,7 @@ public class VisionConstants {
               new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
 
- public static final CameraConfig FRONT_LEFT_CAMERA =
+  public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",
           new Transform3d(
@@ -71,7 +71,6 @@ public class VisionConstants {
               new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(35)))));
 
-            
   // ThriftyCam constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
