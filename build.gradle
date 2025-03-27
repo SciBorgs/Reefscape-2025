@@ -100,9 +100,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.4'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
 
-    // Monologue
-    implementation 'com.github.shueja:Monologue:+'
-
     // Gson
     // Remove this once choreolib changes get upstreamed
     implementation 'com.google.code.gson:gson:2.10.1'
