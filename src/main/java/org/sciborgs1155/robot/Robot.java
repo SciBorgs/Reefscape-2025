@@ -174,7 +174,7 @@ public class Robot extends CommandRobot {
     Epilogue.bind(this);
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
-    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
+    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD.in(Seconds));
     FaultLogger.register(pdh);
 
     if (TUNING) {
@@ -263,7 +263,8 @@ public class Robot extends CommandRobot {
         .onTrue(
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
-        .onFalse(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
+        .onFalse(
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
