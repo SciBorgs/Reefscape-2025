@@ -2,10 +2,11 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.Constants.REEF_ADJUSTMENT_TIME;
+import static org.sciborgs1155.robot.Constants.CHECKPOINT_TIME;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.advance;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -112,7 +113,7 @@ public class Autos {
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
     return alignment
         .slowReef(Level.L4, branch)
-        .withTimeout(7 + REEF_ADJUSTMENT_TIME.in(Seconds))
+        .withTimeout(7 + CHECKPOINT_TIME.in(Seconds))
         .onlyIf(scoraling::hasCoral);
   }
 

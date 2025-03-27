@@ -3,7 +3,7 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.Constants.REEF_ADJUSTMENT_TIME;
+import static org.sciborgs1155.robot.Constants.CHECKPOINT_TIME;
 import static org.sciborgs1155.robot.Constants.REEF_CHECKPOINT;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
@@ -117,8 +117,13 @@ public class Alignment {
                     Epilogue.getConfig()
                         .backend
                         .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)),
+            Commands.runOnce(
+                () ->
+                    Epilogue.getConfig()
+                        .backend
+                        .log("/Robot/alignment/checkpoint", checkpoint.get(), Pose2d.struct)),
             pathfind(checkpoint).withName("go to checkpoint").asProxy(),
-            Commands.waitSeconds(REEF_ADJUSTMENT_TIME.in(Seconds)),
+            Commands.waitSeconds(CHECKPOINT_TIME.in(Seconds)),
             pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
                 Commands.sequence(

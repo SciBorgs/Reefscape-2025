@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -134,7 +135,6 @@ public class Robot extends CommandRobot {
   // COMMANDS
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
-  @Logged
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
@@ -143,6 +143,7 @@ public class Robot extends CommandRobot {
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
     super(PERIOD.in(Seconds));
+    Epilogue.bind(this);
     configureGameBehavior();
     configureBindings();
 
@@ -171,11 +172,11 @@ public class Robot extends CommandRobot {
     DataLogManager.start();
     SignalLogger.enableAutoLogging(true);
     addPeriodic(FaultLogger::update, 2);
-    Epilogue.bind(this);
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
     addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     FaultLogger.register(pdh);
+    SmartDashboard.putData(autos);
 
     if (TUNING) {
       addPeriodic(
