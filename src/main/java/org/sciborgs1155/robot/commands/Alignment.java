@@ -2,6 +2,9 @@ package org.sciborgs1155.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static org.sciborgs1155.robot.Constants.REEF_ADJUSTMENT_TIME;
+import static org.sciborgs1155.robot.Constants.REEF_CHECKPOINT;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
@@ -73,6 +76,40 @@ public class Alignment implements Logged {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
             Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
+            pathfind(goal).withName("go to reef").asProxy(),
+            Commands.deadline(
+                Commands.sequence(
+                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    Commands.waitUntil(elevator::atGoal)
+                        .withTimeout(1.5)
+                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+                    moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
+                elevator.scoreLevel(level).asProxy(),
+                leds.error(
+                    () ->
+                        drive
+                                .pose()
+                                .relativeTo(goal.get())
+                                .getTranslation()
+                                .getDistance(Translation2d.kZero)
+                            * 3.5,
+                    0.02 * 3.5)))
+        .asProxy()
+        .withName("align to reef")
+        .onlyWhile(
+            () ->
+                !FaultLogger.report(
+                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
+                    alternateAlliancePathfinding));
+  }
+
+  public Command slowReef(Level level, Branch branch) {
+    Supplier<Pose2d> checkpoint = () -> branch.pose().transformBy(advance(REEF_CHECKPOINT.times(-1)));
+    Supplier<Pose2d> goal = branch::pose;
+    return Commands.sequence(
+            Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
+            pathfind(checkpoint).withName("go to checkpoint").asProxy(),
+            Commands.waitSeconds(REEF_ADJUSTMENT_TIME.in(Seconds)),
             pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
                 Commands.sequence(

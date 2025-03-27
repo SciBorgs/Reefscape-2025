@@ -88,6 +88,12 @@ public class Constants {
         new Translation2d(distance.in(Meters), Rotation2d.kZero), Rotation2d.kZero);
   }
 
+  /** How far away the robot will stop to readjust when aligning to the reef */
+  public static final Distance REEF_CHECKPOINT = Meter.of(.3);
+
+  /** How long the robot will stop to readjust when aligning to the reef */
+  public static final Time REEF_ADJUSTMENT_TIME = Seconds.of(1);
+
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = true;
