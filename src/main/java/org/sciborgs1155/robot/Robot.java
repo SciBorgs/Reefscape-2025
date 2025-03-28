@@ -263,7 +263,9 @@ public class Robot extends CommandRobot {
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY))
+                .alongWith(scoral.algae())
+                .withTimeout(0.5));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
