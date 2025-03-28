@@ -133,6 +133,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   private final GyroIO gyro;
   @Logged private static Rotation2d simRotation = Rotation2d.kZero;
 
+  @NotLogged
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   @NotLogged
@@ -167,12 +168,13 @@ public class Drive extends SubsystemBase implements AutoCloseable {
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
-  private Vector<N2> desiredAcceleration = VecBuilder.fill(0, 0);
+  @NotLogged private Vector<N2> desiredAcceleration = VecBuilder.fill(0, 0);
 
   // Odometry and pose estimation
   // private final BetterSwerveDrivePoseEstimator odometry;
   private final FOMPoseEstimator poseEstimator;
 
+  @NotLogged
   public Vector<N3> odometryFOM() {
     Vector<N3> fom =
         VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 1e-10 : 1e20) // Double.MAX_VALUE)
@@ -951,7 +953,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
-  @Logged
   private double odomFOM() {
     return 1
         - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
