@@ -32,7 +32,12 @@
       "/SmartDashboard/translation dynamic backward": "Command",
       "/SmartDashboard/translation dynamic forward": "Command",
       "/SmartDashboard/translation quasistatic backward": "Command",
-      "/SmartDashboard/translation quasistatic forward": "Command"
+      "/SmartDashboard/translation quasistatic forward": "Command",
+      "Robot/arm/fb": "ProfiledPIDController",
+      "Robot/autos": "String Chooser",
+      "Robot/drive/rotationController": "PIDController",
+      "Robot/drive/translationController": "ProfiledPIDController",
+      "Robot/elevator/pid": "ProfiledPIDController"
     },
     "windows": {
       "/FMSInfo": {
@@ -69,11 +74,37 @@
     }
   },
   "NetworkTables": {
+    "retained": {
+      "Robot": {
+        "open": true
+      }
+    },
     "transitory": {
-      "CameraPublisher": {
+      "Epilogue": {
+        "Stats": {
+          "open": true
+        },
         "open": true
       },
       "Robot": {
+        "align": {
+          "open": true,
+          "planner": {
+            "Pose2d##v_Robot/align/planner/goal": {
+              "Rotation2d##v_rotation": {
+                "open": true
+              },
+              "Translation2d##v_translation": {
+                "open": true
+              },
+              "open": true
+            },
+            "open": true
+          }
+        },
+        "drive": {
+          "open": true
+        },
         "open": true,
         "scoraling": {
           "scoral": {
@@ -81,16 +112,10 @@
               "open": true
             }
           }
-        },
-        "vision": {
-          "open": true
         }
       },
       "SmartDashboard": {
-        "VisionSystemSim-main": {
-          "Sim Field": {
-            "open": true
-          },
+        "PDH": {
           "open": true
         }
       },
@@ -101,10 +126,24 @@
       },
       "notfound": {
         "open": true
+      },
+      "photonvision": {
+        "front left": {
+          "open": true
+        }
       }
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
     "visible": true
   }
 }

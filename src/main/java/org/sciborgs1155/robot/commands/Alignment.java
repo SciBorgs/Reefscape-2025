@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,9 +16,6 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
@@ -34,13 +32,13 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Alignment implements Logged {
-  @IgnoreLogged private final Drive drive;
-  @IgnoreLogged private final Elevator elevator;
-  @IgnoreLogged private final Scoral scoral;
-  @IgnoreLogged private final LEDs leds;
+public class Alignment {
+  @NotLogged private final Drive drive;
+  @NotLogged private final Elevator elevator;
+  @NotLogged private final Scoral scoral;
+  @NotLogged private final LEDs leds;
 
-  @Log.NT private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+  private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
   private Fault alternateAlliancePathfinding =
       new Fault(
@@ -72,7 +70,12 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
-            Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
+            Commands.runOnce(
+                    () ->
+                        Epilogue.getConfig()
+                            .backend
+                            .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
+                .asProxy(),
             pathfind(goal).withName("go to reef").asProxy(),
             Commands.deadline(
                 Commands.sequence(
@@ -138,7 +141,11 @@ public class Alignment implements Logged {
   }
 
   public Command alignTo(Supplier<Pose2d> goal) {
-    return Commands.runOnce(() -> log("goal pose", goal.get()))
+    return Commands.runOnce(
+            () ->
+                Epilogue.getConfig()
+                    .backend
+                    .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
         .andThen(
             pathfind(goal)
                 .asProxy()
@@ -268,24 +275,4 @@ public class Alignment implements Logged {
         .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }
-
-  // @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d kll = Face.KL.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d abr = Face.AB.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d efr = Face.EF.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
-
-  // @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
-  // @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
-  // @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
-  // @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
-  // @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
-  // @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }

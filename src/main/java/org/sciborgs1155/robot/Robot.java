@@ -23,26 +23,8 @@ import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
-import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
-import monologue.Monologue;
+
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
@@ -66,13 +48,31 @@ import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 import org.sciborgs1155.robot.vision.Vision;
 
+import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class Robot extends CommandRobot implements Logged {
+@Logged
+public class Robot extends CommandRobot {
   // INPUT DEVICES
   private final CommandXboxController operator = new CommandXboxController(OI.OPERATOR);
   private final CommandXboxController driver = new CommandXboxController(OI.DRIVER);
@@ -81,45 +81,48 @@ public class Robot extends CommandRobot implements Logged {
   private final PowerDistribution pdh = new PowerDistribution();
 
   // SUBSYSTEMS
+  @Logged
   private final Drive drive =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
         default -> Drive.none();
       };
-
+  @Logged
   private final Vision vision =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
-  @IgnoreLogged
+  @Logged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Elevator.create();
-        default -> Elevator.none();
+        default -> Elevator.create();
       };
 
-  @IgnoreLogged
+  @Logged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Scoral.create();
         default -> Scoral.none();
       };
 
-  @IgnoreLogged
+  @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING -> Hopper.none(); // Hopper.create();
         default -> Hopper.none();
       };
 
+  @Logged
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Coroller.create();
         default -> Coroller.none();
       };
 
+  @Logged
   private final Arm arm =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Arm.create();
@@ -132,13 +135,13 @@ public class Robot extends CommandRobot implements Logged {
   // private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
-  @Log.NT private final Alignment align = new Alignment(drive, elevator, scoral, leds);
+  private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
-  @Log.NT
+  @Logged
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
-  @Log.NT private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
+  @Logged private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -169,40 +172,40 @@ public class Robot extends CommandRobot implements Logged {
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
-    Monologue.setupMonologue(this, "/Robot", false, true);
     SignalLogger.enableAutoLogging(true);
-    addPeriodic(Monologue::updateAll, PERIOD.in(Seconds));
     addPeriodic(FaultLogger::update, 2);
-    addPeriodic(vision::logCamEnabled, 1);
+    Epilogue.bind(this);
+    // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
-
-    // Log PDH
-    SmartDashboard.putData("PDH", pdh);
     FaultLogger.register(pdh);
 
     if (TUNING) {
       addPeriodic(
           () ->
-              log(
-                  "camera transforms",
-                  Arrays.stream(vision.cameraTransforms())
-                      .map(
-                          t ->
-                              new Pose3d(
-                                  drive
-                                      .pose3d()
-                                      .getTranslation()
-                                      .plus(
-                                          t.getTranslation()
-                                              .rotateBy(drive.pose3d().getRotation())),
-                                  t.getRotation().plus(drive.pose3d().getRotation())))
-                      .toArray(Pose3d[]::new)),
+              Epilogue.getConfig()
+                  .backend
+                  .log(
+                      "/Robot/camera transforms",
+                      Arrays.stream(vision.cameraTransforms())
+                          .map(
+                              t ->
+                                  new Pose3d(
+                                      drive
+                                          .pose3d()
+                                          .getTranslation()
+                                          .plus(
+                                              t.getTranslation()
+                                                  .rotateBy(drive.pose3d().getRotation())),
+                                      t.getRotation().plus(drive.pose3d().getRotation())))
+                          .toArray(Pose3d[]::new),
+                      Pose3d.struct),
           PERIOD.in(Seconds));
     }
 
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
-    addPeriodic(() -> drive.updatePoseEstimate(vision.estimatedGlobalPoses()), PERIOD);
+    addPeriodic(
+        () -> drive.updatePoseEstimate(vision.estimatedGlobalPoses(drive.heading())), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -220,9 +223,8 @@ public class Robot extends CommandRobot implements Logged {
 
   /** Configures trigger -> command bindings. */
   private void configureBindings() {
-    InputStream raw_x = InputStream.of(driver::getLeftY).log("raw x").negate();
-    InputStream raw_y = InputStream.of(driver::getLeftX).log("raw y").negate();
-
+    InputStream raw_x = InputStream.of(driver::getLeftY).log("/Robot/raw x").negate();
+    InputStream raw_y = InputStream.of(driver::getLeftX).log("/Robot/raw y").negate();
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(raw_x, raw_y)
@@ -239,10 +241,10 @@ public class Robot extends CommandRobot implements Logged {
     // Split x and y components of translation input
     InputStream x =
         r.scale(theta.map(Math::cos))
-            .log("final x"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+            .log("/Robot/final x"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
     InputStream y =
         r.scale(theta.map(Math::sin))
-            .log("final y"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
+            .log("/Robot/final y"); // .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond));
 
     // Apply speed multiplier, deadband, square inputs, and scale rotation to max teleop speed
     InputStream omega =
@@ -398,7 +400,7 @@ public class Robot extends CommandRobot implements Logged {
     scoral.blocked.onFalse(leds.blink(Color.kLime));
   }
 
-  @Log.NT
+  @Logged
   public boolean isBlueAlliance() {
     return alliance() == Alliance.Blue;
   }

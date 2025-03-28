@@ -4,12 +4,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -18,7 +17,7 @@ import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Scoraling implements Logged {
+public class Scoraling {
   private final Hopper hopper;
   private final Scoral scoral;
   private final Elevator elevator;
@@ -37,7 +36,7 @@ public class Scoraling implements Logged {
     hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
   }
 
-  @Log.NT private boolean stop = false;
+  @Logged private boolean stop = false;
 
   public Command noElevatorIntake() {
     return Commands.runOnce(() -> stop = false)

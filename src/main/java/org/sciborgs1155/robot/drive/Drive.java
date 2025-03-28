@@ -7,15 +7,40 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
-import static org.sciborgs1155.lib.Assertion.*;
+import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.Robot.MASS;
 import static org.sciborgs1155.robot.Constants.Robot.MOI;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
-import static org.sciborgs1155.robot.Ports.Drive.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
+import static org.sciborgs1155.robot.drive.DriveConstants.ANGULAR_OFFSETS;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_DRIVING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_ROTATING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.COLLISION_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.DRIVE_MODE;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SKID_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_TILT_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
+import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
+import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -26,6 +51,9 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -62,7 +90,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -71,9 +98,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
@@ -93,39 +117,52 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
-public class Drive extends SubsystemBase implements Logged, AutoCloseable {
+@Logged
+public class Drive extends SubsystemBase implements AutoCloseable {
   // Modules
   private final ModuleIO frontLeft;
   private final ModuleIO frontRight;
   private final ModuleIO rearLeft;
   private final ModuleIO rearRight;
 
-  @IgnoreLogged private final List<ModuleIO> modules;
+  @NotLogged private final List<ModuleIO> modules;
 
   private final BooleanSupplier[] modulesStalling;
 
   // Gyro
   private final GyroIO gyro;
-  private static Rotation2d simRotation = Rotation2d.kZero;
+  @Logged private static Rotation2d simRotation = Rotation2d.kZero;
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
+  @NotLogged
   private final DoubleEntry translationP =
       Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
+
+  @NotLogged
   private final DoubleEntry translationI =
       Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
+
+  @NotLogged
   private final DoubleEntry translationD =
       Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
 
+  @NotLogged
   private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+
+  @NotLogged
   private final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+
+  @NotLogged
   private final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
 
+  @NotLogged
   private final DoubleEntry maxAccel =
       Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
-  private final DoubleEntry maxSkidAccel =
-      Tuning.entry(
-          "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
+
+  @NotLogged private final DoubleEntry maxSkidAccel;
+
+  @NotLogged
   private final DoubleEntry maxTiltAccel =
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
@@ -137,15 +174,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final FOMPoseEstimator poseEstimator;
 
   public Vector<N3> odometryFOM() {
-  Vector<N3> fom = VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 1e-10 : 1e20)//Double.MAX_VALUE)
-  .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
-    log("x fom", fom.get(0));
-    log("y fom", fom.get(1));
-    log("theta fom", fom.get(2));
+    Vector<N3> fom =
+        VecBuilder.fill(1, 1, DriverStation.isEnabled() ? 1e-10 : 1e20) // Double.MAX_VALUE)
+            .times((isSkidding() ? 3 : 1) + (isColliding() ? 3 : 1));
+    // log("x fom", fom.get(0));
+    // log("y fom", fom.get(1));
+    // log("theta fom", fom.get(2));
     return fom;
   }
 
-  @Log.NT private final Field2d field2d = new Field2d();
+  @Logged private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
 
   // Characterization routines
@@ -160,7 +198,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public static final ReentrantLock lock = new ReentrantLock();
 
   // Movement automation
-  @Log.NT
+  @Logged
   private final ProfiledPIDController translationController =
       new ProfiledPIDController(
           translationP.get(),
@@ -168,7 +206,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           translationD.get(),
           new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
 
-  @Log.NT
+  @Logged
   private final PIDController rotationController =
       new PIDController(rotationP.get(), rotationI.get(), rotationD.get());
 
@@ -229,6 +267,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /** A swerve drive subsystem containing four {@link ModuleIO} modules and a gyroscope. */
   public Drive(
       GyroIO gyro, ModuleIO frontLeft, ModuleIO frontRight, ModuleIO rearLeft, ModuleIO rearRight) {
+    this.maxSkidAccel =
+        Tuning.entry(
+            "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
     this.gyro = gyro;
     this.frontLeft = frontLeft;
     this.frontRight = frontRight;
@@ -379,7 +420,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The pose.
    */
-  @Log.NT
+  @Logged
   public Pose2d pose() {
     return poseEstimator.pose();
   }
@@ -394,7 +435,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The rotation.
    */
-  @Log.NT
+  @Logged
   public Rotation2d heading() {
     return pose().getRotation();
   }
@@ -569,7 +610,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
   }
 
-  @Log.NT
+  @Logged
   public boolean atRotationalSetpoint() {
     return rotationController.atSetpoint();
   }
@@ -665,7 +706,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     Vector<N2> limitedVelocity = currentVelocity.plus(limitedDeltaV);
     desiredAcceleration = limitedDeltaV.div(PERIOD.in(Seconds));
 
-    log("forward accel limit", (skidAccelerationLimit(deltaV)).norm());
+    Epilogue.getConfig()
+        .backend
+        .log("/Robot/drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
 
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
@@ -697,7 +740,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
         maxAccel.get()
             * PERIOD.in(Seconds)
             * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
-    log("accel limit", limit);
+    Epilogue.getConfig().backend.log("/Robot/drive/accel limit", limit);
     Vector<N2> proj = deltaV.projection(currVel);
     if (proj.norm() > limit && proj.dot(currVel) > 0) {
       Vector<N2> parallel = proj.unit().times(limit);
@@ -773,7 +816,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
-          log("driveTo goal", targetPose);
+          Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -837,7 +880,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return If the robot is skidding.
    */
-  @Log.NT
+  @Logged
   public boolean isSkidding() {
     DoubleSummaryStatistics diffs =
         Arrays.stream(moduleStates())
@@ -856,14 +899,14 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /**
    * @return If the robot is colliding.
    */
-  @Log.NT
+  @Logged
   public boolean isColliding() {
-    log("accel", gyro.acceleration().norm());
+    // log("accel", gyro.acceleration().norm());
     return gyro.acceleration().norm() - desiredAcceleration.norm()
         > COLLISION_THRESHOLD.in(MetersPerSecondPerSecond);
   }
 
-  @Log.NT
+  @Logged
   public boolean isStalling() {
     return Arrays.stream(modulesStalling)
         .map(bs -> bs.getAsBoolean())
@@ -881,18 +924,19 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns the module states. */
-  @Log.NT
+  @Logged
   public SwerveModuleState[] moduleStates() {
     return modules.stream().map(ModuleIO::state).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the module states. */
-  @Log.NT
-  private SwerveModuleState[] moduleSetpoints() {
+  @Logged
+  public SwerveModuleState[] moduleSetpoints() {
     return modules.stream().map(ModuleIO::desiredState).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the module positions. */
+  @Logged
   public SwerveModulePosition[] modulePositions() {
     return modules.stream().map(ModuleIO::position).toArray(SwerveModulePosition[]::new);
   }
@@ -907,7 +951,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeChassisSpeeds(), heading());
   }
 
-  @Log.NT
+  @Logged
   private double odomFOM() {
     return 1
         - (isSkidding() ? 0.6 : 0) // reduce FOM if skidding
@@ -1040,7 +1084,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
 
-    log("estimated poses", loggedEstimates);
+    // log("estimated poses", loggedEstimates);
 
     Tracer.endTrace();
   }
@@ -1063,7 +1107,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
     }
 
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+    // log("command",
+    // Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   @Override
