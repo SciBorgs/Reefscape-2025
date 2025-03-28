@@ -92,11 +92,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Logged private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
-  @Logged
+  @NotLogged
   private final ElevatorVisualizer setpoint =
       new ElevatorVisualizer("setpoint visualizer", new Color8Bit(0, 0, 255));
 
-  @Logged
+  @NotLogged
   private final ElevatorVisualizer measurement =
       new ElevatorVisualizer("measurement visualizer", new Color8Bit(255, 0, 0));
 
