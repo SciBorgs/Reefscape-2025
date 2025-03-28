@@ -113,7 +113,7 @@ public final class DriveConstants {
           );
 
   public static final class Translation {
-    public static final double P = 3.0;
+    public static final double P = 4.0;
     public static final double I = 0.0;
     public static final double D = 0.05;
 

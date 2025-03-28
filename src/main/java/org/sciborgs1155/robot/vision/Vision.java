@@ -152,7 +152,7 @@ public class Vision {
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();
-
+        
         estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
