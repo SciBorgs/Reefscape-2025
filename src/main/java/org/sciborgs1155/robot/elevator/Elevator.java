@@ -93,10 +93,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   @Logged private final ElevatorFeedforward ff = new ElevatorFeedforward(kS, kG, kV, kA);
 
   @Logged
-  private final ElevatorVisualizer setpoint = new ElevatorVisualizer(new Color8Bit(0, 0, 255));
+  private final ElevatorVisualizer setpoint =
+      new ElevatorVisualizer("setpoint visualizer", new Color8Bit(0, 0, 255));
 
   @Logged
-  private final ElevatorVisualizer measurement = new ElevatorVisualizer(new Color8Bit(255, 0, 0));
+  private final ElevatorVisualizer measurement =
+      new ElevatorVisualizer("measurement visualizer", new Color8Bit(255, 0, 0));
 
   @NotLogged private final DoubleEntry S = Tuning.entry("/Robot/tuning/elevator/kS", kS);
   @NotLogged private final DoubleEntry G = Tuning.entry("/Robot/tuning/elevator/kG", kG);
@@ -123,25 +125,25 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     if (TUNING) {
       SmartDashboard.putData(
-          "elevator quasistatic forward",
+          "Robot/elevator/quasistatic forward",
           sysIdRoutine
               .quasistatic(Direction.kForward)
               .until(() -> atPosition(Level.L4.extension.in(Meters)))
               .withName("elevator quasistatic forward"));
       SmartDashboard.putData(
-          "elevator quasistatic backward",
+          "Robot/elevator/quasistatic backward",
           sysIdRoutine
               .quasistatic(Direction.kReverse)
               .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
               .withName("elevator quasistatic backward"));
       SmartDashboard.putData(
-          "elevator dynamic forward",
+          "Robot/elevator/dynamic forward",
           sysIdRoutine
               .dynamic(Direction.kForward)
               .until(() -> atPosition(Level.L4.extension.in(Meters)))
               .withName("elevator dynamic forward"));
       SmartDashboard.putData(
-          "elevator dynamic backward",
+          "Robot/elevator/dynamic backward",
           sysIdRoutine
               .dynamic(Direction.kReverse)
               .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))

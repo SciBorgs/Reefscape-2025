@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -204,6 +205,8 @@ public class Robot extends CommandRobot {
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
 
+    addPeriodic(() -> SmartDashboard.putData("Autos Chooser", autos), PERIOD);
+
     RobotController.setBrownoutVoltage(6.0);
 
     if (isReal()) {
@@ -263,7 +266,8 @@ public class Robot extends CommandRobot {
         .onTrue(
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
-        .onFalse(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
+        .onFalse(
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
