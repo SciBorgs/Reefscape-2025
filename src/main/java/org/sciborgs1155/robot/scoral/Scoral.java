@@ -70,9 +70,9 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
     return run(() -> scoral.set(SCORE_POWER)).withName("score");
   }
 
+  /** Runs the motor to move a coral inwards. */
   public Command reverse() {
     return run(() -> scoral.set(-SCORE_POWER)).withName("score");
-
   }
 
   /** Slowly runs the motor to move a coral out of the scoral outwards. */
@@ -90,8 +90,13 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
     return run(() -> algae.set(SCORE_POWER)).withName("expalgae");
   }
 
+  /** Intakes coral and raises the lower algae claw. */
   public Command intake() {
-    return run(() -> scoral.set(INTAKE_POWER * 0.6)).withName("intake");
+    return run(() -> {
+          scoral.set(INTAKE_POWER * 0.6);
+          algae.set(SCORE_POWER);
+        })
+        .withName("intake");
   }
 
   /** Stops the motor */

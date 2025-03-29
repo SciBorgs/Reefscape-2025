@@ -21,6 +21,7 @@
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -74,6 +75,11 @@
         }
       },
       "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Chooser": {
         "window": {
           "visible": true
         }

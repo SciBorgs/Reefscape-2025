@@ -66,7 +66,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to intake corals.
    */
   public Command intake() {
-    return run(HopperConstants.INTAKE_POWER); // more logic later
+    return run(HopperConstants.INTAKE_POWER).withName("intake"); // more logic later
   }
 
   /**
@@ -75,7 +75,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to outtake corals.
    */
   public Command outtake() {
-    return run(-HopperConstants.INTAKE_POWER);
+    return run(-HopperConstants.INTAKE_POWER).withName("outtake");
   }
 
   /**
@@ -84,7 +84,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to stop the hopper.
    */
   public Command stop() {
-    return run(0);
+    return run(0).withName("stop");
   }
 
   @Override

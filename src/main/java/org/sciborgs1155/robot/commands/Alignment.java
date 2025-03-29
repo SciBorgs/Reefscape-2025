@@ -81,7 +81,7 @@ public class Alignment {
             Commands.waitSeconds(1),
             Commands.deadline(
                 Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    drive.driveTo(() -> branch.pose().transformBy(advance(Meters.of(-1)))).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
                         .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
@@ -227,7 +227,7 @@ public class Alignment {
                   elevator::position);
               Tracer.endTrace();
             })
-        .until(() -> drive.atTranslation(goal.get().getTranslation(), Meters.of(1)))
+        .until(() -> drive.atPose(goal.get()))
         .onlyWhile(
             () ->
                 !FaultLogger.report(

@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -108,7 +109,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.none();
+        case FULL, SCORALING -> Hopper.create();
         default -> Hopper.none();
       };
 
@@ -134,7 +135,6 @@ public class Robot extends CommandRobot {
   // COMMANDS
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
-  @Logged
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
@@ -175,6 +175,7 @@ public class Robot extends CommandRobot {
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
     FaultLogger.register(pdh);
+    SmartDashboard.putData("Auto Chooser", autos);
 
     if (TUNING) {
       addPeriodic(
@@ -335,20 +336,20 @@ public class Robot extends CommandRobot {
         .whileTrue(
             align
                 .nearAlgae()
-                        .alongWith(
-                            leds.progressGradient(
-                                () -> 1 - elevator.position() / Level.L2_ALGAE.extension.in(Meters),
-                                elevator::atGoal)));
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L2_ALGAE.extension.in(Meters),
+                        elevator::atGoal)));
 
     driver
         .povRight()
         .whileTrue(
             align
                 .nearAlgae()
-                        .alongWith(
-                            leds.progressGradient(
-                                () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
-                                elevator::atGoal)));
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
+                        elevator::atGoal)));
 
     // driver.povUp().whileTrue(coroller.intake());
 
