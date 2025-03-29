@@ -23,6 +23,7 @@
       "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/arm dynamic backward": "Command",
       "/SmartDashboard/arm dynamic forward": "Command",
@@ -77,12 +78,20 @@
         "window": {
           "visible": true
         }
+      },
+      "Robot/autos": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
     "retained": {
       "Robot": {
+        "autos": {
+          "open": true
+        },
         "open": true
       }
     },
