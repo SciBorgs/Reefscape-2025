@@ -6,7 +6,6 @@ import static org.sciborgs1155.robot.Constants.CHECKPOINT_TIME;
 import static org.sciborgs1155.robot.Constants.Robot.*;
 import static org.sciborgs1155.robot.Constants.advance;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
