@@ -2,7 +2,6 @@ package org.sciborgs1155.robot.hopper;
 
 import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import static org.sciborgs1155.robot.Ports.Hopper.BEAMBREAK;
 import static org.sciborgs1155.robot.Ports.Hopper.MOTOR;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -25,7 +24,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
 
   /** Creates a Hopper based on whether it is utilizing hardware. */
   public static Hopper create() {
-    return Robot.isReal() ? new Hopper(realMotor(), Beambreak.real(BEAMBREAK)) : none();
+    return Robot.isReal() ? new Hopper(realMotor(), Beambreak.none()) : none();
   }
 
   /** Creates a hopper sans hardware or simulation. */

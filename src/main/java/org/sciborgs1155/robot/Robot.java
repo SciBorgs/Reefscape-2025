@@ -108,7 +108,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING -> Hopper.none();
         default -> Hopper.none();
       };
 
@@ -264,7 +264,7 @@ public class Robot extends CommandRobot {
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
             Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY))
-                .alongWith(scoral.algae())
+                .alongWith(scoral.stealgae())
                 .withTimeout(0.5));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
@@ -328,9 +328,32 @@ public class Robot extends CommandRobot {
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
     // B for dashboard select
-    driver.povLeft().onTrue(drive.zeroHeading());
+    // driver.povLeft().onTrue(drive.zeroHeading());
 
-    driver.povUp().whileTrue(coroller.intake());
+    driver
+        .povLeft()
+        .whileTrue(
+            align
+                .nearAlgae()
+                        .alongWith(
+                            leds.progressGradient(
+                                () -> 1 - elevator.position() / Level.L2_ALGAE.extension.in(Meters),
+                                elevator::atGoal)));
+
+    driver
+        .povRight()
+        .whileTrue(
+            align
+                .nearAlgae()
+                        .alongWith(
+                            leds.progressGradient(
+                                () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
+                                elevator::atGoal)));
+
+    // driver.povUp().whileTrue(coroller.intake());
+
+    driver.povUp().whileTrue(align.nearAlgae());
+
     driver.povDown().whileTrue(coroller.outtake());
 
     // OPERATOR
@@ -347,8 +370,25 @@ public class Robot extends CommandRobot {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
-    operator.rightBumper().whileTrue(scoral.algae());
-    operator.x().whileTrue(scoral.scoreSlow());
+    operator.rightBumper().whileTrue(scoral.expalgae());
+
+    operator
+        .a()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L2_ALGAE)
+                .asProxy()
+                .alongWith(
+                    Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
+
+    operator
+        .x()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L3_ALGAE)
+                .asProxy()
+                .alongWith(
+                    Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());

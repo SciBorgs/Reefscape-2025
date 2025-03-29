@@ -62,7 +62,8 @@ public class ElevatorConstants {
     L3(Meters.of(0.822)),
     L4(Meters.of(1.39)),
 
-    L3_ALGAE(Meters.of(0.68286));
+    L2_ALGAE(Meters.of(0.119)),
+    L3_ALGAE(Meters.of(0.496));
 
     public final Distance extension;
 

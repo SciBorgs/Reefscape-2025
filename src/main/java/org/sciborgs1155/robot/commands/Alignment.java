@@ -78,6 +78,7 @@ public class Alignment {
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
             pathfind(goal).withName("go to reef").asProxy(),
+            Commands.waitSeconds(1),
             Commands.deadline(
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
@@ -179,6 +180,15 @@ public class Alignment {
    */
   public Command nearReef(Side side) {
     return alignTo(() -> Face.nearest(drive.pose()).branch(side).pose()).asProxy();
+  }
+
+  /**
+   * Finds the nearest reef face, then pathfinds right up to it.
+   *
+   * @return A Command to align to the nearest reef branch.
+   */
+  public Command nearAlgae() {
+    return alignTo(() -> Face.nearest(drive.pose()).pose()).asProxy();
   }
 
   /**

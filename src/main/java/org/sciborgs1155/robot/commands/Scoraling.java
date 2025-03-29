@@ -33,7 +33,8 @@ public class Scoraling {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
+    hopper.blocked.onFalse(Commands.runOnce(() -> stop = true));
+    scoral.blocked.onTrue(Commands.runOnce(() -> stop = true));
   }
 
   @Logged private boolean stop = false;
@@ -123,7 +124,7 @@ public class Scoraling {
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollersBack() {
-    return hopper.outtake().alongWith(scoral.algae()).withName("runningRollers");
+    return hopper.outtake().alongWith(scoral.reverse()).withName("runningRollers");
   }
 
   public Test runRollersTest() {
