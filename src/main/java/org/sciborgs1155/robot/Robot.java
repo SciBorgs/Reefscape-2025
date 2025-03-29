@@ -1,25 +1,42 @@
 package org.sciborgs1155.robot;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.disabled;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
-import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
+import java.util.Arrays;
+import java.util.List;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.sciborgs1155.lib.CommandRobot;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
 import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
+import org.sciborgs1155.robot.FieldConstants.Face.Side;
+import org.sciborgs1155.robot.Ports.OI;
+import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.commands.Alignment;
+import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Dashboard;
+import org.sciborgs1155.robot.commands.Scoraling;
+import org.sciborgs1155.robot.coroller.Coroller;
+import org.sciborgs1155.robot.drive.Drive;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
 import static org.sciborgs1155.robot.drive.DriveConstants.driveSimAdded;
+import org.sciborgs1155.robot.elevator.Elevator;
+import org.sciborgs1155.robot.elevator.ElevatorConstants;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
+import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDs;
+import org.sciborgs1155.robot.scoral.Scoral;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.intakeSim;
+import org.sciborgs1155.robot.vision.Vision;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
@@ -27,10 +44,16 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -43,31 +66,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.Arrays;
-import java.util.List;
-import org.ironmaple.simulation.SimulatedArena;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.sciborgs1155.lib.CommandRobot;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tracer;
-import org.sciborgs1155.robot.FieldConstants.Face.Side;
-import org.sciborgs1155.robot.Ports.OI;
-import org.sciborgs1155.robot.arm.Arm;
-import org.sciborgs1155.robot.commands.Alignment;
-import org.sciborgs1155.robot.commands.Autos;
-import org.sciborgs1155.robot.commands.Dashboard;
-import org.sciborgs1155.robot.commands.Scoraling;
-import org.sciborgs1155.robot.coroller.Coroller;
-import org.sciborgs1155.robot.drive.Drive;
-import org.sciborgs1155.robot.elevator.Elevator;
-import org.sciborgs1155.robot.elevator.ElevatorConstants;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
-import org.sciborgs1155.robot.hopper.Hopper;
-import org.sciborgs1155.robot.led.LEDs;
-import org.sciborgs1155.robot.scoral.Scoral;
-import org.sciborgs1155.robot.vision.Vision;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.disabled;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.teleop;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.test;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -237,8 +239,13 @@ public class Robot extends CommandRobot {
    * Gives the pose as modeled by the maplesim drivetrain. It should be the trusted pose in sim that
    * odometry tries to follow.
    */
-  @Logged
   public static Pose2d maplePose() {
+    Epilogue.getConfig()
+        .backend
+        .log(
+            "/Robot/maple pose",
+            driveSim.getSimulatedDriveTrainPose(),
+            Pose2d.struct);
     return driveSim.getSimulatedDriveTrainPose();
   }
 
