@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
+import static org.sciborgs1155.robot.FieldConstants.nearestBarge;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.NotLogged;
@@ -121,6 +122,15 @@ public class Alignment {
    */
   public Command source(Source source) {
     return alignTo(source::pose).deadlineFor(elevator.retract()).asProxy();
+  }
+
+  /**
+   * Pathfinds and aligns to the nearest barge position.
+   *
+   * @return A command to align to the barge.
+   */
+  public Command barge() {
+    return alignTo(() -> nearestBarge(drive.pose())).asProxy();
   }
 
   /**
