@@ -174,7 +174,6 @@ public class Robot extends CommandRobot {
     addPeriodic(FaultLogger::update, 2);
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
-    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     FaultLogger.register(pdh);
     SmartDashboard.putData(autos);
 
@@ -203,7 +202,7 @@ public class Robot extends CommandRobot {
 
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
+    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.heading())), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -265,7 +264,9 @@ public class Robot extends CommandRobot {
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY))
+                .alongWith(scoral.algae())
+                .withTimeout(0.5));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);

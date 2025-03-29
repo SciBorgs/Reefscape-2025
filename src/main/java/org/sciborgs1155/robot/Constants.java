@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -111,7 +110,6 @@ public class Constants {
 
   /** Describes physical properites of the robot. */
   public static class Robot {
-    public static final Mass MASS = Kilograms.of(25);
     public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.2);
 
     public static final Distance SIDE_LENGTH = Inches.of(28);

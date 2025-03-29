@@ -138,7 +138,7 @@ public class Vision {
    * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
    *     used for estimation.
    */
-  public PoseEstimate[] estimatedGlobalPoses() {
+  public PoseEstimate[] estimatedGlobalPoses(Rotation2d rotation) {
     Tracer.startTrace("get vision poses");
     List<PoseEstimate> estimates = new ArrayList<>();
     filteredEstimates.clear();
@@ -152,6 +152,8 @@ public class Vision {
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();
+
+        estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
@@ -237,12 +239,6 @@ public class Vision {
 
   public boolean getCameraStatus(String name) {
     return camerasEnabled.get(name);
-  }
-
-  public void feedEstimatorHeading(Rotation2d heading) {
-    for (PhotonPoseEstimator estimator : estimators) {
-      estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
-    }
   }
 
   public void setPoseStrategy(PoseStrategy strategy) {

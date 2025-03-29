@@ -27,39 +27,6 @@ import org.sciborgs1155.robot.scoral.Scoral;
 public class Autos {
   public static SendableChooser<Command> configureAutos(
       Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment, Scoral scoral) {
-    // AutoBuilder.configure(
-    //     drive::pose,
-    //     drive::resetOdometry,
-    //     drive::robotRelativeChassisSpeeds,
-    //     (s, g) -> drive.setChassisSpeeds(s, ControlMode.CLOSED_LOOP_VELOCITY,
-    // elevator.position()),
-    //     new PPHolonomicDriveController(
-    //         new PIDConstants(Translation.P, Translation.I, Translation.D),
-    //         new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-    //     new RobotConfig(
-    //         MASS.in(Kilograms),
-    //         MOI.in(KilogramSquareMeters),
-    //         new ModuleConfig(
-    //             WHEEL_RADIUS,
-    //             MAX_SPEED,
-    //             WHEEL_COF,
-    //             DCMotor.getNEO(1).withReduction(Driving.GEARING),
-    //             Driving.STATOR_LIMIT,
-    //             1),
-    //         MODULE_OFFSET),
-    //     () -> false,
-    //     drive);
-
-    // NamedCommands.registerCommand(
-    //     "elevator L4", new ScheduleCommand(elevator.scoreLevel(Level.L4)));
-
-    // NamedCommands.registerCommand(
-    //     "score L4", new ScheduleCommand(scoraling.scoral(Level.L4)).withTimeout(1));
-
-    // NamedCommands.registerCommand("intake", new ScheduleCommand(scoraling.hpsIntake()));
-
-    // NamedCommands.registerCommand("retract", new ScheduleCommand(scoraling.retract()));
-
     SendableChooser<Command> chooser = new SendableChooser<>();
     chooser.addOption("no auto", Commands.none());
     chooser.addOption("B4", B4(alignment, scoraling));
