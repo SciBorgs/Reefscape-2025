@@ -95,7 +95,7 @@ public class Robot extends CommandRobot {
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Elevator.create();
-        default -> Elevator.create();
+        default -> Elevator.none();
       };
 
   @Logged
@@ -108,7 +108,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.none(); // Hopper.create();
+        case FULL, SCORALING -> Hopper.create();
         default -> Hopper.none();
       };
 

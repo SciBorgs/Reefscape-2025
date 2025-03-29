@@ -87,7 +87,7 @@ public class Constants {
         new Translation2d(distance.in(Meters), Rotation2d.kZero), Rotation2d.kZero);
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.CHASSIS;
+  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = true;
 
