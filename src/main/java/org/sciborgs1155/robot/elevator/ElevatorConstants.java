@@ -66,9 +66,9 @@ public class ElevatorConstants {
 
   public enum Level {
     L1(Meters.of(0.3)),
-    L2(Meters.of(0.427)),
-    L3(Meters.of(0.82)),
-    L4(Meters.of(1.42)),
+    L2(Meters.of(0.488)),
+    L3(Meters.of(0.822)),
+    L4(Meters.of(1.39)),
 
     L3_ALGAE(Meters.of(0.68286));
 

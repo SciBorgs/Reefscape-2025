@@ -7,7 +7,9 @@ public interface ScoralIO extends AutoCloseable {
    * @param power the percent power from -1 to 1
    * @param outtaking indicates whether the current action taken by the scoral is outtaking or not
    */
-  void set(double power, boolean outtaking);
+  void scoralPower(double power, boolean outtaking);
+
+  void algaePower(double power, boolean outtaking);
 
   /**
    * @return a boolean indicating whether there is a coral in the scoral mechanism

@@ -30,6 +30,7 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class AlignTest {
@@ -39,6 +40,7 @@ public class AlignTest {
   Hopper hopper;
   Alignment align;
   Scoraling scoraling;
+  LEDs leds;
 
   @BeforeEach
   public void setup() {
@@ -47,7 +49,8 @@ public class AlignTest {
     elevator = Elevator.create();
     scoral = Scoral.create();
     hopper = Hopper.create();
-    scoraling = new Scoraling(hopper, scoral, elevator);
+    leds = LEDs.create();
+    scoraling = new Scoraling(hopper, scoral, elevator, leds);
 
     if (!driveSimAdded) {
       SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
@@ -56,7 +59,7 @@ public class AlignTest {
 
     drive.resetEncoders();
     drive.resetOdometry(new Pose2d());
-    align = new Alignment(drive, elevator, scoral, scoraling);
+    align = new Alignment(drive, elevator, scoral, scoraling, leds);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.notifyNewData();
   }

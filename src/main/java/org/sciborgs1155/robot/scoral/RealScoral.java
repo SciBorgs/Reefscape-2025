@@ -1,8 +1,7 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
-import static org.sciborgs1155.robot.Ports.Scoral.BEAMBREAK;
-import static org.sciborgs1155.robot.Ports.Scoral.ROLLER;
+import static org.sciborgs1155.robot.Ports.Scoral.*;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
 import static org.sciborgs1155.robot.scoral.ScoralConstants.STATOR_LIMIT;
 
@@ -14,7 +13,8 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
 
 public class RealScoral implements ScoralIO {
-  TalonFX motor = new TalonFX(ROLLER, "rio");
+  TalonFX scoral = new TalonFX(SCORAL, "rio");
+  TalonFX algae = new TalonFX(ALGAE, "rio");
   DigitalInput beambreak = new DigitalInput(BEAMBREAK);
 
   public RealScoral() {
@@ -24,14 +24,12 @@ public class RealScoral implements ScoralIO {
     config.CurrentLimits.SupplyCurrentLimit = CURRENT_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    FaultLogger.register(motor);
-    TalonUtils.addMotor(motor);
-    motor.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void set(double power, boolean outtaking) {
-    motor.set(power);
+    FaultLogger.register(scoral);
+    TalonUtils.addMotor(scoral);
+    FaultLogger.register(algae);
+    TalonUtils.addMotor(algae);
+    scoral.getConfigurator().apply(config);
+    algae.getConfigurator().apply(config);
   }
 
   @Override
@@ -42,6 +40,17 @@ public class RealScoral implements ScoralIO {
   @Override
   public void close() throws Exception {
     beambreak.close();
-    motor.close();
+    scoral.close();
+    algae.close();
+  }
+
+  @Override
+  public void scoralPower(double power, boolean outtaking) {
+    scoral.setVoltage(power);
+  }
+
+  @Override
+  public void algaePower(double power, boolean outtaking) {
+    algae.setVoltage(power);
   }
 }

@@ -3,20 +3,21 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.CORAL_FROM_CARRIAGE;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Set;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.sciborgs1155.lib.Assertion;
@@ -26,17 +27,20 @@ import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.hopper.Hopper;
+import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Scoraling implements Logged {
+public class Scoraling {
   private final Hopper hopper;
   private final Scoral scoral;
   private final Elevator elevator;
+  private final LEDs leds;
 
-  public Scoraling(Hopper hopper, Scoral scoral, Elevator elevator) {
+  public Scoraling(Hopper hopper, Scoral scoral, Elevator elevator, LEDs leds) {
     this.hopper = hopper;
     this.scoral = scoral;
     this.elevator = elevator;
+    this.leds = leds;
 
     /*
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
@@ -48,7 +52,7 @@ public class Scoraling implements Logged {
     // scoral.blocked.onTrue(Commands.runOnce(() -> stop = true));
   }
 
-  @Log.NT private boolean stop = false;
+  @Logged private boolean stop = false;
 
   public Command noElevatorIntake() {
     return Commands.runOnce(() -> stop = false)
@@ -88,8 +92,9 @@ public class Scoraling implements Logged {
     return elevator
         .scoreLevel(level)
         .alongWith(
-            Commands.waitUntil(elevator::atGoal)
-                .andThen(scoral.score(level).alongWith(shootCoral())))
+            Commands.waitUntil(elevator::atGoal).andThen(scoral.score()),
+            leds.progressGradient(
+                () -> 1 - elevator.position() / level.extension.in(Meters), elevator::atGoal))
         .withName("scoraling");
   }
 
@@ -114,7 +119,10 @@ public class Scoraling implements Logged {
   public Command cleanAlgae(Level level) {
     return elevator
         .clean(level)
-        .alongWith(Commands.waitUntil(elevator::atGoal).andThen(scoral.score()))
+        .alongWith(
+            Commands.waitUntil(elevator::atGoal).andThen(scoral.score()),
+            leds.progressGradient(
+                () -> 1 - elevator.position() / level.extension.in(Meters), elevator::atGoal))
         .onlyIf(scoral.blocked.negate())
         .withName("cleanAlgae");
   }
@@ -122,6 +130,14 @@ public class Scoraling implements Logged {
   /** A command which halts both the hopper and the scoral. */
   public Command stop() {
     return hopper.stop().alongWith(scoral.stop()).withName("stopping");
+  }
+
+  public Command retryIntake() {
+    return elevator
+        .scoreLevel(Level.L1)
+        .withTimeout(Seconds.of(0.2))
+        .asProxy()
+        .alongWith(runRollersBack().asProxy().until(hopper.blocked.negate()));
   }
 
   /**
@@ -132,6 +148,7 @@ public class Scoraling implements Logged {
     return hopper
         .intake()
         .alongWith(scoral.intake())
+        .andThen(leds.blink(Color.kGold).onlyIf(() -> !scoral.blocked.getAsBoolean()))
         // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
@@ -214,7 +231,7 @@ public class Scoraling implements Logged {
    * @return the pose of a coral if held in the scoral
    * Used to visualize coral in simulation.
    */
-  @Log
+  @Logged
   public Pose3d heldCoral() {
     if (!scoral.blocked.getAsBoolean()) {
       return new Pose3d();

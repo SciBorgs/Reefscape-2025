@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.FieldConstants.Branch;
@@ -19,7 +20,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
  * Dashboard listens to NetworkTable information from the Reefscape-2025-Dashboard, which can be
  * used as Triggers. Must call the configure() method.
  */
-public class Dashboard {
+public class Dashboard extends SubsystemBase implements AutoCloseable {
   private static NetworkTable base;
   private static NetworkTableEntry entryTargetBranch;
   private static NetworkTableEntry entryTargetLevel;
@@ -197,7 +198,7 @@ public class Dashboard {
     return new Trigger(() -> entryCameraBR.getBoolean(true));
   }
 
-  /** Returns a trigger based on the enabled status of camera back middle. */
+  /** Returns a boolean based on the enabled status of camera back middle. */
   public static Trigger cameraBM() {
     return new Trigger(() -> entryCameraBM.getBoolean(true));
   }
@@ -212,4 +213,7 @@ public class Dashboard {
         (meters - MIN_EXTENSION.in(Meters))
             / (MAX_EXTENSION.in(Meters) - MIN_EXTENSION.in(Meters)));
   }
+
+  @Override
+  public void close() throws Exception {}
 }

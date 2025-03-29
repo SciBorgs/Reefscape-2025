@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,15 +53,14 @@ public class FieldConstants {
               .getMeasureX()
               .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
           CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
-          Rotation2d.fromRotations(0));
+          Rotation2d.kZero);
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-              CENTER_REEF
-                  .getMeasureX()
-                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-              Rotation2d.fromRotations(0))
-          .transformBy(strafe(Inches.of(3)));
+          CENTER_REEF
+              .getMeasureX()
+              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+          Rotation2d.kZero);
 
   // Reef faces
 
@@ -154,9 +152,8 @@ public class FieldConstants {
     private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose =
-          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1)))
-              .transformBy(Constants.advance(Inches.of(-1.25)));
+      this.pose = pose.transformBy(Constants.strafe(Inches.of(-2)));
+      // .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
     public Pose2d pose() {
@@ -216,9 +213,9 @@ public class FieldConstants {
   }
 
   public static enum Cage {
-    LEFT(new Pose2d()),
-    MID(new Pose2d()),
-    RIGHT(new Pose2d());
+    LEFT(Pose2d.kZero),
+    MID(Pose2d.kZero),
+    RIGHT(Pose2d.kZero);
 
     private final Pose2d pose;
 
@@ -250,7 +247,7 @@ public class FieldConstants {
     }
   }
 
-  private static final Distance SOURCE_MID_DISPLACEMENT = Inches.of(20);
+  // private static final Distance SOURCE_MID_DISPLACEMENT = Inches.of(20);
 
   // Rotation of the top source (facing into the field)
   private static final Rotation2d SOURCE_ROTATION = Rotation2d.fromDegrees(90 - 144.011);
@@ -260,7 +257,7 @@ public class FieldConstants {
           new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
               .plus(
                   new Translation2d(
-                      Constants.Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                      Constants.Robot.BUMPER_LENGTH.in(Meters) / 2.0 + 0.05,
                       Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
           SOURCE_ROTATION);
 
@@ -269,7 +266,7 @@ public class FieldConstants {
           new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
               .plus(
                   new Translation2d(
-                      Constants.Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                      Constants.Robot.BUMPER_LENGTH.in(Meters) / 2.0 + 0.05,
                       Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
           SOURCE_ROTATION.unaryMinus());
 
@@ -298,13 +295,13 @@ public class FieldConstants {
   }
 
   // We don't have these poses. do NOT use them.
-  public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
+  // public static final Pose2d PROCESSOR = allianceReflect(Pose2d.kZero);
 
-  public static final Pose2d CAGE_1 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_2 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_3 = allianceReflect(new Pose2d());
+  // public static final Pose2d CAGE_1 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_2 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_3 = allianceReflect(Pose2d.kZero);
 
-  public static Pose2d nearestCage(Pose2d pose) {
-    return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
-  }
+  // public static Pose2d nearestCage(Pose2d pose) {
+  //   return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
+  // }
 }

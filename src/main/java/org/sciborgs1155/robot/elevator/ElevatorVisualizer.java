@@ -3,15 +3,14 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import monologue.Annotations.Log;
-import monologue.Logged;
 
-public class ElevatorVisualizer implements Logged {
-  @Log.NT private final Mechanism2d mech;
+public class ElevatorVisualizer {
+  @Logged private final Mechanism2d mech;
   private final MechanismLigament2d elevator;
 
   public ElevatorVisualizer(Color8Bit color) {

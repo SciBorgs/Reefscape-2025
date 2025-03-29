@@ -26,7 +26,8 @@ public class SimModule implements ModuleIO {
       new PIDController(Driving.PID.P, Driving.PID.I, Driving.PID.D);
 
   private final SimpleMotorFeedforward driveFF =
-      new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
+      new SimpleMotorFeedforward(
+          Driving.FRONT_LEFT_FF.kS(), Driving.FRONT_LEFT_FF.kV(), Driving.FRONT_LEFT_FF.kA());
 
   private final SimulatedMotorController.GenericMotorController turnMotor;
 

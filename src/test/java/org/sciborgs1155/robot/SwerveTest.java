@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -28,14 +29,11 @@ import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.drive.NoGyro;
-import org.sciborgs1155.robot.drive.OldSimModule;
+import org.sciborgs1155.robot.drive.SimGyro;
+import org.sciborgs1155.robot.drive.SimModule;
 
 /** Swerve test. Currently incomplete and does nothing. */
 public class SwerveTest {
-  OldSimModule frontLeft;
-  OldSimModule frontRight;
-  OldSimModule rearLeft;
-  OldSimModule rearRight;
   NoGyro gyro;
   Drive drive;
 
@@ -44,12 +42,16 @@ public class SwerveTest {
   @BeforeEach
   public void setup() {
     setupTests();
-    frontLeft = new OldSimModule("FL");
-    frontRight = new OldSimModule("FR");
-    rearLeft = new OldSimModule("RL");
-    rearRight = new OldSimModule("RR");
+    SwerveModuleSimulation[] modules = driveSim.getModules();
+
+    drive =
+        new Drive(
+            new SimGyro(driveSim.getGyroSimulation()),
+            new SimModule(modules[0], "FL"),
+            new SimModule(modules[1], "FR"),
+            new SimModule(modules[2], "RL"),
+            new SimModule(modules[3], "RR"));
     gyro = new NoGyro();
-    drive = new Drive(gyro, frontLeft, frontRight, rearLeft, rearRight);
 
     if (!driveSimAdded) {
       SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
@@ -72,15 +74,13 @@ public class SwerveTest {
   public void reachesRobotVelocity() {
     double xVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
     double yVelocitySetpoint = Math.random() * (2 * 2.265) - 2.265;
+
     run(
-        drive.run(
-            () ->
-                drive.setChassisSpeeds(
-                    new ChassisSpeeds(xVelocitySetpoint, yVelocitySetpoint, 0),
-                    ControlMode.CLOSED_LOOP_VELOCITY)));
+        drive.drive(
+            () -> xVelocitySetpoint, () -> yVelocitySetpoint, () -> Rotation2d.kZero, () -> 0));
     fastForward(500);
 
-    ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
+    ChassisSpeeds chassisSpeed = drive.fieldRelativeChassisSpeeds();
 
     assertEquals(xVelocitySetpoint, chassisSpeed.vxMetersPerSecond, DELTA);
     assertEquals(yVelocitySetpoint, chassisSpeed.vyMetersPerSecond, DELTA);
@@ -94,7 +94,8 @@ public class SwerveTest {
             () ->
                 drive.setChassisSpeeds(
                     new ChassisSpeeds(0, 0, omegaRadiansPerSecond),
-                    ControlMode.CLOSED_LOOP_VELOCITY)));
+                    ControlMode.CLOSED_LOOP_VELOCITY,
+                    0)));
     fastForward();
 
     ChassisSpeeds chassisSpeed = drive.robotRelativeChassisSpeeds();
@@ -118,7 +119,13 @@ public class SwerveTest {
 
     Command c =
         drive
-            .run(() -> drive.setChassisSpeeds(speeds, ControlMode.CLOSED_LOOP_VELOCITY))
+            .run(
+                () ->
+                    drive.setChassisSpeeds(
+                        ChassisSpeeds.fromFieldRelativeSpeeds(
+                            xVelocitySetpoint, yVelocitySetpoint, 0, drive.heading()),
+                        ControlMode.CLOSED_LOOP_VELOCITY,
+                        0))
             .withName(name);
 
     run(c);
@@ -151,7 +158,7 @@ public class SwerveTest {
 
     runToCompletion(
         drive
-            .assistedDrive(input::getX, input::getY, () -> 0, target)
+            .assistedDrive(input::getX, input::getY, () -> 0, target, () -> 0)
             .until(
                 () ->
                     target.getTranslation().minus(drive.pose().getTranslation()).getNorm()

@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import java.util.Queue;
 import org.sciborgs1155.lib.TalonUtils;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
+import org.sciborgs1155.robot.drive.DriveConstants.FFConstants;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
@@ -52,11 +54,12 @@ public class TalonModule implements ModuleIO {
       int turnPort,
       int sensorID,
       Rotation2d angularOffset,
+      FFConstants ff,
       String name,
       boolean invert) {
     // drive motor
     driveMotor = new TalonFX(drivePort, CANIVORE_NAME);
-    driveFF = new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
+    driveFF = new SimpleMotorFeedforward(ff.kS(), ff.kV(), ff.kA());
 
     TalonFXConfiguration talonDriveConfig = new TalonFXConfiguration();
 
@@ -106,8 +109,7 @@ public class TalonModule implements ModuleIO {
 
     // reduces update frequency on unnecessary signals
     // only reset on robot restart and redeploy or calling motor.resetSignalFrequencies()
-    driveMotor.optimizeBusUtilization();
-    turnMotor.optimizeBusUtilization();
+    ParentDevice.optimizeBusUtilizationForAll(driveMotor, turnMotor);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         1 / ODOMETRY_PERIOD.in(Seconds),
