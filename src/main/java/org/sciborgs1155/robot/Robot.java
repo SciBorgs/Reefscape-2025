@@ -328,6 +328,8 @@ public class Robot extends CommandRobot {
 
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
+    driver.y().whileTrue(align.barge());
+
     // B for dashboard select
     // driver.povLeft().onTrue(drive.zeroHeading());
 

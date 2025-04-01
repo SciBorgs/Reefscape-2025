@@ -4,7 +4,10 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
+import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
+import static org.sciborgs1155.robot.Constants.clamp;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,6 +33,42 @@ public class FieldConstants {
         && pose.getX() < LENGTH.in(Meters)
         && pose.getY() > 0
         && pose.getY() < WIDTH.in(Meters));
+  }
+
+  // TODO  hello!! IVAN!!! edit these as needed.
+
+  // The minimum field-relative Y that the robot goes to. This dictates how close to the center
+  // pillar the robot will try to score.
+  public static final Distance BARGE_MIN_Y = WIDTH.div(2).plus(Feet.of(2));
+
+  // The optimal X that the robot goes to. Increasing this value makes it go closer to the barge;
+  // decreasing makes it go farther.
+  public static final Distance BARGE_OPTIMAL_X = LENGTH.div(2).minus(Feet.of(4));
+
+  /**
+   * @param pose The field-relative pose of the robot.
+   * @return The nearest position to go to for the barge.
+   */
+  public static Pose2d nearestBarge(Pose2d pose) {
+    return allianceReflect(
+        new Pose2d(
+            BARGE_OPTIMAL_X.in(Meters),
+            clamp(
+                reflectDistance(pose.getMeasureY()).in(Meters),
+                BARGE_MIN_Y.in(Meters),
+                WIDTH.minus(BUMPER_LENGTH.div(2)).in(Meters)),
+            Rotation2d.kZero));
+  }
+
+  /**
+   * Reflects width-wise distances through the middle of the field if the alliance is red, otherwise
+   * does nothing
+   *
+   * @param blueDist The input distance, usually for the blue alliance.
+   * @return A reflected distance, only if the alliance is red.
+   */
+  private static Distance reflectDistance(Distance blueDist) {
+    return alliance() == Alliance.Blue ? blueDist : WIDTH.minus(blueDist);
   }
 
   public static final Distance REEF_MIN_RADIUS = Centimeters.of(166 / 2);

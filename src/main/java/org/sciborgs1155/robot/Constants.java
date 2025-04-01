@@ -87,6 +87,18 @@ public class Constants {
         new Translation2d(distance.in(Meters), Rotation2d.kZero), Rotation2d.kZero);
   }
 
+  /**
+   * Clamps a double between two other doubles; If it was already in between, this does nothing.
+   *
+   * @param value The value being clamped.
+   * @param min The maximum value.
+   * @param max The minimum value.
+   * @return A new double, in between the min and max.
+   */
+  public static double clamp(double value, double min, double max) {
+    return Math.min(Math.max(min, value), max);
+  }
+
   public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = true;
