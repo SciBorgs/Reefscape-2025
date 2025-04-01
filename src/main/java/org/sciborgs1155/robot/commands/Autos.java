@@ -28,6 +28,7 @@ public class Autos {
     chooser.addOption("no auto", Commands.none());
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
+    chooser.addOption("EVERYTHING!!!!", everything(alignment, scoraling));
     chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
     chooser.setDefaultOption(
         "line",
@@ -123,5 +124,9 @@ public class Autos {
 
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
     return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
+  }
+
+  public static Command everything(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(alignment, scoraling, List.of(Branch.values()));
   }
 }

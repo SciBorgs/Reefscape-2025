@@ -61,6 +61,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -215,6 +216,8 @@ public class Robot extends CommandRobot {
     }
 
     SimulatedArena.getInstance().resetFieldForAuto();
+
+    addPeriodic(() -> SmartDashboard.putData("Autos Chooser", autos), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 

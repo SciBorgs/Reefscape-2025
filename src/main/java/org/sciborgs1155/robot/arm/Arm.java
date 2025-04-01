@@ -59,7 +59,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   private final SysIdRoutine sysIdRoutine;
 
   /** Arm visualization software. */
-  @Logged private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
+  @NotLogged private final Mechanism2d armCanvas = new Mechanism2d(60, 60);
 
   private final MechanismRoot2d armRoot = armCanvas.getRoot("ArmPivot", 30, 30);
 
@@ -116,10 +116,10 @@ public class Arm extends SubsystemBase implements AutoCloseable {
             new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
 
     if (TUNING) {
-      SmartDashboard.putData("arm quasistatic forward", quasistaticForward());
-      SmartDashboard.putData("arm quasistatic backward", quasistaticBack());
-      SmartDashboard.putData("arm dynamic forward", dynamicForward());
-      SmartDashboard.putData("arm dynamic backward", dynamicBack());
+      SmartDashboard.putData("Robot/arm/quasistatic forward", quasistaticForward());
+      SmartDashboard.putData("Robot/arm/quasistatic backward", quasistaticBack());
+      SmartDashboard.putData("Robot/arm/dynamic forward", dynamicForward());
+      SmartDashboard.putData("Robot/arm/dynamic backward", dynamicBack());
     }
 
     Tuning.changes(A).onTrue(runOnce(() -> ff.setKa(A.get())).asProxy());
@@ -276,6 +276,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     armLigament.setAngle(Math.toDegrees(position()));
+    SmartDashboard.putData("Robot/arm/visualizer", armCanvas);
   }
 
   @Override

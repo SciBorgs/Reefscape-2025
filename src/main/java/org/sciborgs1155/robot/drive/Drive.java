@@ -316,38 +316,38 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     if (TUNING) {
       SmartDashboard.putData(
-          "translation quasistatic forward",
+          "Robot/translation/quasistatic forward",
           translationCharacterization
               .quasistatic(Direction.kForward)
               .withName("translation quasistatic forward"));
       SmartDashboard.putData(
-          "translation dynamic forward",
+          "Robot/translation/dynamic forward",
           translationCharacterization
               .dynamic(Direction.kForward)
               .withName("translation dynamic forward"));
       SmartDashboard.putData(
-          "translation quasistatic backward",
+          "Robot/translation/quasistatic backward",
           translationCharacterization.quasistatic(Direction.kReverse));
       SmartDashboard.putData(
-          "translation dynamic backward",
+          "Robot/translation/dynamic backward",
           translationCharacterization
               .dynamic(Direction.kReverse)
               .withName("translation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation quasistatic forward",
+          "Robot/rotation/quasistatic forward",
           rotationalCharacterization.quasistatic(Direction.kForward));
       SmartDashboard.putData(
-          "rotation dynamic forward",
+          "Robot/rotation/dynamic forward",
           rotationalCharacterization
               .dynamic(Direction.kForward)
               .withName("rotation quasistatic forward"));
       SmartDashboard.putData(
-          "rotation quasistatic backward",
+          "Robot/rotation/quasistatic backward",
           rotationalCharacterization
               .quasistatic(Direction.kReverse)
               .withName("rotation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation dynamic backward",
+          "Robot/rotation/dynamic backward",
           rotationalCharacterization
               .dynamic(Direction.kReverse)
               .withName("rotation dynamic backward"));
@@ -984,6 +984,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     // update our simulated field poses
     field2d.setRobotPose(pose());
+
+    SmartDashboard.putData("Drive Field", field2d);
 
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);

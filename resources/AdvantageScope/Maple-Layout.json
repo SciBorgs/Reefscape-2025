@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": 862,
-      "y": 157,
+      "x": 745,
+      "y": 117,
       "width": 988,
       "height": 711,
       "state": {
@@ -20,9 +20,9 @@
             "/SmartDashboard/field",
             "/Robot/vision",
             "/Robot/scoraling/elevator",
-            "/Robot/arm",
             "/Robot/scoraling",
-            "/Robot/algae"
+            "/Robot/arm",
+            "/Robot/elevator"
           ]
         },
         "tabs": {
@@ -82,7 +82,7 @@
                 "sources": [
                   {
                     "type": "robot",
-                    "logKey": "NT:/Robot/drive/pose",
+                    "logKey": "NT:Robot/drive/pose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -91,28 +91,28 @@
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/arm/pose",
+                    "logKey": "NT:Robot/arm/pose",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/elevator/stage1",
+                    "logKey": "NT:Robot/elevator/stage1",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/elevator/carriage",
+                    "logKey": "NT:Robot/elevator/carriage",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Robot/maplePose",
+                    "logKey": "NT:/Robot/maple pose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -122,28 +122,28 @@
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/arm/pose",
+                    "logKey": "NT:Robot/arm/pose",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/scoraling/elevator/stage1",
+                    "logKey": "NT:Robot/elevator/stage1",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/scoraling/elevator/carriage",
+                    "logKey": "NT:Robot/elevator/carriage",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "vision",
-                    "logKey": "NT:/Robot/vision/getSeenTags",
+                    "logKey": "NT:Robot/vision/getSeenTags",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
@@ -153,7 +153,7 @@
                   },
                   {
                     "type": "gamePiece",
-                    "logKey": "NT:/Robot/coral",
+                    "logKey": "NT:Robot/coral",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
@@ -162,7 +162,7 @@
                   },
                   {
                     "type": "gamePiece",
-                    "logKey": "NT:/Robot/algae",
+                    "logKey": "NT:Robot/algae",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
@@ -178,14 +178,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -4.105745943235434,
-                  3.9159518717273323,
-                  -5.740833631918833
+                  -3.1520269961957395,
+                  6.345779498601224,
+                  4.631533012848719
                 ],
                 "cameraTarget": [
-                  -1.0998066917232279,
-                  -2.337223493689779,
-                  -1.5199584719023445
+                  -3.3420213038424254,
+                  3.9651889357071948,
+                  1.7241453872032373
                 ]
               },
               "controlsHeight": 153
@@ -196,5 +196,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.2"
+  "version": "4.1.5"
 }

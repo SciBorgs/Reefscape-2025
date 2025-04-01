@@ -85,7 +85,7 @@ public class Alignment {
                     drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
-                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+                        .andThen(scoral.score().asProxy().alongWith(scoraling.shootCoral()).until(scoral.blocked.negate())),
                     moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
                 elevator.scoreLevel(level).asProxy(),
                 leds.error(
