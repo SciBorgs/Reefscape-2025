@@ -1,4 +1,3 @@
-
 package org.sciborgs1155.robot.vision;
 
 import static edu.wpi.first.units.Units.Degrees;

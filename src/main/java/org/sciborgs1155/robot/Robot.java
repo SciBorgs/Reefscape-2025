@@ -204,7 +204,8 @@ public class Robot extends CommandRobot {
 
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.gyroHeading())), PERIOD);
+    addPeriodic(
+        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.gyroHeading())), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
