@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1552,
-      "height": 832,
+      "width": 1619,
+      "height": 878,
       "state": {
         "sidebar": {
           "width": 354,
@@ -30,15 +30,17 @@
             "/NT/Robot/arm",
             "/Robot/align",
             "/Robot/vision",
-            "/Robot/drive",
             "/Robot/hopper",
             "/Robot/scoral",
             "/Robot/elevator",
-            "/Robot/LEDs"
+            "/Robot/LEDs",
+            "/Epilogue",
+            "/Epilogue/Stats",
+            "/Robot/arm"
           ]
         },
         "tabs": {
-          "selected": 6,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -304,9 +306,9 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  0.029924313106186817,
+                  0.029924313106187483,
                   9.452797703718385,
-                  2.6112246170279203
+                  2.611224617027906
                 ],
                 "cameraTarget": [
                   0.5407292492104125,
@@ -329,7 +331,13 @@
             {
               "type": 4,
               "title": "goals & beambreaks",
-              "controller": [],
+              "controller": [
+                "NT:Robot/drive/isStalling",
+                "NT:Robot/drive/isSkidding",
+                "NT:Robot/elevator/atGoal",
+                "NT:Robot/hopper/blocked",
+                "NT:Robot/scoral/blocked"
+              ],
               "controllerUUID": "azsxe2vuah56207xxjwonraxkcj3phjz",
               "renderer": null,
               "controlsHeight": 0
@@ -339,37 +347,14 @@
               "title": "commands",
               "controller": [
                 "NT:/Robot/scoral/command",
+                "NT:/Robot/elevator/command",
                 "NT:/Robot/hopper/command",
-                "NT:/Robot/elevator/commmand",
                 "NT:/Robot/drive/command",
                 "NT:/Robot/LEDs/command"
               ],
               "controllerUUID": "rlfjqqsvbtqe0qc2drsmrsow2sgds6so",
               "renderer": null,
               "controlsHeight": 0
-            },
-            {
-              "type": 10,
-              "title": "elevator",
-              "controller": [
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/Robot/scoraling/elevator/measurement/mech",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                },
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/Robot/scoraling/elevator/setpoint/mech",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                }
-              ],
-              "controllerUUID": "f98pjbda8cms2m293n75h0yjn4816cfz",
-              "renderer": null,
-              "controlsHeight": 200
             },
             {
               "type": 10,

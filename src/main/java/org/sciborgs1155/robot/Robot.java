@@ -175,7 +175,6 @@ public class Robot extends CommandRobot {
     Epilogue.bind(this);
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
-    addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     FaultLogger.register(pdh);
 
     if (TUNING) {
@@ -202,9 +201,8 @@ public class Robot extends CommandRobot {
     }
 
     // Configure pose estimation updates from vision every tick
-    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses()), PERIOD);
-
-    SmartDashboard.putData("Autos Chooser", autos);
+    // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
+    addPeriodic(() -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.heading())), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
