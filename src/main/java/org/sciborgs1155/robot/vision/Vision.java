@@ -152,7 +152,9 @@ public class Vision {
 
         int unreadLength = unreadChanges.size();
 
-        estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
+        if (estimators[i].getPrimaryStrategy() == PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
+          estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
+        }
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
