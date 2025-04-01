@@ -12,30 +12,13 @@ import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_CANCODER;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_DRIVE;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_TURNING;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_CANCODER;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_DRIVE;
-import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_TURNING;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_CANCODER;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_DRIVE;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_CANCODER;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
-import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
-import static org.sciborgs1155.robot.drive.DriveConstants.ANGULAR_OFFSETS;
-import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_DRIVING_THRESHOLD;
-import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_ROTATING_THRESHOLD;
-import static org.sciborgs1155.robot.drive.DriveConstants.DRIVE_MODE;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SKID_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
-import static org.sciborgs1155.robot.drive.DriveConstants.MAX_TILT_ACCEL;
-import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
+import static org.sciborgs1155.robot.Ports.Drive.*;
+import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
 import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
 import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -312,38 +295,38 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     if (TUNING) {
       SmartDashboard.putData(
-          "translation quasistatic forward",
+          "Robot/translation/quasistatic forward",
           translationCharacterization
               .quasistatic(Direction.kForward)
               .withName("translation quasistatic forward"));
       SmartDashboard.putData(
-          "translation dynamic forward",
+          "Robot/translation/dynamic forward",
           translationCharacterization
               .dynamic(Direction.kForward)
               .withName("translation dynamic forward"));
       SmartDashboard.putData(
-          "translation quasistatic backward",
+          "Robot/translation/quasistatic backward",
           translationCharacterization.quasistatic(Direction.kReverse));
       SmartDashboard.putData(
-          "translation dynamic backward",
+          "Robot/translation/dynamic backward",
           translationCharacterization
               .dynamic(Direction.kReverse)
               .withName("translation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation quasistatic forward",
+          "Robot/rotation/quasistatic forward",
           rotationalCharacterization.quasistatic(Direction.kForward));
       SmartDashboard.putData(
-          "rotation dynamic forward",
+          "Robot/rotation/dynamic forward",
           rotationalCharacterization
               .dynamic(Direction.kForward)
               .withName("rotation quasistatic forward"));
       SmartDashboard.putData(
-          "rotation quasistatic backward",
+          "Robot/rotation/quasistatic backward",
           rotationalCharacterization
               .quasistatic(Direction.kReverse)
               .withName("rotation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation dynamic backward",
+          "Robot/rotation/dynamic backward",
           rotationalCharacterization
               .dynamic(Direction.kReverse)
               .withName("rotation dynamic backward"));
@@ -980,6 +963,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     // update our simulated field poses
     field2d.setRobotPose(pose());
+
+    SmartDashboard.putData("Drive Field", field2d);
 
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);
