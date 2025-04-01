@@ -53,10 +53,10 @@ public final class Ports {
   }
 
   public static final class GroundIntake {
-    public static final int ARM_LEADER = 100;
-    public static final int ARM_FOLLOWER = 100;
-    public static final int ROLLER_MOTOR = 100;
-    public static final int CANCODER = 100;
+    public static final int ARM_LEADER = 99;
+    public static final int ARM_FOLLOWER = 101;
+    public static final int ROLLER_MOTOR = 102;
+    public static final int CANCODER = 103;
   }
 
   public static final class Elevator {
@@ -66,7 +66,7 @@ public final class Ports {
 
   public static final class Scoral {
     public static final int SCORAL = 15;
-    public static final int ALGAE = 16;
+    public static final int ALGAE = 17;
     public static final int BEAMBREAK = 1;
   }
 
@@ -75,7 +75,7 @@ public final class Ports {
   }
 
   public static final class Hopper {
-    public static final int MOTOR = 17;
+    public static final int MOTOR = 18;
     public static final int BEAMBREAK = 3;
   }
 }

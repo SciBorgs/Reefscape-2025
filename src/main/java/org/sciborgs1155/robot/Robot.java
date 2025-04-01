@@ -26,6 +26,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -135,7 +136,7 @@ public class Robot extends CommandRobot {
   // COMMANDS
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
-  @Logged
+  @NotLogged
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
@@ -176,6 +177,7 @@ public class Robot extends CommandRobot {
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
     FaultLogger.register(pdh);
+    SmartDashboard.putData("Auto Chooser", autos);
 
     if (TUNING) {
       addPeriodic(
@@ -327,9 +329,32 @@ public class Robot extends CommandRobot {
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
     // B for dashboard select
-    driver.povLeft().onTrue(drive.zeroHeading());
+    // driver.povLeft().onTrue(drive.zeroHeading());
 
-    driver.povUp().whileTrue(coroller.intake());
+    driver
+        .povLeft()
+        .whileTrue(
+            align
+                .nearAlgae()
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L2_ALGAE.extension.in(Meters),
+                        elevator::atGoal)));
+
+    driver
+        .povRight()
+        .whileTrue(
+            align
+                .nearAlgae()
+                .alongWith(
+                    leds.progressGradient(
+                        () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
+                        elevator::atGoal)));
+
+    // driver.povUp().whileTrue(coroller.intake());
+
+    driver.povUp().whileTrue(align.nearAlgae());
+
     driver.povDown().whileTrue(coroller.outtake());
 
     // OPERATOR
@@ -346,8 +371,25 @@ public class Robot extends CommandRobot {
     operator.rightTrigger().whileTrue(scoraling.hpsIntake());
 
     operator.leftBumper().whileTrue(scoral.score());
-    operator.rightBumper().whileTrue(scoral.algae());
-    operator.x().whileTrue(scoral.scoreSlow());
+    operator.rightBumper().whileTrue(scoral.expalgae());
+
+    operator
+        .a()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L2_ALGAE)
+                .asProxy()
+                .alongWith(
+                    Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
+
+    operator
+        .x()
+        .whileTrue(
+            elevator
+                .scoreLevel(Level.L3_ALGAE)
+                .asProxy()
+                .alongWith(
+                    Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
     operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());

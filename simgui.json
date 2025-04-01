@@ -13,7 +13,6 @@
       "/Faults/Total Faults": "Alerts",
       "/Robot/arm/armCanvas": "Mechanism2d",
       "/Robot/arm/fb": "ProfiledPIDController",
-      "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
@@ -21,7 +20,7 @@
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
-      "/SmartDashboard/Autos Chooser": "String Chooser",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
       "/SmartDashboard/Drive Field": "Field2d",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Robot/arm/dynamic backward": "Command",
@@ -73,7 +72,28 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Autos Chooser": {
+      "/Robot/drive/field2d": {
+        "bottom": 1638,
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/measurement/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Chooser": {
         "window": {
           "visible": true
         }
