@@ -79,9 +79,10 @@ public class Alignment {
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
             pathfind(goal).withName("go to reef").asProxy(),
+            Commands.waitSeconds(1),
             Commands.deadline(
                 Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(4),
+                    drive.driveTo(() -> branch.pose().transformBy(advance(Meters.of(-1)))).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
                         .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
@@ -192,6 +193,15 @@ public class Alignment {
   }
 
   /**
+   * Finds the nearest reef face, then pathfinds right up to it.
+   *
+   * @return A Command to align to the nearest reef branch.
+   */
+  public Command nearAlgae() {
+    return alignTo(() -> Face.nearest(drive.pose()).pose()).asProxy();
+  }
+
+  /**
    * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
    * level on that branch.
    *
@@ -227,7 +237,7 @@ public class Alignment {
                   elevator::position);
               Tracer.endTrace();
             })
-        .until(() -> drive.atTranslation(goal.get().getTranslation(), Meters.of(1)))
+        .until(() -> drive.atPose(goal.get()))
         .onlyWhile(
             () ->
                 !FaultLogger.report(

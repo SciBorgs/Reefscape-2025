@@ -106,7 +106,7 @@ public final class DriveConstants {
     public static final double I = 0.0;
     public static final double D = 0.05;
 
-    public static final Angle TOLERANCE = Degrees.of(3);
+    public static final Angle TOLERANCE = Degrees.of(2);
   }
 
   public static final class ModuleConstants {

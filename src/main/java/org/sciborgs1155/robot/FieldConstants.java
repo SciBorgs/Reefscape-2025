@@ -181,7 +181,7 @@ public class FieldConstants {
     private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose = pose.transformBy(Constants.strafe(Inches.of(-2)));
+      this.pose = pose.transformBy(Constants.strafe(Inches.of(-3)));
       // .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
