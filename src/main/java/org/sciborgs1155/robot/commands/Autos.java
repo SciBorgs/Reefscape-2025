@@ -128,7 +128,8 @@ public class Autos {
                     .until(alignment::stalling)
                     .andThen(
                         alignment
-                            .moveRobotRelative(rotate(Rotation2d.kCW_90deg).plus(strafe(Meters.of(0.2))))
+                            .moveRobotRelative(
+                                rotate(Rotation2d.kCW_90deg).plus(strafe(Meters.of(0.2))))
                             .onlyIf(alignment::stalling)
                             .withTimeout(1)))
                 .repeatedly()

@@ -55,6 +55,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -288,7 +289,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     TalonOdometryThread.getInstance().start();
 
-    skidReset.onTrue(stop().withTimeout(PERIOD));
+    skidReset.onTrue(goADifferentWay().withTimeout(PERIOD));
 
     if (TUNING) {
       SmartDashboard.putData(
@@ -427,6 +428,16 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()),
             elevatorHeight)
         .beforeStarting(rotationController::reset);
+  }
+
+  public Command goADifferentWay() {
+    return Commands.defer(
+        () -> {
+          Rotation2d direction = modulePositions()[0].angle.plus(Rotation2d.kCCW_90deg);
+          Vector<N2> desired = new Translation2d(2, direction).toVector();
+          return drive(() -> desired.get(0), () -> desired.get(1), () -> 0, () -> 0);
+        },
+        Set.of(this));
   }
 
   /**
