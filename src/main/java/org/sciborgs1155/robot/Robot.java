@@ -26,6 +26,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -135,6 +136,7 @@ public class Robot extends CommandRobot {
   // COMMANDS
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
+  @NotLogged
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
@@ -264,9 +266,7 @@ public class Robot extends CommandRobot {
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY))
-                .alongWith(scoral.stealgae())
-                .withTimeout(0.5));
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);

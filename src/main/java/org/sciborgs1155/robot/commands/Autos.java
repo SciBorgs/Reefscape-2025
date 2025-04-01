@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.advance;
 
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,6 +23,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Autos {
+  @NotLogged
   public static SendableChooser<Command> configureAutos(
       Drive drive, Scoraling scoraling, Elevator elevator, Alignment alignment, Scoral scoral) {
     SendableChooser<Command> chooser = new SendableChooser<>();

@@ -17,6 +17,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.WIDTH;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -297,6 +298,7 @@ public class Vision {
     return estStdDevs.times(avgWeight);
   }
 
+  @NotLogged
   public Transform3d[] cameraTransforms() {
     return new Transform3d[] {
       FRONT_LEFT_CAMERA.robotToCam(),
