@@ -11,6 +11,8 @@ import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.FieldConstants.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDs;
@@ -78,11 +81,13 @@ public class Alignment {
                             .backend
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
-            pathfind(goal).withName("go to reef").asProxy(),
+            pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))))
+                .withName("go to reef")
+                .asProxy(),
             Commands.waitSeconds(1),
             Commands.deadline(
                 Commands.sequence(
-                    drive.driveTo(() -> branch.pose().transformBy(advance(Meters.of(-1)))).asProxy().withTimeout(4),
+                    drive.driveTo(goal).asProxy().withTimeout(4),
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
                         .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
@@ -159,7 +164,7 @@ public class Alignment {
                     .backend
                     .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
         .andThen(
-            pathfind(goal)
+            pathfind(goal, Meters.of(1))
                 .asProxy()
                 .andThen(
                     drive
@@ -225,19 +230,20 @@ public class Alignment {
    * @param maxSpeed The maximum speed the path will command the drivetrain to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Supplier<Pose2d> goal, double maxSpeed) {
+  public Command pathfind(Supplier<Pose2d> goal, LinearVelocity maxSpeed, Distance tolerance) {
+    double speed = maxSpeed.in(MetersPerSecond);
     return drive
         .run(
             () -> {
               Tracer.startTrace("repulsor pathfinding");
               planner.setGoal(goal.get().getTranslation());
               drive.goToSample(
-                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), maxSpeed, true),
+                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), speed, true),
                   goal.get().getRotation(),
                   elevator::position);
               Tracer.endTrace();
             })
-        .until(() -> drive.atPose(goal.get()))
+        .until(() -> drive.atTranslation(goal.get().getTranslation(), tolerance))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
@@ -252,8 +258,28 @@ public class Alignment {
    * @param goal The field pose to pathfind to.
    * @return A Command to pathfind to an onfield pose.
    */
+  public Command pathfind(Supplier<Pose2d> goal, Distance tolerance) {
+    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.7), tolerance);
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
+  public Command pathfind(Supplier<Pose2d> goal, LinearVelocity maxSpeed) {
+    return pathfind(goal, maxSpeed, Translation.TOLERANCE);
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
   public Command pathfind(Supplier<Pose2d> goal) {
-    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond) * 0.7);
+    return pathfind(goal, Translation.TOLERANCE);
   }
 
   /**
@@ -291,7 +317,7 @@ public class Alignment {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(() -> drive.pose(), 0)
+    return pathfind(() -> drive.pose(), MetersPerSecond.of(0))
         .withTimeout(3)
         .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);

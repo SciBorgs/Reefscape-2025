@@ -17,8 +17,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
 import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
 import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
-import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
-import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -361,7 +359,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
-  
+
   /**
    * Resets the odometry to the specified pose.
    *
