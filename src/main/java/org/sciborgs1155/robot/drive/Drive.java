@@ -17,8 +17,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
 import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
 import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
-import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_COF;
-import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -752,7 +750,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
     for (int i = 0; i < 4; i++) {
-      values[i] = modules.get(i).drivePosition();
+      values[i] = modules.get(i).drivePosition()/WHEEL_RADIUS.in(Meters);
     }
     return values;
   }
