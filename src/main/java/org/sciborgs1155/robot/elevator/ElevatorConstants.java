@@ -19,13 +19,13 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 3.0;
+  public static final double kP = 0.3;
   public static final double kI = 0.0;
-  public static final double kD = 0.3;
+  public static final double kD = 0.0;
 
-  public static final double kS = 0.062;
-  public static final double kG = 0.24;
-  public static final double kV = 3.6;
+  public static final double kS = 0.0755;
+  public static final double kG = 0.2645;
+  public static final double kV = 3.7;
   public static final double kA = 0.012;
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(3.5); // (1.0);
@@ -60,7 +60,7 @@ public class ElevatorConstants {
     L1(Meters.of(0.3)),
     L2(Meters.of(0.488)),
     L3(Meters.of(0.838)),
-    L4(Meters.of(1.427)),
+    L4(Meters.of(1.408)),
 
     L2_ALGAE(Meters.of(0.119)),
     L3_ALGAE(Meters.of(0.496));

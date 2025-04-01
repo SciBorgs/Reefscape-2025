@@ -134,7 +134,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           "Robot/elevator/quasistatic backward",
           sysIdRoutine
               .quasistatic(Direction.kReverse)
-              .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
+              // .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
               .withName("elevator quasistatic backward"));
       SmartDashboard.putData(
           "Robot/elevator/dynamic forward",
@@ -146,7 +146,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           "Robot/elevator/dynamic backward",
           sysIdRoutine
               .dynamic(Direction.kReverse)
-              .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
+              // .until(() -> atPosition(MIN_EXTENSION.in(Meters) + 0.1))
               .withName("elevator dynamic backward"));
     }
   }

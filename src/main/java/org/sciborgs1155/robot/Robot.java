@@ -158,6 +158,7 @@ public class Robot extends CommandRobot {
     //     .ignoringDisable(true)
     //     .schedule();
 
+    Commands.sequence(Commands.waitSeconds(7), drive.resetHeading(drive.heading())).schedule();
   }
 
   @Override
@@ -267,7 +268,7 @@ public class Robot extends CommandRobot {
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
+            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
@@ -323,10 +324,10 @@ public class Robot extends CommandRobot {
 
     // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
+
     driver.a().whileTrue(align.source());
 
     driver.x().whileTrue(align.nearReef(Side.LEFT));
-
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
     driver.y().whileTrue(align.barge());

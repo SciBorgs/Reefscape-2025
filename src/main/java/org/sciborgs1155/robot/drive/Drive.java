@@ -277,7 +277,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                 this,
                 "rotation"));
 
-    gyro.reset();
+    gyro.reset(Rotation2d.kZero);
     odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
@@ -356,6 +356,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return pose().getRotation();
   }
 
+  @Logged
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
@@ -800,8 +801,14 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   /** Zeroes the heading of the robot. */
   public Command zeroHeading() {
-    return runOnce(gyro::reset);
+    return resetHeading(Rotation2d.kZero);
   }
+
+  /** Zeroes the heading of the robot. */
+  public Command resetHeading(Rotation2d rotation) {
+    return runOnce(() -> gyro.reset(rotation));
+  }
+  
 
   /** Returns the module states. */
   @Logged
