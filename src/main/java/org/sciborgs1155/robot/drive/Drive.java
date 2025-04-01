@@ -358,6 +358,10 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return pose().getRotation();
   }
 
+  public Rotation2d gyroHeading() {
+    return lastHeading;
+  }
+  
   /**
    * Resets the odometry to the specified pose.
    *
