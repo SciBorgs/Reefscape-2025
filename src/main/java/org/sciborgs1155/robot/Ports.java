@@ -25,7 +25,8 @@ public final class Ports {
           entry(GroundIntake.CANCODER, "ground intake"),
           entry(Elevator.FRONT_LEADER, "front elevator"),
           entry(Elevator.BACK_FOLLOWER, "back elevator"),
-          entry(Scoral.ROLLER, "scoral roller"),
+          entry(Scoral.SCORAL, "scoral roller"),
+          entry(Scoral.ALGAE, "algae roller"),
           entry(Hopper.MOTOR, "hopper"));
 
   public static final class OI {
@@ -52,10 +53,10 @@ public final class Ports {
   }
 
   public static final class GroundIntake {
-    public static final int ARM_LEADER = 17;
-    public static final int ARM_FOLLOWER = 18;
-    public static final int ROLLER_MOTOR = 19;
-    public static final int CANCODER = 20;
+    public static final int ARM_LEADER = 99;
+    public static final int ARM_FOLLOWER = 101;
+    public static final int ROLLER_MOTOR = 102;
+    public static final int CANCODER = 103;
   }
 
   public static final class Elevator {
@@ -64,7 +65,8 @@ public final class Ports {
   }
 
   public static final class Scoral {
-    public static final int ROLLER = 15;
+    public static final int SCORAL = 15;
+    public static final int ALGAE = 17;
     public static final int BEAMBREAK = 1;
   }
 
@@ -73,7 +75,7 @@ public final class Ports {
   }
 
   public static final class Hopper {
-    public static final int MOTOR = 16;
+    public static final int MOTOR = 18;
     public static final int BEAMBREAK = 3;
   }
 }

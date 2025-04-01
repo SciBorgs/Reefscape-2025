@@ -13,7 +13,6 @@
       "/Faults/Total Faults": "Alerts",
       "/Robot/arm/armCanvas": "Mechanism2d",
       "/Robot/arm/fb": "ProfiledPIDController",
-      "/Robot/autos": "String Chooser",
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
@@ -21,7 +20,28 @@
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Drive Field": "Field2d",
       "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Robot/arm/dynamic backward": "Command",
+      "/SmartDashboard/Robot/arm/dynamic forward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/arm/visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/dynamic backward": "Command",
+      "/SmartDashboard/Robot/elevator/dynamic forward": "Command",
+      "/SmartDashboard/Robot/elevator/measurement visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/elevator/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/elevator/setpoint visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/rotation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/rotation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic forward": "Command",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/arm dynamic backward": "Command",
@@ -39,15 +59,15 @@
       "/SmartDashboard/translation dynamic backward": "Command",
       "/SmartDashboard/translation dynamic forward": "Command",
       "/SmartDashboard/translation quasistatic backward": "Command",
-      "/SmartDashboard/translation quasistatic forward": "Command"
+      "/SmartDashboard/translation quasistatic forward": "Command",
+      "Robot/arm/fb": "ProfiledPIDController",
+      "Robot/autos": "String Chooser",
+      "Robot/drive/rotationController": "PIDController",
+      "Robot/drive/translationController": "ProfiledPIDController",
+      "Robot/elevator/pid": "ProfiledPIDController"
     },
     "windows": {
       "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/autos": {
         "window": {
           "visible": true
         }
@@ -72,15 +92,46 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
+    "retained": {
+      "Robot": {
+        "open": true
+      }
+    },
     "transitory": {
-      "CameraPublisher": {
+      "Epilogue": {
+        "Stats": {
+          "open": true
+        },
         "open": true
       },
       "Robot": {
+        "align": {
+          "open": true,
+          "planner": {
+            "Pose2d##v_Robot/align/planner/goal": {
+              "Rotation2d##v_rotation": {
+                "open": true
+              },
+              "Translation2d##v_translation": {
+                "open": true
+              },
+              "open": true
+            },
+            "open": true
+          }
+        },
+        "drive": {
+          "open": true
+        },
         "open": true,
         "scoraling": {
           "scoral": {
@@ -88,16 +139,10 @@
               "open": true
             }
           }
-        },
-        "vision": {
-          "open": true
         }
       },
       "SmartDashboard": {
-        "VisionSystemSim-main": {
-          "Sim Field": {
-            "open": true
-          },
+        "PDH": {
           "open": true
         }
       },
@@ -108,10 +153,24 @@
       },
       "notfound": {
         "open": true
+      },
+      "photonvision": {
+        "front left": {
+          "open": true
+        }
       }
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
     "visible": true
   }
 }

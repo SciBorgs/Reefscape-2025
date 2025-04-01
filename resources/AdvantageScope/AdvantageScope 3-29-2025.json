@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1619,
-      "height": 878,
+      "width": 1552,
+      "height": 832,
       "state": {
         "sidebar": {
           "width": 354,
@@ -30,17 +30,24 @@
             "/NT/Robot/arm",
             "/Robot/align",
             "/Robot/vision",
+            "/Robot/drive",
             "/Robot/hopper",
             "/Robot/scoral",
             "/Robot/elevator",
             "/Robot/LEDs",
+            "/SmartDashboard",
+            "/SmartDashboard/Robot",
+            "/Robot/vision/logCamEnabled",
+            "/Robot/vision/getSeenTags",
+            "/Robot/vision/filteredEstimates",
+            "/Robot/tuning",
+            "/Robot/tuning/drive",
             "/Epilogue",
-            "/Epilogue/Stats",
-            "/Robot/arm"
+            "/Robot/alignment"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 5,
           "tabs": [
             {
               "type": 0,
@@ -306,17 +313,97 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  0.029924313106187483,
-                  9.452797703718385,
-                  2.611224617027906
+                  -1.6253062683068924,
+                  -23.119755469716328,
+                  -16.341347677863467
                 ],
                 "cameraTarget": [
-                  0.5407292492104125,
-                  -25.885766509253035,
-                  -7.820707232978675
+                  -0.2996612647408332,
+                  -20.12703998020253,
+                  16.38214594062346
                 ]
               },
-              "controlsHeight": 416
+              "controlsHeight": 219
+            },
+            {
+              "type": 2,
+              "title": "2D",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:Robot/drive/pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Robot/drive/moduleSetpoints",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:Robot/drive/moduleStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:Robot/vision/getSeenTags",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/drive/estimated poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/alignment/goal pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:Robot/vision/filteredEstimates",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  }
+                ],
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 27
+              },
+              "controllerUUID": "oxl5aboeh6et6l9e5433jnrmnp2cz8tl",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 5,
@@ -331,13 +418,7 @@
             {
               "type": 4,
               "title": "goals & beambreaks",
-              "controller": [
-                "NT:Robot/drive/isStalling",
-                "NT:Robot/drive/isSkidding",
-                "NT:Robot/elevator/atGoal",
-                "NT:Robot/hopper/blocked",
-                "NT:Robot/scoral/blocked"
-              ],
+              "controller": [],
               "controllerUUID": "azsxe2vuah56207xxjwonraxkcj3phjz",
               "renderer": null,
               "controlsHeight": 0
@@ -347,14 +428,37 @@
               "title": "commands",
               "controller": [
                 "NT:/Robot/scoral/command",
-                "NT:/Robot/elevator/command",
                 "NT:/Robot/hopper/command",
+                "NT:/Robot/elevator/commmand",
                 "NT:/Robot/drive/command",
                 "NT:/Robot/LEDs/command"
               ],
               "controllerUUID": "rlfjqqsvbtqe0qc2drsmrsow2sgds6so",
               "renderer": null,
               "controlsHeight": 0
+            },
+            {
+              "type": 10,
+              "title": "elevator",
+              "controller": [
+                {
+                  "type": "mechanism",
+                  "logKey": "NT:/Robot/scoraling/elevator/measurement/mech",
+                  "logType": "Mechanism2d",
+                  "visible": true,
+                  "options": {}
+                },
+                {
+                  "type": "mechanism",
+                  "logKey": "NT:/Robot/scoraling/elevator/setpoint/mech",
+                  "logType": "Mechanism2d",
+                  "visible": true,
+                  "options": {}
+                }
+              ],
+              "controllerUUID": "f98pjbda8cms2m293n75h0yjn4816cfz",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 10,

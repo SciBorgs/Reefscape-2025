@@ -1,14 +1,32 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.vision.VisionConstants.*;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
+import static org.sciborgs1155.robot.vision.VisionConstants.HEIGHT;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_AMBIGUITY;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_ANGLE;
+import static org.sciborgs1155.robot.vision.VisionConstants.MAX_HEIGHT;
+import static org.sciborgs1155.robot.vision.VisionConstants.REEF_TAGS;
+import static org.sciborgs1155.robot.vision.VisionConstants.TAG_LAYOUT;
+import static org.sciborgs1155.robot.vision.VisionConstants.TAG_WEIGHTS;
+import static org.sciborgs1155.robot.vision.VisionConstants.WIDTH;
 
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -28,12 +44,12 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
-public class Vision implements Logged {
+@Logged
+public class Vision {
   public static record CameraConfig(String name, Transform3d robotToCam) {}
 
   public static record PoseEstimate(EstimatedRobotPose estimatedPose, Matrix<N3, N1> standardDev) {}
@@ -43,13 +59,13 @@ public class Vision implements Logged {
   private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
-  @Log.NT private final List<Pose3d> filteredEstimates;
+  @Logged private final List<Pose3d> filteredEstimates;
 
   private VisionSystemSim visionSim;
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
-    return Robot.isReal() ? new Vision(FRONT_RIGHT_CAMERA, BACK_MIDDLE_CAMERA) : new Vision();
+    return new Vision(FRONT_RIGHT_CAMERA, FRONT_LEFT_CAMERA);
   }
 
   public static Vision none() {
@@ -105,8 +121,14 @@ public class Vision implements Logged {
     }
   }
 
-  public void logCamEnabled() {
-    camerasEnabled.forEach((name, enabled) -> log(name + " enabled", enabled));
+  @Logged
+  public boolean[] logCamEnabled() {
+    boolean[] booleanArray = new boolean[camerasEnabled.values().size()];
+    int i = 0;
+    for (Boolean value : camerasEnabled.values()) {
+      booleanArray[i++] = value != null && value;
+    }
+    return booleanArray;
   }
 
   /**
@@ -115,7 +137,7 @@ public class Vision implements Logged {
    * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
    *     used for estimation.
    */
-  public PoseEstimate[] estimatedGlobalPoses() {
+  public PoseEstimate[] estimatedGlobalPoses(Rotation2d rotation) {
     Tracer.startTrace("get vision poses");
     List<PoseEstimate> estimates = new ArrayList<>();
     filteredEstimates.clear();
@@ -129,6 +151,10 @@ public class Vision implements Logged {
         Optional<EstimatedRobotPose> estimate = Optional.empty();
 
         int unreadLength = unreadChanges.size();
+
+        if (estimators[i].getPrimaryStrategy() == PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
+          estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
+        }
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
@@ -170,8 +196,9 @@ public class Vision implements Logged {
               change.multitagResult.filter(r -> r.estimatedPose.ambiguity < MAX_AMBIGUITY);
 
           estimate = estimators[i].update(change);
-
-          log(name + " estimates present", estimate.isPresent());
+          Epilogue.getConfig()
+              .backend
+              .log("Robot/vision/ " + name + " estimates present", estimate.isPresent());
           estimate
               .filter(
                   f -> {
@@ -182,8 +209,12 @@ public class Vision implements Logged {
                             && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
                     if (!valid) {
                       filteredEstimates.add(f.estimatedPose);
-                      log(name + "filtered pose", f.estimatedPose);
-                      FaultLogger.report(name, "Estimate outside field!", FaultType.INFO);
+                      Epilogue.getConfig()
+                          .backend
+                          .log(
+                              "Robot/vision/ " + name + " filtered pose",
+                              f.estimatedPose,
+                              Pose3d.struct);
                     }
                     return valid;
                   })
@@ -211,12 +242,6 @@ public class Vision implements Logged {
     return camerasEnabled.get(name);
   }
 
-  // public void feedEstimatorHeading(Rotation2d heading) {
-  //   for (PhotonPoseEstimator estimator : estimators) {
-  //     estimator.addHeadingData(Timer.getFPGATimestamp(), heading);
-  //   }
-  // }
-
   public void setPoseStrategy(PoseStrategy strategy) {
     for (int i = 0; i < estimators.length; i++) {
       if (Set.of("front left", "front right").contains(cameras[i].getName())) {
@@ -230,7 +255,6 @@ public class Vision implements Logged {
    *
    * @return An array of Pose3ds.
    */
-  @Log.NT
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())
@@ -276,6 +300,7 @@ public class Vision implements Logged {
     return estStdDevs.times(avgWeight);
   }
 
+  @NotLogged
   public Transform3d[] cameraTransforms() {
     return new Transform3d[] {
       FRONT_LEFT_CAMERA.robotToCam(),

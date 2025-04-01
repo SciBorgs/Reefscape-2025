@@ -4,12 +4,11 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Set;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.elevator.Elevator;
@@ -18,7 +17,7 @@ import org.sciborgs1155.robot.hopper.Hopper;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Scoraling implements Logged {
+public class Scoraling {
   private final Hopper hopper;
   private final Scoral scoral;
   private final Elevator elevator;
@@ -34,10 +33,11 @@ public class Scoraling implements Logged {
     Causes the intaking command to end if the coral reaches the desired state between the hps and scoral
     beambreaks.
     */
-    hopper.blocked.negate().or(scoral.blocked).onTrue(Commands.runOnce(() -> stop = true));
+    hopper.blocked.onFalse(Commands.runOnce(() -> stop = true));
+    scoral.blocked.onTrue(Commands.runOnce(() -> stop = true));
   }
 
-  @Log.NT private boolean stop = false;
+  @Logged private boolean stop = false;
 
   public Command noElevatorIntake() {
     return Commands.runOnce(() -> stop = false)
@@ -124,7 +124,7 @@ public class Scoraling implements Logged {
 
   /** A command which runs the hps + scoral rollers forward (generally as a form of intaking). */
   public Command runRollersBack() {
-    return hopper.outtake().alongWith(scoral.algae()).withName("runningRollers");
+    return hopper.outtake().alongWith(scoral.reverse()).withName("runningRollers");
   }
 
   public Test runRollersTest() {

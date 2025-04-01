@@ -4,10 +4,15 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
+import static org.sciborgs1155.robot.FieldConstants.nearestBarge;
 
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Arrays;
@@ -15,9 +20,6 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
@@ -29,18 +31,19 @@ import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.FieldConstants.Source;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
-public class Alignment implements Logged {
-  @IgnoreLogged private final Drive drive;
-  @IgnoreLogged private final Elevator elevator;
-  @IgnoreLogged private final Scoral scoral;
-  @IgnoreLogged private final LEDs leds;
+public class Alignment {
+  @NotLogged private final Drive drive;
+  @NotLogged private final Elevator elevator;
+  @NotLogged private final Scoral scoral;
+  @NotLogged private final LEDs leds;
 
-  @Log.NT private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
+  private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
   public boolean stalling() {
     return drive.isStalling();
@@ -80,8 +83,19 @@ public class Alignment implements Logged {
   public Command reef(Level level, Branch branch) {
     Supplier<Pose2d> goal = branch::pose;
     return Commands.sequence(
-            Commands.runOnce(() -> log("goal pose", goal.get())).asProxy(),
-            pathfind(goal).withName("go to reef").asProxy(),
+            Commands.runOnce(
+                    () ->
+                        Epilogue.getConfig()
+                            .backend
+                            .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
+                .asProxy(),
+            pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))))
+                .withName("go to reef")
+                .asProxy(),
+            pathfind(goal, MetersPerSecond.of(0.1))
+                .withTimeout(0.2)
+                .withName("approach slowly")
+                .asProxy(),
             Commands.deadline(
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
@@ -128,6 +142,15 @@ public class Alignment implements Logged {
   }
 
   /**
+   * Pathfinds and aligns to the nearest barge position.
+   *
+   * @return A command to align to the barge.
+   */
+  public Command barge() {
+    return alignTo(() -> nearestBarge(drive.pose())).asProxy();
+  }
+
+  /**
    * Pathfinds and aligns to the nearest source.
    *
    * @return A command to go to the nearest source.
@@ -146,9 +169,13 @@ public class Alignment implements Logged {
   }
 
   public Command alignTo(Supplier<Pose2d> goal) {
-    return Commands.runOnce(() -> log("goal pose", goal.get()))
+    return Commands.runOnce(
+            () ->
+                Epilogue.getConfig()
+                    .backend
+                    .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
         .andThen(
-            pathfind(goal)
+            pathfind(goal, Meters.of(1))
                 .asProxy()
                 .andThen(
                     drive
@@ -182,6 +209,15 @@ public class Alignment implements Logged {
   }
 
   /**
+   * Finds the nearest reef face, then pathfinds right up to it.
+   *
+   * @return A Command to align to the nearest reef branch.
+   */
+  public Command nearAlgae() {
+    return alignTo(() -> Face.nearest(drive.pose()).pose()).asProxy();
+  }
+
+  /**
    * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
    * level on that branch.
    *
@@ -205,19 +241,20 @@ public class Alignment implements Logged {
    * @param maxSpeed The maximum speed the path will command the drivetrain to.
    * @return A Command to pathfind to an onfield pose.
    */
-  public Command pathfind(Supplier<Pose2d> goal, double maxSpeed) {
+  public Command pathfind(Supplier<Pose2d> goal, LinearVelocity maxSpeed, Distance tolerance) {
+    double speed = maxSpeed.in(MetersPerSecond);
     return drive
         .run(
             () -> {
               Tracer.startTrace("repulsor pathfinding");
               planner.setGoal(goal.get().getTranslation());
               drive.goToSample(
-                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), maxSpeed, true),
+                  planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), speed, true),
                   goal.get().getRotation(),
                   elevator::position);
               Tracer.endTrace();
             })
-        .until(() -> drive.atTranslation(goal.get().getTranslation(), Meters.of(1)))
+        .until(() -> drive.atTranslation(goal.get().getTranslation(), tolerance))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
@@ -232,8 +269,28 @@ public class Alignment implements Logged {
    * @param goal The field pose to pathfind to.
    * @return A Command to pathfind to an onfield pose.
    */
+  public Command pathfind(Supplier<Pose2d> goal, Distance tolerance) {
+    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.7), tolerance);
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
+  public Command pathfind(Supplier<Pose2d> goal, LinearVelocity maxSpeed) {
+    return pathfind(goal, maxSpeed, Translation.TOLERANCE);
+  }
+
+  /**
+   * Pathfinds around obstacles and drives to a certain pose on the field.
+   *
+   * @param goal The field pose to pathfind to.
+   * @return A Command to pathfind to an onfield pose.
+   */
   public Command pathfind(Supplier<Pose2d> goal) {
-    return pathfind(goal, DriveConstants.MAX_SPEED.in(MetersPerSecond) * 0.7);
+    return pathfind(goal, Translation.TOLERANCE);
   }
 
   /**
@@ -271,29 +328,9 @@ public class Alignment implements Logged {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(() -> drive.pose(), 0)
+    return pathfind(() -> drive.pose(), MetersPerSecond.of(0))
         .withTimeout(3)
         .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
   }
-
-  // @Log.NT public Pose2d abl = Face.AB.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d cdl = Face.CD.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d efl = Face.EF.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d ghl = Face.GH.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d ijl = Face.IJ.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d kll = Face.KL.left.withLevel(Level.L4);
-  // @Log.NT public Pose2d abr = Face.AB.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d cdr = Face.CD.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d efr = Face.EF.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d ghr = Face.GH.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d ijr = Face.IJ.right.withLevel(Level.L4);
-  // @Log.NT public Pose2d klr = Face.KL.right.withLevel(Level.L4);
-
-  // @Log.NT public Pose2d leftSourceLeft = Source.LEFT_SOURCE_LEFT.pose;
-  // @Log.NT public Pose2d leftSourceMid = Source.LEFT_SOURCE_MID.pose;
-  // @Log.NT public Pose2d leftSourceRight = Source.LEFT_SOURCE_RIGHT.pose;
-  // @Log.NT public Pose2d rightSourceLeft = Source.RIGHT_SOURCE_LEFT.pose;
-  // @Log.NT public Pose2d rightSourceMid = Source.RIGHT_SOURCE_MID.pose;
-  // @Log.NT public Pose2d rightSourceRight = Source.RIGHT_SOURCE_RIGHT.pose;
 }
