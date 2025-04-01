@@ -1,0 +1,200 @@
+{
+  "hubs": [
+    {
+      "x": 745,
+      "y": 117,
+      "width": 988,
+      "height": 711,
+      "state": {
+        "sidebar": {
+          "width": 296,
+          "expanded": [
+            "/Robot",
+            "/Robot/corals",
+            "/Robot/drive/modulePositions/0",
+            "/Robot/Drive",
+            "/Robot/Simulation",
+            "/SmartDashboard",
+            "/SmartDashboard/SwerveDrive",
+            "/SmartDashboard/MapleArenaSimulation",
+            "/SmartDashboard/field",
+            "/Robot/vision",
+            "/Robot/scoraling/elevator",
+            "/Robot/scoraling",
+            "/Robot/arm",
+            "/Robot/elevator"
+          ]
+        },
+        "tabs": {
+          "selected": 3,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "jhqiaqu8f9w5zuy9u95jnq8t4ftuuomt",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "ardygrad01o39bymxmphx3sen02rpli2",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 2,
+              "title": "Odometry",
+              "controller": {
+                "sources": [],
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
+              },
+              "controllerUUID": "mx3xt24tt6kzqa98hdcgflaskdqgubj8",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:Robot/drive/pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Sciduck"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/arm/pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/elevator/stage1",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/elevator/carriage",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/maple pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Sciduck",
+                      "color": "#0000ff"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/arm/pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/elevator/stage1",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:Robot/elevator/carriage",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:Robot/vision/getSeenTags",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:Robot/coral",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:Robot/algae",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "variant": "Algae"
+                    }
+                  }
+                ],
+                "game": "2025 Field (Welded)",
+                "origin": "blue"
+              },
+              "controllerUUID": "dau4ono90toi9b59hl0put5kz9vpttlv",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  -3.1520269961957395,
+                  6.345779498601224,
+                  4.631533012848719
+                ],
+                "cameraTarget": [
+                  -3.3420213038424254,
+                  3.9651889357071948,
+                  1.7241453872032373
+                ]
+              },
+              "controlsHeight": 153
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "4.1.5"
+}

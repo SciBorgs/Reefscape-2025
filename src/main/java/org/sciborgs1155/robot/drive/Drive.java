@@ -7,29 +7,49 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static java.lang.Math.atan;
-import static org.sciborgs1155.lib.Assertion.*;
-import static org.sciborgs1155.robot.Constants.Robot.MASS;
-import static org.sciborgs1155.robot.Constants.Robot.MOI;
+import static org.sciborgs1155.lib.Assertion.eAssert;
+import static org.sciborgs1155.lib.Assertion.tAssert;
+import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.allianceRotation;
-import static org.sciborgs1155.robot.Ports.Drive.*;
-import static org.sciborgs1155.robot.drive.DriveConstants.*;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.FRONT_RIGHT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_LEFT_TURNING;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_CANCODER;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_DRIVE;
+import static org.sciborgs1155.robot.Ports.Drive.REAR_RIGHT_TURNING;
+import static org.sciborgs1155.robot.drive.DriveConstants.ANGULAR_OFFSETS;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_DRIVING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.ASSISTED_ROTATING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.DRIVE_MODE;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SKID_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
+import static org.sciborgs1155.robot.drive.DriveConstants.MAX_TILT_ACCEL;
+import static org.sciborgs1155.robot.drive.DriveConstants.MODULE_OFFSET;
+import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
+import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
+import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import static org.sciborgs1155.robot.drive.DriveConstants.driveSim;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.DriveFeedforwards;
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,9 +61,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -51,20 +71,22 @@ import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import java.util.Arrays;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import monologue.Annotations.IgnoreLogged;
-import monologue.Annotations.Log;
-import monologue.Logged;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.photonvision.EstimatedRobotPose;
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Assertion.EqualityAssertion;
@@ -73,6 +95,8 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tracer;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -80,20 +104,54 @@ import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
 
-public class Drive extends SubsystemBase implements Logged, AutoCloseable {
+public class Drive extends SubsystemBase implements AutoCloseable {
   // Modules
   private final ModuleIO frontLeft;
   private final ModuleIO frontRight;
   private final ModuleIO rearLeft;
   private final ModuleIO rearRight;
 
-  @IgnoreLogged private final List<ModuleIO> modules;
+  @NotLogged private final List<ModuleIO> modules;
+
+  private final BooleanSupplier[] modulesStalling;
 
   // Gyro
   private final GyroIO gyro;
-  private static Rotation2d simRotation = new Rotation2d();
+  @Logged private static Rotation2d simRotation = Rotation2d.kZero;
 
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
+
+  @NotLogged
+  private final DoubleEntry translationP =
+      Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
+
+  @NotLogged
+  private final DoubleEntry translationI =
+      Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
+
+  @NotLogged
+  private final DoubleEntry translationD =
+      Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
+
+  @NotLogged
+  private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
+
+  @NotLogged
+  private final DoubleEntry rotationI = Tuning.entry("Robot/tuning/drive/rotation i", Rotation.I);
+
+  @NotLogged
+  private final DoubleEntry rotationD = Tuning.entry("Robot/tuning/drive/rotation d", Rotation.D);
+
+  @NotLogged
+  private final DoubleEntry maxAccel =
+      Tuning.entry("Robot/tuning/drive/Max Accel", MAX_ACCEL.in(MetersPerSecondPerSecond));
+
+  @NotLogged private final DoubleEntry maxSkidAccel;
+
+  @NotLogged
+  private final DoubleEntry maxTiltAccel =
+      Tuning.entry(
+          "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
@@ -101,7 +159,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private Rotation2d lastHeading;
   public static final ReentrantLock lock = new ReentrantLock();
 
-  @Log.NT private final Field2d field2d = new Field2d();
+  @Logged private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
 
   // Characterization routines
@@ -109,18 +167,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   private final SysIdRoutine rotationalCharacterization;
 
   // Movement automation
-  @Log.NT
+  @Logged
   private final ProfiledPIDController translationController =
       new ProfiledPIDController(
-          Translation.P,
-          Translation.I,
-          Translation.D,
-          new TrapezoidProfile.Constraints(
-              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
+          translationP.get(),
+          translationI.get(),
+          translationD.get(),
+          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
 
-  @Log.NT
+  @Logged
   private final PIDController rotationController =
-      new PIDController(Rotation.P, Rotation.I, Rotation.D);
+      new PIDController(rotationP.get(), rotationI.get(), rotationD.get());
 
   /**
    * A factory to create a new swerve drive based on the type of module used / real or simulation.
@@ -134,6 +191,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               FRONT_LEFT_TURNING,
               FRONT_LEFT_CANCODER,
               ANGULAR_OFFSETS.get(0),
+              FF_CONSTANTS.get(0),
               "FL",
               false),
           new TalonModule(
@@ -141,6 +199,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               FRONT_RIGHT_TURNING,
               FRONT_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(1),
+              FF_CONSTANTS.get(1),
               "FR",
               true),
           new TalonModule(
@@ -148,6 +207,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               REAR_LEFT_TURNING,
               REAR_LEFT_CANCODER,
               ANGULAR_OFFSETS.get(2),
+              FF_CONSTANTS.get(2),
               "RL",
               false),
           new TalonModule(
@@ -155,15 +215,18 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
               REAR_RIGHT_TURNING,
               REAR_RIGHT_CANCODER,
               ANGULAR_OFFSETS.get(3),
+              FF_CONSTANTS.get(3),
               "RR",
               true));
     } else {
+      SwerveModuleSimulation[] modules = driveSim.getModules();
+
       return new Drive(
-          new NoGyro(),
-          new SimModule("FL"),
-          new SimModule("FR"),
-          new SimModule("RL"),
-          new SimModule("RR"));
+          new SimGyro(driveSim.getGyroSimulation()),
+          new SimModule(modules[0], "FL"),
+          new SimModule(modules[1], "FR"),
+          new SimModule(modules[2], "RL"),
+          new SimModule(modules[3], "RR"));
     }
   }
 
@@ -175,6 +238,9 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   /** A swerve drive subsystem containing four {@link ModuleIO} modules and a gyroscope. */
   public Drive(
       GyroIO gyro, ModuleIO frontLeft, ModuleIO frontRight, ModuleIO rearLeft, ModuleIO rearRight) {
+    this.maxSkidAccel =
+        Tuning.entry(
+            "Robot/tuning/drive/Max Skid Accel", MAX_SKID_ACCEL.in(MetersPerSecondPerSecond));
     this.gyro = gyro;
     this.frontLeft = frontLeft;
     this.frontRight = frontRight;
@@ -185,6 +251,18 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     modules2d = new FieldObject2d[modules.size()];
     lastPositions = modulePositions();
     lastHeading = gyro.rotation2d();
+
+    modulesStalling =
+        modules.stream()
+            .map(
+                m ->
+                    new Trigger(
+                            () ->
+                                Math.abs(m.desiredState().speedMetersPerSecond) > 0.3
+                                    && Math.abs(m.state().speedMetersPerSecond) < 0.1)
+                        .debounce(0.2, DebounceType.kRising)
+                        .debounce(0.04, DebounceType.kFalling))
+            .toArray(BooleanSupplier[]::new);
 
     translationCharacterization =
         new SysIdRoutine(
@@ -223,12 +301,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                 "rotation"));
 
     gyro.reset();
-    odometry =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            lastHeading,
-            lastPositions,
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(0)));
+    odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
@@ -243,25 +316,41 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
     if (TUNING) {
       SmartDashboard.putData(
-          "translation quasistatic forward",
-          translationCharacterization.quasistatic(Direction.kForward));
+          "Robot/translation/quasistatic forward",
+          translationCharacterization
+              .quasistatic(Direction.kForward)
+              .withName("translation quasistatic forward"));
       SmartDashboard.putData(
-          "translation dynamic forward", translationCharacterization.dynamic(Direction.kForward));
+          "Robot/translation/dynamic forward",
+          translationCharacterization
+              .dynamic(Direction.kForward)
+              .withName("translation dynamic forward"));
       SmartDashboard.putData(
-          "translation quasistatic backward",
+          "Robot/translation/quasistatic backward",
           translationCharacterization.quasistatic(Direction.kReverse));
       SmartDashboard.putData(
-          "translation dynamic backward", translationCharacterization.dynamic(Direction.kReverse));
+          "Robot/translation/dynamic backward",
+          translationCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("translation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation quasistatic forward",
+          "Robot/rotation/quasistatic forward",
           rotationalCharacterization.quasistatic(Direction.kForward));
       SmartDashboard.putData(
-          "rotation dynamic forward", rotationalCharacterization.dynamic(Direction.kForward));
+          "Robot/rotation/dynamic forward",
+          rotationalCharacterization
+              .dynamic(Direction.kForward)
+              .withName("rotation quasistatic forward"));
       SmartDashboard.putData(
-          "rotation quasistatic backward",
-          rotationalCharacterization.quasistatic(Direction.kReverse));
+          "Robot/rotation/quasistatic backward",
+          rotationalCharacterization
+              .quasistatic(Direction.kReverse)
+              .withName("rotation quasistatic backward"));
       SmartDashboard.putData(
-          "rotation dynamic backward", rotationalCharacterization.dynamic(Direction.kReverse));
+          "Robot/rotation/dynamic backward",
+          rotationalCharacterization
+              .dynamic(Direction.kReverse)
+              .withName("rotation dynamic backward"));
     }
   }
 
@@ -270,7 +359,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The pose.
    */
-  @Log.NT
+  @Logged
   public Pose2d pose() {
     return odometry.getEstimatedPosition();
   }
@@ -285,7 +374,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *
    * @return The rotation.
    */
-  @Log.NT
+  @Logged
   public Rotation2d heading() {
     return pose().getRotation();
   }
@@ -307,18 +396,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
    *     side).
    * @param vOmega A supplier for the angular velocity of the robot.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    * @return The driving command.
    */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega) {
+  /** /** Drive command with acceleration limiting. */
+  public Command drive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, DoubleSupplier elevatorHeight) {
     return run(
-        () ->
-            setChassisSpeeds(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                    vx.getAsDouble(),
-                    vy.getAsDouble(),
-                    vOmega.getAsDouble(),
-                    heading().plus(allianceRotation())),
-                DRIVE_MODE));
+        () -> {
+          // Set chassis speeds
+          setChassisSpeeds(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  vx.getAsDouble(),
+                  vy.getAsDouble(),
+                  vOmega.getAsDouble(),
+                  heading().plus(allianceRotation())),
+              ControlMode.OPEN_LOOP_VELOCITY,
+              elevatorHeight.getAsDouble());
+        });
   }
 
   /**
@@ -329,18 +424,24 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vy A supplier for the velocity of the robot along the y axis (parallel to the alliance
    *     side).
    * @param heading A supplier for the field relative heading of the robot.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    * @return The driving command.
    */
-  public Command drive(DoubleSupplier vx, DoubleSupplier vy, Supplier<Rotation2d> heading) {
+  public Command drive(
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      Supplier<Rotation2d> heading,
+      DoubleSupplier elevatorHeight) {
     return drive(
             vx,
             vy,
-            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()))
+            () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()),
+            elevatorHeight)
         .beforeStarting(rotationController::reset);
   }
 
   /**
-   * Drives the robot based in a {@link InputStream} for field relative x y and omega velocities.
+   * Drives the robot based in a {@link InputStream} for field-relative x, y, and omega velocities.
    * Also adds a little extra translational velocity to move the robot to a certain desired position
    * if the driver is already attempting to move in that general direction. This command does not
    * assist in controlling the rotation of the robot.
@@ -351,10 +452,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *     side).
    * @param vOmega A supplier for the angular velocity of the robot.
    * @param target The target field-relative position for the robot, as a {@link Translation2d}.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    * @return The assisted driving command.
    */
   public Command assistedDrive(
-      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Translation2d target) {
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      DoubleSupplier vOmega,
+      Translation2d target,
+      DoubleSupplier elevatorHeight) {
     return run(() -> {
           Vector<N2> driverVel = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
           Vector<N2> displacement = pose().getTranslation().minus(target).toVector();
@@ -378,7 +484,8 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       vy.getAsDouble(),
                       vOmega.getAsDouble(),
                       heading().plus(allianceRotation())),
-              ControlMode.CLOSED_LOOP_VELOCITY);
+              ControlMode.CLOSED_LOOP_VELOCITY,
+              elevatorHeight.getAsDouble());
         })
         .repeatedly();
   }
@@ -396,10 +503,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    *     side).
    * @param vOmega A supplier for the angular velocity of the robot.
    * @param target The target field-relative position for the robot, as a {@link Pose2d}.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    * @return The assisted driving command.
    */
   public Command assistedDrive(
-      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, Pose2d target) {
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      DoubleSupplier vOmega,
+      Pose2d target,
+      DoubleSupplier elevatorHeight) {
     return assistedDrive(
             vx,
             vy,
@@ -409,9 +521,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                     ? rotationController.calculate(
                         heading().minus(target.getRotation()).getRadians(), 0)
                     : vOmega.getAsDouble(),
-            target.getTranslation())
+            target.getTranslation(),
+            elevatorHeight)
         .until(() -> vOmega.getAsDouble() > ASSISTED_ROTATING_THRESHOLD)
-        .andThen(assistedDrive(vx, vy, vOmega, target.getTranslation()));
+        .andThen(assistedDrive(vx, vy, vOmega, target.getTranslation(), elevatorHeight));
   }
 
   /**
@@ -420,14 +533,19 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * @param vx A supplier for the absolute x velocity of the robot.
    * @param vy A supplier for the absolute y velocity of the robot.
    * @param translation A supplier for the translation2d to face on the field.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    * @return A command to drive while facing a target.
    */
   public Command driveFacingTarget(
-      DoubleSupplier vx, DoubleSupplier vy, Supplier<Translation2d> translation) {
-    return drive(vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle());
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      Supplier<Translation2d> translation,
+      DoubleSupplier elevatorHeight) {
+    return drive(
+        vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
   }
 
-  @Log.NT
+  @Logged
   public boolean atRotationalSetpoint() {
     return rotationController.atSetpoint();
   }
@@ -494,19 +612,106 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /**
    * Sets the states of each swerve module using target speeds that the drivetrain will work to
-   * reach.
+   * reach. Applies acceleration limits to ensure smooth and safe operation.
    *
-   * @param speeds The robot relative speeds the drivetrain will run at.
+   * @param desired The robot relative speeds the drivetrain will run at.
    * @param mode The control loop used to achieve those speeds.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    */
-  public void setChassisSpeeds(ChassisSpeeds speeds, ControlMode mode) {
-    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+  public void setChassisSpeeds(ChassisSpeeds desired, ControlMode mode, double elevatorHeight) {
+    Vector<N2> currentVelocity =
+        VecBuilder.fill(
+            robotRelativeChassisSpeeds().vxMetersPerSecond,
+            robotRelativeChassisSpeeds().vyMetersPerSecond);
+
+    Vector<N2> deltaV =
+        VecBuilder.fill(desired.vxMetersPerSecond, desired.vyMetersPerSecond)
+            .minus(currentVelocity);
+    // Vector<N2> limitedVelocity =
+    // currentVelocity.plus(
+    //     currentVelocity.norm() > 1e-6
+    //         ? forwardAccelerationLimit(
+    //             skidAccelerationLimit(
+    //                 tiltAccelerationLimit(
+    //                     skidAccelerationLimit(forwardAccelerationLimit(accel)),
+    //                     elevatorHeight.getAsDouble())))
+    //         : accel);
+    Vector<N2> limitedVelocity = currentVelocity.plus(skidAccelerationLimit(deltaV));
+    // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
+    // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
+
+    Epilogue.getConfig()
+        .backend
+        .log("/Robot/drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
+
+    ChassisSpeeds newSpeeds =
+        new ChassisSpeeds(
+            limitedVelocity.get(0), limitedVelocity.get(1), desired.omegaRadiansPerSecond);
+
+    SwerveModuleState[] states = kinematics.toSwerveModuleStates(newSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED.in(MetersPerSecond));
     setModuleStates(
         kinematics.toSwerveModuleStates(
             ChassisSpeeds.discretize(
                 kinematics.toChassisSpeeds(states), Constants.PERIOD.in(Seconds))),
         mode);
+  }
+
+  /**
+   * Applies forward acceleration limiting to the desired acceleration based on the current
+   * velocity. Limits the acceleration in the direction of the current velocity to prevent excessive
+   * acceleration.
+   *
+   * @param desiredAccel The desired field-relative acceleration vector.
+   * @return The adjusted acceleration vector after applying forward acceleration limits.
+   */
+  private Vector<N2> forwardAccelerationLimit(Vector<N2> deltaV) {
+    Vector<N2> currVel =
+        VecBuilder.fill(
+            fieldRelativeChassisSpeeds().vxMetersPerSecond,
+            fieldRelativeChassisSpeeds().vyMetersPerSecond);
+    double limit =
+        maxAccel.get()
+            * PERIOD.in(Seconds)
+            * (1 - Math.min(1, (currVel.norm() / MAX_SPEED.in(MetersPerSecond))));
+    Epilogue.getConfig().backend.log("/Robot/drive/accel limit", limit);
+    Vector<N2> proj = deltaV.projection(currVel);
+    if (proj.norm() > limit && proj.dot(currVel) > 0) {
+      Vector<N2> parallel = proj.unit().times(limit);
+      Vector<N2> perpendicular = deltaV.minus(proj);
+      return parallel.plus(perpendicular);
+    }
+    return deltaV;
+  }
+
+  // /**
+  //  * Applies tilt acceleration limiting based on the height of the elevator. The higher the
+  //  * elevator, the more the acceleration is limited to prevent tipping.
+  //  *
+  //  * @param desiredAccel The desired field-relative acceleration vector.
+  //  * @param elevatorHeight The current height of the elevator.
+  //  * @return The adjusted acceleration vector after applying tilt acceleration limits.
+  //  */
+  // private Vector<N2> tiltAccelerationLimit(Vector<N2> desiredAccel, double elevatorHeight) {
+  //   double limit =
+  //       MAX_TILT_ACCEL.in(MetersPerSecondPerSecond)
+  //           * (1 - (elevatorHeight / MAX_EXTENSION.in(Meters)));
+  //   return desiredAccel.norm() > limit && elevatorHeight > MIN_EXTENSION.in(Meters)
+  //       ? desiredAccel.unit().times(limit)
+  //       : desiredAccel;
+  // }
+
+  /**
+   * Applies skid acceleration limiting based on the maximum allowed skid acceleration. Ensures that
+   * the acceleration does not exceed the skid limit to prevent skidding.
+   *
+   * @param desiredAccel The desired field-relative acceleration vector.
+   * @return The adjusted acceleration vector after applying skid acceleration limits.
+   */
+  private Vector<N2> skidAccelerationLimit(Vector<N2> deltaV) {
+    return deltaV.norm() == 0
+        ? deltaV
+        : deltaV.unit().times(Math.min(deltaV.norm(), maxSkidAccel.get() * PERIOD.in(Seconds)));
   }
 
   /**
@@ -545,54 +750,23 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
                       * RADIUS.in(Meters));
           double out = translationController.calculate(difference.norm(), 0);
           Vector<N3> velocities = difference.unit().times(out);
+          Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
                   velocities.get(1),
                   velocities.get(2) / RADIUS.in(Meters),
                   pose().getRotation()),
-              ControlMode.CLOSED_LOOP_VELOCITY);
+              ControlMode.CLOSED_LOOP_VELOCITY,
+              0);
         })
-        .until(
-            () ->
-                atPose(
-                    target.get(),
-                    Translation.TOLERANCE.times(1 / 3.0),
-                    Rotation.TOLERANCE.times(1 / 3.0)))
+        .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
         .andThen(stop())
         .withName("drive to pose");
   }
 
-  /**
-   * Follows a given pathplanner path.
-   *
-   * @param path A pathplanner path.
-   * @return A command to follow a path.
-   */
-  public Command pathfollow(PathPlannerPath path) {
-    return new FollowPathCommand(
-        path,
-        this::pose,
-        this::robotRelativeChassisSpeeds,
-        (ChassisSpeeds a, DriveFeedforwards b) ->
-            setChassisSpeeds(a, ControlMode.CLOSED_LOOP_VELOCITY),
-        new PPHolonomicDriveController(
-            new PIDConstants(Translation.P, Translation.I, Translation.D),
-            new PIDConstants(Rotation.P, Rotation.I, Rotation.D)),
-        new RobotConfig(
-            MASS,
-            MOI,
-            new ModuleConfig(
-                WHEEL_RADIUS,
-                MAX_SPEED,
-                WHEEL_COF,
-                DCMotor.getKrakenX60(1),
-                DriveConstants.ModuleConstants.Driving.GEARING,
-                DriveConstants.ModuleConstants.Driving.STATOR_LIMIT,
-                1),
-            DriveConstants.TRACK_WIDTH),
-        () -> false,
-        this);
+  public Command driveTo(Pose2d goal) {
+    return driveTo(() -> goal);
   }
 
   /** Returns the position of each module in radians. */
@@ -602,6 +776,40 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
       values[i] = modules.get(i).drivePosition();
     }
     return values;
+  }
+
+  /**
+   * @return If the robot is skidding.
+   */
+  @Logged
+  public boolean isSkidding() {
+    DoubleSummaryStatistics diffs =
+        Arrays.stream(moduleStates())
+            .mapToDouble(
+                s ->
+                    Constants.fromPolarCoords(s.speedMetersPerSecond, s.angle)
+                        .minus(
+                            VecBuilder.fill(
+                                robotRelativeChassisSpeeds().vxMetersPerSecond,
+                                robotRelativeChassisSpeeds().vyMetersPerSecond))
+                        .norm())
+            .summaryStatistics();
+    return diffs.getMax() - diffs.getMin() > SKIDDING_THRESHOLD.in(MetersPerSecond);
+  }
+
+  /**
+   * @return If the robot is colliding.
+   */
+  @Logged
+  public boolean isColliding() {
+    return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
+  }
+
+  @Logged
+  public boolean isStalling() {
+    return Arrays.stream(modulesStalling)
+        .map(bs -> bs.getAsBoolean())
+        .reduce(false, (a, b) -> a || b);
   }
 
   /** Resets all drive encoders to read a position of 0. */
@@ -615,19 +823,19 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   }
 
   /** Returns the module states. */
-  @Log.NT
+  @Logged
   public SwerveModuleState[] moduleStates() {
     return modules.stream().map(ModuleIO::state).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the module states. */
-  @Log.NT
-  private SwerveModuleState[] moduleSetpoints() {
+  @Logged
+  public SwerveModuleState[] moduleSetpoints() {
     return modules.stream().map(ModuleIO::desiredState).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the module positions. */
-  @Log.NT
+  @Logged
   public SwerveModulePosition[] modulePositions() {
     return modules.stream().map(ModuleIO::position).toArray(SwerveModulePosition[]::new);
   }
@@ -646,8 +854,10 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    * Drives the robot to a Choreo {@link SwerveSample}.
    *
    * @param sample The SwerveSample to drive the robot to.
+   * @param rotation A goal rotation to drive to.
+   * @param elevatorHeight A supplier for the current height of the elevator.
    */
-  public void goToSample(SwerveSample sample, Rotation2d rotation) {
+  public void goToSample(SwerveSample sample, Rotation2d rotation, DoubleSupplier elevatorHeight) {
     Vector<N2> displacement =
         pose().getTranslation().minus(sample.getPose().getTranslation()).toVector();
 
@@ -674,7 +884,37 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             result.get(1),
             rotationController.calculate(heading().minus(rotation).getRadians(), 0),
             heading()),
-        DRIVE_MODE);
+        DRIVE_MODE,
+        elevatorHeight.getAsDouble());
+  }
+
+  /**
+   * Adds on a Choreo {@link SwerveSample} to the drive's desired velocity such that it does not
+   * interfere (as much) with driving.
+   *
+   * @param vx Driver's inputted vx.
+   * @param vy Driver's inputted vy.
+   * @param omega Driver's inputted omega.
+   * @param sample The swerve sample being added on.
+   * @param elevatorHeight A supplier for the height of the elevator.
+   */
+  public void addOnSample(
+      DoubleSupplier vx,
+      DoubleSupplier vy,
+      DoubleSupplier omega,
+      SwerveSample sample,
+      DoubleSupplier elevatorHeight) {
+    Vector<N2> driverSpeeds = VecBuilder.fill(vx.getAsDouble(), vy.getAsDouble());
+    Vector<N2> sampleSpeeds = VecBuilder.fill(sample.vx, sample.vy);
+    Vector<N2> speeds =
+        driverSpeeds.norm() > 1e-3 && driverSpeeds.dot(sampleSpeeds) > 0
+            ? sampleSpeeds.plus(driverSpeeds).projection(driverSpeeds)
+            : VecBuilder.fill(0, 0);
+    setChassisSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds.get(0), speeds.get(1), omega.getAsDouble(), heading()),
+        DRIVE_MODE,
+        elevatorHeight.getAsDouble());
   }
 
   /**
@@ -684,6 +924,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
    */
   public void updateEstimates(PoseEstimate... poses) {
     Pose3d[] loggedEstimates = new Pose3d[poses.length];
+
     for (int i = 0; i < poses.length; i++) {
       loggedEstimates[i] = poses[i].estimatedPose().estimatedPose;
       odometry.addVisionMeasurement(
@@ -694,12 +935,15 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
           .getObject("Cam " + i + " Est Pose")
           .setPose(poses[i].estimatedPose().estimatedPose.toPose2d());
     }
-    log("estimated poses", loggedEstimates);
+    Epilogue.getConfig()
+        .backend
+        .log("/Robot/drive/estimated poses", loggedEstimates, Pose3d.struct);
   }
 
   @Override
   public void periodic() {
     // update our heading in reality / sim
+    Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
       lock.lock();
       try {
@@ -716,18 +960,17 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
             };
         double[][] allGyro = gyro.odometryData();
 
+        SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+        Rotation2d angle = Rotation2d.kZero;
         for (int i = 0; i < timestamps.length; i++) {
-          SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
           for (int m = 0; m < modules.size(); m++) {
             modulePositions[m] = allPositions[m][i];
           }
 
-          odometry.updateWithTime(
-              timestamps[i],
-              new Rotation2d(Units.rotationsToRadians(allGyro[0][i])),
-              modulePositions);
+          angle = Rotation2d.fromRotations(allGyro[0][i]);
+          odometry.updateWithTime(timestamps[i], angle, modulePositions);
           lastPositions = modulePositions;
-          lastHeading = new Rotation2d(Units.rotationsToRadians(allGyro[0][i]));
+          lastHeading = angle;
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -742,13 +985,26 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
     // update our simulated field poses
     field2d.setRobotPose(pose());
 
+    SmartDashboard.putData("Drive Field", field2d);
+
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
       modules2d[i].setPose(pose().transformBy(transform));
     }
 
-    log("command", Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+    if (TUNING) {
+      translationController.setPID(translationP.get(), translationI.get(), translationD.get());
+      rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
+    }
+
+    Epilogue.getConfig()
+        .backend
+        .log(
+            "/Robot/drive/command",
+            Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
+
+    Tracer.endTrace();
   }
 
   @Override
@@ -764,7 +1020,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
 
   /** Stops the drivetrain. */
   public Command stop() {
-    return runOnce(() -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY));
+    return runOnce(() -> setChassisSpeeds(new ChassisSpeeds(), ControlMode.OPEN_LOOP_VELOCITY, 0));
   }
 
   /** Sets the drivetrain to an "X" configuration, preventing movement. */
@@ -788,7 +1044,7 @@ public class Drive extends SubsystemBase implements Logged, AutoCloseable {
   public Test systemsCheck() {
     ChassisSpeeds speeds = new ChassisSpeeds(1, 1, 0);
     Command testCommand =
-        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY)).withTimeout(0.5);
+        run(() -> setChassisSpeeds(speeds, ControlMode.OPEN_LOOP_VELOCITY, 0)).withTimeout(0.75);
     Function<ModuleIO, TruthAssertion> speedCheck =
         m ->
             tAssert(

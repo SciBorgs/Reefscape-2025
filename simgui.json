@@ -17,10 +17,36 @@
       "/Robot/drive/field2d": "Field2d",
       "/Robot/drive/rotationController": "PIDController",
       "/Robot/drive/translationController": "ProfiledPIDController",
+      "/Robot/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/elevator/pid": "ProfiledPIDController",
+      "/Robot/elevator/setpoint/mech": "Mechanism2d",
       "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
       "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
       "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Autos Chooser": "String Chooser",
+      "/SmartDashboard/Drive Field": "Field2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
+      "/SmartDashboard/Robot/arm/dynamic backward": "Command",
+      "/SmartDashboard/Robot/arm/dynamic forward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/arm/visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/dynamic backward": "Command",
+      "/SmartDashboard/Robot/elevator/dynamic forward": "Command",
+      "/SmartDashboard/Robot/elevator/measurement visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/elevator/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/elevator/setpoint visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/rotation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/rotation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic forward": "Command",
       "/SmartDashboard/Scheduler": "Scheduler",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
       "/SmartDashboard/arm dynamic backward": "Command",
@@ -38,7 +64,12 @@
       "/SmartDashboard/translation dynamic backward": "Command",
       "/SmartDashboard/translation dynamic forward": "Command",
       "/SmartDashboard/translation quasistatic backward": "Command",
-      "/SmartDashboard/translation quasistatic forward": "Command"
+      "/SmartDashboard/translation quasistatic forward": "Command",
+      "Robot/arm/fb": "ProfiledPIDController",
+      "Robot/autos": "String Chooser",
+      "Robot/drive/rotationController": "PIDController",
+      "Robot/drive/translationController": "ProfiledPIDController",
+      "Robot/elevator/pid": "ProfiledPIDController"
     },
     "windows": {
       "/FMSInfo": {
@@ -46,19 +77,7 @@
           "visible": true
         }
       },
-      "/Robot/autos": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/Robot/drive/field2d": {
-        "bottom": 1638,
-        "builtin": "2025 Reefscape",
-        "height": 8.051901817321777,
-        "left": 534,
-        "right": 3466,
-        "top": 291,
-        "width": 17.54825210571289,
+      "/SmartDashboard/Autos Chooser": {
         "window": {
           "visible": true
         }
@@ -66,31 +85,96 @@
     }
   },
   "NetworkTables": {
-    "transitory": {
-      "CameraPublisher": {
+    "retained": {
+      "Robot": {
         "open": true
-      },
+      }
+    },
+    "transitory": {
       "Robot": {
         "align": {
           "open": true
         },
+        "drive": {
+          "open": true
+        },
         "open": true,
         "scoraling": {
-          "elevator": {
-            "open": true
-          },
-          "open": true,
           "scoral": {
             "beambreak": {
               "open": true
-            },
-            "open": true
+            }
           }
+        }
+      },
+      "SmartDashboard": {
+        "PDH": {
+          "open": true
+        }
+      },
+      "Tracer": {
+        "robot main": {
+          "open": true
+        }
+      },
+      "notfound": {
+        "open": true
+      },
+      "photonvision": {
+        "front left": {
+          "open": true
         }
       }
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 0,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/positionSetpoint"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/Robot/elevator/position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "name": "Elevator"
+      }
+    }
   }
 }

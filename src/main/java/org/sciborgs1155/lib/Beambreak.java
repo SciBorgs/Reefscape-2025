@@ -1,16 +1,15 @@
 package org.sciborgs1155.lib;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DigitalInput;
 import java.util.function.BooleanSupplier;
-import monologue.Annotations.Log;
-import monologue.Logged;
 
 /**
  * A beambreak wrapper that contains two main elements: 1. A BooleanSupplier detailing the
  * beambreak's state; true for unbroken, false for broken. 2. A runnable that will close all
  * resources as necessary.
  */
-public class Beambreak implements Logged {
+public class Beambreak {
   private final BooleanSupplier beambreak;
   private final Runnable close;
 
@@ -33,13 +32,23 @@ public class Beambreak implements Logged {
    * Generates a beambreak that does not contain hardware. This beambreak will always return true.
    */
   public static Beambreak none() {
-    return new Beambreak(() -> true, () -> {});
+    return none(true);
+  }
+
+  /**
+   * Generates a beambreak that does not contain hardware. This beambreak always returns a default
+   * value.
+   *
+   * @param defaultValue the value the beambreak always returns
+   */
+  public static Beambreak none(boolean defaultValue) {
+    return new Beambreak(() -> defaultValue, () -> {});
   }
 
   /**
    * @return the value of the beambreak; true for unbroken, false for broken
    */
-  @Log.NT
+  @Logged
   public boolean get() {
     return beambreak.getAsBoolean();
   }

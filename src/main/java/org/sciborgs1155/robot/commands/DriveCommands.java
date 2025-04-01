@@ -4,13 +4,17 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 
 /**
  * Source:
@@ -18,8 +22,8 @@ import org.sciborgs1155.robot.drive.DriveConstants;
  * https://docs.advantagekit.org/getting-started/template-projects/spark-swerve-template/#wheel-radius-characterization
  */
 public class DriveCommands {
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+  private static final double WHEEL_RADIUS_MAX_VELOCITY = 1; // Rad/Sec
+  private static final double WHEEL_RADIUS_RAMP_RATE = 0.25; // Rad/Sec^2
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
@@ -55,7 +59,8 @@ public class DriveCommands {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                  drive.drive(() -> 0, () -> 0, () -> speed);
+                  drive.setChassisSpeeds(
+                      new ChassisSpeeds(0, 0, speed), ControlMode.CLOSED_LOOP_VELOCITY, 0);
                 },
                 drive)),
 
@@ -91,24 +96,32 @@ public class DriveCommands {
                       double wheelRadius = (state.gyroDelta * DRIVE_BASE_RADIUS) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
-                      System.out.println(
-                          "********** Wheel Radius Characterization Results **********");
-                      System.out.println(
-                          "\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
-                      System.out.println(
-                          "\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
-                      System.out.println(
+                      // System.out.println(
+                      //     "********** Wheel Radius Characterization Results **********");
+                      // System.out.println(
+                      //     "\tWheel Delta: " + formatter.format(wheelDelta) + " radians");
+                      // System.out.println(
+                      //     "\tGyro Delta: " + formatter.format(state.gyroDelta) + " radians");
+                      // System.out.println(
+                      //     "\tWheel Radius: "
+                      //         + formatter.format(wheelRadius)
+                      //         + " meters, "
+                      //         + formatter.format(Units.metersToInches(wheelRadius))
+                      //         + " inches");
+                      FaultLogger.report(
+                          "wheel chara",
                           "\tWheel Radius: "
                               + formatter.format(wheelRadius)
                               + " meters, "
                               + formatter.format(Units.metersToInches(wheelRadius))
-                              + " inches");
+                              + " inches",
+                          FaultType.INFO);
                     })));
   }
 
   private static class WheelRadiusCharacterizationState {
     double[] positions = new double[4];
-    Rotation2d lastAngle = new Rotation2d();
+    Rotation2d lastAngle = Rotation2d.kZero;
     double gyroDelta = 0.0;
   }
 }

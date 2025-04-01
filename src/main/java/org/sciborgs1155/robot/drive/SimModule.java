@@ -1,35 +1,35 @@
 package org.sciborgs1155.robot.drive;
 
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
+import static org.sciborgs1155.robot.drive.DriveConstants.WHEEL_RADIUS;
 
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import org.sciborgs1155.robot.Constants;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
+import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving;
 import org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Turning;
 
 public class SimModule implements ModuleIO {
-  private final DCMotorSim drive =
-      new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(Driving.FF.V, Driving.FF.A), DCMotor.getKrakenX60(1));
+  private final SwerveModuleSimulation moduleSimulation;
+
+  private final SimulatedMotorController.GenericMotorController driveMotor;
 
   private final PIDController driveFeedback =
       new PIDController(Driving.PID.P, Driving.PID.I, Driving.PID.D);
 
   private final SimpleMotorFeedforward driveFF =
-      new SimpleMotorFeedforward(Driving.FF.S, Driving.FF.V, Driving.FF.A);
+      new SimpleMotorFeedforward(
+          Driving.FRONT_LEFT_FF.kS(), Driving.FRONT_LEFT_FF.kV(), Driving.FRONT_LEFT_FF.kA());
 
-  private final DCMotorSim turn =
-      new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(Turning.FF.V, Turning.FF.A), DCMotor.getKrakenX60(1));
+  private final SimulatedMotorController.GenericMotorController turnMotor;
 
   private final PIDController turnFeedback =
       new PIDController(Turning.PID.P, Turning.PID.I, Turning.PID.D);
@@ -38,8 +38,16 @@ public class SimModule implements ModuleIO {
 
   private final String name;
 
-  public SimModule(String name) {
+  public SimModule(SwerveModuleSimulation moduleSimulation, String name) {
     this.name = name;
+
+    this.moduleSimulation = moduleSimulation;
+
+    // configures a generic motor controller for drive motor
+    // set a current limit of 60 amps
+    this.driveMotor =
+        moduleSimulation.useGenericMotorControllerForDrive().withCurrentLimit(Amps.of(60));
+    this.turnMotor = moduleSimulation.useGenericControllerForSteer().withCurrentLimit(Amps.of(20));
 
     turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -51,34 +59,32 @@ public class SimModule implements ModuleIO {
 
   @Override
   public void setDriveVoltage(double voltage) {
-    drive.setInputVoltage(voltage);
-    drive.update(Constants.PERIOD.in(Seconds));
+    this.driveMotor.requestVoltage(Volts.of(voltage));
   }
 
   @Override
   public void setTurnVoltage(double voltage) {
-    turn.setInputVoltage(voltage);
-    turn.update(Constants.PERIOD.in(Seconds));
+    this.turnMotor.requestVoltage(Volts.of(voltage));
   }
 
   @Override
   public double drivePosition() {
-    return drive.getAngularPositionRad();
+    return moduleSimulation.getDriveWheelFinalPosition().in(Radians) * WHEEL_RADIUS.in(Meters);
   }
 
   @Override
   public double driveVelocity() {
-    return drive.getAngularVelocityRadPerSec();
+    return state().speedMetersPerSecond;
   }
 
   @Override
   public Rotation2d rotation() {
-    return Rotation2d.fromRadians(turn.getAngularPositionRad());
+    return state().angle;
   }
 
   @Override
   public SwerveModuleState state() {
-    return new SwerveModuleState(driveVelocity(), rotation());
+    return moduleSimulation.getCurrentState();
   }
 
   @Override
@@ -89,12 +95,6 @@ public class SimModule implements ModuleIO {
   @Override
   public SwerveModuleState desiredState() {
     return setpoint;
-  }
-
-  @Override
-  public void resetEncoders() {
-    drive.setState(VecBuilder.fill(0, 0));
-    turn.setState(VecBuilder.fill(0, 0));
   }
 
   @Override
@@ -134,6 +134,10 @@ public class SimModule implements ModuleIO {
     setDriveVoltage(voltage);
     setTurnVoltage(turnVolts);
   }
+
+  // Currently can not do this
+  @Override
+  public void resetEncoders() {}
 
   @Override
   public double[][] moduleOdometryData() {
