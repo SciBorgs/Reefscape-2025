@@ -212,6 +212,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return goTo(() -> height);
   }
 
+  public Command homingSequence() {
+    return run(() -> hardware.setVoltage(-0.5))
+        .until(() -> hardware.velocity() < 0.005)
+        .andThen(() -> hardware.resetPosition());
+  }
+
   /**
    * @return A very safe and serious command....
    */

@@ -3,7 +3,11 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.GEARING;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.SPROCKET_RADIUS;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.WEIGHT;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -54,6 +58,11 @@ public class SimElevator implements ElevatorIO {
   @Override
   public double velocity() {
     return elevator.getVelocityMetersPerSecond();
+  }
+
+  @Override
+  public void resetPosition() {
+    elevator.setState(0, 0);
   }
 
   /**
