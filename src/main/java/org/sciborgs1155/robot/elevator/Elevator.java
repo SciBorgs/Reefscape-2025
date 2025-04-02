@@ -1,15 +1,23 @@
 package org.sciborgs1155.robot.elevator;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.DoubleSupplier;
+
+import org.sciborgs1155.lib.Assertion;
 import static org.sciborgs1155.lib.Assertion.eAssert;
+import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
+import org.sciborgs1155.lib.InputStream;
+import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.lib.Tuning;
+import org.sciborgs1155.robot.Constants;
 import static org.sciborgs1155.robot.Constants.TUNING;
+import org.sciborgs1155.robot.Robot;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.BASE_FROM_CHASSIS;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.CARRIAGE_FROM_CHASSIS;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.HIGH_FIVE_DELAY;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_ACCEL;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_VELOCITY;
@@ -18,6 +26,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.POSITION_TOLERAN
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.RAY_HIGH;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.RAY_LOW;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.RAY_MIDDLE;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.VELOCITY_TOLERANCE;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.kA;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.kD;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.kG;
@@ -27,6 +36,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.kS;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.kV;
 
 import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -38,6 +48,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleEntry;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -46,18 +61,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.DoubleSupplier;
-import org.sciborgs1155.lib.Assertion;
-import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.lib.InputStream;
-import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tuning;
-import org.sciborgs1155.robot.Constants;
-import org.sciborgs1155.robot.Robot;
-import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 @Logged
 public class Elevator extends SubsystemBase implements AutoCloseable {
@@ -214,7 +217,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public Command homingSequence() {
     return run(() -> hardware.setVoltage(-0.5))
-        .until(() -> hardware.velocity() < 0.005)
+        .until(() -> hardware.velocity() < VELOCITY_TOLERANCE)
         .andThen(() -> hardware.resetPosition());
   }
 

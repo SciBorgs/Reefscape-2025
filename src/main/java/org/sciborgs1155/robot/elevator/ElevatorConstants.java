@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.elevator;
 
+import edu.wpi.first.math.geometry.Translation3d;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Inches;
@@ -9,8 +10,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -29,6 +28,7 @@ public class ElevatorConstants {
   public static final double kA = 0.012;
 
   public static final Distance POSITION_TOLERANCE = Centimeters.of(3.5); // (1.0);
+  public static final double VELOCITY_TOLERANCE = 0.005; // (0.1);
 
   public static final Distance MIN_EXTENSION = Meters.of(0.0);
   public static final Distance MAX_EXTENSION = Meters.of(1.455);
