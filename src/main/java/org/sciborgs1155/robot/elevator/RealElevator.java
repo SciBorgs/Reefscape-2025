@@ -1,16 +1,19 @@
 package org.sciborgs1155.robot.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.lib.FaultLogger.register;
+import org.sciborgs1155.lib.TalonUtils;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import static org.sciborgs1155.robot.Ports.Elevator.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
+import static org.sciborgs1155.robot.Ports.Elevator.BACK_FOLLOWER;
+import static org.sciborgs1155.robot.Ports.Elevator.FRONT_LEADER;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.CONVERSION_FACTOR;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.CURRENT_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import org.sciborgs1155.lib.TalonUtils;
+
+import static edu.wpi.first.units.Units.Amps;
 
 public class RealElevator implements ElevatorIO {
   private final TalonFX leader = new TalonFX(FRONT_LEADER, CANIVORE_NAME);
@@ -65,6 +68,11 @@ public class RealElevator implements ElevatorIO {
    */
   public double velocity() {
     return leader.getVelocity().getValueAsDouble();
+  }
+
+  @Override
+  public void resetPosition() {
+    leader.setPosition(0);
   }
 
   @Override
