@@ -1,6 +1,8 @@
 package org.sciborgs1155.robot.elevator;
 
-import org.sciborgs1155.robot.Constants;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.GEARING;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MIN_EXTENSION;
@@ -9,10 +11,8 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.WEIGHT;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import org.sciborgs1155.robot.Constants;
 
 public class SimElevator implements ElevatorIO {
   private final ElevatorSim elevator =
@@ -64,6 +64,7 @@ public class SimElevator implements ElevatorIO {
   public void resetPosition() {
     elevator.setState(0, 0);
   }
+
   /**
    * Closes the elevator. This implementation does nothing.
    *
