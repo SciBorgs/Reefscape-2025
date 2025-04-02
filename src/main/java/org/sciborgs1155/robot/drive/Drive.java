@@ -152,7 +152,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           translationP.get(),
           translationI.get(),
           translationD.get(),
-          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
+          new TrapezoidProfile.Constraints(0.4 * MAX_SPEED.in(MetersPerSecond), 0.6 * MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Logged
   private final PIDController rotationController =
@@ -808,7 +808,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public Command resetHeading(Rotation2d rotation) {
     return runOnce(() -> gyro.reset(rotation));
   }
-  
 
   /** Returns the module states. */
   @Logged

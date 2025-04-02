@@ -53,6 +53,7 @@ public class Scoraling {
         .andThen(
             elevator
                 .retract()
+                .asProxy()
                 .alongWith(Commands.waitUntil(elevator::atGoal).andThen(runRollers()))
                 .until(() -> stop)
                 .finallyDo(() -> stop = false))
@@ -116,7 +117,8 @@ public class Scoraling {
   public Command runRollers() {
     return hopper
         .intake()
-        .alongWith(scoral.intake())
+        .asProxy()
+        .alongWith(scoral.intake().asProxy())
         .andThen(leds.blink(Color.kGold).onlyIf(() -> !scoral.beambreak.get()))
         // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");

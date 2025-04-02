@@ -24,15 +24,10 @@ public class RealArm implements ArmIO {
   /** Controls arm orientation. */
   private final TalonFX leader;
 
-  // private final TalonFX follower;
-
   private TalonFXConfiguration config;
 
   public RealArm() {
-    leader = new TalonFX(ARM_LEADER, CANIVORE_NAME);
-    // follower = new TalonFX(ARM_FOLLOWER, CANIVORE_NAME);
-
-    // follower.setControl(new Follower(ARM_LEADER, false));
+    leader = new TalonFX(ARM_PIVOT, CANIVORE_NAME);
 
     // Resetting configuration
     config = new TalonFXConfiguration();
@@ -47,13 +42,9 @@ public class RealArm implements ArmIO {
     config.Feedback.FeedbackRemoteSensorID = CANCODER;
 
     leader.getConfigurator().apply(config);
-    // follower.getConfigurator().apply(config);
 
     FaultLogger.register(leader);
     TalonUtils.addMotor(leader);
-
-    // FaultLogger.register(follower);
-    // TalonUtils.addMotor(follower);
   }
 
   @Override

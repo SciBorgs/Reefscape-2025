@@ -19,10 +19,9 @@ public final class Ports {
           entry(Drive.REAR_LEFT_CANCODER, "RL cancoder"),
           entry(Drive.FRONT_RIGHT_CANCODER, "FR cancoder"),
           entry(Drive.REAR_RIGHT_CANCODER, "RR cancoder"),
-          entry(GroundIntake.ARM_LEADER, "ground left arm leader"),
-          entry(GroundIntake.ARM_FOLLOWER, "ground right arm follower"),
-          entry(GroundIntake.ROLLER_MOTOR, "ground roller"),
-          entry(GroundIntake.CANCODER, "ground intake"),
+          entry(GroundIntake.ARM_PIVOT, "ground arm pivot"),
+          entry(GroundIntake.ARM_INTAKE, "ground intake"),
+          entry(GroundIntake.CANCODER, "ground arm encoder"),
           entry(Elevator.FRONT_LEADER, "front elevator"),
           entry(Elevator.BACK_FOLLOWER, "back elevator"),
           entry(Scoral.SCORAL, "scoral roller"),
@@ -53,10 +52,9 @@ public final class Ports {
   }
 
   public static final class GroundIntake {
-    public static final int ARM_LEADER = 99;
-    public static final int ARM_FOLLOWER = 101;
-    public static final int ROLLER_MOTOR = 102;
-    public static final int CANCODER = 103;
+    public static final int ARM_PIVOT = 19;
+    public static final int ARM_INTAKE = 20;
+    public static final int CANCODER = 21;
   }
 
   public static final class Elevator {

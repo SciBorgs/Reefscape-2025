@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 
 public class ElevatorConstants {
-  public static final double kP = 0.3;
+  public static final double kP = 3;
   public static final double kI = 0.0;
   public static final double kD = 0.0;
 

@@ -104,13 +104,13 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     fb.setGoal(DEFAULT_ANGLE.in(Radians));
     fb.enableContinuousInput(-Math.PI, Math.PI);
 
-    setDefaultCommand(goTo(DEFAULT_ANGLE));
+    // setDefaultCommand(goTo(DEFAULT_ANGLE));
 
     this.sysIdRoutine =
         new SysIdRoutine(
             new Config(
                 Volts.of(0.5).per(Second),
-                Volts.of(0.2),
+                Volts.of(0.8),
                 Seconds.of(5),
                 (state) -> SignalLogger.writeString("arm state", state.toString())),
             new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
@@ -255,7 +255,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        // .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
         .withName("quasistatic backward");
   }
 
@@ -269,7 +269,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        // .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
         .withName("dynamic backward");
   }
 
