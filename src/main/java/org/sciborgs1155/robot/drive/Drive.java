@@ -357,7 +357,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   }
 
   @Logged
-  public Rotation2d gyroHeading() {
+  public Rotation2d fieldRelativeGyroHeading() {
     return lastHeading;
   }
 
