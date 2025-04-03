@@ -163,16 +163,16 @@ public class Vision {
           var change = unreadChanges.get(j);
 
           // only reef tags
-          if (Set.of("back left", "back right").contains(name)) {
-            change.targets =
-                change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
-            change.multitagResult =
-                change.multitagResult.filter(
-                    r ->
-                        r.fiducialIDsUsed.stream()
-                            .map(id -> REEF_TAGS.contains((int) id))
-                            .reduce(true, (a, b) -> a && b));
-          }
+          // if (Set.of("back left", "back right").contains(name)) {
+          //   change.targets =
+          //       change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+          //   change.multitagResult =
+          //       change.multitagResult.filter(
+          //           r ->
+          //               r.fiducialIDsUsed.stream()
+          //                   .map(id -> REEF_TAGS.contains((int) id))
+          //                   .reduce(true, (a, b) -> a && b));
+          // }
 
           // negate pitch
           if (cameras[i].getName() != "back middle") {
@@ -212,7 +212,7 @@ public class Vision {
                       Epilogue.getConfig()
                           .backend
                           .log(
-                              "Robot/vision/ " + name + " filtered pose",
+                              "Robot/vision/filtered poses/ " + name,
                               f.estimatedPose,
                               Pose3d.struct);
                     }

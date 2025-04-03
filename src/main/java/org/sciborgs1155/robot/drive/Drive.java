@@ -152,8 +152,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           translationP.get(),
           translationI.get(),
           translationD.get(),
-          new TrapezoidProfile.Constraints(0, 0));
-              // 0.04 * MAX_SPEED.in(MetersPerSecond), 0.04 * MAX_ACCEL.in(MetersPerSecondPerSecond)));
+          new TrapezoidProfile.Constraints(
+              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Logged
   private final PIDController rotationController =
@@ -357,8 +357,16 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return pose().getRotation();
   }
 
+  /**
+   * Return the gyro's heading (unaffected by vision and wheel odometry throughout a match).
+   *
+   * <p>This value is reset to odometry heading on each robot enable. Primarily used for
+   * field-relative applications.
+   *
+   * @return The gyro heading, set after enable to be field-relative after odometry correction.
+   */
   @Logged
-  public Rotation2d fieldRelativeGyroHeading() {
+  public Rotation2d gyroHeading() {
     return lastHeading;
   }
 
@@ -802,12 +810,12 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   /** Zeroes the heading of the robot. */
   public Command zeroHeading() {
-    return resetHeading(Rotation2d.kZero);
+    return resetGyro(Rotation2d.kZero);
   }
 
-  /** Zeroes the heading of the robot. */
-  public Command resetHeading(Rotation2d rotation) {
-    return runOnce(() -> gyro.reset(rotation));
+  /** Sets the gyro reading of the robot to a specified rotation. */
+  public Command resetGyro(Rotation2d rotation) {
+    return runOnce(() -> gyro.reset(rotation)).withName("gyro reset");
   }
 
   /** Returns the module states. */
