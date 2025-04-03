@@ -28,6 +28,7 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -57,6 +58,7 @@ import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
@@ -479,6 +481,14 @@ public class Robot extends CommandRobot {
             drive.systemsCheck(),
             Test.fromCommand(
                 scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
+            Test.fromCommand(
+                Commands.run(
+                        () ->
+                            drive.setChassisSpeeds(
+                                new ChassisSpeeds(1, 0, 0),
+                                ControlMode.CLOSED_LOOP_VELOCITY,
+                                ElevatorConstants.MIN_EXTENSION.in(Meters)))
+                    .withTimeout(Seconds.of(0.1))),
             Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }

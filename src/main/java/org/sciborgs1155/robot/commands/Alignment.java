@@ -73,7 +73,7 @@ public class Alignment {
    * @return A command to quickly prepare and then score in the reef.
    */
   public Command reef(Level level, Branch branch) {
-    Supplier<Pose2d> goal = branch::pose;
+    Supplier<Pose2d> goal = () -> branch.withLevel(level);
     return Commands.sequence(
             Commands.runOnce(
                     () ->
@@ -197,7 +197,7 @@ public class Alignment {
    * @return A command to align to the nearest reef branch.
    */
   public Command nearReef(Side side) {
-    return alignTo(() -> Face.nearest(drive.pose()).branch(side).pose()).asProxy();
+    return alignTo(() -> Face.nearest(drive.pose()).branch(side).withLevel(Level.L4)).asProxy();
   }
 
   /**
@@ -207,23 +207,6 @@ public class Alignment {
    */
   public Command nearAlgae() {
     return alignTo(() -> Face.nearest(drive.pose()).pose()).asProxy();
-  }
-
-  /**
-   * Drives to a designated reef branch, then raises the elevator, and then scores onto a designated
-   * level on that branch.
-   *
-   * @param level The level (L1, L2, L3, L4) being scored on.
-   * @param branch The reef branch (A, B, C, etc.) being scored on.
-   * @return A command to score in the reef without raising the elevator while moving.
-   */
-  public Command safeReef(Level level, Branch branch) {
-    return pathfind(branch::pose)
-        .andThen(elevator.scoreLevel(level))
-        .until(scoral.blocked.negate())
-        .deadlineFor(
-            Commands.waitUntil(() -> elevator.atPosition(level.extension.in(Meters)))
-                .andThen(scoral.scoreSlow()));
   }
 
   /**
