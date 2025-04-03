@@ -22,8 +22,6 @@ public interface ElevatorIO extends AutoCloseable {
    */
   public double velocity();
 
-  /**
-   * Resets the elevator encoder to a measurement of 0.
-   */
+  /** Resets the elevator encoder to a measurement of 0. */
   public void resetPosition();
 }

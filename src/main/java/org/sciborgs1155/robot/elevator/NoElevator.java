@@ -30,8 +30,9 @@ public class NoElevator implements ElevatorIO {
     return 0;
   }
 
-  public void resetPosition() {};
-  
+  public void resetPosition() {}
+  ;
+
   @Override
   /**
    * Closes the elevator. This implementation does nothing.
