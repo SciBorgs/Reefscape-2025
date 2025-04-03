@@ -153,7 +153,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           translationI.get(),
           translationD.get(),
           new TrapezoidProfile.Constraints(
-              0.4 * MAX_SPEED.in(MetersPerSecond), 0.4 * MAX_ACCEL.in(MetersPerSecondPerSecond)));
+              0.04 * MAX_SPEED.in(MetersPerSecond), 0.04 * MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Logged
   private final PIDController rotationController =
