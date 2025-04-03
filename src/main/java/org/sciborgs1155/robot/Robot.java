@@ -204,7 +204,8 @@ public class Robot extends CommandRobot {
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     addPeriodic(
-        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.fieldRelativeGyroHeading())), PERIOD);
+        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.fieldRelativeGyroHeading())),
+        PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -265,8 +266,7 @@ public class Robot extends CommandRobot {
         .onTrue(
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
-        .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
+        .onFalse(Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY)));
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
