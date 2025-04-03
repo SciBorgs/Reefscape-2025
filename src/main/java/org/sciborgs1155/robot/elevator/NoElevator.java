@@ -37,4 +37,7 @@ public class NoElevator implements ElevatorIO {
    * @throws Exception if an error occurs.
    */
   public void close() throws Exception {}
+
+  @Override
+  public void resetPosition() {}
 }

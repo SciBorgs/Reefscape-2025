@@ -92,10 +92,7 @@ public class Alignment {
             pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))))
                 .withName("go to reef")
                 .asProxy(),
-            pathfind(goal, MetersPerSecond.of(0.1))
-                .withTimeout(0.2)
-                .withName("approach slowly")
-                .asProxy(),
+            Commands.waitSeconds(1),
             Commands.deadline(
                 Commands.sequence(
                     drive.driveTo(goal).asProxy().withTimeout(4),
