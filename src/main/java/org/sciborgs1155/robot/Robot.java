@@ -157,8 +157,6 @@ public class Robot extends CommandRobot {
     //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
     //     .ignoringDisable(true)
     //     .schedule();
-
-    Commands.sequence(Commands.waitSeconds(7), drive.resetHeading(drive.heading())).schedule();
   }
 
   @Override
@@ -206,7 +204,8 @@ public class Robot extends CommandRobot {
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
     addPeriodic(
-        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.gyroHeading())), PERIOD);
+        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.fieldRelativeGyroHeading())),
+        PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
