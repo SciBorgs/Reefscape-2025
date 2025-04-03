@@ -740,7 +740,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                   velocities.get(1),
                   velocities.get(2) / RADIUS.in(Meters),
                   pose().getRotation()),
-              ControlMode.OPEN_LOOP_VELOCITY,
+              ControlMode.CLOSED_LOOP_VELOCITY,
               0);
         })
         .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
