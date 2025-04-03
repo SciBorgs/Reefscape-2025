@@ -21,10 +21,10 @@ public class ArmConstants {
   public static final double kI = 0;
   public static final double kD = 0;
 
-  public static final double kS = 0;
+  public static final double kS = 0.14739;
   public static final double kV = 0;
   public static final double kA = 0;
-  public static final double kG = 0;
+  public static final double kG = 0.40557;
 
   public static final Angle DEFAULT_ANGLE = Radians.of(1.266); // Radians.of(Math.PI * 5 / 8);
 

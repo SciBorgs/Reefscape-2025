@@ -403,7 +403,7 @@ public class Robot extends CommandRobot {
                 .alongWith(
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
-    operator.b().toggleOnTrue(elevator.manualElevator(InputStream.of(operator::getLeftY)));
+    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator
