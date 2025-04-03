@@ -63,7 +63,7 @@ public class Autos {
         .map(
             b ->
                 Commands.sequence(
-                    alignSource(alignment, scoraling, 1), alignReef(b, alignment, scoraling)))
+                    alignSource(alignment, scoraling, 0), alignReef(b, alignment, scoraling)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 
