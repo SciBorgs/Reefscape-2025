@@ -152,7 +152,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           translationP.get(),
           translationI.get(),
           translationD.get(),
-          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
+          new TrapezoidProfile.Constraints(
+              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
   @Logged
   private final PIDController rotationController =
@@ -277,7 +278,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                 this,
                 "rotation"));
 
-    gyro.reset();
+    gyro.reset(Rotation2d.kZero);
     odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
@@ -356,6 +357,15 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return pose().getRotation();
   }
 
+  /**
+   * Return the gyro's heading (unaffected by vision and wheel odometry throughout a match).
+   *
+   * <p>This value is reset to odometry heading on each robot enable. Primarily used for
+   * field-relative applications.
+   *
+   * @return The gyro heading, set after enable to be field-relative after odometry correction.
+   */
+  @Logged
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
@@ -800,7 +810,12 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   /** Zeroes the heading of the robot. */
   public Command zeroHeading() {
-    return runOnce(gyro::reset);
+    return resetGyro(Rotation2d.kZero);
+  }
+
+  /** Sets the gyro reading of the robot to a specified rotation. */
+  public Command resetGyro(Rotation2d rotation) {
+    return runOnce(() -> gyro.reset(rotation)).withName("gyro reset");
   }
 
   /** Returns the module states. */

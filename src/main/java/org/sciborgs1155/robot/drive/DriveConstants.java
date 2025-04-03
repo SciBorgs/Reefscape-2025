@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static java.lang.Math.PI;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -113,7 +114,7 @@ public final class DriveConstants {
     public static final double COUPLING_RATIO = 0;
 
     public static final class Driving {
-      public static final Distance CIRCUMFERENCE = Inches.of(4.0 * Math.PI);
+      public static final Distance CIRCUMFERENCE = WHEEL_RADIUS.times(2 * PI);
 
       public static final double GEARING = 5.68;
 

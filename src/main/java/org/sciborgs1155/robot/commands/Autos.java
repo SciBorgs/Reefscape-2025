@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
-import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.drive.Drive;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
@@ -41,9 +40,6 @@ public class Autos {
                     elevator.position())));
     // chooser.addOption("practice field", test(alignment, scoraling, drive::resetOdometry));
     chooser.addOption(
-        "test drive to",
-        drive.driveTo(FieldConstants.Branch.I.pose()).andThen(scoraling.runRollers()));
-    chooser.addOption(
         "wheel characteirzatiion",
         DriveCommands.wheelRadiusCharacterization(drive).withTimeout(Seconds.of(8)));
     return chooser;
@@ -67,7 +63,7 @@ public class Autos {
         .map(
             b ->
                 Commands.sequence(
-                    alignSource(alignment, scoraling, 1), alignReef(b, alignment, scoraling)))
+                    alignSource(alignment, scoraling, 0), alignReef(b, alignment, scoraling)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 

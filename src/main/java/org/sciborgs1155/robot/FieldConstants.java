@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class FieldConstants {
   // Origin at corner of blue alliance side of field
@@ -50,7 +51,7 @@ public class FieldConstants {
    * @return The nearest position to go to for the barge.
    */
   public static Pose2d nearestBarge(Pose2d pose) {
-    return allianceReflect(
+    return allianceReflect( // I edited this comment muahahahah
         new Pose2d(
             BARGE_OPTIMAL_X.in(Meters),
             clamp(
@@ -182,28 +183,21 @@ public class FieldConstants {
 
     private Branch(Pose2d pose) {
       this.pose = pose.transformBy(Constants.strafe(Inches.of(-3)));
-      // .transformBy(Constants.advance(Inches.of(-1.25)));
     }
 
     public Pose2d pose() {
       return allianceReflect(pose);
     }
 
-    // /**
-    //  * Moves the pose in or out depending on the level.
-    //  *
-    //  * @param level The level that the movement depends on.
-    //  * @return A new pose moved to account for elevator tilt.
-    //  */
-    // public Pose2d withLevel(Level level) {
-    //   return switch (level) {
-    //     case L1, L2, L3 ->
-    //         pose().transformBy(Constants.advance(Inches.of(-2)));
-    //     case L4 ->
-    //         pose().transformBy(Constants.advance(Inches.of(-2)));
-    //     default -> pose(); // hi ;P
-    //   };
-    // }
+    /**
+     * Moves the pose in or out depending on the level.
+     *
+     * @param level The level that the movement depends on.
+     * @return A new pose moved to account for elevator tilt.
+     */
+    public Pose2d withLevel(Level level) {
+      return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-4.5))) : pose();
+    }
 
     /**
      * @return A list of all branch poses.

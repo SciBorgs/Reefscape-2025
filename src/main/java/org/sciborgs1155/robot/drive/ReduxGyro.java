@@ -8,6 +8,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N2;
 import java.util.Queue;
@@ -65,8 +66,8 @@ public class ReduxGyro implements GyroIO {
   }
 
   @Override
-  public void reset() {
-    canandgyro.setYaw(0);
+  public void reset(Rotation2d heading) {
+    canandgyro.setYaw(heading.getRotations());
   }
 
   @Override

@@ -47,7 +47,7 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR, CANIVORE_NAME), config);
+    return SimpleMotor.talon(new TalonFX(GroundIntake.ARM_INTAKE, CANIVORE_NAME), config);
   }
 
   // TODO specify which gamepiece this intakes

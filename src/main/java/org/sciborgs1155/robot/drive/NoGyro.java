@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.drive;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N2;
 
@@ -33,5 +34,5 @@ public class NoGyro implements GyroIO {
   }
 
   @Override
-  public void reset() {}
+  public void reset(Rotation2d heading) {}
 }

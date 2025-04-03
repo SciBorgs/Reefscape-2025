@@ -14,6 +14,7 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
+import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -28,6 +29,7 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -57,6 +59,7 @@ import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
 import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.elevator.Elevator;
 import org.sciborgs1155.robot.elevator.ElevatorConstants;
 import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
@@ -157,7 +160,6 @@ public class Robot extends CommandRobot {
     //         Commands.runOnce(() -> Threads.setCurrentThreadPriority(true, 10)))
     //     .ignoringDisable(true)
     //     .schedule();
-
   }
 
   @Override
@@ -267,7 +269,14 @@ public class Robot extends CommandRobot {
             Commands.runOnce(
                 () -> vision.setPoseStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR)))
         .onFalse(
-            Commands.runOnce(() -> vision.setPoseStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE)));
+            Commands.runOnce(
+                () -> {
+                  drive
+                      .resetGyro(allianceRotation().plus(drive.heading()))
+                      .withName("gyro reset enabled");
+                  vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+                }));
+
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
     if (TUNING) {
       SignalLogger.enableAutoLogging(false);
@@ -323,10 +332,10 @@ public class Robot extends CommandRobot {
 
     // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
+
     driver.a().whileTrue(align.source());
 
     driver.x().whileTrue(align.nearReef(Side.LEFT));
-
     driver.b().whileTrue(align.nearReef(Side.RIGHT));
 
     driver.y().whileTrue(align.barge());
@@ -480,6 +489,14 @@ public class Robot extends CommandRobot {
             drive.systemsCheck(),
             Test.fromCommand(
                 scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
+            Test.fromCommand(
+                Commands.run(
+                        () ->
+                            drive.setChassisSpeeds(
+                                new ChassisSpeeds(1, 0, 0),
+                                ControlMode.CLOSED_LOOP_VELOCITY,
+                                ElevatorConstants.MIN_EXTENSION.in(Meters)))
+                    .withTimeout(Seconds.of(0.1))),
             Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }
