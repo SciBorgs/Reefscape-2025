@@ -202,9 +202,9 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command manualArm(InputStream input) {
     return goTo(input
             .deadband(.15, 1)
-            .scale(MAX_VELOCITY.in(RotationsPerSecond))
+            .scale(MAX_VELOCITY.in(RadiansPerSecond))
             .scale(Constants.PERIOD.in(Seconds))
-            .rateLimit(MAX_ACCEL.in(RotationsPerSecondPerSecond))
+            .rateLimit(MAX_ACCEL.in(RadiansPerSecondPerSecond))
             .add(() -> fb.getGoal().position))
         .withName("manual arm");
   }
