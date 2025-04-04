@@ -104,7 +104,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     fb.setGoal(DEFAULT_ANGLE.in(Radians));
     fb.enableContinuousInput(-Math.PI, Math.PI);
 
-    setDefaultCommand(goTo(this::position).withName("don't move"));
+    setDefaultCommand(goTo(DEFAULT_ANGLE).withName("don't move"));
 
     this.sysIdRoutine =
         new SysIdRoutine(

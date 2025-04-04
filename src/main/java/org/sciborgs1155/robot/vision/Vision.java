@@ -1,8 +1,5 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
@@ -26,6 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,31 +161,27 @@ public class Vision {
           var change = unreadChanges.get(j);
 
           // only reef tags
-          // if (Set.of("back left", "back right").contains(name)) {
-          //   change.targets =
-          //       change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
-          //   change.multitagResult =
-          //       change.multitagResult.filter(
-          //           r ->
-          //               r.fiducialIDsUsed.stream()
-          //                   .map(id -> REEF_TAGS.contains((int) id))
-          //                   .reduce(true, (a, b) -> a && b));
-          // }
+          change.targets =
+              change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+          change.multitagResult =
+              change.multitagResult.filter(
+                  r ->
+                      r.fiducialIDsUsed.stream()
+                          .map(id -> REEF_TAGS.contains((int) id))
+                          .reduce(true, (a, b) -> a && b));
 
           // negate pitch
-          if (cameras[i].getName() != "back middle") {
-            change.targets.stream()
-                .forEach(
-                    t -> {
-                      t.pitch = -t.pitch;
-                    });
-            change.multitagResult =
-                change.multitagResult.filter(
-                    r ->
-                        r.fiducialIDsUsed.stream()
-                            .map(id -> REEF_TAGS.contains((int) id))
-                            .reduce(true, (a, b) -> a && b));
-          }
+          change.targets.stream()
+              .forEach(
+                  t -> {
+                    t.pitch = -t.pitch;
+                  });
+          change.multitagResult =
+              change.multitagResult.filter(
+                  r ->
+                      r.fiducialIDsUsed.stream()
+                          .map(id -> REEF_TAGS.contains((int) id))
+                          .reduce(true, (a, b) -> a && b));
 
           // remove ambiguity
           change.targets =
@@ -297,17 +291,16 @@ public class Vision {
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
+    // disregard estimate heading after initial reposition
+    if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
+
     return estStdDevs.times(avgWeight);
   }
 
   @NotLogged
   public Transform3d[] cameraTransforms() {
     return new Transform3d[] {
-      FRONT_LEFT_CAMERA.robotToCam(),
-      FRONT_RIGHT_CAMERA.robotToCam(),
-      BACK_LEFT_CAMERA.robotToCam(),
-      BACK_RIGHT_CAMERA.robotToCam(),
-      BACK_MIDDLE_CAMERA.robotToCam()
+      FRONT_LEFT_CAMERA.robotToCam(), FRONT_RIGHT_CAMERA.robotToCam(),
     };
   }
 

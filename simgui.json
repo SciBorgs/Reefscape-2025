@@ -62,8 +62,10 @@
       "/SmartDashboard/translation quasistatic forward": "Command",
       "Robot/arm/fb": "ProfiledPIDController",
       "Robot/autos": "String Chooser",
+      "Robot/drive/poseController": "PIDController",
+      "Robot/drive/profiledPID": "ProfiledPIDController",
       "Robot/drive/rotationController": "PIDController",
-      "Robot/drive/translationController": "ProfiledPIDController",
+      "Robot/drive/translationController": "PIDController",
       "Robot/elevator/pid": "ProfiledPIDController"
     },
     "windows": {

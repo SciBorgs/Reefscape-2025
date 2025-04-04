@@ -57,7 +57,7 @@ public final class DriveConstants {
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(40);
   public static final LinearAcceleration MAX_SKID_ACCEL =
-      MetersPerSecondPerSecond.of(38); // TODO: Tune
+      MetersPerSecondPerSecond.of(36); // TODO: Tune
   public static final LinearAcceleration MAX_TILT_ACCEL =
       MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final AngularVelocity MAX_ANGULAR_SPEED =
@@ -100,6 +100,12 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Distance TOLERANCE = Centimeters.of(1);
+  }
+
+  public static final class NewTranslation {
+    public static final double P = 30.0;
+    public static final double I = 0.0;
+    public static final double D = 0.05;
   }
 
   public static final class Rotation {
