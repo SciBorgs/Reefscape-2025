@@ -3,8 +3,10 @@ package org.sciborgs1155.robot.elevator;
 import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.lib.FaultLogger.register;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
-import static org.sciborgs1155.robot.Ports.Elevator.*;
-import static org.sciborgs1155.robot.elevator.ElevatorConstants.*;
+import static org.sciborgs1155.robot.Ports.Elevator.BACK_FOLLOWER;
+import static org.sciborgs1155.robot.Ports.Elevator.FRONT_LEADER;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.CONVERSION_FACTOR;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.CURRENT_LIMIT;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -27,6 +29,9 @@ public class RealElevator implements ElevatorIO {
 
     leader.getConfigurator().apply(talonConfig);
     follower.getConfigurator().apply(talonConfig);
+
+    leader.setPosition(0);
+    follower.setPosition(0);
 
     TalonUtils.addMotor(leader);
     TalonUtils.addMotor(follower);
@@ -62,6 +67,11 @@ public class RealElevator implements ElevatorIO {
    */
   public double velocity() {
     return leader.getVelocity().getValueAsDouble();
+  }
+
+  @Override
+  public void resetPosition() {
+    leader.setPosition(0);
   }
 
   @Override

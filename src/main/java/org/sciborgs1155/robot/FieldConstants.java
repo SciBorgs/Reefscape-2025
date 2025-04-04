@@ -4,8 +4,10 @@ import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
+import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
-import static org.sciborgs1155.robot.Constants.strafe;
+import static org.sciborgs1155.robot.Constants.clamp;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class FieldConstants {
   // Origin at corner of blue alliance side of field
@@ -31,6 +34,42 @@ public class FieldConstants {
         && pose.getX() < LENGTH.in(Meters)
         && pose.getY() > 0
         && pose.getY() < WIDTH.in(Meters));
+  }
+
+  // TODO  hello!! IVAN!!! edit these as needed.
+
+  // The minimum field-relative Y that the robot goes to. This dictates how close to the center
+  // pillar the robot will try to score.
+  public static final Distance BARGE_MIN_Y = WIDTH.div(2).plus(Feet.of(2));
+
+  // The optimal X that the robot goes to. Increasing this value makes it go closer to the barge;
+  // decreasing makes it go farther.
+  public static final Distance BARGE_OPTIMAL_X = LENGTH.div(2).minus(Feet.of(4));
+
+  /**
+   * @param pose The field-relative pose of the robot.
+   * @return The nearest position to go to for the barge.
+   */
+  public static Pose2d nearestBarge(Pose2d pose) {
+    return allianceReflect( // I edited this comment muahahahah
+        new Pose2d(
+            BARGE_OPTIMAL_X.in(Meters),
+            clamp(
+                reflectDistance(pose.getMeasureY()).in(Meters),
+                BARGE_MIN_Y.in(Meters),
+                WIDTH.minus(BUMPER_LENGTH.div(2)).in(Meters)),
+            Rotation2d.kZero));
+  }
+
+  /**
+   * Reflects width-wise distances through the middle of the field if the alliance is red, otherwise
+   * does nothing
+   *
+   * @param blueDist The input distance, usually for the blue alliance.
+   * @return A reflected distance, only if the alliance is red.
+   */
+  private static Distance reflectDistance(Distance blueDist) {
+    return alliance() == Alliance.Blue ? blueDist : WIDTH.minus(blueDist);
   }
 
   public static final Distance REEF_MIN_RADIUS = Centimeters.of(166 / 2);
@@ -53,15 +92,14 @@ public class FieldConstants {
               .getMeasureX()
               .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
           CENTER_REEF.getMeasureY().plus(Inches.of(13 / 2)),
-          Rotation2d.fromRotations(0));
+          Rotation2d.kZero);
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-              CENTER_REEF
-                  .getMeasureX()
-                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-              Rotation2d.fromRotations(0))
-          .transformBy(strafe(Inches.of(3)));
+          CENTER_REEF
+              .getMeasureX()
+              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+          Rotation2d.kZero);
 
   // Reef faces
 
@@ -122,8 +160,6 @@ public class FieldConstants {
     }
   }
 
-  public static final Distance TO_THE_LEFT = Inches.of(0);
-
   // Poses for scoraling.
   // A is the side of the reef closest to the barge, then B is clockwise of that, etc.
   // There are two reef branches per side, so the more counter-clockwise one is 1, and the
@@ -146,30 +182,22 @@ public class FieldConstants {
     private final Pose2d pose;
 
     private Branch(Pose2d pose) {
-      this.pose =
-          pose.transformBy(Constants.strafe(TO_THE_LEFT.times(-1)))
-              .transformBy(Constants.advance(Inches.of(-1.25)));
+      this.pose = pose.transformBy(Constants.strafe(Inches.of(-3)));
     }
 
     public Pose2d pose() {
       return allianceReflect(pose);
     }
 
-    // /**
-    //  * Moves the pose in or out depending on the level.
-    //  *
-    //  * @param level The level that the movement depends on.
-    //  * @return A new pose moved to account for elevator tilt.
-    //  */
-    // public Pose2d withLevel(Level level) {
-    //   return switch (level) {
-    //     case L1, L2, L3 ->
-    //         pose().transformBy(Constants.advance(Inches.of(-2)));
-    //     case L4 ->
-    //         pose().transformBy(Constants.advance(Inches.of(-2)));
-    //     default -> pose(); // hi ;P
-    //   };
-    // }
+    /**
+     * Moves the pose in or out depending on the level.
+     *
+     * @param level The level that the movement depends on.
+     * @return A new pose moved to account for elevator tilt.
+     */
+    public Pose2d withLevel(Level level) {
+      return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-4.5))) : pose();
+    }
 
     /**
      * @return A list of all branch poses.
@@ -208,9 +236,9 @@ public class FieldConstants {
   }
 
   public static enum Cage {
-    LEFT(new Pose2d()),
-    MID(new Pose2d()),
-    RIGHT(new Pose2d());
+    LEFT(Pose2d.kZero),
+    MID(Pose2d.kZero),
+    RIGHT(Pose2d.kZero);
 
     private final Pose2d pose;
 
@@ -242,7 +270,7 @@ public class FieldConstants {
     }
   }
 
-  private static final Distance SOURCE_MID_DISPLACEMENT = Inches.of(20);
+  // private static final Distance SOURCE_MID_DISPLACEMENT = Inches.of(20);
 
   // Rotation of the top source (facing into the field)
   private static final Rotation2d SOURCE_ROTATION = Rotation2d.fromDegrees(90 - 144.011);
@@ -252,7 +280,7 @@ public class FieldConstants {
           new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(291.176))
               .plus(
                   new Translation2d(
-                      Constants.Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                      Constants.Robot.BUMPER_LENGTH.in(Meters) / 2.0 + 0.05,
                       Rotation2d.fromRadians(SOURCE_ROTATION.getRadians()))),
           SOURCE_ROTATION);
 
@@ -261,7 +289,7 @@ public class FieldConstants {
           new Translation2d(Units.inchesToMeters(33.526), Units.inchesToMeters(25.824))
               .plus(
                   new Translation2d(
-                      Constants.Robot.BUMPER_LENGTH.div(2).in(Meters) + 0.05,
+                      Constants.Robot.BUMPER_LENGTH.in(Meters) / 2.0 + 0.05,
                       Rotation2d.fromRadians(SOURCE_ROTATION.unaryMinus().getRadians()))),
           SOURCE_ROTATION.unaryMinus());
 
@@ -285,13 +313,13 @@ public class FieldConstants {
   }
 
   // We don't have these poses. do NOT use them.
-  public static final Pose2d PROCESSOR = allianceReflect(new Pose2d());
+  // public static final Pose2d PROCESSOR = allianceReflect(Pose2d.kZero);
 
-  public static final Pose2d CAGE_1 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_2 = allianceReflect(new Pose2d());
-  public static final Pose2d CAGE_3 = allianceReflect(new Pose2d());
+  // public static final Pose2d CAGE_1 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_2 = allianceReflect(Pose2d.kZero);
+  // public static final Pose2d CAGE_3 = allianceReflect(Pose2d.kZero);
 
-  public static Pose2d nearestCage(Pose2d pose) {
-    return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
-  }
+  // public static Pose2d nearestCage(Pose2d pose) {
+  //   return pose.nearest(List.of(CAGE_1, CAGE_2, CAGE_3)).rotateBy(Constants.allianceRotation());
+  // }
 }

@@ -2,6 +2,7 @@ package org.sciborgs1155.lib;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -16,6 +17,7 @@ public class UnitTestingUtil {
   public static void setupTests() {
     assert HAL.initialize(500, 0);
     DriverStationSim.resetData();
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.setEnabled(true);
     DriverStationSim.setTest(true);
     DriverStationSim.notifyNewData();
@@ -72,8 +74,7 @@ public class UnitTestingUtil {
    * @param command The command to run.
    */
   public static void run(Command command) {
-    command.schedule();
-    CommandScheduler.getInstance().run();
+    run(command, 1);
   }
 
   /**

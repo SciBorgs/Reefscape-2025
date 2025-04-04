@@ -6,7 +6,11 @@ import static org.sciborgs1155.robot.Ports.Drive.CANANDGYRO;
 
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.reduxrobotics.sensors.canandgyro.CanandgyroSettings;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.numbers.N2;
 import java.util.Queue;
 import org.sciborgs1155.lib.FaultLogger;
 
@@ -62,8 +66,18 @@ public class ReduxGyro implements GyroIO {
   }
 
   @Override
-  public void reset() {
-    canandgyro.setYaw(0);
+  public void reset(Rotation2d heading) {
+    canandgyro.setYaw(heading.getRotations());
+  }
+
+  @Override
+  public Vector<N2> acceleration() {
+    return VecBuilder.fill(
+        canandgyro.getAccelerationX(),
+        canandgyro.getAccelerationY()); // .rotateBy(canandgyro.getRotation2d());
+
+    // TODO We don't know if this is field relative or robot relative. if robot relative add in the
+    // commented code.
   }
 
   @Override

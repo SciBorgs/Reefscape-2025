@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.units.measure.Current;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.TalonUtils;
 
@@ -24,15 +23,10 @@ public class RealArm implements ArmIO {
   /** Controls arm orientation. */
   private final TalonFX leader;
 
-  // private final TalonFX follower;
-
   private TalonFXConfiguration config;
 
   public RealArm() {
-    leader = new TalonFX(ARM_LEADER, CANIVORE_NAME);
-    // follower = new TalonFX(ARM_FOLLOWER, CANIVORE_NAME);
-
-    // follower.setControl(new Follower(ARM_LEADER, false));
+    leader = new TalonFX(ARM_PIVOT, CANIVORE_NAME);
 
     // Resetting configuration
     config = new TalonFXConfiguration();
@@ -47,22 +41,20 @@ public class RealArm implements ArmIO {
     config.Feedback.FeedbackRemoteSensorID = CANCODER;
 
     leader.getConfigurator().apply(config);
-    // follower.getConfigurator().apply(config);
 
     FaultLogger.register(leader);
     TalonUtils.addMotor(leader);
-
-    // FaultLogger.register(follower);
-    // TalonUtils.addMotor(follower);
   }
 
   @Override
+  /** arm angle in radians */
   public double position() {
     // Converting 'rotations' to 'radians'
     return leader.getPosition().getValue().in(Radians);
   }
 
   @Override
+  /** rotational velocity of arm in radians per second */
   public double velocity() {
     // Converting 'rotations' to 'radians'
     return leader.getVelocity().getValue().in(RadiansPerSecond);
@@ -71,12 +63,6 @@ public class RealArm implements ArmIO {
   @Override
   public void setVoltage(double voltage) {
     leader.setVoltage(voltage);
-  }
-
-  @Override
-  public void setCurrentLimit(Current limit) {
-    config.CurrentLimits.SupplyCurrentLimit = limit.in(Amps);
-    leader.getConfigurator().apply(config);
   }
 
   @Override

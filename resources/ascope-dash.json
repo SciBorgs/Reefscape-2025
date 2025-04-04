@@ -1,45 +1,47 @@
 {
   "hubs": [
     {
-      "x": -10,
-      "y": -10,
-      "width": 1607,
-      "height": 866,
+      "x": -8,
+      "y": -8,
+      "width": 1936,
+      "height": 1056,
       "state": {
         "sidebar": {
-          "width": 389,
+          "width": 354,
           "expanded": [
             "/Robot/vision/getSeenTags/4",
             "/Robot/vision/getSeenTags/4/translation",
-            "/Robot/vision/getSeenTags",
             "/Robot/hopper/beambreak",
             "/Robot/align/planner",
             "/Faults",
             "/Robot/scoraling/elevator/setpoint",
             "/Robot/scoraling/elevator/pid",
-            "/Dashboard",
             "/Robot",
-            "/Robot/drive/moduleStates",
-            "/Robot/drive/moduleSetpoints",
             "/Robot/drive/moduleSetpoints/0",
             "/Robot/drive/moduleStates/0",
-            "/Robot/scoraling",
-            "/Robot/arm",
             "/Robot/scoraling/hopper",
             "/Robot/scoraling/hopper/beambreak",
             "/Robot/scoraling/scoral",
             "/Robot/scoraling/scoral/beambreak",
-            "/Robot/drive",
             "/NT",
             "/NT/Robot",
             "/NT/Robot/scoraling",
             "/NT/Robot/scoraling/elevator",
             "/NT/Robot/arm",
-            "/Robot/align"
+            "/Robot/align",
+            "/Robot/vision",
+            "/Robot/hopper",
+            "/Robot/scoral",
+            "/Robot/elevator",
+            "/Robot/LEDs",
+            "/Epilogue",
+            "/Epilogue/Stats",
+            "/Robot/arm",
+            "/NT/Robot/drive"
           ]
         },
         "tabs": {
-          "selected": 4,
+          "selected": 5,
           "tabs": [
             {
               "type": 0,
@@ -53,50 +55,8 @@
               "type": 1,
               "title": "modules",
               "controller": {
-                "leftSources": [
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/Robot/drive/moduleSetpoints/0/angle/value",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#2b66a2",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/Robot/drive/moduleStates/0/angle/value",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b",
-                      "size": "normal"
-                    }
-                  }
-                ],
-                "rightSources": [
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/Robot/drive/moduleSetpoints/0/speed",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#af2437",
-                      "size": "normal"
-                    }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/Robot/drive/moduleStates/0/speed",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#80588e",
-                      "size": "normal"
-                    }
-                  }
-                ],
+                "leftSources": [],
+                "rightSources": [],
                 "discreteSources": [],
                 "leftLockedRange": null,
                 "rightLockedRange": null,
@@ -122,21 +82,21 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Robot/arm/position",
+                    "logKey": "NT:Robot/elevator/position",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#2b66a2",
+                      "color": "#e5b31b",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Robot/arm/positionSetpoint",
+                    "logKey": "NT:Robot/elevator/positionSetpoint",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#e5b31b",
+                      "color": "#af2437",
                       "size": "normal"
                     }
                   }
@@ -144,21 +104,21 @@
                 "rightSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Robot/scoraling/elevator/position",
+                    "logKey": "NT:Robot/elevator/velocity",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
+                      "color": "#80588e",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/Robot/scoraling/elevator/positionSetpoint",
+                    "logKey": "NT:Robot/elevator/velocitySetpoint",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#80588e",
+                      "color": "#e48b32",
                       "size": "normal"
                     }
                   }
@@ -166,11 +126,11 @@
                 "discreteSources": [
                   {
                     "type": "stripes",
-                    "logKey": "NT:/Robot/scoraling/elevator/atGoal",
+                    "logKey": "NT:Robot/elevator/atGoal",
                     "logType": "Boolean",
                     "visible": true,
                     "options": {
-                      "color": "#e48b32"
+                      "color": "#2b66a2"
                     }
                   }
                 ],
@@ -197,18 +157,15 @@
               "controller": {
                 "sources": [
                   {
-                    "type": "states",
-                    "logKey": "NT:/Robot/drive/moduleStates",
-                    "logType": "SwerveModuleState[]",
+                    "type": "rotation",
+                    "logKey": "NT:Robot/drive/heading",
+                    "logType": "Rotation2d",
                     "visible": true,
-                    "options": {
-                      "color": "#0000ff",
-                      "arrangement": "0,1,2,3"
-                    }
+                    "options": {}
                   },
                   {
                     "type": "states",
-                    "logKey": "NT:/Robot/drive/moduleSetpoints",
+                    "logKey": "NT:Robot/drive/moduleSetpoints",
                     "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
@@ -217,11 +174,14 @@
                     }
                   },
                   {
-                    "type": "rotation",
-                    "logKey": "NT:/Robot/drive/heading",
-                    "logType": "Rotation2d",
+                    "type": "states",
+                    "logKey": "NT:Robot/drive/moduleStates",
+                    "logType": "SwerveModuleState[]",
                     "visible": true,
-                    "options": {}
+                    "options": {
+                      "color": "#0000ff",
+                      "arrangement": "0,1,2,3"
+                    }
                   }
                 ],
                 "maxSpeed": 5,
@@ -240,7 +200,7 @@
                 "sources": [
                   {
                     "type": "robot",
-                    "logKey": "NT:/Robot/drive/pose",
+                    "logKey": "NT:Robot/drive/pose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -248,18 +208,8 @@
                     }
                   },
                   {
-                    "type": "vision",
-                    "logKey": "NT:/Robot/vision/getSeenTags",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00",
-                      "size": "normal"
-                    }
-                  },
-                  {
                     "type": "swerveStates",
-                    "logKey": "NT:/Robot/drive/moduleSetpoints",
+                    "logKey": "NT:Robot/drive/moduleSetpoints",
                     "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
@@ -269,7 +219,7 @@
                   },
                   {
                     "type": "swerveStates",
-                    "logKey": "NT:/Robot/drive/moduleStates",
+                    "logKey": "NT:Robot/drive/moduleStates",
                     "logType": "SwerveModuleState[]",
                     "visible": true,
                     "options": {
@@ -278,22 +228,32 @@
                     }
                   },
                   {
+                    "type": "vision",
+                    "logKey": "NT:Robot/vision/getSeenTags",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
                     "type": "component",
-                    "logKey": "NT:/Robot/arm/pose",
+                    "logKey": "NT:Robot/arm/pose",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/scoraling/elevator/stage1",
+                    "logKey": "NT:Robot/elevator/stage1",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
-                    "logKey": "NT:/Robot/scoraling/elevator/carriage",
+                    "logKey": "NT:Robot/elevator/carriage",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {}
@@ -309,9 +269,19 @@
                     }
                   },
                   {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/alignment/goal pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Sciduck",
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
                     "type": "cone",
-                    "logKey": "NT:/Robot/camera transforms",
-                    "logType": "Pose3d[]",
+                    "logKey": "NT:Robot/vision/cameraTransforms",
+                    "logType": "Transform3d[]",
                     "visible": true,
                     "options": {
                       "color": "#ff0000",
@@ -320,12 +290,12 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/Robot/align/goal pose",
-                    "logType": "Pose2d",
+                    "logKey": "NT:Robot/vision/filteredEstimates",
+                    "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
                       "model": "Sciduck",
-                      "color": "#ffff00"
+                      "color": "#ff0000"
                     }
                   }
                 ],
@@ -337,17 +307,77 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.4705303552633413,
-                  1.7654032697251743,
-                  4.374467521737858
+                  -5.839031244520699,
+                  2.5496709056796583,
+                  -6.4588227750439025
                 ],
                 "cameraTarget": [
-                  3.4340872728078744,
-                  0.9876251917678255,
-                  0.6288662010102938
+                  -2.158285439163586,
+                  -9.017892985024604,
+                  25.376659148497538
                 ]
               },
-              "controlsHeight": 199
+              "controlsHeight": 246
+            },
+            {
+              "type": 2,
+              "title": "2D",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:Robot/drive/pose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "vision",
+                    "logKey": "NT:Robot/vision/getSeenTags",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/drive/estimated poses",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/Robot/drive/driveTo goal",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:Robot/vision/filteredEstimates",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000"
+                    }
+                  }
+                ],
+                "game": "2025 Field (Welded)",
+                "bumpers": "auto",
+                "origin": "blue",
+                "orientation": 0,
+                "size": 30
+              },
+              "controllerUUID": "p0hytnyv2zhloy8q50wnobz4fcngfjjy",
+              "renderer": null,
+              "controlsHeight": 200
             },
             {
               "type": 5,
@@ -363,15 +393,12 @@
               "type": 4,
               "title": "goals & beambreaks",
               "controller": [
-                "NT:/Robot/scoraling/hopper/beambreak/get",
-                "NT:/Robot/scoraling/scoral/beambreak/get",
-                "NT:/Robot/drive/atRotationalSetpoint",
-                "NT:/Robot/scoraling/stop",
-                "NT:/Robot/scoraling/elevator/atGoal",
-                "NT:raw x",
-                "NT:raw y",
-                "NT:final x",
-                "NT:final y"
+                "NT:Robot/drive/isStalling",
+                "NT:Robot/drive/isSkidding",
+                "NT:Robot/elevator/atGoal",
+                "NT:Robot/hopper/blocked",
+                "NT:Robot/scoral/blocked",
+                "NT:Robot/drive/atRotationalSetpoint"
               ],
               "controllerUUID": "azsxe2vuah56207xxjwonraxkcj3phjz",
               "renderer": null,
@@ -381,40 +408,15 @@
               "type": 4,
               "title": "commands",
               "controller": [
-                "NT:/Robot/scoraling/elevator/command",
-                "NT:/Robot/scoraling/scoral/command",
+                "NT:/Robot/scoral/command",
+                "NT:/Robot/elevator/command",
+                "NT:/Robot/hopper/command",
                 "NT:/Robot/drive/command",
-                "NT:/Robot/scoraling/hopper/command",
-                "NT:/Robot/scoraling/leftStrip/command",
-                "NT:/Robot/scoraling/rightStrip/command",
-                "NT:/Robot/middleLED/command"
+                "NT:/Robot/LEDs/command"
               ],
               "controllerUUID": "rlfjqqsvbtqe0qc2drsmrsow2sgds6so",
               "renderer": null,
               "controlsHeight": 0
-            },
-            {
-              "type": 10,
-              "title": "elevator",
-              "controller": [
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/Robot/scoraling/elevator/measurement/mech",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                },
-                {
-                  "type": "mechanism",
-                  "logKey": "NT:/Robot/scoraling/elevator/setpoint/mech",
-                  "logType": "Mechanism2d",
-                  "visible": true,
-                  "options": {}
-                }
-              ],
-              "controllerUUID": "f98pjbda8cms2m293n75h0yjn4816cfz",
-              "renderer": null,
-              "controlsHeight": 200
             },
             {
               "type": 10,
@@ -438,5 +440,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.2"
+  "version": "4.1.5"
 }
