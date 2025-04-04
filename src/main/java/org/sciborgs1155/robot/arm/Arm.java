@@ -102,7 +102,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     fb.setTolerance(POSITION_TOLERANCE.in(Radians));
     fb.reset(position());
     fb.setGoal(DEFAULT_ANGLE.in(Radians));
-    // fb.enableContinuousInput(-Math.PI, Math.PI);
+    fb.enableContinuousInput(-Math.PI, Math.PI);
 
     setDefaultCommand(goTo(DEFAULT_ANGLE).withName("don't move"));
 

@@ -379,7 +379,7 @@ public class Robot extends CommandRobot {
     operator.rightTrigger().and(operator.b()).onTrue(corolling.algaeIntake());
     operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorGoTo()).onFalse(corolling.processorOuttake());
 
-    operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake());
+    operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake()).onFalse(coroller.coralIntake());
     operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
     // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));

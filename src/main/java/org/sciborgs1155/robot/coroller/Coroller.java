@@ -53,12 +53,12 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
   // TODO specify which gamepiece this intakes
   /** Makes the roller spin inwards(towards robot). */
   public Command algaeIntake() {
-    return run(() -> hardware.set(INTAKE_POWER)).withName("intake");
+    return run(() -> hardware.set(-INTAKE_POWER)).withName("intake");
   }
 
   /** Makes the roller spin outwards(away from robot). */
   public Command coralIntake() {
-    return run(() -> hardware.set(OUTTAKE_POWER)).withName("outtake");
+    return run(() -> hardware.set(INTAKE_POWER)).withName("outtake");
   }
 
   /** Stops the roller motors. */

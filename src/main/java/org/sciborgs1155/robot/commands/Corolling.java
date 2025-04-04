@@ -25,19 +25,18 @@ public class Corolling {
   public Command coralIntake() {
     return arm.goTo(CORAL_INTAKE_ANGLE)
         .asProxy()
-        .withDeadline(
+        .alongWith(
             Commands.waitUntil(() -> arm.atPosition(CORAL_INTAKE_ANGLE.in(Radians)))
-                .andThen(roller.coralIntake().asProxy().withTimeout(1)))
+                .andThen(roller.coralIntake().asProxy()))
         .withName("ground intake");
   }
 
   public Command algaeIntake() {
     return arm.goTo(ALGAE_INTAKE_ANGLE)
         .asProxy()
-        .withDeadline(
+        .alongWith(
             Commands.waitUntil(() -> arm.atPosition(ALGAE_INTAKE_ANGLE.in(Radians)))
-                .andThen(roller.algaeIntake().asProxy().withTimeout(1)))
-        .andThen(roller.algaeIntake())
+                .andThen(roller.algaeIntake().asProxy()))
         .withName("ground intake");
   }
   
