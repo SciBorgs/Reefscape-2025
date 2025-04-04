@@ -46,14 +46,25 @@ public class ScoralingTest {
   }
 
   @Test
+  public void testRunRollers() {
+    fastForward(1);
+    assertEquals(hopper.getCurrentCommand().getName(), "stop");
+    assertEquals(scoral.getCurrentCommand().getName(), "stop");
+    run(scoraling.runRollers());
+    assertEquals(hopper.getCurrentCommand().getName(), "intake");
+    assertEquals(scoral.getCurrentCommand().getName(), "intake");
+  }
+
+  @Test
   public void hpsIntakeTest() {
     run(scoraling.hpsIntake());
-    assertEquals(
-        MIN_EXTENSION.in(Meters),
-        elevator.position(),
-        ElevatorConstants.POSITION_TOLERANCE.in(Meters));
-    assertTrue(hopper.getCurrentCommand().getName() == "intakingHPS");
-    assertTrue(scoral.getCurrentCommand().getName() == "intakingHPS");
+    assert elevator.atPosition(MIN_EXTENSION.in(Meters));
+    assertEquals(elevator.getCurrentCommand().getName(), "retracting");
+    assertEquals(hopper.getCurrentCommand().getName(), "stop");
+    assertEquals(scoral.getCurrentCommand().getName(), "stop");
+    fastForward(2);
+    assertEquals(hopper.getCurrentCommand().getName(), "intake");
+    assertEquals(scoral.getCurrentCommand().getName(), "intake");
   }
 
   @ParameterizedTest

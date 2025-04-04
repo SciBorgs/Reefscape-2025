@@ -104,13 +104,13 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     fb.setGoal(DEFAULT_ANGLE.in(Radians));
     fb.enableContinuousInput(-Math.PI, Math.PI);
 
-    setDefaultCommand(goTo(DEFAULT_ANGLE));
+    setDefaultCommand(goTo(DEFAULT_ANGLE).withName("don't move"));
 
     this.sysIdRoutine =
         new SysIdRoutine(
             new Config(
                 Volts.of(0.5).per(Second),
-                Volts.of(0.2),
+                Volts.of(0.8),
                 Seconds.of(5),
                 (state) -> SignalLogger.writeString("arm state", state.toString())),
             new Mechanism(voltage -> hardware.setVoltage(voltage.in(Volts)), null, this));
@@ -202,9 +202,9 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command manualArm(InputStream input) {
     return goTo(input
             .deadband(.15, 1)
-            .scale(MAX_VELOCITY.in(RotationsPerSecond))
+            .scale(MAX_VELOCITY.in(RadiansPerSecond))
             .scale(Constants.PERIOD.in(Seconds))
-            .rateLimit(MAX_ACCEL.in(RotationsPerSecondPerSecond))
+            .rateLimit(MAX_ACCEL.in(RadiansPerSecondPerSecond))
             .add(() -> fb.getGoal().position))
         .withName("manual arm");
   }
@@ -223,28 +223,6 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     return new Test(testCommand, Set.of(atGoal));
   }
 
-  /**
-   * Moves the arm to an angle necessary to attach to the cage.
-   *
-   * @return A command to move the arm to be horizontal.
-   */
-  public Command climbSetup() {
-    return goTo(CLIMB_INTAKE_ANGLE).withName("climb setup");
-  }
-
-  /**
-   * Increases the current limit for the arm, then moves the arm back to climb. Keep in mind that
-   * this is a one-time command, and is completely uninteruptible.
-   *
-   * @return A command to climb, once the climb arm is hooked onto the cage.
-   */
-  public Command climbExecute() {
-    return runOnce(() -> hardware.setCurrentLimit(CLIMB_LIMIT))
-        .andThen(goTo(CLIMB_FINAL_ANGLE))
-        .finallyDo(() -> hardware.setCurrentLimit(SUPPLY_LIMIT))
-        .withName("climb execute");
-  }
-
   public Command quasistaticForward() {
     return sysIdRoutine
         .quasistatic(Direction.kForward)
@@ -255,7 +233,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command quasistaticBack() {
     return sysIdRoutine
         .quasistatic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        // .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
         .withName("quasistatic backward");
   }
 
@@ -269,7 +247,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   public Command dynamicBack() {
     return sysIdRoutine
         .dynamic(Direction.kReverse)
-        .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
+        // .until(() -> position() < MIN_ANGLE.in(Radians) + 0.2)
         .withName("dynamic backward");
   }
 

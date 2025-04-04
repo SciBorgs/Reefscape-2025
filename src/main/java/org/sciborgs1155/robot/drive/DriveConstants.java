@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static java.lang.Math.PI;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -56,7 +57,7 @@ public final class DriveConstants {
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5);
   public static final LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(40);
   public static final LinearAcceleration MAX_SKID_ACCEL =
-      MetersPerSecondPerSecond.of(38); // TODO: Tune
+      MetersPerSecondPerSecond.of(36); // TODO: Tune
   public static final LinearAcceleration MAX_TILT_ACCEL =
       MetersPerSecondPerSecond.of(12); // TODO: Tune
   public static final AngularVelocity MAX_ANGULAR_SPEED =
@@ -101,6 +102,12 @@ public final class DriveConstants {
     public static final Distance TOLERANCE = Centimeters.of(1);
   }
 
+  public static final class NewTranslation {
+    public static final double P = 30.0;
+    public static final double I = 0.0;
+    public static final double D = 0.05;
+  }
+
   public static final class Rotation {
     public static final double P = 4.5;
     public static final double I = 0.0;
@@ -113,7 +120,7 @@ public final class DriveConstants {
     public static final double COUPLING_RATIO = 0;
 
     public static final class Driving {
-      public static final Distance CIRCUMFERENCE = Inches.of(4.0 * Math.PI);
+      public static final Distance CIRCUMFERENCE = WHEEL_RADIUS.times(2 * PI);
 
       public static final double GEARING = 5.68;
 

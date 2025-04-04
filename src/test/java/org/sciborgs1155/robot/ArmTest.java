@@ -1,17 +1,11 @@
 package org.sciborgs1155.robot;
 
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.sciborgs1155.lib.Test.runUnitTest;
 import static org.sciborgs1155.lib.UnitTestingUtil.*;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_FINAL_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.CLIMB_INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.MIN_ANGLE;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -41,20 +35,6 @@ public class ArmTest {
   public void fullExtension() {
     runUnitTest(arm.goToTest(MIN_ANGLE));
     runUnitTest(arm.goToTest(MAX_ANGLE));
-  }
-
-  @Disabled
-  @Test
-  public void climbTest() {
-    run(arm.climbSetup());
-    fastForward();
-    assertEquals(CLIMB_INTAKE_ANGLE.in(Radians), arm.position(), TOLERANCE);
-    Command exec = arm.climbExecute();
-    run(exec);
-    fastForward();
-    assertEquals(CLIMB_FINAL_ANGLE.in(Radians), arm.position(), TOLERANCE);
-    fastForward(Seconds.of(10));
-    assertFalse(exec::isFinished);
   }
 
   @RepeatedTest(5)

@@ -1,0 +1,189 @@
+{
+  "HALProvider": {
+    "Addressable LEDs": {
+      "window": {
+        "visible": true
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Faults/Active Faults": "Alerts",
+      "/Faults/Total Faults": "Alerts",
+      "/Robot/arm/armCanvas": "Mechanism2d",
+      "/Robot/arm/fb": "ProfiledPIDController",
+      "/Robot/drive/field2d": "Field2d",
+      "/Robot/drive/rotationController": "PIDController",
+      "/Robot/drive/translationController": "ProfiledPIDController",
+      "/Robot/scoraling/elevator/measurement/mech": "Mechanism2d",
+      "/Robot/scoraling/elevator/pid": "ProfiledPIDController",
+      "/Robot/scoraling/elevator/setpoint/mech": "Mechanism2d",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Drive Field": "Field2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Robot/arm/dynamic backward": "Command",
+      "/SmartDashboard/Robot/arm/dynamic forward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/arm/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/arm/visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/dynamic backward": "Command",
+      "/SmartDashboard/Robot/elevator/dynamic forward": "Command",
+      "/SmartDashboard/Robot/elevator/measurement visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/elevator/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/elevator/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/elevator/setpoint visualizer": "Mechanism2d",
+      "/SmartDashboard/Robot/rotation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/rotation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/rotation/quasistatic forward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic backward": "Command",
+      "/SmartDashboard/Robot/translation/dynamic forward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic backward": "Command",
+      "/SmartDashboard/Robot/translation/quasistatic forward": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
+      "/SmartDashboard/arm dynamic backward": "Command",
+      "/SmartDashboard/arm dynamic forward": "Command",
+      "/SmartDashboard/arm quasistatic backward": "Command",
+      "/SmartDashboard/arm quasistatic forward": "Command",
+      "/SmartDashboard/elevator dynamic backward": "Command",
+      "/SmartDashboard/elevator dynamic forward": "Command",
+      "/SmartDashboard/elevator quasistatic backward": "Command",
+      "/SmartDashboard/elevator quasistatic forward": "Command",
+      "/SmartDashboard/rotation dynamic backward": "Command",
+      "/SmartDashboard/rotation dynamic forward": "Command",
+      "/SmartDashboard/rotation quasistatic backward": "Command",
+      "/SmartDashboard/rotation quasistatic forward": "Command",
+      "/SmartDashboard/translation dynamic backward": "Command",
+      "/SmartDashboard/translation dynamic forward": "Command",
+      "/SmartDashboard/translation quasistatic backward": "Command",
+      "/SmartDashboard/translation quasistatic forward": "Command",
+      "Robot/arm/fb": "ProfiledPIDController",
+      "Robot/autos": "String Chooser",
+      "Robot/drive/poseController": "PIDController",
+      "Robot/drive/profiledPID": "ProfiledPIDController",
+      "Robot/drive/rotationController": "PIDController",
+      "Robot/drive/translationController": "PIDController",
+      "Robot/elevator/pid": "ProfiledPIDController"
+    },
+    "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/drive/field2d": {
+        "bottom": 1638,
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/measurement/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/Robot/elevator/setpoint/mech": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Drive Field": {
+        "bottom": 1638,
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "retained": {
+      "Robot": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "Epilogue": {
+        "Stats": {
+          "open": true
+        },
+        "open": true
+      },
+      "Robot": {
+        "align": {
+          "open": true,
+          "planner": {
+            "Pose2d##v_Robot/align/planner/goal": {
+              "Rotation2d##v_rotation": {
+                "open": true
+              },
+              "Translation2d##v_translation": {
+                "open": true
+              },
+              "open": true
+            },
+            "open": true
+          }
+        },
+        "drive": {
+          "open": true
+        },
+        "open": true,
+        "scoraling": {
+          "scoral": {
+            "beambreak": {
+              "open": true
+            }
+          }
+        }
+      },
+      "SmartDashboard": {
+        "PDH": {
+          "open": true
+        }
+      },
+      "Tracer": {
+        "robot main": {
+          "open": true
+        }
+      },
+      "notfound": {
+        "open": true
+      },
+      "photonvision": {
+        "front left": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  }
+}

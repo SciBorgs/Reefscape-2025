@@ -16,8 +16,7 @@ import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.Ports.Drive.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.*;
 import static org.sciborgs1155.robot.drive.DriveConstants.ModuleConstants.Driving.FF_CONSTANTS;
-import static org.sciborgs1155.robot.drive.DriveConstants.RADIUS;
-import static org.sciborgs1155.robot.drive.DriveConstants.SKIDDING_THRESHOLD;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_VELOCITY;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
@@ -103,16 +102,28 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(MODULE_OFFSET);
 
   @NotLogged
+  private final DoubleEntry oldTranslationP =
+      Tuning.entry("Robot/tuning/drive/old translation p", Translation.P);
+
+  @NotLogged
+  private final DoubleEntry oldTranslationI =
+      Tuning.entry("Robot/tuning/drive/old translation i", Translation.I);
+
+  @NotLogged
+  private final DoubleEntry oldTranslationD =
+      Tuning.entry("Robot/tuning/drive/old translation d", Translation.D);
+
+  @NotLogged
   private final DoubleEntry translationP =
-      Tuning.entry("Robot/tuning/drive/translation p", Translation.P);
+      Tuning.entry("Robot/tuning/drive/new translation p", NewTranslation.P);
 
   @NotLogged
   private final DoubleEntry translationI =
-      Tuning.entry("Robot/tuning/drive/translation i", Translation.I);
+      Tuning.entry("Robot/tuning/drive/new translation i", NewTranslation.I);
 
   @NotLogged
   private final DoubleEntry translationD =
-      Tuning.entry("Robot/tuning/drive/translation d", Translation.D);
+      Tuning.entry("Robot/tuning/drive/new translation d", NewTranslation.D);
 
   @NotLogged
   private final DoubleEntry rotationP = Tuning.entry("Robot/tuning/drive/rotation p", Rotation.P);
@@ -153,12 +164,22 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   // Movement automation
   @Logged
-  private final ProfiledPIDController translationController =
+  private final ProfiledPIDController profiledPID =
       new ProfiledPIDController(
-          translationP.get(),
-          translationI.get(),
-          translationD.get(),
-          new TrapezoidProfile.Constraints(MAX_SPEED.in(MetersPerSecond), 12));
+          oldTranslationP.get(),
+          oldTranslationI.get(),
+          oldTranslationD.get(),
+          new TrapezoidProfile.Constraints(
+              MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
+
+  @Logged
+  private final PIDController poseController =
+      new PIDController(translationP.get(), translationI.get(), translationD.get());
+
+  private final TrapezoidProfile poseProfile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              MAX_VELOCITY.in(MetersPerSecond) / 4., MAX_ACCEL.in(MetersPerSecondPerSecond) / 4.));
 
   @Logged
   private final PIDController rotationController =
@@ -283,7 +304,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                 this,
                 "rotation"));
 
-    gyro.reset();
+    gyro.reset(Rotation2d.kZero);
     odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
 
     for (int i = 0; i < modules.size(); i++) {
@@ -291,7 +312,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
       modules2d[i] = field2d.getObject("module-" + module.name());
     }
 
-    translationController.setTolerance(Translation.TOLERANCE.in(Meters));
+    profiledPID.setTolerance(Translation.TOLERANCE.in(Meters));
+    poseController.setTolerance(Translation.TOLERANCE.in(Meters));
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
@@ -377,6 +399,15 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return pose().getRotation();
   }
 
+  /**
+   * Return the gyro's heading (unaffected by vision and wheel odometry throughout a match).
+   *
+   * <p>This value is reset to odometry heading on each robot enable. Primarily used for
+   * field-relative applications.
+   *
+   * @return The gyro heading, set after enable to be field-relative after odometry correction.
+   */
+  @Logged
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
@@ -479,9 +510,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           Vector<N2> perpDisplacement = displacement.projection(driverVel).minus(displacement);
           Vector<N2> result =
               driverVel.plus(
-                  perpDisplacement
-                      .unit()
-                      .times(translationController.calculate(perpDisplacement.norm(), 0)));
+                  perpDisplacement.unit().times(profiledPID.calculate(perpDisplacement.norm(), 0)));
           setChassisSpeeds(
               Math.acos(driverVel.unit().dot(displacement.unit()))
                           < ASSISTED_DRIVING_THRESHOLD.in(Radians)
@@ -760,7 +789,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                   MathUtil.angleModulus(
                           pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
                       * RADIUS.in(Meters));
-          double out = translationController.calculate(difference.norm(), 0);
+          double out = profiledPID.calculate(difference.norm(), 0) / 2.5;
           Vector<N3> velocities = difference.unit().times(out);
           Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(
@@ -775,6 +804,45 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
         .andThen(stop())
         .withName("drive to pose");
+  }
+
+  @Logged private double prevError = -1;
+
+  public Command newDriveTo(Supplier<Pose2d> target) {
+    return run(() -> {
+          Pose2d targetPose = target.get();
+          Pose2d pose = pose();
+          Vector<N3> difference =
+              VecBuilder.fill(
+                  pose.getX() - targetPose.getX(),
+                  pose.getY() - targetPose.getY(),
+                  MathUtil.angleModulus(
+                          pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
+                      * RADIUS.in(Meters));
+          double error = difference.norm();
+          TrapezoidProfile.State goal =
+              poseProfile.calculate(
+                  PERIOD.in(Seconds),
+                  new TrapezoidProfile.State(
+                      error, (error - (prevError == -1 ? error : prevError)) / PERIOD.in(Seconds)),
+                  new TrapezoidProfile.State(0, 0));
+          double out = poseController.calculate(error, goal.position);
+          prevError = error;
+          Vector<N3> velocities = difference.unit().times(out);
+          Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
+          setChassisSpeeds(
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  velocities.get(0),
+                  velocities.get(1),
+                  velocities.get(2) / RADIUS.in(Meters),
+                  pose().getRotation()),
+              ControlMode.CLOSED_LOOP_VELOCITY,
+              0);
+        })
+        .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
+        .andThen(stop())
+        .finallyDo(() -> prevError = -1)
+        .withName("new weird drive to pose");
   }
 
   public Command driveTo(Pose2d goal) {
@@ -831,7 +899,12 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   /** Zeroes the heading of the robot. */
   public Command zeroHeading() {
-    return runOnce(gyro::reset);
+    return resetGyro(Rotation2d.kZero);
+  }
+
+  /** Sets the gyro reading of the robot to a specified rotation. */
+  public Command resetGyro(Rotation2d rotation) {
+    return runOnce(() -> gyro.reset(rotation)).withName("gyro reset");
   }
 
   /** Returns the module states. */
@@ -877,9 +950,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         VecBuilder.fill(sample.vx, sample.vy)
             .plus(
                 displacement.norm() > 1e-4
-                    ? displacement
-                        .unit()
-                        .times(translationController.calculate(displacement.norm(), 0))
+                    ? displacement.unit().times(profiledPID.calculate(displacement.norm(), 0))
                     : displacement.times(0));
 
     if (Double.isNaN(result.norm())) {
@@ -1006,7 +1077,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     }
 
     if (TUNING) {
-      translationController.setPID(translationP.get(), translationI.get(), translationD.get());
+      profiledPID.setPID(oldTranslationP.get(), oldTranslationI.get(), oldTranslationD.get());
+      poseController.setPID(translationP.get(), translationI.get(), translationD.get());
       rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
     }
 

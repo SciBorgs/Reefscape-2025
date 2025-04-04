@@ -47,18 +47,22 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
     config.CurrentLimits.SupplyCurrentLimit = SUPPLY_LIMIT.in(Amps);
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-    return SimpleMotor.talon(new TalonFX(GroundIntake.ROLLER_MOTOR, CANIVORE_NAME), config);
+    return SimpleMotor.talon(new TalonFX(GroundIntake.ARM_INTAKE, CANIVORE_NAME), config);
   }
 
   // TODO specify which gamepiece this intakes
   /** Makes the roller spin inwards(towards robot). */
-  public Command intake() {
-    return run(() -> hardware.set(INTAKE_POWER)).withName("intake");
+  public Command algaeIntake() {
+    return run(() -> hardware.set(-INTAKE_POWER)).withName("intake");
   }
 
   /** Makes the roller spin outwards(away from robot). */
-  public Command outtake() {
-    return run(() -> hardware.set(OUTTAKE_POWER)).withName("outtake");
+  public Command coralIntake() {
+    return run(() -> hardware.set(INTAKE_POWER)).withName("outtake");
+  }
+
+  public Command coralOuttake() {
+    return run(() -> hardware.set(-INTAKE_POWER / 2));
   }
 
   /** Stops the roller motors. */
