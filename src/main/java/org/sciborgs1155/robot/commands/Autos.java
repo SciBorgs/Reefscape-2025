@@ -87,7 +87,7 @@ public class Autos {
         () ->
             alignment
                 .source()
-                .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
+                .withDeadline(scoraling.hpsIntake().asProxy())
                 .withTimeout(5);
 
     Command source = attempt.get();

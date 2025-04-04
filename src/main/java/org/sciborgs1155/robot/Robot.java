@@ -14,7 +14,9 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.Constants.allianceRotation;
+import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
+import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -270,9 +272,9 @@ public class Robot extends CommandRobot {
         .onFalse(
             Commands.runOnce(
                 () -> {
-                //   drive
-                //       .resetGyro(allianceRotation().plus(drive.heading()))
-                //       .withName("gyro reset enabled");
+                  //   drive
+                  //       .resetGyro(allianceRotation().plus(drive.heading()))
+                  //       .withName("gyro reset enabled");
                   vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
                 }));
 
@@ -314,43 +316,24 @@ public class Robot extends CommandRobot {
 
     driver.a().whileTrue(align.source());
 
-    driver.x().whileTrue(align.nearReef(Side.LEFT));
-    driver.b().whileTrue(align.nearReef(Side.RIGHT));
+    driver.x().and(driver.povDown()).whileTrue(align.nearReef(Side.LEFT, Level.L2));
+    driver.b().and(driver.povDown()).whileTrue(align.nearReef(Side.RIGHT, Level.L2));
+
+    driver.x().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.LEFT, Level.L4));
+    driver.b().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.RIGHT, Level.L4));
 
     driver.y().whileTrue(align.barge());
 
-    // B for dashboard select
-    // driver.povLeft().onTrue(drive.zeroHeading());
+    driver.povLeft().onTrue(drive.zeroHeading());
 
-    driver
-        .povLeft()
-        .whileTrue(
-            align
-                .nearAlgae()
-                .alongWith(
-                    leds.progressGradient(
-                        () -> 1 - elevator.position() / Level.L2_ALGAE.extension.in(Meters),
-                        elevator::atGoal)));
-
-    driver
-        .povRight()
-        .whileTrue(
-            align
-                .nearAlgae()
-                .alongWith(
-                    leds.progressGradient(
-                        () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
-                        elevator::atGoal)));
 
     // driver.povUp().whileTrue(coroller.intake());
 
     driver.povUp().whileTrue(align.nearAlgae());
 
-    driver.povDown().whileTrue(coroller.coralIntake());
-
     // OPERATOR
 
-    // 
+    //
     // operator.rightTrigger()
 
     operator.leftBumper().whileTrue(scoral.score());
@@ -374,16 +357,23 @@ public class Robot extends CommandRobot {
                 .alongWith(
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
-
     // corolling
-    operator.rightTrigger().and(operator.b()).whileTrue(corolling.algaeIntake()).onFalse(corolling.processorGoTo());
+    operator
+        .rightTrigger()
+        .and(operator.b())
+        .whileTrue(corolling.algaeIntake())
+        .onFalse(corolling.processorGoTo());
     operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
 
-    operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake()).onFalse(coroller.coralIntake());
+    operator
+        .rightTrigger()
+        .and(operator.b().negate())
+        .whileTrue(corolling.coralIntake())
+        .onFalse(coroller.coralIntake());
     operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
     // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
-    
+
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator
@@ -458,14 +448,15 @@ public class Robot extends CommandRobot {
 
   public Command systemsCheck() {
     return Test.toCommand(
-            Test.fromCommand(leds.blink(Color.kRed).withTimeout(0.5)),
+            // Test.fromCommand(leds.blink(Color.kRed).withTimeout(0.5)),
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
-            // arm.goToTest(INTAKE_ANGLE),
-            // Test.fromCommand(coroller.outtake().withTimeout(1)),
-            // Test.fromCommand(coroller.intake().withTimeout(1)),
-            // arm.goToTest(DEFAULT_ANGLE),
+            arm.goToTest(CORAL_INTAKE_ANGLE),
+            arm.goToTest(TROUGH_OUTTAKE_ANGLE),
+            Test.fromCommand(coroller.coralIntake().asProxy().withTimeout(0.5)),
+            Test.fromCommand(coroller.coralOuttake().asProxy().withTimeout(0.5)),
+            arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(
                 scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
@@ -476,8 +467,8 @@ public class Robot extends CommandRobot {
                                 new ChassisSpeeds(1, 0, 0),
                                 ControlMode.CLOSED_LOOP_VELOCITY,
                                 ElevatorConstants.MIN_EXTENSION.in(Meters)))
-                    .withTimeout(Seconds.of(0.1))),
-            Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
+                    .withTimeout(Seconds.of(0.1))))
+            // Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }
 

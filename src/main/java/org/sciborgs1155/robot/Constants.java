@@ -101,7 +101,7 @@ public class Constants {
 
   public static RobotType ROBOT_TYPE = RobotType.FULL;
 
-  public static boolean TUNING = true;
+  public static boolean TUNING = false;
 
   /**
    * Creates a Vector from polar coordinates.

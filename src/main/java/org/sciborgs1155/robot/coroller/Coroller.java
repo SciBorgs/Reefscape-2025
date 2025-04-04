@@ -3,7 +3,6 @@ package org.sciborgs1155.robot.coroller;
 import static edu.wpi.first.units.Units.Amps;
 import static org.sciborgs1155.robot.Constants.CANIVORE_NAME;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.INTAKE_POWER;
-import static org.sciborgs1155.robot.coroller.CorollerConstants.OUTTAKE_POWER;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.STRATOR_LIMIT;
 import static org.sciborgs1155.robot.coroller.CorollerConstants.SUPPLY_LIMIT;
 

@@ -28,7 +28,7 @@ public class ArmConstants {
 
   public static final Angle DEFAULT_ANGLE = Radians.of(1.266); // Radians.of(Math.PI * 5 / 8);
 
-  public static final Angle CORAL_INTAKE_ANGLE = Radians.of(-0.67);//-0.638);
+  public static final Angle CORAL_INTAKE_ANGLE = Radians.of(-0.67); // -0.638);
   public static final Angle PROCESSOR_OUTTAKE_ANGLE = Radians.of(0.8973787609131001);
   public static final Angle TROUGH_OUTTAKE_ANGLE = Radians.of(.97);
   public static final Angle ALGAE_INTAKE_ANGLE = Radians.of(0.273);

@@ -234,8 +234,8 @@ public class Alignment {
    * @param side The branch side (Left/Right) to score on.
    * @return A command to align to the nearest reef branch.
    */
-  public Command nearReef(Side side) {
-    return alignTo(() -> Face.nearest(drive.pose()).branch(side).withLevel(Level.L4)).asProxy();
+  public Command nearReef(Side side, Level level) {
+    return alignTo(() -> Face.nearest(drive.pose()).branch(side).withLevel(level)).asProxy();
   }
 
   /**
