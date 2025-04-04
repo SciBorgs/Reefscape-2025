@@ -376,13 +376,13 @@ public class Robot extends CommandRobot {
 
 
     // corolling
-    // operator.rightTrigger().and(operator.b()).whileTrue(corolling.algaeIntake());
-    // operator.leftTrigger().and(operator.b()).whileTrue(corolling.processor());
+    operator.rightTrigger().and(operator.b()).onTrue(corolling.algaeIntake());
+    operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorGoTo()).onFalse(corolling.processorOuttake());
 
-    // operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake());
-    // operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
+    operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake());
+    operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
-    operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
+    // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
     
     operator.y().whileTrue(scoraling.runRollersBack());
 

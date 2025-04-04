@@ -27,7 +27,7 @@ public class Corolling {
         .asProxy()
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(CORAL_INTAKE_ANGLE.in(Radians)))
-                .andThen(roller.algaeIntake().asProxy().withTimeout(1)))
+                .andThen(roller.coralIntake().asProxy().withTimeout(1)))
         .withName("ground intake");
   }
 
@@ -37,19 +37,26 @@ public class Corolling {
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(ALGAE_INTAKE_ANGLE.in(Radians)))
                 .andThen(roller.algaeIntake().asProxy().withTimeout(1)))
+        .andThen(roller.algaeIntake())
         .withName("ground intake");
   }
+  
   /**
    * Moves the arm to the processor angle and then outtakes.
    *
    * @return A command for outtaking algae in the processor.
    */
-  public Command processor() {
-    return arm.goTo(PROCESSOR_OUTTAKE_ANGLE)
-        .withDeadline(
-            Commands.waitUntil(() -> arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.coralIntake().asProxy().withTimeout(1)))
+  public Command processorGoTo() {
+    return 
+      arm.goTo(PROCESSOR_OUTTAKE_ANGLE)
         .withName("processor");
+  }
+
+  public Command processorOuttake() {
+    return arm.goTo(PROCESSOR_OUTTAKE_ANGLE).asProxy()
+    .withDeadline(
+      Commands.waitUntil(() -> arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radians)))
+          .andThen(roller.coralIntake().asProxy().withTimeout(1)));
   }
 
   /**
@@ -58,10 +65,10 @@ public class Corolling {
    * @return A command for outtaking coral into the trough (L1).
    */
   public Command trough() {
-    return arm.goTo(TROUGH_OUTTAKE_ANGLE)
+    return arm.goTo(TROUGH_OUTTAKE_ANGLE).asProxy()
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.coralIntake().asProxy().withTimeout(1)))
+                .andThen(roller.algaeIntake().asProxy().withTimeout(1)))
         .withName("trough");
   }
 }
