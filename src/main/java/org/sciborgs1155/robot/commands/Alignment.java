@@ -81,7 +81,7 @@ public class Alignment {
                             .backend
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
-            pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))))
+            pathfind(() -> goal.get().transformBy(advance(Meters.of(-0.5))))
                 .withName("go to reef")
                 .asProxy(),
             // pathfind(goal, MetersPerSecond.of(0.1))
