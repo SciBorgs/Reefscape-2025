@@ -21,36 +21,6 @@ public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-  public static final CameraConfig BACK_LEFT_CAMERA =
-      new CameraConfig(
-          "back left",
-          new Transform3d(
-              Inches.of(-13.227812).in(Meters),
-              Inches.of(12.049788).in(Meters),
-              Inches.of(9.629971).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-25), Radians.zero())
-                  .rotateBy(new Rotation3d(Radians.zero(), Radians.zero(), Degrees.of(160)))));
-
-  public static final CameraConfig BACK_RIGHT_CAMERA =
-      new CameraConfig(
-          "back right",
-          new Transform3d(
-              Inches.of(-13.227812).in(Meters),
-              Inches.of(-12.049788).in(Meters),
-              Inches.of(9.629971).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-25), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-160)))));
-
-  public static final CameraConfig BACK_MIDDLE_CAMERA =
-      new CameraConfig(
-          "back middle",
-          new Transform3d(
-              Inches.of(-9.340270).in(Meters), // -10
-              Inches.of(4.449673).in(Meters), // 3.354
-              Inches.of(12.249288).in(Meters), // 12.341
-              new Rotation3d(Radians.zero(), Degrees.of(-15), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-165)))));
-
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
           "front left",

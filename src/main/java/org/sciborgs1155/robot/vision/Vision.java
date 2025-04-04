@@ -1,8 +1,5 @@
 package org.sciborgs1155.robot.vision;
 
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
@@ -176,7 +173,6 @@ public class Vision {
           // }
 
           // negate pitch
-          if (cameras[i].getName() != "back middle") {
             change.targets.stream()
                 .forEach(
                     t -> {
@@ -188,7 +184,7 @@ public class Vision {
                         r.fiducialIDsUsed.stream()
                             .map(id -> REEF_TAGS.contains((int) id))
                             .reduce(true, (a, b) -> a && b));
-          }
+          
 
           // remove ambiguity
           change.targets =
@@ -309,9 +305,6 @@ public class Vision {
     return new Transform3d[] {
       FRONT_LEFT_CAMERA.robotToCam(),
       FRONT_RIGHT_CAMERA.robotToCam(),
-      BACK_LEFT_CAMERA.robotToCam(),
-      BACK_RIGHT_CAMERA.robotToCam(),
-      BACK_MIDDLE_CAMERA.robotToCam()
     };
   }
 

@@ -18,9 +18,6 @@ import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_MIDDLE_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.BACK_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
@@ -301,26 +298,6 @@ public class Robot extends CommandRobot {
                 .ignoringDisable(true))
         .onFalse(
             Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
-                .ignoringDisable(true));
-    Dashboard.cameraBR()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(BACK_RIGHT_CAMERA.name()))
-                .ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(BACK_RIGHT_CAMERA.name()))
-                .ignoringDisable(true));
-    Dashboard.cameraBL()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(BACK_LEFT_CAMERA.name())).ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(BACK_LEFT_CAMERA.name()))
-                .ignoringDisable(true));
-    Dashboard.cameraBM()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(BACK_MIDDLE_CAMERA.name()))
-                .ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(BACK_MIDDLE_CAMERA.name()))
                 .ignoringDisable(true));
 
     // DRIVER
