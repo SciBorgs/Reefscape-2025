@@ -177,6 +177,7 @@ public class Robot extends CommandRobot {
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
     FaultLogger.register(pdh);
     SmartDashboard.putData("Auto Chooser", autos);
+    addPeriodic(() -> Epilogue.getConfig().backend.log("fms", DriverStation.isFMSAttached()), 5);
 
     if (TUNING) {
       addPeriodic(

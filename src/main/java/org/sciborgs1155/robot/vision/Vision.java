@@ -161,30 +161,27 @@ public class Vision {
           var change = unreadChanges.get(j);
 
           // only reef tags
-          // if (Set.of("back left", "back right").contains(name)) {
-          //   change.targets =
-          //       change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
-          //   change.multitagResult =
-          //       change.multitagResult.filter(
-          //           r ->
-          //               r.fiducialIDsUsed.stream()
-          //                   .map(id -> REEF_TAGS.contains((int) id))
-          //                   .reduce(true, (a, b) -> a && b));
-          // }
+          change.targets =
+              change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+          change.multitagResult =
+              change.multitagResult.filter(
+                  r ->
+                      r.fiducialIDsUsed.stream()
+                          .map(id -> REEF_TAGS.contains((int) id))
+                          .reduce(true, (a, b) -> a && b));
 
           // negate pitch
-            change.targets.stream()
-                .forEach(
-                    t -> {
-                      t.pitch = -t.pitch;
-                    });
-            change.multitagResult =
-                change.multitagResult.filter(
-                    r ->
-                        r.fiducialIDsUsed.stream()
-                            .map(id -> REEF_TAGS.contains((int) id))
-                            .reduce(true, (a, b) -> a && b));
-          
+          change.targets.stream()
+              .forEach(
+                  t -> {
+                    t.pitch = -t.pitch;
+                  });
+          change.multitagResult =
+              change.multitagResult.filter(
+                  r ->
+                      r.fiducialIDsUsed.stream()
+                          .map(id -> REEF_TAGS.contains((int) id))
+                          .reduce(true, (a, b) -> a && b));
 
           // remove ambiguity
           change.targets =
@@ -293,7 +290,7 @@ public class Vision {
     if (targets.size() == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-    
+
     // disregard estimate heading after initial reposition
     if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
 
@@ -303,8 +300,7 @@ public class Vision {
   @NotLogged
   public Transform3d[] cameraTransforms() {
     return new Transform3d[] {
-      FRONT_LEFT_CAMERA.robotToCam(),
-      FRONT_RIGHT_CAMERA.robotToCam(),
+      FRONT_LEFT_CAMERA.robotToCam(), FRONT_RIGHT_CAMERA.robotToCam(),
     };
   }
 
