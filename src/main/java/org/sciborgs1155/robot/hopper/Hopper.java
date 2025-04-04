@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,7 +21,9 @@ import org.sciborgs1155.robot.Robot;
 public class Hopper extends SubsystemBase implements AutoCloseable {
   private final SimpleMotor motor;
   private final Beambreak beambreak;
-  @Logged public final Trigger blocked;
+
+  @Logged(importance = Importance.CRITICAL)
+  public final Trigger blocked;
 
   /** Creates a Hopper based on whether it is utilizing hardware. */
   public static Hopper create() {

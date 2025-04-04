@@ -21,6 +21,7 @@ import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -149,7 +150,9 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   private Rotation2d lastHeading;
   public static final ReentrantLock lock = new ReentrantLock();
 
-  @Logged private final Field2d field2d = new Field2d();
+  @Logged(importance = Importance.INFO)
+  private final Field2d field2d = new Field2d();
+
   private final FieldObject2d[] modules2d;
 
   // Characterization routines
@@ -358,7 +361,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
    *
    * @return The pose.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public Pose2d pose() {
     return odometry.getEstimatedPosition();
   }
@@ -373,7 +376,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
    *
    * @return The rotation.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public Rotation2d heading() {
     return pose().getRotation();
   }
@@ -386,7 +389,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
    *
    * @return The gyro heading, set after enable to be field-relative after odometry correction.
    */
-  @Logged
+  @Logged(importance = Importance.INFO)
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
@@ -555,7 +558,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         vx, vy, () -> translation.get().minus(pose().getTranslation()).getAngle(), elevatorHeight);
   }
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public boolean atRotationalSetpoint() {
     return rotationController.atSetpoint();
   }
@@ -830,7 +833,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   /**
    * @return If the robot is skidding.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public boolean isSkidding() {
     DoubleSummaryStatistics diffs =
         Arrays.stream(moduleStates())
@@ -849,12 +852,12 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   /**
    * @return If the robot is colliding.
    */
-  @Logged
+  @Logged(importance = Importance.INFO)
   public boolean isColliding() {
     return gyro.acceleration().norm() > MAX_ACCEL.in(MetersPerSecondPerSecond) * 2;
   }
 
-  @Logged
+  @Logged(importance = Importance.INFO)
   public boolean isStalling() {
     return Arrays.stream(modulesStalling)
         .map(bs -> bs.getAsBoolean())
@@ -877,13 +880,13 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   }
 
   /** Returns the module states. */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public SwerveModuleState[] moduleStates() {
     return modules.stream().map(ModuleIO::state).toArray(SwerveModuleState[]::new);
   }
 
   /** Returns the module states. */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public SwerveModuleState[] moduleSetpoints() {
     return modules.stream().map(ModuleIO::desiredState).toArray(SwerveModuleState[]::new);
   }

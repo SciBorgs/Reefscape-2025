@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -185,7 +186,7 @@ public class RepulsorFieldPlanner {
   private List<Obstacle> fixedObstacles = new ArrayList<>();
   private Optional<Translation2d> goalOpt = Optional.empty();
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public Pose2d goal() {
     return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
   }

@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -31,7 +32,9 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
   private final SimpleMotor algae;
 
   public final Beambreak beambreak;
-  @Logged public final Trigger blocked;
+
+  @Logged(importance = Importance.CRITICAL)
+  public final Trigger blocked;
 
   /** Creates a Scoral based on if it is utilizing hardware. */
   public static Scoral create() {

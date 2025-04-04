@@ -6,6 +6,7 @@ import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -126,12 +127,13 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     Tuning.changes(S).onTrue(runOnce(() -> ff.setKa(S.get())).asProxy());
     Tuning.changes(V).onTrue(runOnce(() -> ff.setKa(V.get())).asProxy());
     Tuning.changes(G).onTrue(runOnce(() -> ff.setKa(G.get())).asProxy());
+    SmartDashboard.putData("Robot/arm/visualizer", armCanvas);
   }
 
   /**
    * @return The position in radians.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public double position() {
     return hardware.position();
   }
@@ -155,17 +157,17 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   /**
    * @return The position in radians/sec.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public double velocity() {
     return hardware.velocity();
   }
 
-  @Logged
+  @Logged(importance = Importance.INFO)
   public double positionSetpoint() {
     return fb.getSetpoint().position;
   }
 
-  @Logged
+  @Logged(importance = Importance.INFO)
   public double velocitySetpoint() {
     return fb.getSetpoint().velocity;
   }
@@ -254,7 +256,6 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     armLigament.setAngle(Math.toDegrees(position()));
-    SmartDashboard.putData("Robot/arm/visualizer", armCanvas);
   }
 
   @Override

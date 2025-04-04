@@ -17,6 +17,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.WIDTH;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -59,7 +60,9 @@ public class Vision {
   private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
-  @Logged private final List<Pose3d> filteredEstimates;
+
+  @Logged(importance = Importance.INFO)
+  private final List<Pose3d> filteredEstimates;
 
   private VisionSystemSim visionSim;
 
@@ -255,6 +258,7 @@ public class Vision {
    *
    * @return An array of Pose3ds.
    */
+  @Logged(importance = Importance.INFO)
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())

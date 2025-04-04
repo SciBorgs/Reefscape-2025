@@ -30,6 +30,7 @@ import static org.sciborgs1155.robot.elevator.ElevatorConstants.kV;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -234,7 +235,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Position of the elevator in meters.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public double position() {
     return hardware.position();
   }
@@ -242,7 +243,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Velocity of the elevator in meters per second.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public double velocity() {
     return hardware.velocity();
   }
@@ -250,7 +251,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Desired position of the elevator in meters
    */
-  @Logged
+  @Logged(importance = Importance.INFO)
   public double positionSetpoint() {
     return pid.getSetpoint().position;
   }
@@ -258,7 +259,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Desired velocity of the elevator in meters per second.
    */
-  @Logged
+  @Logged(importance = Importance.INFO)
   public double velocitySetpoint() {
     return pid.getSetpoint().velocity;
   }
@@ -266,7 +267,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Whether or not the elevator is at its desired state.
    */
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   public boolean atGoal() {
     return pid.atGoal();
   }

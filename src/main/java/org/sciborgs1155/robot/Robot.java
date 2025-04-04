@@ -27,9 +27,13 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.epilogue.logging.FileBackend;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -143,7 +147,8 @@ public class Robot extends CommandRobot {
   private final SendableChooser<Command> autos =
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
-  @Logged private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
+  @Logged(importance = Importance.CRITICAL)
+  private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -176,6 +181,19 @@ public class Robot extends CommandRobot {
     SignalLogger.enableAutoLogging(true);
     addPeriodic(FaultLogger::update, 2);
     Epilogue.bind(this);
+
+    Epilogue.configure(
+        config -> {
+          config.backend =
+              DriverStation.isFMSAttached()
+                  ? new FileBackend(DataLogManager.getLog())
+                  : new NTEpilogueBackend(NetworkTableInstance.getDefault());
+          //   config.minimumImportance =
+          //     DriverStation.isFMSAttached()
+          //         ? Importance.INFO
+          //         : Importance.DEBUG;
+        });
+
     // addPeriodic(vision::logCamEnabled, 1);
     // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
     FaultLogger.register(pdh);
