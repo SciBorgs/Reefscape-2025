@@ -6,8 +6,8 @@ import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.rotate;
 import static org.sciborgs1155.robot.Constants.strafe;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;

@@ -14,7 +14,6 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.Constants.allianceRotation;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -270,9 +269,9 @@ public class Robot extends CommandRobot {
         .onFalse(
             Commands.runOnce(
                 () -> {
-                //   drive
-                //       .resetGyro(allianceRotation().plus(drive.heading()))
-                //       .withName("gyro reset enabled");
+                  //   drive
+                  //       .resetGyro(allianceRotation().plus(drive.heading()))
+                  //       .withName("gyro reset enabled");
                   vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
                 }));
 
@@ -350,7 +349,7 @@ public class Robot extends CommandRobot {
 
     // OPERATOR
 
-    // 
+    //
     // operator.rightTrigger()
 
     operator.leftBumper().whileTrue(scoral.score());
@@ -374,16 +373,23 @@ public class Robot extends CommandRobot {
                 .alongWith(
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
-
     // corolling
-    operator.rightTrigger().and(operator.b()).whileTrue(corolling.algaeIntake()).onFalse(corolling.processorGoTo());
+    operator
+        .rightTrigger()
+        .and(operator.b())
+        .whileTrue(corolling.algaeIntake())
+        .onFalse(corolling.processorGoTo());
     operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
 
-    operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake()).onFalse(coroller.coralIntake());
+    operator
+        .rightTrigger()
+        .and(operator.b().negate())
+        .whileTrue(corolling.coralIntake())
+        .onFalse(coroller.coralIntake());
     operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
     // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
-    
+
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator
