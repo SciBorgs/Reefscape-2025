@@ -17,7 +17,7 @@ import edu.wpi.first.units.measure.Distance;
 
 /** Constants for the {@link Arm} subsystem. */
 public class ArmConstants {
-  public static final double kP = 0;
+  public static final double kP = 2;
   public static final double kI = 0;
   public static final double kD = 0;
 
@@ -28,10 +28,10 @@ public class ArmConstants {
 
   public static final Angle DEFAULT_ANGLE = Radians.of(1.266); // Radians.of(Math.PI * 5 / 8);
 
-  public static final Angle INTAKE_ANGLE = Radians.of(-0.638);
-  public static final Angle PROCESSOR_OUTTAKE_ANGLE = DEFAULT_ANGLE;
-  public static final Angle TROUGH_OUTTAKE_ANGLE = DEFAULT_ANGLE;
-  public static final Angle ALGAE_INTAKE_ANGLE = Radians.of(0.253);
+  public static final Angle CORAL_INTAKE_ANGLE = Radians.of(-0.638);
+  public static final Angle PROCESSOR_OUTTAKE_ANGLE = Radians.of(0.8973787609131001);
+  public static final Angle TROUGH_OUTTAKE_ANGLE = Radians.of(.97);
+  public static final Angle ALGAE_INTAKE_ANGLE = Radians.of(0.273);
 
   @Deprecated public static final Angle CLIMB_INTAKE_ANGLE = Radians.of(0);
   @Deprecated public static final Angle CLIMB_FINAL_ANGLE = Radians.of(Math.PI * 3 / 4);

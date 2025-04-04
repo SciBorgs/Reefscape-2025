@@ -52,6 +52,7 @@ import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
+import org.sciborgs1155.robot.commands.Corolling;
 import org.sciborgs1155.robot.commands.Dashboard;
 import org.sciborgs1155.robot.commands.Scoraling;
 import org.sciborgs1155.robot.coroller.Coroller;
@@ -131,7 +132,7 @@ public class Robot extends CommandRobot {
   private final LEDs leds = LEDs.create();
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leds);
-  // private final Corolling corolling = new Corolling(arm, coroller);
+  private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
@@ -269,9 +270,9 @@ public class Robot extends CommandRobot {
         .onFalse(
             Commands.runOnce(
                 () -> {
-                  drive
-                      .resetGyro(allianceRotation().plus(drive.heading()))
-                      .withName("gyro reset enabled");
+                //   drive
+                //       .resetGyro(allianceRotation().plus(drive.heading()))
+                //       .withName("gyro reset enabled");
                   vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
                 }));
 
@@ -345,20 +346,12 @@ public class Robot extends CommandRobot {
 
     driver.povUp().whileTrue(align.nearAlgae());
 
-    driver.povDown().whileTrue(coroller.outtake());
+    driver.povDown().whileTrue(coroller.coralIntake());
 
     // OPERATOR
-    operator
-        .leftTrigger()
-        .whileTrue(
-            elevator
-                .scoreLevel(Level.L3_ALGAE)
-                .alongWith(
-                    leds.progressGradient(
-                        () -> 1 - elevator.position() / Level.L3_ALGAE.extension.in(Meters),
-                        elevator::atGoal)));
 
-    operator.rightTrigger().whileTrue(scoraling.hpsIntake());
+    // 
+    // operator.rightTrigger()
 
     operator.leftBumper().whileTrue(scoral.score());
     operator.rightBumper().whileTrue(scoral.expalgae());
@@ -381,7 +374,16 @@ public class Robot extends CommandRobot {
                 .alongWith(
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
-    operator.b().toggleOnTrue(arm.manualArm(InputStream.of(operator::getLeftY)));
+
+    // corolling
+    // operator.rightTrigger().and(operator.b()).whileTrue(corolling.algaeIntake());
+    // operator.leftTrigger().and(operator.b()).whileTrue(corolling.processor());
+
+    // operator.rightTrigger().and(operator.b().negate()).whileTrue(corolling.coralIntake());
+    // operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
+
+    operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
+    
     operator.y().whileTrue(scoraling.runRollersBack());
 
     operator
