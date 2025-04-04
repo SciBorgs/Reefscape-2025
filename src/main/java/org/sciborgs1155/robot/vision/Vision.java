@@ -299,7 +299,7 @@ public class Vision {
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
     
     // disregard estimate heading after initial reposition
-    if (DriverStation.isEnabled()) estStdDevs.set(3, 0, Double.MAX_VALUE);
+    if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
 
     return estStdDevs.times(avgWeight);
   }
