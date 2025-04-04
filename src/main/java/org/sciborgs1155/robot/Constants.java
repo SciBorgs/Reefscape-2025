@@ -88,6 +88,16 @@ public class Constants {
   }
 
   /**
+   * A transform that will rotate the pose.
+   *
+   * @param rotation The rotation to rotate the pose.
+   * @return A transform that rotates a pose by a certain Rotation2d.
+   */
+  public static Transform2d rotate(Rotation2d rotation) {
+    return new Transform2d(Translation2d.kZero, rotation);
+  }
+
+  /**
    * Clamps a double between two other doubles; If it was already in between, this does nothing.
    *
    * @param value The value being clamped.

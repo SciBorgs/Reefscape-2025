@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.wpilibj2.command.button.RobotModeTriggers.autonomous;
 import static java.lang.Math.atan;
 import static org.sciborgs1155.lib.Assertion.eAssert;
 import static org.sciborgs1155.lib.Assertion.tAssert;
@@ -49,6 +50,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -143,6 +145,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
       Tuning.entry(
           "Robot/tuning/drive/Max Tilt Accel", MAX_TILT_ACCEL.in(MetersPerSecondPerSecond));
 
+  private final Trigger skidReset = autonomous().and(this::isStalling);
+
   // Odometry and pose estimation
   private final SwerveDrivePoseEstimator odometry;
   private SwerveModulePosition[] lastPositions;
@@ -155,6 +159,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   // Characterization routines
   private final SysIdRoutine translationCharacterization;
   private final SysIdRoutine rotationalCharacterization;
+
+  private Pose2d goalPose = Pose2d.kZero;
 
   // Movement automation
   @Logged
@@ -313,6 +319,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     TalonOdometryThread.getInstance().start();
 
+    skidReset.onTrue(goADifferentWay().withTimeout(PERIOD));
+
     if (TUNING) {
       SmartDashboard.putData(
           "Robot/translation/quasistatic forward",
@@ -361,6 +369,19 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   @Logged
   public Pose2d pose() {
     return odometry.getEstimatedPosition();
+  }
+
+  /**
+   * Returns the pose that driveTo() has last attempted to go to.
+   *
+   * @return
+   */
+  public Pose2d goalPose() {
+    return goalPose;
+  }
+
+  public boolean atGoal() {
+    return atPose(goalPose);
   }
 
   /** Returns a Pose3D of the estimated pose of the robot. */
@@ -450,6 +471,16 @@ public class Drive extends SubsystemBase implements AutoCloseable {
             () -> rotationController.calculate(heading().getRadians(), heading.get().getRadians()),
             elevatorHeight)
         .beforeStarting(rotationController::reset);
+  }
+
+  public Command goADifferentWay() {
+    return Commands.defer(
+        () -> {
+          Rotation2d direction = modulePositions()[0].angle.plus(Rotation2d.kCCW_90deg);
+          Vector<N2> desired = new Translation2d(2, direction).toVector();
+          return drive(() -> desired.get(0), () -> desired.get(1), () -> 0, () -> 0);
+        },
+        Set.of(this));
   }
 
   /**

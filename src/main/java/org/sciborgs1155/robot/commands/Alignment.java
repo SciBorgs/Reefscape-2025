@@ -45,6 +45,14 @@ public class Alignment {
 
   private RepulsorFieldPlanner planner = new RepulsorFieldPlanner();
 
+  public boolean stalling() {
+    return drive.isStalling();
+  }
+
+  public boolean atGoal() {
+    return drive.atGoal();
+  }
+
   private Fault alternateAlliancePathfinding =
       new Fault(
           "Alternate Alliance Pathfinding",

@@ -30,9 +30,6 @@ public class NoElevator implements ElevatorIO {
     return 0;
   }
 
-  public void resetPosition() {}
-  ;
-
   @Override
   /**
    * Closes the elevator. This implementation does nothing.
@@ -40,4 +37,7 @@ public class NoElevator implements ElevatorIO {
    * @throws Exception if an error occurs.
    */
   public void close() throws Exception {}
+
+  @Override
+  public void resetPosition() {}
 }
