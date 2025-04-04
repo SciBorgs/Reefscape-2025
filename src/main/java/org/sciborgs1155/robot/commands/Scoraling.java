@@ -120,7 +120,6 @@ public class Scoraling {
         .asProxy()
         .alongWith(scoral.intake().asProxy())
         .andThen(leds.blink(Color.kGold).onlyIf(() -> !scoral.beambreak.get()))
-        // .andThen((runRollersBack().withTimeout(0.2).onlyIf(hopper.beambreakTrigger.negate())))
         .withName("runningRollers");
   }
 
