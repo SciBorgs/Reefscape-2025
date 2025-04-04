@@ -789,7 +789,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                   MathUtil.angleModulus(
                           pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
                       * RADIUS.in(Meters));
-          double out = profiledPID.calculate(difference.norm(), 0) / 1.7;
+          double out = profiledPID.calculate(difference.norm(), 0) * 0.62;
           Vector<N3> velocities = difference.unit().times(out);
           Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           setChassisSpeeds(

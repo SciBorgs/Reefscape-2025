@@ -3,11 +3,8 @@ package org.sciborgs1155.robot.commands;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.advance;
-import static org.sciborgs1155.robot.Constants.rotate;
-import static org.sciborgs1155.robot.Constants.strafe;
 
 import edu.wpi.first.epilogue.NotLogged;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -100,10 +97,7 @@ public class Autos {
             //     .repeatedly()
             //     .until(alignment::atGoal)
             //     .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
-            alignment
-                .source()
-                .withDeadline(scoraling.hpsIntake().asProxy())
-                .withTimeout(5);
+            alignment.source().withDeadline(scoraling.hpsIntake().asProxy()).withTimeout(5);
 
     Command source = attempt.get();
 

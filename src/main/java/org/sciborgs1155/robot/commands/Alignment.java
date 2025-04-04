@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
@@ -89,7 +90,7 @@ public class Alignment {
                             .backend
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .asProxy(),
-            pathfind(() -> goal.get().transformBy(advance(Meters.of(-0.5))))
+            pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))), Meters.of(0.5))
                 .withName("go to reef")
                 .asProxy(),
             // pathfind(goal, MetersPerSecond.of(0.1))
@@ -102,7 +103,7 @@ public class Alignment {
                     Commands.waitUntil(elevator::atGoal)
                         .withTimeout(1.5)
                         .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
-                    moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
+                    moveRobotRelative(advance(Inches.of(1))).asProxy()),
                 elevator.scoreLevel(level).asProxy(),
                 leds.error(
                     () ->
@@ -291,7 +292,7 @@ public class Alignment {
    * @return A Command to pathfind to an onfield pose.
    */
   public Command pathfind(Supplier<Pose2d> goal, Distance tolerance) {
-    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.7), tolerance);
+    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.8), tolerance);
   }
 
   /**

@@ -215,8 +215,23 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public Command homingSequence() {
     return run(() -> hardware.setVoltage(-0.5))
-        .until(() -> hardware.velocity() < VELOCITY_TOLERANCE)
-        .andThen(() -> hardware.resetPosition());
+        .until(() -> Math.abs(hardware.velocity()) < VELOCITY_TOLERANCE)
+        .andThen(
+            () -> {
+              hardware.resetPosition();
+              FaultLogger.report(
+                  "elevator homing", "successful at " + hardware.position(), FaultType.INFO);
+            })
+        .finallyDo(() -> hardware.setVoltage(0));
+    // return Commands.sequence(
+    //     run(() -> hardware.setVoltage(-0.5)),
+    //     Commands.either(
+    //         runOnce(hardware::resetPosition),
+    //         Commands.runOnce(
+    //             () ->
+    //                 FaultLogger.report(
+    //                     "homing sequence", "failed, velocity > 0.005", FaultType.INFO)),
+    //         () -> Math.abs(hardware.velocity()) < VELOCITY_TOLERANCE));
   }
 
   /**

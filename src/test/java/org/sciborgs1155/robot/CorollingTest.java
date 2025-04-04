@@ -62,7 +62,7 @@ public class CorollingTest {
 
   @Test
   public void processorTest() {
-    Command testcmd = corolling.processorOuttakeGoTo();
+    Command testcmd = corolling.processorOuttake();
     runToCompletion(testcmd);
     assert arm.atPosition(PROCESSOR_OUTTAKE_ANGLE.in(Radians));
     assertTrue(testcmd::isFinished);

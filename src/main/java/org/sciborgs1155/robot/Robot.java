@@ -174,6 +174,7 @@ public class Robot extends CommandRobot {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start();
     SignalLogger.enableAutoLogging(true);
+    SignalLogger.setPath("/u/logs");
     addPeriodic(FaultLogger::update, 2);
     Epilogue.bind(this);
     // addPeriodic(vision::logCamEnabled, 1);
@@ -314,7 +315,7 @@ public class Robot extends CommandRobot {
     // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
 
-    driver.a().whileTrue(align.source());
+    driver.a().whileTrue(align.source().withDeadline(scoraling.hpsIntake()));
 
     driver.x().and(driver.povDown()).whileTrue(align.nearReef(Side.LEFT, Level.L2));
     driver.b().and(driver.povDown()).whileTrue(align.nearReef(Side.RIGHT, Level.L2));
@@ -326,6 +327,7 @@ public class Robot extends CommandRobot {
 
     driver.povLeft().onTrue(drive.zeroHeading());
 
+    driver.povDown().whileTrue(elevator.homingSequence());
 
     // driver.povUp().whileTrue(coroller.intake());
 
@@ -408,12 +410,12 @@ public class Robot extends CommandRobot {
 
     // DASHBOARD
     // TO REEF - DASHBOARD SELECT + DRIVER A
-    Dashboard.reef()
-        .and(driver.y())
-        .whileTrue(
-            Commands.deferredProxy(
-                    () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
-                .alongWith(leds.blink(Color.kAqua)));
+    // Dashboard.reef()
+    //     .and(driver.y())
+    //     .whileTrue(
+    //         Commands.deferredProxy(
+    //                 () -> align.reef(Dashboard.getLevelEntry(), Dashboard.getBranchEntry()))
+    //             .alongWith(leds.blink(Color.kAqua)));
 
     Dashboard.elevator().whileTrue(elevator.goTo(() -> Dashboard.getElevatorEntry()));
 
@@ -468,7 +470,7 @@ public class Robot extends CommandRobot {
                                 ControlMode.CLOSED_LOOP_VELOCITY,
                                 ElevatorConstants.MIN_EXTENSION.in(Meters)))
                     .withTimeout(Seconds.of(0.1))))
-            // Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
+        // Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }
 
