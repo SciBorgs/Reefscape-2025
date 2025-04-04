@@ -47,7 +47,8 @@ public class Corolling {
    */
   public Command processorGoTo() {
     return 
-      arm.goTo(PROCESSOR_OUTTAKE_ANGLE)
+      arm.goTo(PROCESSOR_OUTTAKE_ANGLE).asProxy()
+      .alongWith(roller.algaeIntake().asProxy())
         .withName("processor");
   }
 
@@ -67,7 +68,7 @@ public class Corolling {
     return arm.goTo(TROUGH_OUTTAKE_ANGLE).asProxy()
         .withDeadline(
             Commands.waitUntil(() -> arm.atPosition(TROUGH_OUTTAKE_ANGLE.in(Radians)))
-                .andThen(roller.algaeIntake().asProxy().withTimeout(1)))
+                .andThen(roller.coralOuttake().asProxy().withTimeout(1)))
         .withName("trough");
   }
 }

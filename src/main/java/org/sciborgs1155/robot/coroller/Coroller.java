@@ -61,6 +61,10 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
     return run(() -> hardware.set(INTAKE_POWER)).withName("outtake");
   }
 
+  public Command coralOuttake() {
+    return run(() -> hardware.set(-INTAKE_POWER / 2));
+  }
+
   /** Stops the roller motors. */
   public Command stop() {
     return run(() -> hardware.set(0)).withName("stop");
