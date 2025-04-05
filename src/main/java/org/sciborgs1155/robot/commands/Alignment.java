@@ -85,37 +85,17 @@ public class Alignment {
     Supplier<Pose2d> goal = () -> branch.withLevel(level);
     return Commands.sequence(
             Commands.runOnce(
-                    () ->
-                        Epilogue.getConfig()
-                            .backend
-                            .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
-                .asProxy(),
-            pathfind(() -> goal.get().transformBy(advance(Meters.of(-1))), Meters.of(0.5))
-                .withName("go to reef")
-                .asProxy(),
-            // pathfind(goal, MetersPerSecond.of(0.1))
-            //     .withTimeout(0.2)
-            //     .withName("approach slowly")
-            //     .asProxy(),
-            Commands.deadline(
-                Commands.sequence(
-                    drive.driveTo(goal).asProxy().withTimeout(4),
+                () ->
+                    Epilogue.getConfig()
+                        .backend
+                        .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)),
+            pathfind(goal, Meters.of(1)).asProxy(),
+            Commands.sequence(
+                    drive.driveTo(goal).asProxy(),
                     Commands.waitUntil(elevator::atGoal)
-                        .withTimeout(1.5)
                         .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
-                    moveRobotRelative(advance(Inches.of(1))).asProxy()),
-                elevator.scoreLevel(level).asProxy(),
-                leds.error(
-                    () ->
-                        drive
-                                .pose()
-                                .relativeTo(goal.get())
-                                .getTranslation()
-                                .getDistance(Translation2d.kZero)
-                            * 3.5,
-                    0.02 * 3.5)))
-        .asProxy()
-        .withName("align to reef")
+                    moveRobotRelative(advance(Inches.of(1.5))).asProxy())
+                .deadlineFor(elevator.scoreLevel(level).asProxy()))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
@@ -171,16 +151,6 @@ public class Alignment {
   }
 
   /**
-   * Pathfinds and aligns to a designated source.
-   *
-   * @param source The source to pathfind to.
-   * @return A command to go to a source.
-   */
-  public Command source(Source source) {
-    return alignTo(source::pose).deadlineFor(elevator.retract()).asProxy();
-  }
-
-  /**
    * Pathfinds and aligns to the nearest barge position.
    *
    * @return A command to align to the barge.
@@ -203,7 +173,6 @@ public class Alignment {
                         Arrays.stream(Source.values())
                             .map(s -> s.pose())
                             .collect(Collectors.toList())))
-        .deadlineFor(elevator.retract())
         .asProxy();
   }
 

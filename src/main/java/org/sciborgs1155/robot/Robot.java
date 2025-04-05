@@ -315,7 +315,7 @@ public class Robot extends CommandRobot {
     // RT to intake, LT to run backwards
     driver.rightTrigger().whileTrue(scoraling.hpsIntake());
 
-    driver.a().whileTrue(align.source().withDeadline(scoraling.hpsIntake()));
+    driver.a().whileTrue(align.source().withDeadline(scoraling.hpsIntake().asProxy()));
 
     driver.x().and(driver.povDown()).whileTrue(align.nearReef(Side.LEFT, Level.L2));
     driver.b().and(driver.povDown()).whileTrue(align.nearReef(Side.RIGHT, Level.L2));

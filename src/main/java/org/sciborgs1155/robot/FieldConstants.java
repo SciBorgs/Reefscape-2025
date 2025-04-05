@@ -196,7 +196,7 @@ public class FieldConstants {
      * @return A new pose moved to account for elevator tilt.
      */
     public Pose2d withLevel(Level level) {
-      return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-2.3))) : pose();
+      return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-2.8))) : pose();
     }
 
     /**

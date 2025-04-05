@@ -111,8 +111,7 @@ public class Autos {
               attempt.get());
     }
 
-    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral))
-        .onlyIf(() -> !scoraling.hasCoral());
+    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral));
   }
 
   /** Runas a "bottom" side auto with 4 L4 coral scored. */
