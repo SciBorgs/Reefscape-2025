@@ -20,14 +20,13 @@ import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
-import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
-import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -172,13 +171,12 @@ public class Robot extends CommandRobot {
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
-    DataLogManager.start();
+    DataLogManager.start("/u/logs");
     SignalLogger.enableAutoLogging(true);
     SignalLogger.setPath("/u/logs");
     addPeriodic(FaultLogger::update, 2);
     Epilogue.bind(this);
-    // addPeriodic(vision::logCamEnabled, 1);
-    // addPeriodic(TalonUtils::refreshAll, PERIOD.in(Seconds));
+
     FaultLogger.register(pdh);
     SmartDashboard.putData("Auto Chooser", autos);
     addPeriodic(() -> Epilogue.getConfig().backend.log("fms", DriverStation.isFMSAttached()), 5);
@@ -208,8 +206,9 @@ public class Robot extends CommandRobot {
 
     // Configure pose estimation updates from vision every tick
     // addPeriodic(() -> vision.feedEstimatorHeading(drive.heading()), PERIOD);
-    addPeriodic(
-        () -> drive.updateEstimates(vision.estimatedGlobalPoses(drive.gyroHeading())), PERIOD);
+
+    addPeriodic( // unused
+        () -> drive.updateEstimates(vision.estimatedGlobalPoses(Rotation2d.kZero)), PERIOD);
 
     RobotController.setBrownoutVoltage(6.0);
 
@@ -232,12 +231,10 @@ public class Robot extends CommandRobot {
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(raw_x, raw_y)
-            .log("Robot/raw joystick")
             .scale(() -> speedMultiplier)
             .clamp(1.0)
             .deadband(Constants.DEADBAND, 1.0)
             .signedPow(2.0)
-            .log("Robot/processed joystick")
             .scale(MAX_SPEED.in(MetersPerSecond));
 
     InputStream theta = InputStream.atan(raw_x, raw_y);
@@ -290,20 +287,20 @@ public class Robot extends CommandRobot {
 
     test().whileTrue(systemsCheck());
 
-    Dashboard.cameraFL()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name()))
-                .ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name()))
-                .ignoringDisable(true));
-    Dashboard.cameraFR()
-        .onTrue(
-            Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
-                .ignoringDisable(true))
-        .onFalse(
-            Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
-                .ignoringDisable(true));
+    // Dashboard.cameraFL()
+    //     .onTrue(
+    //         Commands.runOnce(() -> vision.enableCam(FRONT_LEFT_CAMERA.name()))
+    //             .ignoringDisable(true))
+    //     .onFalse(
+    //         Commands.runOnce(() -> vision.disableCam(FRONT_LEFT_CAMERA.name()))
+    //             .ignoringDisable(true));
+    // Dashboard.cameraFR()
+    //     .onTrue(
+    //         Commands.runOnce(() -> vision.enableCam(FRONT_RIGHT_CAMERA.name()))
+    //             .ignoringDisable(true))
+    //     .onFalse(
+    //         Commands.runOnce(() -> vision.disableCam(FRONT_RIGHT_CAMERA.name()))
+    //             .ignoringDisable(true));
 
     // DRIVER
     driver

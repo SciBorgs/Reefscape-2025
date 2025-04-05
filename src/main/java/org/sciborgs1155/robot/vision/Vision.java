@@ -24,7 +24,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,16 +118,6 @@ public class Vision {
     }
   }
 
-  @Logged
-  public boolean[] logCamEnabled() {
-    boolean[] booleanArray = new boolean[camerasEnabled.values().size()];
-    int i = 0;
-    for (Boolean value : camerasEnabled.values()) {
-      booleanArray[i++] = value != null && value;
-    }
-    return booleanArray;
-  }
-
   /**
    * Returns a list of all currently visible pose estimates and their standard deviation vectors.
    *
@@ -150,9 +139,9 @@ public class Vision {
 
         int unreadLength = unreadChanges.size();
 
-        if (estimators[i].getPrimaryStrategy() == PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
-          estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
-        }
+        // if (estimators[i].getPrimaryStrategy() == PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
+        //   estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
+        // }
 
         // feeds latest result for visualization; multiple different pos breaks getSeenTags()
         lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);

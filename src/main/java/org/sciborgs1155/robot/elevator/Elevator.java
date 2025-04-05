@@ -334,8 +334,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
    * lengths.
    */
   public void periodic() {
-    setpoint.setLength(positionSetpoint());
-    measurement.setLength(position());
+    // setpoint.setLength(positionSetpoint());
+    // measurement.setLength(position());
 
     if (TUNING) {
       ff.setKs(S.get());
@@ -343,6 +343,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       ff.setKv(V.get());
       ff.setKa(A.get());
     }
+
     Epilogue.getConfig()
         .backend
         .log(

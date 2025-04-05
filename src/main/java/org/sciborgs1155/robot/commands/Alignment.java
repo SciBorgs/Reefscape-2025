@@ -103,43 +103,43 @@ public class Alignment {
                     alternateAlliancePathfinding));
   }
 
-  public Command weirdReef(Level level, Branch branch) {
-    Supplier<Pose2d> goal = () -> branch.withLevel(level);
-    return Commands.sequence(
-            Commands.runOnce(
-                    () ->
-                        Epilogue.getConfig()
-                            .backend
-                            .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
-                .asProxy(),
-            pathfind(() -> goal.get().transformBy(advance(Meters.of(-0.5))))
-                .withName("go to reef")
-                .asProxy(),
-            Commands.deadline(
-                Commands.sequence(
-                    drive.newDriveTo(goal).asProxy().withTimeout(4),
-                    Commands.waitUntil(elevator::atGoal)
-                        .withTimeout(1.5)
-                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
-                    moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
-                elevator.scoreLevel(level).asProxy(),
-                leds.error(
-                    () ->
-                        drive
-                                .pose()
-                                .relativeTo(goal.get())
-                                .getTranslation()
-                                .getDistance(Translation2d.kZero)
-                            * 3.5,
-                    0.02 * 3.5)))
-        .asProxy()
-        .withName("new weird align to reef")
-        .onlyWhile(
-            () ->
-                !FaultLogger.report(
-                    allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding));
-  }
+  // public Command weirdReef(Level level, Branch branch) {
+  //   Supplier<Pose2d> goal = () -> branch.withLevel(level);
+  //   return Commands.sequence(
+  //           Commands.runOnce(
+  //                   () ->
+  //                       Epilogue.getConfig()
+  //                           .backend
+  //                           .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
+  //               .asProxy(),
+  //           pathfind(() -> goal.get().transformBy(advance(Meters.of(-0.5))))
+  //               .withName("go to reef")
+  //               .asProxy(),
+  //           Commands.deadline(
+  //               Commands.sequence(
+  //                   drive.newDriveTo(goal).asProxy().withTimeout(4),
+  //                   Commands.waitUntil(elevator::atGoal)
+  //                       .withTimeout(1.5)
+  //                       .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+  //                   moveRobotRelative(advance(Meters.of(-0.2))).asProxy()),
+  //               elevator.scoreLevel(level).asProxy(),
+  //               leds.error(
+  //                   () ->
+  //                       drive
+  //                               .pose()
+  //                               .relativeTo(goal.get())
+  //                               .getTranslation()
+  //                               .getDistance(Translation2d.kZero)
+  //                           * 3.5,
+  //                   0.02 * 3.5)))
+  //       .asProxy()
+  //       .withName("new weird align to reef")
+  //       .onlyWhile(
+  //           () ->
+  //               !FaultLogger.report(
+  //                   allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
+  //                   alternateAlliancePathfinding));
+  // }
 
   public Command moveRobotRelative(Transform2d transform) {
     return Commands.defer(

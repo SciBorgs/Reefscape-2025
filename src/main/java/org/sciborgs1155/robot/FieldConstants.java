@@ -36,8 +36,6 @@ public class FieldConstants {
         && pose.getY() < WIDTH.in(Meters));
   }
 
-  // TODO  hello!! IVAN!!! edit these as needed.
-
   // The minimum field-relative Y that the robot goes to. This dictates how close to the center
   // pillar the robot will try to score.
   public static final Distance BARGE_MIN_Y = WIDTH.div(2).plus(Feet.of(2));
