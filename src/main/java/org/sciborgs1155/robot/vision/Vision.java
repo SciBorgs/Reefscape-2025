@@ -216,7 +216,9 @@ public class Vision {
                   e ->
                       estimates.add(
                           new PoseEstimate(
-                              e, estimationStdDevs(e.estimatedPose.toPose2d(), change))));
+                              e,
+                              estimationStdDevs(e.estimatedPose.toPose2d(), change)
+                                  .times(name == "front right" ? 1.2 : 1))));
         }
       }
     }
