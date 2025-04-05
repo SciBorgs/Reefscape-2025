@@ -26,8 +26,10 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -42,12 +44,16 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 import java.util.Arrays;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
@@ -332,9 +338,9 @@ public class Robot extends CommandRobot {
 
     //
     // operator.rightTrigger()
-
-    operator.leftBumper().and(operator.povRight()).whileTrue(scoral.slowScore());
-    operator.leftBumper().and(operator.povRight().negate()).whileTrue(scoral.score());
+    Trigger slow = operator.povRight().or(operator.povUp());
+    operator.leftBumper().and(slow).whileTrue(scoral.slowScore());
+    operator.leftBumper().and(slow.negate()).whileTrue(scoral.score());
 
     operator.rightBumper().whileTrue(scoral.expalgae());
 
@@ -394,8 +400,11 @@ public class Robot extends CommandRobot {
                         () -> 1 - elevator.position() / Level.L3.extension.in(Meters),
                         elevator::atGoal)));
 
+    operator.povLeft().and(operator.b()).whileTrue(elevator.scoreBarge());
+
     operator
         .povLeft()
+        .and(operator.b().negate())
         .whileTrue(
             elevator
                 .scoreLevel(Level.L4)

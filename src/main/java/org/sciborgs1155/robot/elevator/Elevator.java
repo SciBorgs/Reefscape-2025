@@ -171,6 +171,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return goTo(level.extension.in(Meters)).withName("scoring");
   }
 
+  public Command scoreBarge() {
+    return goTo(MAX_EXTENSION.in(Meters)).withName("barge");
+  }
+
   /**
    * Goes to an offset height above the level given in order to clean algae; ONLY L2 and L3!
    *

@@ -207,7 +207,7 @@ public class Vision {
                               estimationStdDevs(e.estimatedPose.toPose2d(), change)
                                   .times(
                                       name == "front right"
-                                          ? (DriverStation.isDisabled() ? Double.MAX_VALUE : 1.6)
+                                          ? (DriverStation.isDisabled() ? Double.MAX_VALUE : 2.6)
                                           : 1)));
                     Epilogue.getConfig()
                         .backend
