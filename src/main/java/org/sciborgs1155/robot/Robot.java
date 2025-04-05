@@ -25,9 +25,12 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.epilogue.logging.FileBackend;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -166,7 +169,15 @@ public class Robot extends CommandRobot {
     // SignalLogger.enableAutoLogging(true);
     // SignalLogger.setPath("/u/logs");
     addPeriodic(FaultLogger::update, 2);
+
     Epilogue.bind(this);
+    Epilogue.configure(
+        config -> {
+          config.backend =
+              DriverStation.isFMSAttached()
+                  ? new FileBackend(DataLogManager.getLog())
+                  : new NTEpilogueBackend(NetworkTableInstance.getDefault());
+        });
 
     FaultLogger.register(pdh);
     SmartDashboard.putData("Auto Chooser", autos);
