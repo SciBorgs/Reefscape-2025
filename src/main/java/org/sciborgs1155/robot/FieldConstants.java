@@ -189,7 +189,8 @@ public class FieldConstants {
     }
 
     /** specifically, Charlie Kerr (represents rotational offset in alignment) */
-    public static Transform2d CHARLIES_CONSTANT = new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(5));
+    public static Transform2d CHARLIES_CONSTANT =
+        new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(5));
 
     /**
      * Moves the pose in or out depending on the level.
@@ -198,7 +199,8 @@ public class FieldConstants {
      * @return A new pose moved to account for elevator tilt.
      */
     public Pose2d withLevel(Level level) {
-      return pose().transformBy(Constants.advance(level == Level.L4 ? Inches.of(-4) : Inches.of(-2)));
+      return pose()
+          .transformBy(Constants.advance(level == Level.L4 ? Inches.of(-4) : Inches.of(-2)));
       // return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-2))) : pose();
     }
 

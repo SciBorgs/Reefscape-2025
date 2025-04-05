@@ -9,13 +9,17 @@ import static org.sciborgs1155.robot.coroller.CorollerConstants.SUPPLY_LIMIT;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Optional;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.robot.Ports.GroundIntake;
 import org.sciborgs1155.robot.Robot;
 
 /** Simple roller subsystem used for intaking/outtaking coral. */
+@Logged
 public class Coroller extends SubsystemBase implements AutoCloseable {
   /** Interface for interacting with the motor itself. */
   private final SimpleMotor hardware;
@@ -72,5 +76,14 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
   @Override
   public void close() throws Exception {
     hardware.close();
+  }
+
+  @Override
+  public void periodic() {
+    Epilogue.getConfig()
+        .backend
+        .log(
+            "/Robot/drive/command",
+            Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 }

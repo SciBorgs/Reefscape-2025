@@ -5,6 +5,7 @@ import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.MathUtil;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import org.sciborgs1155.lib.Assertion;
@@ -257,6 +259,11 @@ public class Arm extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // armLigament.setAngle(Math.toDegrees(position()));
+    Epilogue.getConfig()
+        .backend
+        .log(
+            "/Robot/arm/command",
+            Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 
   @Override

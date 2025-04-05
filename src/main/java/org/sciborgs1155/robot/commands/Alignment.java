@@ -89,9 +89,9 @@ public class Alignment {
                     Epilogue.getConfig()
                         .backend
                         .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)),
-            pathfind(goal, Meters.of(1)).asProxy(),
+            pathfind(goal, Meters.of(1)).withName("pathfind to reef").asProxy(),
             Commands.sequence(
-                    drive.driveTo(goal).asProxy(),
+                    drive.driveTo(goal).withTimeout(4.5).withName("drive to reef").asProxy(),
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(
                             scoral

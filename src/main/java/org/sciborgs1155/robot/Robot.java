@@ -13,7 +13,6 @@ import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
-import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
@@ -336,7 +335,7 @@ public class Robot extends CommandRobot {
 
     operator.leftBumper().and(operator.povRight()).whileTrue(scoral.slowScore());
     operator.leftBumper().and(operator.povRight().negate()).whileTrue(scoral.score());
-    
+
     operator.rightBumper().whileTrue(scoral.expalgae());
 
     operator
