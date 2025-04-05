@@ -100,6 +100,8 @@ public final class DriveConstants {
     public static final double D = 0.05;
 
     public static final Distance TOLERANCE = Centimeters.of(1);
+
+    public static final double VIVIANS_CONSTANT = 0.62;
   }
 
   public static final class NewTranslation {

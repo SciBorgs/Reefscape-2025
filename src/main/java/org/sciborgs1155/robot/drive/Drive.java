@@ -768,6 +768,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  DoubleEntry vivians_constant = Tuning.entry("/Robot/drive/vivian's constant", Translation.VIVIANS_CONSTANT);
+
   /**
    * Command factory that automatically path-follows, in a straight line, to a position on the
    * field.
@@ -786,7 +788,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                   MathUtil.angleModulus(
                           pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
                       * RADIUS.in(Meters));
-          double out = profiledPID.calculate(difference.norm(), 0) * 0.7;
+          double out = profiledPID.calculate(difference.norm(), 0) * vivians_constant.get();
           Vector<N3> velocities = difference.unit().times(out);
           Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
           Epilogue.getConfig()
