@@ -150,6 +150,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     return new Pose3d(AXLE_FROM_CHASSIS, new Rotation3d(0, hardware.position(), -Math.PI / 2));
   }
 
+  @Logged(importance = Importance.CRITICAL)
   public boolean atGoal() {
     return atPosition(fb.getGoal().position);
   }
@@ -162,7 +163,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
     return hardware.velocity();
   }
 
-  @Logged(importance = Importance.INFO)
+  @Logged(importance = Importance.CRITICAL)
   public double positionSetpoint() {
     return fb.getSetpoint().position;
   }

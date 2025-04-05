@@ -251,7 +251,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   /**
    * @return Desired position of the elevator in meters
    */
-  @Logged(importance = Importance.INFO)
+  @Logged(importance = Importance.CRITICAL)
   public double positionSetpoint() {
     return pid.getSetpoint().position;
   }

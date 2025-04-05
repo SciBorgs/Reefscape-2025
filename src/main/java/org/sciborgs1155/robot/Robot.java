@@ -88,47 +88,49 @@ public class Robot extends CommandRobot {
   private final PowerDistribution pdh = new PowerDistribution();
 
   // SUBSYSTEMS
+  @Logged(importance = Importance.CRITICAL)
   private final Drive drive =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
         default -> Drive.none();
       };
 
+  @Logged(importance = Importance.CRITICAL)
   private final Vision vision =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
         default -> Vision.none();
       };
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Elevator.create();
         default -> Elevator.none();
       };
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Scoral.create();
         default -> Scoral.none();
       };
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
         case FULL, SCORALING -> Hopper.create();
         default -> Hopper.none();
       };
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Coroller.create();
         default -> Coroller.none();
       };
 
-  @Logged
+  @Logged(importance = Importance.CRITICAL)
   private final Arm arm =
       switch (ROBOT_TYPE) {
         case FULL, COROLLING -> Arm.create();
@@ -138,9 +140,11 @@ public class Robot extends CommandRobot {
   private final LEDs leds = LEDs.create();
 
   private final Scoraling scoraling = new Scoraling(hopper, scoral, elevator, leds);
+
   // private final Corolling corolling = new Corolling(arm, coroller);
 
   // COMMANDS
+  @Logged(importance = Importance.CRITICAL)
   private final Alignment align = new Alignment(drive, elevator, scoral, leds);
 
   @NotLogged
@@ -188,10 +192,10 @@ public class Robot extends CommandRobot {
               DriverStation.isFMSAttached()
                   ? new FileBackend(DataLogManager.getLog())
                   : new NTEpilogueBackend(NetworkTableInstance.getDefault());
-          //   config.minimumImportance =
-          //     DriverStation.isFMSAttached()
-          //         ? Importance.INFO
-          //         : Importance.DEBUG;
+            // config.minimumImportance =
+              // DriverStation.isFMSAttached()
+                //   ? Importance.CRITICAL;
+                  // : Importance.DEBUG;
         });
 
     // addPeriodic(vision::logCamEnabled, 1);

@@ -62,9 +62,12 @@
       "/SmartDashboard/translation quasistatic forward": "Command",
       "Robot/arm/fb": "ProfiledPIDController",
       "Robot/autos": "String Chooser",
+      "Robot/drive/poseController": "PIDController",
+      "Robot/drive/profiledPID": "ProfiledPIDController",
       "Robot/drive/rotationController": "PIDController",
       "Robot/drive/translationController": "PIDController",
-      "Robot/elevator/pid": "ProfiledPIDController"
+      "Robot/elevator/pid": "ProfiledPIDController",
+      "Robot/scoraling/elevator/pid": "ProfiledPIDController"
     },
     "windows": {
       "/FMSInfo": {
@@ -121,8 +124,7 @@
       "Epilogue": {
         "Stats": {
           "open": true
-        },
-        "open": true
+        }
       },
       "Robot": {
         "align": {
@@ -144,12 +146,18 @@
           "open": true
         },
         "open": true,
+        "scoral": {
+          "open": true
+        },
         "scoraling": {
           "scoral": {
             "beambreak": {
               "open": true
             }
           }
+        },
+        "tuning": {
+          "open": true
         }
       },
       "SmartDashboard": {

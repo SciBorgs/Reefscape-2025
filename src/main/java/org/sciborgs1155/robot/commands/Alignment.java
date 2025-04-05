@@ -7,6 +7,7 @@ import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 import static org.sciborgs1155.robot.FieldConstants.nearestBarge;
 
 import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -37,6 +38,7 @@ import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
+@Logged
 public class Alignment {
   @NotLogged private final Drive drive;
   @NotLogged private final Elevator elevator;

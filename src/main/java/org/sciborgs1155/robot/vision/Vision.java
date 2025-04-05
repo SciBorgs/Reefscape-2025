@@ -258,7 +258,7 @@ public class Vision {
    *
    * @return An array of Pose3ds.
    */
-  @Logged(importance = Importance.INFO)
+  @Logged(importance = Importance.CRITICAL)
   public Pose3d[] getSeenTags() {
     return Arrays.stream(lastResults)
         .flatMap(c -> c.targets.stream())

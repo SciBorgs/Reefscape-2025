@@ -389,7 +389,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
    *
    * @return The gyro heading, set after enable to be field-relative after odometry correction.
    */
-  @Logged(importance = Importance.INFO)
   public Rotation2d gyroHeading() {
     return lastHeading;
   }

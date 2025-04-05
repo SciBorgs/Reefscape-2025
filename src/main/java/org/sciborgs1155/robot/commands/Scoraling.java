@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -18,10 +20,16 @@ import org.sciborgs1155.robot.led.LEDs;
 import org.sciborgs1155.robot.scoral.Scoral;
 
 public class Scoraling {
+  @Logged(importance = Importance.CRITICAL)
   private final Hopper hopper;
+
+  @Logged(importance = Importance.CRITICAL)
   private final Scoral scoral;
+
+  @Logged(importance = Importance.CRITICAL)
   private final Elevator elevator;
-  private final LEDs leds;
+
+  @NotLogged private final LEDs leds;
 
   public Scoraling(Hopper hopper, Scoral scoral, Elevator elevator, LEDs leds) {
     this.hopper = hopper;
