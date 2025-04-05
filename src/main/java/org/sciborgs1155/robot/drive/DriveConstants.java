@@ -101,7 +101,7 @@ public final class DriveConstants {
 
     public static final Distance TOLERANCE = Centimeters.of(1);
 
-    public static final double VIVIANS_CONSTANT = 0.62;
+    public static final double VIVIANS_CONSTANT = 0.5;
   }
 
   public static final class NewTranslation {
@@ -153,7 +153,7 @@ public final class DriveConstants {
       public static final double GEARING = 12.1;
       public static final double CANCODER_GEARING = 1;
 
-      public static final Current CURRENT_LIMIT = Amps.of(20);
+      public static final Current CURRENT_LIMIT = Amps.of(40);
 
       public static final class PID {
         public static final double P = 50;

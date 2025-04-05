@@ -74,7 +74,7 @@ public class Autos {
    * @param branch the branch to score on.
    */
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
-    return alignment.reef(Level.L4, branch).withTimeout(7).onlyIf(scoraling::hasCoral);
+    return alignment.reef(Level.L4, branch).withTimeout(6).onlyIf(scoraling::hasCoral);
   }
 
   /**

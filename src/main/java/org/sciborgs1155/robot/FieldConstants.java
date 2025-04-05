@@ -13,6 +13,7 @@ import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -184,8 +185,11 @@ public class FieldConstants {
     }
 
     public Pose2d pose() {
-      return allianceReflect(pose);
+      return allianceReflect(pose).transformBy(CHARLIES_CONSTANT);
     }
+
+    /** specifically, Charlie Kerr (represents rotational offset in alignment) */
+    public static Transform2d CHARLIES_CONSTANT = new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(5));
 
     /**
      * Moves the pose in or out depending on the level.
@@ -194,7 +198,8 @@ public class FieldConstants {
      * @return A new pose moved to account for elevator tilt.
      */
     public Pose2d withLevel(Level level) {
-      return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-2.8))) : pose();
+      return pose().transformBy(Constants.advance(level == Level.L4 ? Inches.of(-4) : Inches.of(-2)));
+      // return level == Level.L4 ? pose().transformBy(Constants.advance(Inches.of(-2))) : pose();
     }
 
     /**

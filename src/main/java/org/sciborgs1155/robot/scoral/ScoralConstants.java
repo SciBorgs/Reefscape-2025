@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Time;
 
 public class ScoralConstants {
   public static final double SCORE_POWER = 0.5;
+  public static final double SLOW_SCORE_POWER = 0.35;
 
   public static final double INTAKE_POWER = 0.4;
 

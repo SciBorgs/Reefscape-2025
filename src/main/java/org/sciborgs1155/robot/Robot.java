@@ -13,10 +13,10 @@ import static org.sciborgs1155.robot.Constants.DEADBAND;
 import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
+import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE_ANGLE;
 import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.TROUGH_OUTTAKE_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -334,7 +334,9 @@ public class Robot extends CommandRobot {
     //
     // operator.rightTrigger()
 
-    operator.leftBumper().whileTrue(scoral.score());
+    operator.leftBumper().and(operator.povRight()).whileTrue(scoral.slowScore());
+    operator.leftBumper().and(operator.povRight().negate()).whileTrue(scoral.score());
+    
     operator.rightBumper().whileTrue(scoral.expalgae());
 
     operator
@@ -451,13 +453,12 @@ public class Robot extends CommandRobot {
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
             arm.goToTest(CORAL_INTAKE_ANGLE),
-            arm.goToTest(TROUGH_OUTTAKE_ANGLE),
+            arm.goToTest(DEFAULT_ANGLE),
             Test.fromCommand(coroller.coralIntake().asProxy().withTimeout(0.5)),
             Test.fromCommand(coroller.coralOuttake().asProxy().withTimeout(0.5)),
-            arm.goToTest(DEFAULT_ANGLE),
             drive.systemsCheck(),
             Test.fromCommand(
-                scoral.scoreSlow().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
+                scoral.testScore().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             Test.fromCommand(
                 Commands.run(
                         () ->
@@ -465,7 +466,9 @@ public class Robot extends CommandRobot {
                                 new ChassisSpeeds(1, 0, 0),
                                 ControlMode.CLOSED_LOOP_VELOCITY,
                                 ElevatorConstants.MIN_EXTENSION.in(Meters)))
-                    .withTimeout(Seconds.of(0.1))))
+                    .withTimeout(Seconds.of(0.1))),
+            Test.fromCommand(scoral.stealgae().asProxy().withTimeout(0.2)),
+            Test.fromCommand(scoral.expalgae().asProxy().withTimeout(0.5)))
         // Test.fromCommand(leds.solid(Color.kLime).withTimeout(0.5)))
         .withName("Test Mechanisms");
   }

@@ -202,15 +202,17 @@ public class Vision {
               .ifPresent(
                   e -> {
                     estimates.add(
-                        new PoseEstimate(
-                            e,
-                            estimationStdDevs(e.estimatedPose.toPose2d(), change)
-                                .times(name == "front right" ? 1.6 : 1)));
+                          new PoseEstimate(
+                              e,
+                              estimationStdDevs(e.estimatedPose.toPose2d(), change)
+                                  .times(
+                                      name == "front right"
+                                          ? (DriverStation.isDisabled() ? Double.MAX_VALUE : 1.6)
+                                          : 1)));
                     Epilogue.getConfig()
                         .backend
                         .log(
                             "Robot/vision/accepted poses/ " + name, e.estimatedPose, Pose3d.struct);
-                    ;
                   });
         }
       }

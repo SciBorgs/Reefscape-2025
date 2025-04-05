@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -220,11 +219,7 @@ public class Arm extends SubsystemBase implements AutoCloseable {
    */
   public Test goToTest(Angle goal) {
     Command testCommand =
-        goTo(goal)
-            .until(fb::atGoal)
-            .withTimeout(8)
-            .andThen(Commands.runOnce(() -> setVoltage(0)))
-            .withName("Arm Test");
+        goTo(goal).until(fb::atGoal).withTimeout(8).withName("Arm Test").asProxy();
     EqualityAssertion atGoal =
         Assertion.eAssert(
             "arm angle", () -> goal.in(Radians), this::position, POSITION_TOLERANCE.in(Radians));

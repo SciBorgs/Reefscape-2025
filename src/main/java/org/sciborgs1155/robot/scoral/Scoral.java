@@ -5,10 +5,7 @@ import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Ports.Scoral.ALGAE;
 import static org.sciborgs1155.robot.Ports.Scoral.BEAMBREAK;
 import static org.sciborgs1155.robot.Ports.Scoral.SCORAL;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.CURRENT_LIMIT;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.INTAKE_POWER;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.SCORE_POWER;
-import static org.sciborgs1155.robot.scoral.ScoralConstants.STATOR_LIMIT;
+import static org.sciborgs1155.robot.scoral.ScoralConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -20,11 +17,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Optional;
 import java.util.Set;
+
 import org.sciborgs1155.lib.Assertion;
 import org.sciborgs1155.lib.Beambreak;
 import org.sciborgs1155.lib.SimpleMotor;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.elevator.ElevatorConstants.Level;
 
 public class Scoral extends SubsystemBase implements AutoCloseable {
   private final SimpleMotor scoral;
@@ -70,14 +69,18 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
     return run(() -> scoral.set(SCORE_POWER)).withName("score");
   }
 
+  public Command slowScore() {
+    return run(() -> scoral.set(SLOW_SCORE_POWER)).withName("slowScore");
+  }
+
   /** Runs the motor to move a coral inwards. */
   public Command reverse() {
     return run(() -> scoral.set(-SCORE_POWER)).withName("score");
   }
 
   /** Slowly runs the motor to move a coral out of the scoral outwards. */
-  public Command scoreSlow() {
-    return run(() -> scoral.set(SCORE_POWER / 2)).withName("score slow");
+  public Command testScore() {
+    return run(() -> scoral.set(SCORE_POWER / 4)).withName("test score (slow)");
   }
 
   /** Intakes (steals) an algae. */

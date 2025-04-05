@@ -319,7 +319,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     TalonOdometryThread.getInstance().start();
 
-    skidReset.onTrue(goADifferentWay().withTimeout(PERIOD));
+    // skidReset.onTrue(goADifferentWay().withTimeout(PERIOD));
 
     SmartDashboard.putData("Drive Field", field2d);
 

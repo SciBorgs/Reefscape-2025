@@ -93,7 +93,12 @@ public class Alignment {
             Commands.sequence(
                     drive.driveTo(goal).asProxy(),
                     Commands.waitUntil(elevator::atGoal)
-                        .andThen(scoral.score().asProxy().until(scoral.blocked.negate())),
+                        .andThen(
+                            scoral
+                                .score()
+                                .withName("auto score")
+                                .asProxy()
+                                .until(scoral.blocked.negate())),
                     moveRobotRelative(advance(Inches.of(1.5))).asProxy())
                 .deadlineFor(elevator.scoreLevel(level).asProxy()))
         .onlyWhile(
@@ -143,11 +148,12 @@ public class Alignment {
 
   public Command moveRobotRelative(Transform2d transform) {
     return Commands.defer(
-        () -> {
-          Pose2d goal = drive.pose().transformBy(transform);
-          return drive.driveTo(goal);
-        },
-        Set.of(drive));
+            () -> {
+              Pose2d goal = drive.pose().transformBy(transform);
+              return drive.driveTo(goal);
+            },
+            Set.of(drive))
+        .withName("move robot relative");
   }
 
   /**
