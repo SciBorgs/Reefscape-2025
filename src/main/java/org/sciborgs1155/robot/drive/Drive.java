@@ -172,9 +172,9 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           new TrapezoidProfile.Constraints(
               MAX_SPEED.in(MetersPerSecond), MAX_ACCEL.in(MetersPerSecondPerSecond)));
 
-  @Logged
-  private final PIDController poseController =
-      new PIDController(translationP.get(), translationI.get(), translationD.get());
+  // @Logged
+  // private final PIDController poseController =
+  //     new PIDController(translationP.get(), translationI.get(), translationD.get());
 
   private final TrapezoidProfile poseProfile =
       new TrapezoidProfile(
@@ -313,13 +313,15 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     }
 
     profiledPID.setTolerance(Translation.TOLERANCE.in(Meters));
-    poseController.setTolerance(Translation.TOLERANCE.in(Meters));
+    // poseController.setTolerance(Translation.TOLERANCE.in(Meters));
     rotationController.enableContinuousInput(0, 2 * Math.PI);
     rotationController.setTolerance(Rotation.TOLERANCE.in(Radians));
 
     TalonOdometryThread.getInstance().start();
 
     skidReset.onTrue(goADifferentWay().withTimeout(PERIOD));
+
+    SmartDashboard.putData("Drive Field", field2d);
 
     if (TUNING) {
       SmartDashboard.putData(
@@ -407,7 +409,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
    *
    * @return The gyro heading, set after enable to be field-relative after odometry correction.
    */
-  @Logged
   public Rotation2d gyroHeading() {
     return lastHeading;
   }
@@ -681,10 +682,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     // currentVelocity.plus(currentVelocity.norm() > 1e-6 ?
     // skidAccelerationLimit(desiredAcceleration) : desiredAcceleration);
 
-    Epilogue.getConfig()
-        .backend
-        .log("/Robot/drive/forward accel limit", (skidAccelerationLimit(deltaV).norm()));
-
     ChassisSpeeds newSpeeds =
         new ChassisSpeeds(
             limitedVelocity.get(0), limitedVelocity.get(1), desired.omegaRadiansPerSecond);
@@ -789,9 +786,14 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                   MathUtil.angleModulus(
                           pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
                       * RADIUS.in(Meters));
-          double out = profiledPID.calculate(difference.norm(), 0) * 0.62;
+          double out = profiledPID.calculate(difference.norm(), 0) * 0.7;
           Vector<N3> velocities = difference.unit().times(out);
           Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
+          Epilogue.getConfig()
+              .backend
+              .log(
+                  "/Robot/drive/driveTo atPose",
+                  atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE));
           setChassisSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   velocities.get(0),
@@ -808,42 +810,45 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   @Logged private double prevError = -1;
 
-  public Command newDriveTo(Supplier<Pose2d> target) {
-    return run(() -> {
-          Pose2d targetPose = target.get();
-          Pose2d pose = pose();
-          Vector<N3> difference =
-              VecBuilder.fill(
-                  pose.getX() - targetPose.getX(),
-                  pose.getY() - targetPose.getY(),
-                  MathUtil.angleModulus(
-                          pose.getRotation().getRadians() - targetPose.getRotation().getRadians())
-                      * RADIUS.in(Meters));
-          double error = difference.norm();
-          TrapezoidProfile.State goal =
-              poseProfile.calculate(
-                  PERIOD.in(Seconds),
-                  new TrapezoidProfile.State(
-                      error, (error - (prevError == -1 ? error : prevError)) / PERIOD.in(Seconds)),
-                  new TrapezoidProfile.State(0, 0));
-          double out = poseController.calculate(error, goal.position);
-          prevError = error;
-          Vector<N3> velocities = difference.unit().times(out);
-          Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
-          setChassisSpeeds(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  velocities.get(0),
-                  velocities.get(1),
-                  velocities.get(2) / RADIUS.in(Meters),
-                  pose().getRotation()),
-              ControlMode.CLOSED_LOOP_VELOCITY,
-              0);
-        })
-        .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
-        .andThen(stop())
-        .finallyDo(() -> prevError = -1)
-        .withName("new weird drive to pose");
-  }
+  // public Command newDriveTo(Supplier<Pose2d> target) {
+  //   return run(() -> {
+  //         Pose2d targetPose = target.get();
+  //         Pose2d pose = pose();
+  //         Vector<N3> difference =
+  //             VecBuilder.fill(
+  //                 pose.getX() - targetPose.getX(),
+  //                 pose.getY() - targetPose.getY(),
+  //                 MathUtil.angleModulus(
+  //                         pose.getRotation().getRadians() -
+  // targetPose.getRotation().getRadians())
+  //                     * RADIUS.in(Meters));
+  //         double error = difference.norm();
+  //         TrapezoidProfile.State goal =
+  //             poseProfile.calculate(
+  //                 PERIOD.in(Seconds),
+  //                 new TrapezoidProfile.State(
+  //                     error, (error - (prevError == -1 ? error : prevError)) /
+  // PERIOD.in(Seconds)),
+  //                 new TrapezoidProfile.State(0, 0));
+  //         // double out = poseController.calculate(error, goal.position);
+  //         prevError = error;
+  //         Vector<N3> velocities = difference.unit().times(out);
+  //         Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose,
+  // Pose2d.struct);
+  //         setChassisSpeeds(
+  //             ChassisSpeeds.fromFieldRelativeSpeeds(
+  //                 velocities.get(0),
+  //                 velocities.get(1),
+  //                 velocities.get(2) / RADIUS.in(Meters),
+  //                 pose().getRotation()),
+  //             ControlMode.CLOSED_LOOP_VELOCITY,
+  //             0);
+  //       })
+  //       .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
+  //       .andThen(stop())
+  //       .finallyDo(() -> prevError = -1)
+  //       .withName("new weird drive to pose");
+  // }
 
   public Command driveTo(Pose2d goal) {
     return driveTo(() -> goal);
@@ -1068,8 +1073,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     // update our simulated field poses
     field2d.setRobotPose(pose());
 
-    SmartDashboard.putData("Drive Field", field2d);
-
     for (int i = 0; i < modules2d.length; i++) {
       var module = modules.get(i);
       var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
@@ -1078,7 +1081,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     if (TUNING) {
       profiledPID.setPID(oldTranslationP.get(), oldTranslationI.get(), oldTranslationD.get());
-      poseController.setPID(translationP.get(), translationI.get(), translationD.get());
+      // poseController.setPID(translationP.get(), translationI.get(), translationD.get());
       rotationController.setPID(rotationP.get(), rotationI.get(), rotationD.get());
     }
 

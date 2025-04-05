@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.Arrays;
@@ -47,7 +46,6 @@ import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
@@ -151,7 +149,7 @@ public class Robot extends CommandRobot {
     configureBindings();
 
     // Warmup pathfinding commands, as the first run could have significant delays.
-    align.warmupCommand().schedule();
+    Commands.waitSeconds(3).andThen(align.warmupCommand()).schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
     //         Commands.waitSeconds(10),
@@ -161,25 +159,17 @@ public class Robot extends CommandRobot {
     //     .schedule();
   }
 
-  @Override
-  public void robotPeriodic() {
-    Tracer.startTrace("commands");
-    CommandScheduler.getInstance().run();
-    Tracer.endTrace();
-  }
-
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
     DataLogManager.start("/u/logs");
-    SignalLogger.enableAutoLogging(true);
-    SignalLogger.setPath("/u/logs");
+    // SignalLogger.enableAutoLogging(true);
+    // SignalLogger.setPath("/u/logs");
     addPeriodic(FaultLogger::update, 2);
     Epilogue.bind(this);
 
     FaultLogger.register(pdh);
     SmartDashboard.putData("Auto Chooser", autos);
-    addPeriodic(() -> Epilogue.getConfig().backend.log("fms", DriverStation.isFMSAttached()), 5);
 
     if (TUNING) {
       addPeriodic(
