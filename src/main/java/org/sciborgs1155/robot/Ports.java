@@ -19,13 +19,13 @@ public final class Ports {
           entry(Drive.REAR_LEFT_CANCODER, "RL cancoder"),
           entry(Drive.FRONT_RIGHT_CANCODER, "FR cancoder"),
           entry(Drive.REAR_RIGHT_CANCODER, "RR cancoder"),
-          entry(GroundIntake.ARM_PIVOT, "ground arm pivot"),
-          entry(GroundIntake.ARM_INTAKE, "ground intake"),
-          entry(GroundIntake.CANCODER, "ground arm encoder"),
+          entry(GroundIntake.ARM_PIVOT, "arm"),
+          entry(GroundIntake.ARM_INTAKE, "coroller"),
+          entry(GroundIntake.CANCODER, "arm encoder"),
           entry(Elevator.FRONT_LEADER, "front elevator"),
           entry(Elevator.BACK_FOLLOWER, "back elevator"),
           entry(Scoral.SCORAL, "scoral roller"),
-          entry(Scoral.ALGAE, "algae roller"),
+          entry(Scoral.ALGAE, "scoralgae roller"),
           entry(Hopper.MOTOR, "hopper"));
 
   public static final class OI {

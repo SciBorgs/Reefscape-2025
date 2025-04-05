@@ -327,8 +327,6 @@ public class Robot extends CommandRobot {
 
     driver.povDown().whileTrue(elevator.homingSequence());
 
-    // driver.povUp().whileTrue(coroller.intake());
-
     driver.povUp().whileTrue(align.nearAlgae());
 
     // OPERATOR

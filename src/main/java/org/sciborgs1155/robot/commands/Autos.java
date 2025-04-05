@@ -29,7 +29,8 @@ public class Autos {
     chooser.addOption("no auto", Commands.none());
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
-    chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
+    chooser.addOption("nyc practice field", nycPracticeField(alignment, scoraling));
+    // chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
     chooser.setDefaultOption(
         "line",
         drive.run(
@@ -63,7 +64,8 @@ public class Autos {
         .map(
             b ->
                 Commands.sequence(
-                    alignSource(alignment, scoraling, 0), alignReef(b, alignment, scoraling)))
+                    alignSource(alignment, scoraling, 0),
+                    alignReef(b, alignment, scoraling)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
 
@@ -122,6 +124,10 @@ public class Autos {
   /** runs a proceser side auto with 4 L4 coral scored. */
   public static Command P4(Alignment alignment, Scoraling scoraling) {
     return alignAuto(alignment, scoraling, List.of(Branch.E, Branch.D, Branch.C, Branch.B));
+  }
+
+  public static Command nycPracticeField(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(alignment, scoraling, List.of(Branch.L, Branch.A, Branch.K));
   }
 
   public static Command badHome(Alignment alignment, Scoraling scoraling) {

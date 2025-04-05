@@ -59,7 +59,7 @@ public class ElevatorConstants {
 
   public enum Level {
     L1(Meters.of(0.3)),
-    L2(Meters.of(0.488)),
+    L2(Meters.of(0.45)),
     L3(Meters.of(0.838)),
     L4(Meters.of(1.408)),
 
