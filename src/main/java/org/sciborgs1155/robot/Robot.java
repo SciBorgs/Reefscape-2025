@@ -160,7 +160,8 @@ public class Robot extends CommandRobot {
     configureBindings();
 
     // Warmup pathfinding commands, as the first run could have significant delays.
-    Commands.waitSeconds(3).andThen(align.warmupCommand().withName("warmup")).schedule();
+    Commands.waitSeconds(3).andThen(Autos.warmupCommand(drive, align, scoraling).ignoringDisable(true).withName("auto warmup")).schedule();
+    // .andThen(align.warmupCommand().withName("alignment warmup")).schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
     //         Commands.waitSeconds(10),
@@ -463,13 +464,13 @@ public class Robot extends CommandRobot {
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
+            Test.fromCommand(
+                scoral.testScore().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             arm.goToTest(CORAL_INTAKE_ANGLE),
             arm.goToTest(DEFAULT_ANGLE),
             Test.fromCommand(coroller.coralIntake().asProxy().withTimeout(0.5)),
             Test.fromCommand(coroller.coralOuttake().asProxy().withTimeout(0.5)),
             drive.systemsCheck(),
-            Test.fromCommand(
-                scoral.testScore().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             Test.fromCommand(
                 Commands.run(
                         () ->
