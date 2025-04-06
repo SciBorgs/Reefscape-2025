@@ -84,7 +84,7 @@ public class Hopper extends SubsystemBase implements AutoCloseable {
    * @return A command to stop the hopper.
    */
   public Command stop() {
-    return run(0).withName("stop");
+    return run(0).withName("stooop");
   }
 
   @Override

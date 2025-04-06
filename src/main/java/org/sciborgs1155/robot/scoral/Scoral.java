@@ -106,7 +106,7 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
           scoral.set(0);
           algae.set(0);
         })
-        .withName("stop");
+        .withName("stoooop");
   }
 
   @Override

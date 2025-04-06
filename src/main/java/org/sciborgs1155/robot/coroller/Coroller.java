@@ -70,7 +70,7 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
 
   /** Stops the roller motors. */
   public Command stop() {
-    return run(() -> hardware.set(0)).withName("stop");
+    return run(() -> hardware.set(0)).withName("stoop");
   }
 
   @Override
@@ -83,7 +83,7 @@ public class Coroller extends SubsystemBase implements AutoCloseable {
     Epilogue.getConfig()
         .backend
         .log(
-            "/Robot/drive/command",
+            "/Robot/coroller/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
   }
 }

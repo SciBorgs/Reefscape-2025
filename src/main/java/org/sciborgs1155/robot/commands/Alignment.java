@@ -17,6 +17,9 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
@@ -88,24 +91,24 @@ public class Alignment {
                 () ->
                     Epilogue.getConfig()
                         .backend
-                        .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)),
-            pathfind(goal, Meters.of(1)).withName("pathfind to reef").asProxy(),
+                        .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)).ignoringDisable(true),
+            pathfind(goal, Meters.of(1)).ignoringDisable(true).withName("pathfind to reef").asProxy(),
             Commands.sequence(
-                    drive.driveTo(goal).withTimeout(4.5).withName("drive to reef").asProxy(),
+                    drive.driveTo(goal).ignoringDisable(true).withTimeout(4.5).withName("drive to reef").asProxy(),
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(
                             scoral
-                                .score()
+                                .score().ignoringDisable(true)
                                 .withName("auto score")
                                 .asProxy()
                                 .until(scoral.blocked.negate())),
-                    moveRobotRelative(advance(Inches.of(1.5))).asProxy())
-                .deadlineFor(elevator.scoreLevel(level).asProxy()))
+                    moveRobotRelative(advance(Inches.of(1.5))).ignoringDisable(true).asProxy())
+                .deadlineFor(elevator.scoreLevel(level).ignoringDisable(true).asProxy()))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
-                    alternateAlliancePathfinding));
+                    alternateAlliancePathfinding)).ignoringDisable(false);
   }
 
   // public Command weirdReef(Level level, Branch branch) {
@@ -248,14 +251,14 @@ public class Alignment {
                   planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), speed, true),
                   goal.get().getRotation(),
                   elevator::position);
-            })
+            }).ignoringDisable(true)
         .until(() -> drive.atTranslation(goal.get().getTranslation(), tolerance))
         .onlyWhile(
             () ->
                 !FaultLogger.report(
                     allianceFromPose(goal.get()) != allianceFromPose(drive.pose()),
                     alternateAlliancePathfinding))
-        .withName("pathfind");
+        .withName("pathfind").ignoringDisable(false);
   }
 
   /**
@@ -321,12 +324,13 @@ public class Alignment {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return Commands.sequence(
-            drive.runOnce(() -> drive.resetOdometry(allianceReflect(Pose2d.kZero))),
-            // pathfind(I::pose, MetersPerSecond.of(0)).withTimeout(0.1).ignoringDisable(true),
-            reef(Level.L4, Branch.J).withTimeout(0.1).ignoringDisable(true),
-            // nearReef(Side.LEFT, Level.L4).withTimeout(0.005).ignoringDisable(true),
-            Commands.runOnce(() -> System.out.println("[Alignment] Finished warmup")))
-        .ignoringDisable(true);
+    return Commands.none();
+    // Commands.sequence(
+    //         drive.runOnce(() -> drive.resetOdometry(allianceReflect(Pose2d.kZero))).ignoringDisable(true),
+    //         // pathfind(I::pose, MetersPerSecond.of(0)).withTimeout(0.1).ignoringDisable(true),
+    //         reef(Level.L4, Branch.J).withTimeout(0.1).ignoringDisable(true),
+    //         // nearReef(Side.LEFT, Level.L4).withTimeout(0.005).ignoringDisable(true),
+    //         Commands.runOnce(() -> System.out.println("[Alignment] Finished warmup")))
+    //     .ignoringDisable(true);
   }
 }
