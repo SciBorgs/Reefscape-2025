@@ -768,7 +768,8 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  DoubleEntry viviansConstant = Tuning.entry("/Robot/drive/vivian's constant", Translation.VIVIANS_CONSTANT);
+  DoubleEntry viviansConstant =
+      Tuning.entry("/Robot/drive/vivian's constant", Translation.VIVIANS_CONSTANT);
 
   /**
    * Command factory that automatically path-follows, in a straight line, to a position on the

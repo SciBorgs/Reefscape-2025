@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.FieldConstants.Branch.I;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 import static org.sciborgs1155.robot.FieldConstants.nearestBarge;
 
@@ -319,7 +320,7 @@ public class Alignment {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(() -> drive.pose(), MetersPerSecond.of(0))
+    return pathfind(I::pose, MetersPerSecond.of(0))
         .withTimeout(3)
         .andThen(() -> System.out.println("[Alignment] Finished warmup"))
         .ignoringDisable(true);
