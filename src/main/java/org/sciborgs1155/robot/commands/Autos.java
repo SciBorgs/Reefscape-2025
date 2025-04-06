@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.commands;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.advance;
@@ -30,7 +31,7 @@ public class Autos {
     chooser.addOption("B4", B4(alignment, scoraling));
     chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption("nyc practice field", nycPracticeField(alignment, scoraling));
-    // chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
+    chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
     chooser.setDefaultOption(
         "line",
         drive.run(
@@ -67,6 +68,25 @@ public class Autos {
                     alignSource(alignment, scoraling, 0), alignReef(b, alignment, scoraling)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
+
+  public static Command fakeAlignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
+    if (branches.isEmpty()) {
+      FaultLogger.report(
+          new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.ERROR));
+      return Commands.none();
+    }
+
+    return branches.stream()
+        .map(
+            b ->
+                Commands.sequence(
+                    scoraling.hpsIntake().onlyIf(() -> !scoraling.hasCoral()).asProxy(),
+                    alignReef(b, alignment, scoraling),
+                    alignment.moveRobotRelative(advance(Inches.of(-15))).asProxy()
+                    ))
+        .reduce(Commands.none(), (a, b) -> a.andThen(b));
+  }
+
 
   /**
    * Aligns to the reef with appropriate timeouts. It will end if it does not possess a coral.
@@ -130,6 +150,7 @@ public class Autos {
   }
 
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
-    return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
+    return fakeAlignAuto(alignment, scoraling, List.of(Branch.I, Branch.J));
+    // return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
   }
 }
