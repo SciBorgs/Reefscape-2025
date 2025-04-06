@@ -372,8 +372,15 @@ public class Robot extends CommandRobot {
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
     // climb
-    operator.rightTrigger().whileTrue(climb.climb());
-    operator.leftTrigger().whileTrue(climb.back());
+    operator
+        .rightTrigger()
+        .and(operator.leftTrigger().negate())
+        .whileTrue(
+            Commands.parallel(elevator.scoreLevel(Level.L2).asProxy(), climb.climb().asProxy()));
+
+    operator.rightTrigger().and(operator.leftTrigger()).onTrue(elevator.scoreLevel(Level.L2));
+
+    operator.leftTrigger().and(operator.rightTrigger().negate()).whileTrue(climb.back());
 
     // corolling
     // operator
