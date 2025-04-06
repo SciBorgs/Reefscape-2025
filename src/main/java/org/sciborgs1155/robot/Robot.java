@@ -20,7 +20,6 @@ import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.NotLogged;
@@ -114,21 +113,21 @@ public class Robot extends CommandRobot {
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, PLAYOOFS-> Hopper.create();
+        case FULL, SCORALING, PLAYOOFS -> Hopper.create();
         default -> Hopper.none();
       };
 
   @Logged
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Coroller.create();
+        case FULL, COROLLING -> Coroller.none();
         default -> Coroller.none();
       };
 
   @Logged
   private final Arm arm =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Arm.create();
+        case FULL, COROLLING -> Arm.none();
         default -> Arm.none();
       };
 
@@ -137,7 +136,7 @@ public class Robot extends CommandRobot {
       switch (ROBOT_TYPE) {
         case FULL, PLAYOOFS -> Climb.create();
         default -> Climb.none();
-      }
+      };
 
   private final LEDs leds = LEDs.create();
 
@@ -160,7 +159,12 @@ public class Robot extends CommandRobot {
     configureBindings();
 
     // Warmup pathfinding commands, as the first run could have significant delays.
-    Commands.waitSeconds(3).andThen(Autos.warmupCommand(drive, align, scoraling).ignoringDisable(true).withName("auto warmup")).schedule();
+    Commands.waitSeconds(3)
+        .andThen(
+            Autos.warmupCommand(drive, align, scoraling)
+                .ignoringDisable(true)
+                .withName("auto warmup"))
+        .schedule();
     // .andThen(align.warmupCommand().withName("alignment warmup")).schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
@@ -287,13 +291,14 @@ public class Robot extends CommandRobot {
                 }));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
-    if (TUNING) {
-      SignalLogger.enableAutoLogging(false);
+    // if (TUNING) {
+    //   SignalLogger.enableAutoLogging(false);
 
-      // manual .start() call is blocking, for up to 100ms
-      teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
-      disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
-    }
+    //   // manual .start() call is blocking, for up to 100ms
+    //   // teleop().onTrue(Commands.runOnce(() -> SignalLogger.start()));
+    //   // disabled().onTrue(Commands.runOnce(() -> SignalLogger.stop()));
+    // }
+    teleop().onTrue(Commands.runOnce(() -> drive.setI(0)));
 
     test().whileTrue(systemsCheck());
 
@@ -366,20 +371,24 @@ public class Robot extends CommandRobot {
                 .alongWith(
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
-    // corolling
-    operator
-        .rightTrigger()
-        .and(operator.b())
-        .whileTrue(corolling.algaeIntake())
-        .onFalse(corolling.processorGoTo());
-    operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
+    // climb
+    operator.rightTrigger().whileTrue(climb.climb());
+    operator.leftTrigger().whileTrue(climb.back());
 
-    operator
-        .rightTrigger()
-        .and(operator.b().negate())
-        .whileTrue(corolling.coralIntake())
-        .onFalse(coroller.coralIntake());
-    operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
+    // corolling
+    // operator
+    //     .rightTrigger()
+    //     .and(operator.b())
+    //     .whileTrue(corolling.algaeIntake())
+    //     .onFalse(corolling.processorGoTo());
+    // operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
+
+    // operator
+    //     .rightTrigger()
+    //     .and(operator.b().negate())
+    //     .whileTrue(corolling.coralIntake())
+    //     .onFalse(coroller.coralIntake());
+    // operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
     // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
 

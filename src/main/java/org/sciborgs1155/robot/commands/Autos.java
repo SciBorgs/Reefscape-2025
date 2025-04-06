@@ -179,7 +179,8 @@ public class Autos {
                 .ignoringDisable(true),
             P4(alignment, scoraling).ignoringDisable(true).withTimeout(0.04),
             B4(alignment, scoraling).ignoringDisable(true).withTimeout(0.04),
-            Commands.runOnce(() -> FaultLogger.report("autos", "Finished warmup", FaultType.INFO)).ignoringDisable(true))
+            Commands.runOnce(() -> FaultLogger.report("autos", "Finished warmup", FaultType.INFO))
+                .ignoringDisable(true))
         .ignoringDisable(true);
   }
 }

@@ -591,6 +591,11 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     return rotationController.atSetpoint();
   }
 
+  public void setI(double kI) {
+    translationI.accept(kI);
+    profiledPID.setI(kI);
+  }
+
   /**
    * Checks whether the robot is facing towards a point on the field.
    *
