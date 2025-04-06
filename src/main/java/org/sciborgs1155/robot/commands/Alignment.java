@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static org.sciborgs1155.robot.Constants.advance;
-import static org.sciborgs1155.robot.FieldConstants.Branch.I;
+import static org.sciborgs1155.robot.Constants.allianceReflect;
 import static org.sciborgs1155.robot.FieldConstants.allianceFromPose;
 import static org.sciborgs1155.robot.FieldConstants.nearestBarge;
 
@@ -262,7 +262,7 @@ public class Alignment {
    * @return A Command to pathfind to an onfield pose.
    */
   public Command pathfind(Supplier<Pose2d> goal, Distance tolerance) {
-    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.8), tolerance);
+    return pathfind(goal, DriveConstants.MAX_SPEED, tolerance);
   }
 
   /**
@@ -320,9 +320,12 @@ public class Alignment {
 
   // * Warms up the pathfind command by telling drive to drive to itself. */
   public Command warmupCommand() {
-    return pathfind(I::pose, MetersPerSecond.of(0))
-        .withTimeout(3)
-        .andThen(() -> System.out.println("[Alignment] Finished warmup"))
+    return Commands.sequence(
+            drive.runOnce(() -> drive.resetOdometry(allianceReflect(Pose2d.kZero))),
+            // pathfind(I::pose, MetersPerSecond.of(0)).withTimeout(0.1).ignoringDisable(true),
+            reef(Level.L4, Branch.J).withTimeout(0.1).ignoringDisable(true),
+            nearReef(Side.LEFT, Level.L4).withTimeout(0.005).ignoringDisable(true),
+            Commands.runOnce(() -> System.out.println("[Alignment] Finished warmup")))
         .ignoringDisable(true);
   }
 }

@@ -152,7 +152,7 @@ public class Robot extends CommandRobot {
     configureBindings();
 
     // Warmup pathfinding commands, as the first run could have significant delays.
-    Commands.waitSeconds(3).andThen(align.warmupCommand()).schedule();
+    Commands.waitSeconds(3).andThen(align.warmupCommand().withName("warmup")).schedule();
     // Wait to set thread priority so that vendor threads can initialize
     // Commands.sequence(
     //         Commands.waitSeconds(10),
