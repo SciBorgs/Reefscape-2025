@@ -94,7 +94,7 @@ public class Alignment {
                         .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct)).ignoringDisable(true),
             pathfind(goal, Meters.of(1)).ignoringDisable(true).withName("pathfind to reef").asProxy(),
             Commands.sequence(
-                    drive.driveTo(goal).ignoringDisable(true).withTimeout(4.5).withName("drive to reef").asProxy(),
+                    drive.driveTo(goal).ignoringDisable(true).withTimeout(1.5).withName("drive to reef").asProxy(),
                     Commands.waitUntil(elevator::atGoal)
                         .andThen(
                             scoral
