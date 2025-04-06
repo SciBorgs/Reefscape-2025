@@ -4,8 +4,10 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.robot.Constants.advance;
+import static org.sciborgs1155.robot.Constants.allianceReflect;
 
 import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -65,11 +67,14 @@ public class Autos {
         .map(
             b ->
                 Commands.sequence(
-                    alignSource(alignment, scoraling, 0), alignReef(b, alignment, scoraling)))
-        .reduce(Commands.none(), (a, b) -> a.andThen(b));
+                    alignSource(alignment, scoraling, 0).ignoringDisable(true),
+                    alignReef(b, alignment, scoraling).ignoringDisable(true)))
+        .reduce(Commands.none(), (a, b) -> a.andThen(b))
+        .ignoringDisable(false);
   }
 
-  public static Command fakeAlignAuto(Alignment alignment, Scoraling scoraling, List<Branch> branches) {
+  public static Command fakeAlignAuto(
+      Alignment alignment, Scoraling scoraling, List<Branch> branches) {
     if (branches.isEmpty()) {
       FaultLogger.report(
           new Fault("alignAuto fault", "alignAuto passed zero branches", FaultType.ERROR));
@@ -82,11 +87,9 @@ public class Autos {
                 Commands.sequence(
                     scoraling.hpsIntake().onlyIf(() -> !scoraling.hasCoral()).asProxy(),
                     alignReef(b, alignment, scoraling),
-                    alignment.moveRobotRelative(advance(Inches.of(-15))).asProxy()
-                    ))
+                    alignment.moveRobotRelative(advance(Inches.of(-15))).asProxy()))
         .reduce(Commands.none(), (a, b) -> a.andThen(b));
   }
-
 
   /**
    * Aligns to the reef with appropriate timeouts. It will end if it does not possess a coral.
@@ -94,7 +97,12 @@ public class Autos {
    * @param branch the branch to score on.
    */
   public static Command alignReef(Branch branch, Alignment alignment, Scoraling scoraling) {
-    return alignment.reef(Level.L4, branch).withTimeout(6).onlyIf(scoraling::hasCoral);
+    return alignment
+        .reef(Level.L4, branch)
+        .ignoringDisable(true)
+        .withTimeout(6)
+        .onlyIf(scoraling::hasCoral)
+        .ignoringDisable(false);
   }
 
   /**
@@ -118,7 +126,11 @@ public class Autos {
             //     .repeatedly()
             //     .until(alignment::atGoal)
             //     .andThen(scoraling.hpsIntake().withTimeout(2.5).asProxy())
-            alignment.source().withDeadline(scoraling.hpsIntake().asProxy()).withTimeout(5);
+            alignment
+                .source()
+                .ignoringDisable(true)
+                .withDeadline(scoraling.hpsIntake().ignoringDisable(true).asProxy())
+                .withTimeout(5);
 
     Command source = attempt.get();
 
@@ -127,12 +139,16 @@ public class Autos {
           Commands.sequence(
               source,
               Commands.parallel(
-                  alignment.moveRobotRelative(advance(Meters.of(0.2))).asProxy(),
-                  scoraling.retryIntake()),
+                  alignment
+                      .moveRobotRelative(advance(Meters.of(0.2)))
+                      .ignoringDisable(true)
+                      .asProxy(),
+                  scoraling.retryIntake().ignoringDisable(true)),
               attempt.get());
     }
 
-    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral));
+    return Commands.race(source, Commands.waitUntil(scoraling::hasCoral).ignoringDisable(true))
+        .ignoringDisable(false);
   }
 
   /** Runas a "bottom" side auto with 4 L4 coral scored. */
@@ -152,5 +168,18 @@ public class Autos {
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
     return fakeAlignAuto(alignment, scoraling, List.of(Branch.I, Branch.J));
     // return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
+  }
+
+  // * Warms up the pathfind command by telling drive to drive to itself. */
+  public static Command warmupCommand(Drive drive, Alignment alignment, Scoraling scoraling) {
+    // return Commands.none();
+    return Commands.sequence(
+            drive
+                .runOnce(() -> drive.resetOdometry(allianceReflect(Pose2d.kZero)))
+                .ignoringDisable(true),
+            P4(alignment, scoraling).ignoringDisable(true).withTimeout(0.04),
+            B4(alignment, scoraling).ignoringDisable(true).withTimeout(0.04),
+            Commands.runOnce(() -> FaultLogger.report("autos", "Finished warmup", FaultType.INFO)).ignoringDisable(true))
+        .ignoringDisable(true);
   }
 }
