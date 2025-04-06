@@ -24,8 +24,8 @@ public class RealClimb implements ClimbIO {
     // Resetting configuration
     config = new TalonFXConfiguration();
 
-    config.CurrentLimits.StatorCurrentLimit = 140;
-    config.CurrentLimits.SupplyCurrentLimit = 140;
+    config.CurrentLimits.StatorCurrentLimit = ClimbConstants.CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimit = ClimbConstants.CURRENT_LIMIT;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Feedback.SensorToMechanismRatio = ClimbConstants.GEARING;
 

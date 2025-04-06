@@ -110,7 +110,7 @@ public class Constants {
     return Math.min(Math.max(min, value), max);
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.PLAYOOFS;
+  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
 
   public static boolean TUNING = false;
 

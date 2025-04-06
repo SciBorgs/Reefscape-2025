@@ -109,7 +109,10 @@ public class Alignment {
                                 .withName("auto score")
                                 .asProxy()
                                 .until(scoral.blocked.negate())),
-                    moveRobotRelative(advance(Inches.of(1.5))).ignoringDisable(true).asProxy())
+                    moveRobotRelative(advance(Inches.of(4)))
+                        .withTimeout(0.5)
+                        .ignoringDisable(true)
+                        .asProxy())
                 .deadlineFor(elevator.scoreLevel(level).ignoringDisable(true).asProxy()))
         .onlyWhile(
             () ->
@@ -284,7 +287,7 @@ public class Alignment {
    * @return A Command to pathfind to an onfield pose.
    */
   public Command pathfind(Supplier<Pose2d> goal, Distance tolerance) {
-    return pathfind(goal, DriveConstants.MAX_SPEED, tolerance).ignoringDisable(true);
+    return pathfind(goal, DriveConstants.MAX_SPEED.times(0.8), tolerance).ignoringDisable(true);
   }
 
   /**

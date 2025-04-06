@@ -27,8 +27,8 @@ public class Climb extends SubsystemBase implements AutoCloseable {
     return run(() -> hardware.setVoltage(ClimbConstants.CLIMB_VOLTAGE)).withName("climb");
   }
 
-  public Command back() {
-    return run(() -> hardware.setVoltage(ClimbConstants.BACK_VOLTAGE)).withName("back");
+  public Command setupClimb() {
+    return run(() -> hardware.setVoltage(-ClimbConstants.BACK_VOLTAGE)).withName("setup climb");
   }
 
   @Override

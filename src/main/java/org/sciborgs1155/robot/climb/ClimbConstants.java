@@ -4,4 +4,6 @@ public final class ClimbConstants {
   public static final int GEARING = 125;
   public static final int CLIMB_VOLTAGE = 10;
   public static final int BACK_VOLTAGE = 3;
+
+  public static final double CURRENT_LIMIT = 140;
 }

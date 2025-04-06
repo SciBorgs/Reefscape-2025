@@ -14,8 +14,6 @@ import static org.sciborgs1155.robot.Constants.PERIOD;
 import static org.sciborgs1155.robot.Constants.ROBOT_TYPE;
 import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.Constants.alliance;
-import static org.sciborgs1155.robot.arm.ArmConstants.CORAL_INTAKE_ANGLE;
-import static org.sciborgs1155.robot.arm.ArmConstants.DEFAULT_ANGLE;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_ANGULAR_ACCEL;
 import static org.sciborgs1155.robot.drive.DriveConstants.MAX_SPEED;
 import static org.sciborgs1155.robot.drive.DriveConstants.TELEOP_ANGULAR_SPEED;
@@ -127,7 +125,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Arm arm =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Arm.none();
+        case FULL, COROLLING -> Arm.create();
         default -> Arm.none();
       };
 
@@ -335,7 +333,15 @@ public class Robot extends CommandRobot {
     driver.x().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.LEFT, Level.L4));
     driver.b().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.RIGHT, Level.L4));
 
-    driver.y().whileTrue(align.barge());
+    // driver.y().whileTrue(align.barge());
+    driver
+        .y()
+        .toggleOnTrue(
+            drive.driveFacingTarget(
+                x,
+                y,
+                () -> Constants.allianceReflect(FieldConstants.CENTER_REEF).getTranslation(),
+                elevator::position));
 
     driver.povLeft().onTrue(drive.zeroHeading());
 
@@ -380,7 +386,7 @@ public class Robot extends CommandRobot {
 
     operator.rightTrigger().and(operator.leftTrigger()).onTrue(elevator.scoreLevel(Level.L2));
 
-    operator.leftTrigger().and(operator.rightTrigger().negate()).whileTrue(climb.back());
+    operator.leftTrigger().and(operator.rightTrigger().negate()).whileTrue(climb.setupClimb());
 
     // corolling
     // operator
@@ -482,10 +488,10 @@ public class Robot extends CommandRobot {
             scoraling.runRollersTest(),
             Test.fromCommand(
                 scoral.testScore().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
-            arm.goToTest(CORAL_INTAKE_ANGLE),
-            arm.goToTest(DEFAULT_ANGLE),
-            Test.fromCommand(coroller.coralIntake().asProxy().withTimeout(0.5)),
-            Test.fromCommand(coroller.coralOuttake().asProxy().withTimeout(0.5)),
+            // arm.goToTest(CORAL_INTAKE_ANGLE),
+            // arm.goToTest(DEFAULT_ANGLE),
+            // Test.fromCommand(coroller.coralIntake().asProxy().withTimeout(0.5)),
+            // Test.fromCommand(coroller.coralOuttake().asProxy().withTimeout(0.5)),
             drive.systemsCheck(),
             Test.fromCommand(
                 Commands.run(
