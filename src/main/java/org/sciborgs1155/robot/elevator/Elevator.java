@@ -218,7 +218,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public Command homingSequence() {
-    return run(() -> hardware.setVoltage(-1))
+    return run(() -> hardware.setVoltage(-2))
         .withDeadline(
             Commands.waitUntil(() -> Math.abs(hardware.velocity()) > VELOCITY_TOLERANCE)
                 .andThen(

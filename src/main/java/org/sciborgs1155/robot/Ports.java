@@ -76,4 +76,8 @@ public final class Ports {
     public static final int MOTOR = 18;
     public static final int BEAMBREAK = 3;
   }
+
+  public static final class Climb {
+    public static final int CLIMB = 21;
+  }
 }

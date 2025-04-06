@@ -52,6 +52,7 @@ import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
 import org.sciborgs1155.robot.Ports.OI;
 import org.sciborgs1155.robot.arm.Arm;
+import org.sciborgs1155.robot.climb.Climb;
 import org.sciborgs1155.robot.commands.Alignment;
 import org.sciborgs1155.robot.commands.Autos;
 import org.sciborgs1155.robot.commands.Corolling;
@@ -86,34 +87,34 @@ public class Robot extends CommandRobot {
   // SUBSYSTEMS
   private final Drive drive =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Drive.create();
+        case FULL, SCORALING, COROLLING, CHASSIS, PLAYOOFS -> Drive.create();
         default -> Drive.none();
       };
 
   private final Vision vision =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS -> Vision.create();
+        case FULL, SCORALING, COROLLING, CHASSIS, PLAYOOFS -> Vision.create();
         default -> Vision.none();
       };
 
   @Logged
   private final Elevator elevator =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Elevator.create();
+        case FULL, SCORALING, PLAYOOFS -> Elevator.create();
         default -> Elevator.none();
       };
 
   @Logged
   private final Scoral scoral =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Scoral.create();
+        case FULL, SCORALING, PLAYOOFS -> Scoral.create();
         default -> Scoral.none();
       };
 
   @Logged
   private final Hopper hopper =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING -> Hopper.create();
+        case FULL, SCORALING, PLAYOOFS-> Hopper.create();
         default -> Hopper.none();
       };
 
@@ -130,6 +131,13 @@ public class Robot extends CommandRobot {
         case FULL, COROLLING -> Arm.create();
         default -> Arm.none();
       };
+
+  @Logged
+  private final Climb climb =
+      switch (ROBOT_TYPE) {
+        case FULL, PLAYOOFS -> Climb.create();
+        default -> Climb.none();
+      }
 
   private final LEDs leds = LEDs.create();
 
