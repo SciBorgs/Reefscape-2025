@@ -41,7 +41,6 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -125,7 +124,6 @@ public class Vision {
    *     used for estimation.
    */
   public PoseEstimate[] estimatedGlobalPoses(Rotation2d rotation) {
-    Tracer.startTrace("get vision poses");
     List<PoseEstimate> estimates = new ArrayList<>();
     filteredEstimates.clear();
 
@@ -202,16 +200,21 @@ public class Vision {
                     return valid;
                   })
               .ifPresent(
-                  e ->
-                      estimates.add(
-                          new PoseEstimate(
-                              e,
-                              estimationStdDevs(e.estimatedPose.toPose2d(), change)
-                                  .times(name == "front right" ? 1.6 : 1))));
+                  e -> {
+                    estimates.add(
+                        new PoseEstimate(
+                            e,
+                            estimationStdDevs(e.estimatedPose.toPose2d(), change)
+                                .times(name == "front right" ? 1.6 : 1)));
+                    Epilogue.getConfig()
+                        .backend
+                        .log(
+                            "Robot/vision/accepted poses/ " + name, e.estimatedPose, Pose3d.struct);
+                    ;
+                  });
         }
       }
     }
-    Tracer.endTrace();
     return estimates.toArray(PoseEstimate[]::new);
   }
 

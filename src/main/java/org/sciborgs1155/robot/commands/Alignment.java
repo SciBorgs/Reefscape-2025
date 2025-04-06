@@ -26,7 +26,6 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.Fault;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.RepulsorFieldPlanner;
-import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.FieldConstants.Face;
 import org.sciborgs1155.robot.FieldConstants.Face.Side;
@@ -238,13 +237,11 @@ public class Alignment {
     return drive
         .run(
             () -> {
-              Tracer.startTrace("repulsor pathfinding");
               planner.setGoal(goal.get().getTranslation());
               drive.goToSample(
                   planner.getCmd(drive.pose(), drive.fieldRelativeChassisSpeeds(), speed, true),
                   goal.get().getRotation(),
                   elevator::position);
-              Tracer.endTrace();
             })
         .until(() -> drive.atTranslation(goal.get().getTranslation(), tolerance))
         .onlyWhile(
@@ -297,7 +294,6 @@ public class Alignment {
   public Command freeDrive(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
     return drive.run(
         () -> {
-          Tracer.startTrace("repulsor pathfinding");
           planner.setGoal(
               drive
                   .pose()
@@ -314,7 +310,6 @@ public class Alignment {
                   DriveConstants.MAX_SPEED.in(MetersPerSecond),
                   true),
               elevator::position);
-          Tracer.endTrace();
         });
   }
 

@@ -75,7 +75,6 @@ import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.lib.FaultLogger.FaultType;
 import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
-import org.sciborgs1155.lib.Tracer;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
 import org.sciborgs1155.robot.Robot;
@@ -155,6 +154,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
   @Logged private final Field2d field2d = new Field2d();
   private final FieldObject2d[] modules2d;
+  private final FieldObject2d driveGoal;
 
   // Characterization routines
   private final SysIdRoutine translationCharacterization;
@@ -306,7 +306,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
 
     gyro.reset(Rotation2d.kZero);
     odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
-
+    driveGoal = field2d.getObject("drive goal");
     for (int i = 0; i < modules.size(); i++) {
       var module = modules.get(i);
       modules2d[i] = field2d.getObject("module-" + module.name());
@@ -792,6 +792,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
           double out = profiledPID.calculate(difference.norm(), 0) * viviansConstant.get();
           Vector<N3> velocities = difference.unit().times(out);
           Epilogue.getConfig().backend.log("/Robot/drive/driveTo goal", targetPose, Pose2d.struct);
+          driveGoal.setPose(targetPose);
           Epilogue.getConfig()
               .backend
               .log(
@@ -1034,7 +1035,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // update our heading in reality / sim
-    Tracer.startTrace("drive pd");
     if (Robot.isReal()) {
       lock.lock();
       try {
@@ -1093,8 +1093,6 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         .log(
             "/Robot/drive/command",
             Optional.ofNullable(getCurrentCommand()).map(Command::getName).orElse("none"));
-
-    Tracer.endTrace();
   }
 
   @Override
