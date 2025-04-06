@@ -153,7 +153,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public static final ReentrantLock lock = new ReentrantLock();
 
   @Logged private final Field2d field2d = new Field2d();
-  private final FieldObject2d[] modules2d;
+  // private final FieldObject2d[] modules2d;
   private final FieldObject2d driveGoal;
 
   // Characterization routines
@@ -252,7 +252,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     this.rearRight = rearRight;
 
     modules = List.of(this.frontLeft, this.frontRight, this.rearLeft, this.rearRight);
-    modules2d = new FieldObject2d[modules.size()];
+    // modules2d = new FieldObject2d[modules.size()];
     lastPositions = modulePositions();
     lastHeading = gyro.rotation2d();
 
@@ -307,10 +307,10 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     gyro.reset(Rotation2d.kZero);
     odometry = new SwerveDrivePoseEstimator(kinematics, lastHeading, lastPositions, Pose2d.kZero);
     driveGoal = field2d.getObject("drive goal");
-    for (int i = 0; i < modules.size(); i++) {
-      var module = modules.get(i);
-      modules2d[i] = field2d.getObject("module-" + module.name());
-    }
+    // for (int i = 0; i < modules.size(); i++) {
+    //   var module = modules.get(i);
+    //   modules2d[i] = field2d.getObject("module-" + module.name());
+    // }
 
     profiledPID.setTolerance(Translation.TOLERANCE.in(Meters));
     // poseController.setTolerance(Translation.TOLERANCE.in(Meters));
@@ -1076,11 +1076,11 @@ public class Drive extends SubsystemBase implements AutoCloseable {
     // update our simulated field poses
     field2d.setRobotPose(pose());
 
-    for (int i = 0; i < modules2d.length; i++) {
-      var module = modules.get(i);
-      var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
-      modules2d[i].setPose(pose().transformBy(transform));
-    }
+    // for (int i = 0; i < modules2d.length; i++) {
+    //   var module = modules.get(i);
+    //   var transform = new Transform2d(MODULE_OFFSET[i], module.position().angle);
+    //   modules2d[i].setPose(pose().transformBy(transform));
+    // }
 
     if (TUNING) {
       profiledPID.setPID(oldTranslationP.get(), oldTranslationI.get(), oldTranslationD.get());
