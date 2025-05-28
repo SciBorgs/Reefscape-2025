@@ -25,9 +25,9 @@ public class VisionConstants {
       new CameraConfig(
           "front left",
           new Transform3d(
-              Inches.of(12.931292).in(Meters),
-              Inches.of(10.883863).in(Meters),
-              Inches.of(8.739474).in(Meters),
+              Inches.of(/*12.931292*/0).in(Meters),
+              Inches.of(/*10.883863*/0).in(Meters),
+              Inches.of(/*8.739474*/0).in(Meters),
               new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
                   .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-35)))));
 

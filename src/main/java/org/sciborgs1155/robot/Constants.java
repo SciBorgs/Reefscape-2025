@@ -43,7 +43,8 @@ public class Constants {
     NONE,
     COROLLING,
     SCORALING,
-    PLAYOOFS
+    PLAYOOFS, 
+    VISION
   }
 
   /**
@@ -110,7 +111,7 @@ public class Constants {
     return Math.min(Math.max(min, value), max);
   }
 
-  public static RobotType ROBOT_TYPE = RobotType.SCORALING;
+  public static RobotType ROBOT_TYPE = RobotType.VISION;
 
   public static boolean TUNING = false;
 

@@ -90,7 +90,7 @@ public class Robot extends CommandRobot {
 
   private final Vision vision =
       switch (ROBOT_TYPE) {
-        case FULL, SCORALING, COROLLING, CHASSIS, PLAYOOFS -> Vision.create();
+        case FULL, SCORALING, COROLLING, CHASSIS, PLAYOOFS, VISION -> Vision.create();
         default -> Vision.none();
       };
 
