@@ -43,7 +43,7 @@ public class Constants {
     NONE,
     COROLLING,
     SCORALING,
-    PLAYOOFS, 
+    PLAYOOFS,
     VISION
   }
 
