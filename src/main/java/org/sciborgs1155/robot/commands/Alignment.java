@@ -90,7 +90,7 @@ public class Alignment {
                             .backend
                             .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
                 .ignoringDisable(true),
-            pathfind(goal, Meters.of(1))
+            pathfind(goal, Meters.of(.3))
                 .ignoringDisable(true)
                 .withName("pathfind to reef")
                 .asProxy(),
@@ -204,7 +204,7 @@ public class Alignment {
                     .log("/Robot/alignment/goal pose", goal.get(), Pose2d.struct))
         .ignoringDisable(true)
         .andThen(
-            pathfind(goal, Meters.of(1))
+            pathfind(goal, Meters.of(0.3))
                 .ignoringDisable(true)
                 .asProxy()
                 .andThen(

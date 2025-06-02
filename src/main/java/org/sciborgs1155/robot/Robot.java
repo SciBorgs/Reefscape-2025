@@ -378,30 +378,30 @@ public class Robot extends CommandRobot {
                     Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
 
     // climb
-    operator
-        .rightTrigger()
-        .and(operator.leftTrigger().negate())
-        .whileTrue(
-            Commands.parallel(elevator.scoreLevel(Level.L2).asProxy(), climb.climb().asProxy()));
+    // // operator
+    // //     .rightTrigger()
+    // //     .and(operator.leftTrigger().negate())
+    //     .whileTrue(
+    //         Commands.parallel(elevator.scoreLevel(Level.L2).asProxy(), climb.climb().asProxy()));
 
-    operator.rightTrigger().and(operator.leftTrigger()).onTrue(elevator.scoreLevel(Level.L2));
+    // operator.rightTrigger().and(operator.leftTrigger()).onTrue(elevator.scoreLevel(Level.L2));
 
-    operator.leftTrigger().and(operator.rightTrigger().negate()).whileTrue(climb.setupClimb());
+    // operator.leftTrigger().and(operator.rightTrigger().negate()).whileTrue(climb.setupClimb());
 
     // corolling
-    // operator
-    //     .rightTrigger()
-    //     .and(operator.b())
-    //     .whileTrue(corolling.algaeIntake())
-    //     .onFalse(corolling.processorGoTo());
-    // operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
+    operator
+        .rightTrigger()
+        .and(operator.b())
+        .whileTrue(corolling.algaeIntake())
+        .onFalse(corolling.processorGoTo());
+    operator.leftTrigger().and(operator.b()).whileTrue(corolling.processorOuttake());
 
-    // operator
-    //     .rightTrigger()
-    //     .and(operator.b().negate())
-    //     .whileTrue(corolling.coralIntake())
-    //     .onFalse(coroller.coralIntake());
-    // operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
+    operator
+        .rightTrigger()
+        .and(operator.b().negate())
+        .whileTrue(corolling.coralIntake())
+        .onFalse(coroller.coralIntake());
+    operator.leftTrigger().and(operator.b().negate()).whileTrue(corolling.trough());
 
     // operator.b().toggleOnTrue(arm.manualArm(operator::getLeftY));
 
