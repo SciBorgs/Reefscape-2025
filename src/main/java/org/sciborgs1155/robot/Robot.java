@@ -118,7 +118,7 @@ public class Robot extends CommandRobot {
   @Logged
   private final Coroller coroller =
       switch (ROBOT_TYPE) {
-        case FULL, COROLLING -> Coroller.none();
+        case FULL, COROLLING -> Coroller.create();
         default -> Coroller.none();
       };
 
@@ -286,6 +286,7 @@ public class Robot extends CommandRobot {
                   //       .resetGyro(allianceRotation().plus(drive.heading()))
                   //       .withName("gyro reset enabled");
                   vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+                  
                 }));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
@@ -348,6 +349,10 @@ public class Robot extends CommandRobot {
     driver.povRight().whileTrue(elevator.homingSequence());
 
     driver.povUp().whileTrue(align.nearAlgae());
+
+    driver.leftTrigger().whileTrue(leds.blink(Color.kWhite));
+
+    operator.povDown().whileTrue(coroller.coralIntake());
 
     // OPERATOR
 
