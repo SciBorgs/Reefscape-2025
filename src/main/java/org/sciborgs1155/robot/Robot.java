@@ -286,7 +286,6 @@ public class Robot extends CommandRobot {
                   //       .resetGyro(allianceRotation().plus(drive.heading()))
                   //       .withName("gyro reset enabled");
                   vision.setPoseStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-                  
                 }));
 
     autonomous().whileTrue(Commands.deferredProxy(autos::getSelected).alongWith(leds.autos()));
