@@ -351,7 +351,7 @@ public class Robot extends CommandRobot {
 
     driver.leftTrigger().whileTrue(leds.blink(Color.kWhite));
 
-    operator.povDown().whileTrue(coroller.coralIntake());
+    // operator.povDown().whileTrue(leds.blink(Color.kWhite));
 
     // OPERATOR
 
