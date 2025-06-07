@@ -234,6 +234,12 @@ public class Robot extends CommandRobot {
 
     addPeriodic(() -> Dashboard.tick(), PERIOD.in(Seconds));
     addPeriodic(() -> Dashboard.setElevatorEntry(elevator.position()), PERIOD.in(Seconds));
+    addPeriodic(
+        () ->
+            Epilogue.getConfig()
+                .backend
+                .log("/Robot/matchTime", Robot.isReal() ? DriverStation.getMatchTime() : -1),
+        PERIOD.in(Seconds));
   }
 
   /** Configures trigger -> command bindings. */
