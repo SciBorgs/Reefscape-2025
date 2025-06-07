@@ -33,6 +33,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -76,11 +77,13 @@ import org.sciborgs1155.lib.InputStream;
 import org.sciborgs1155.lib.Test;
 import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.Constants;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 import org.sciborgs1155.robot.Robot;
 import org.sciborgs1155.robot.drive.DriveConstants.ControlMode;
 import org.sciborgs1155.robot.drive.DriveConstants.Rotation;
 import org.sciborgs1155.robot.drive.DriveConstants.Translation;
 import org.sciborgs1155.robot.vision.Vision.PoseEstimate;
+import org.sciborgs1155.robot.vision.VisionConstants;
 
 public class Drive extends SubsystemBase implements AutoCloseable {
   // Modules
@@ -814,6 +817,32 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         .until(() -> atPose(target.get(), Translation.TOLERANCE, Rotation.TOLERANCE))
         .andThen(stop())
         .withName("drive to pose");
+  }
+
+  public Command observantDrive(
+      DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier elevatorHeight) {
+    return drive(
+        vx,
+        vy,
+        () ->
+            Branch.nearest(
+                    pose()
+                        .transformBy(
+                            new Transform2d(
+                                VisionConstants.FRONT_LEFT_CAMERA
+                                    .robotToCam()
+                                    .getTranslation()
+                                    .toTranslation2d(),
+                                VisionConstants.FRONT_LEFT_CAMERA
+                                    .robotToCam()
+                                    .getRotation()
+                                    .toRotation2d())))
+                .pose()
+                .getTranslation()
+                .minus(pose().getTranslation())
+                .getAngle()
+                .minus(VisionConstants.FRONT_LEFT_CAMERA.robotToCam().getRotation().toRotation2d()),
+        elevatorHeight);
   }
 
   @Logged private double prevError = -1;

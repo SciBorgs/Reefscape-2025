@@ -355,7 +355,8 @@ public class Robot extends CommandRobot {
 
     driver.povUp().whileTrue(align.nearAlgae());
 
-    driver.leftTrigger().whileTrue(leds.blink(Color.kWhite));
+    // driver.leftTrigger().whileTrue(leds.blink(Color.kWhite));
+    driver.leftTrigger().whileTrue(drive.observantDrive(x, y, elevator::position));
 
     // operator.povDown().whileTrue(leds.blink(Color.kWhite));
 
