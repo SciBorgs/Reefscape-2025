@@ -1,5 +1,6 @@
 package org.sciborgs1155.robot.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
@@ -24,6 +25,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,21 +47,24 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
+import org.sciborgs1155.robot.drive.Drive;
+import org.sciborgs1155.robot.FieldConstants.Branch;
 
 @Logged
-public class Vision {
+public class Vision extends SubsystemBase{
   public static record CameraConfig(String name, Transform3d robotToCam) {}
 
   public static record PoseEstimate(EstimatedRobotPose estimatedPose, Matrix<N3, N1> standardDev) {}
 
   private final PhotonCamera[] cameras;
-  private final PhotonPoseEstimator[] estimators;
-  private final PhotonCameraSim[] simCameras;
+  // private final PhotonPoseEstimator[] estimators;
+  // private final PhotonCameraSim[] simCameras;
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
-  @Logged private final List<Pose3d> filteredEstimates;
+  // @Logged private final List<Pose3d> filteredEstimates;
 
   private VisionSystemSim visionSim;
+  
 
   /** A factory to create new vision classes with our four configured cameras. */
   public static Vision create() {
@@ -70,156 +77,31 @@ public class Vision {
 
   public Vision(CameraConfig... configs) {
     cameras = new PhotonCamera[configs.length];
-    estimators = new PhotonPoseEstimator[configs.length];
-    simCameras = new PhotonCameraSim[configs.length];
+    // estimators = new PhotonPoseEstimator[configs.length];
+    // simCameras = new PhotonCameraSim[configs.length];
     lastResults = new PhotonPipelineResult[configs.length];
-    filteredEstimates = new ArrayList<>();
+    // filteredEstimates = new ArrayList<>();
     camerasEnabled = new HashMap<>();
 
     for (int i = 0; i < configs.length; i++) {
       PhotonCamera camera = new PhotonCamera(configs[i].name());
-      PhotonPoseEstimator estimator =
-          new PhotonPoseEstimator(
-              VisionConstants.TAG_LAYOUT,
-              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-              configs[i].robotToCam());
+      // PhotonPoseEstimator estimator =
+      //     new PhotonPoseEstimator(
+      //         VisionConstants.TAG_LAYOUT,
+      //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+      //         configs[i].robotToCam());
 
-      estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+      // estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
       cameras[i] = camera;
-      estimators[i] = estimator;
+      // estimators[i] = estimator;
       lastResults[i] = new PhotonPipelineResult();
       camerasEnabled.put(camera.getName(), true);
 
       FaultLogger.register(camera);
     }
-
-    if (Robot.isSimulation()) {
-      visionSim = new VisionSystemSim("main");
-      visionSim.addAprilTags(VisionConstants.TAG_LAYOUT);
-
-      for (int i = 0; i < cameras.length; i++) {
-        var prop = new SimCameraProperties();
-        prop.setCalibration(WIDTH, HEIGHT, FOV);
-        prop.setCalibError(0.15, 0.05);
-        prop.setFPS(45);
-        prop.setAvgLatencyMs(12);
-        prop.setLatencyStdDevMs(3.5);
-
-        PhotonCameraSim cameraSim = new PhotonCameraSim(cameras[i], prop);
-        cameraSim.setMaxSightRange(5);
-        cameraSim.enableRawStream(true);
-        cameraSim.enableProcessedStream(true);
-        cameraSim.enableDrawWireframe(true);
-
-        visionSim.addCamera(cameraSim, configs[i].robotToCam());
-        simCameras[i] = cameraSim;
-      }
-    }
   }
 
-  /**
-   * Returns a list of all currently visible pose estimates and their standard deviation vectors.
-   *
-   * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
-   *     used for estimation.
-   */
-  public PoseEstimate[] estimatedGlobalPoses(Rotation2d rotation) {
-    List<PoseEstimate> estimates = new ArrayList<>();
-    filteredEstimates.clear();
-
-    for (int i = 0; i < estimators.length; i++) {
-      if (camerasEnabled.get(cameras[i].getName())) {
-        var unreadChanges = cameras[i].getAllUnreadResults();
-
-        String name = cameras[i].getName();
-
-        Optional<EstimatedRobotPose> estimate = Optional.empty();
-
-        int unreadLength = unreadChanges.size();
-
-        // if (estimators[i].getPrimaryStrategy() == PoseStrategy.PNP_DISTANCE_TRIG_SOLVE) {
-        //   estimators[i].addHeadingData(Timer.getFPGATimestamp(), rotation);
-        // }
-
-        // feeds latest result for visualization; multiple different pos breaks getSeenTags()
-        lastResults[i] = unreadLength == 0 ? lastResults[i] : unreadChanges.get(unreadLength - 1);
-
-        for (int j = 0; j < unreadLength; j++) {
-          var change = unreadChanges.get(j);
-
-          // only reef tags
-          change.targets =
-              change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
-          change.multitagResult =
-              change.multitagResult.filter(
-                  r ->
-                      r.fiducialIDsUsed.stream()
-                          .map(id -> REEF_TAGS.contains((int) id))
-                          .reduce(true, (a, b) -> a && b));
-
-          // negate pitch
-          change.targets.stream()
-              .forEach(
-                  t -> {
-                    t.pitch = -t.pitch;
-                  });
-          change.multitagResult =
-              change.multitagResult.filter(
-                  r ->
-                      r.fiducialIDsUsed.stream()
-                          .map(id -> REEF_TAGS.contains((int) id))
-                          .reduce(true, (a, b) -> a && b));
-
-          // remove ambiguity
-          change.targets =
-              change.targets.stream().filter(t -> t.poseAmbiguity < MAX_AMBIGUITY).toList();
-          change.multitagResult =
-              change.multitagResult.filter(r -> r.estimatedPose.ambiguity < MAX_AMBIGUITY);
-
-          estimate = estimators[i].update(change);
-          Epilogue.getConfig()
-              .backend
-              .log("Robot/vision/ " + name + " estimates present", estimate.isPresent());
-          estimate
-              .filter(
-                  f -> {
-                    boolean valid =
-                        FieldConstants.inField(f.estimatedPose)
-                            && Math.abs(f.estimatedPose.getZ()) < MAX_HEIGHT
-                            && Math.abs(f.estimatedPose.getRotation().getX()) < MAX_ANGLE
-                            && Math.abs(f.estimatedPose.getRotation().getY()) < MAX_ANGLE;
-                    if (!valid) {
-                      filteredEstimates.add(f.estimatedPose);
-                      Epilogue.getConfig()
-                          .backend
-                          .log(
-                              "Robot/vision/filtered poses/ " + name,
-                              f.estimatedPose,
-                              Pose3d.struct);
-                    }
-                    return valid;
-                  })
-              .ifPresent(
-                  e -> {
-                    estimates.add(
-                        new PoseEstimate(
-                            e,
-                            estimationStdDevs(e.estimatedPose.toPose2d(), change)
-                                .times(
-                                    name == "front right"
-                                        ? (DriverStation.isDisabled() ? Double.MAX_VALUE : 2.6)
-                                        : 1)));
-                    Epilogue.getConfig()
-                        .backend
-                        .log(
-                            "Robot/vision/accepted poses/ " + name, e.estimatedPose, Pose3d.struct);
-                  });
-        }
-      }
-    }
-    return estimates.toArray(PoseEstimate[]::new);
-  }
-
+ 
   public void disableCam(String name) {
     camerasEnabled.put(name, false);
   }
@@ -230,14 +112,6 @@ public class Vision {
 
   public boolean getCameraStatus(String name) {
     return camerasEnabled.get(name);
-  }
-
-  public void setPoseStrategy(PoseStrategy strategy) {
-    for (int i = 0; i < estimators.length; i++) {
-      if (Set.of("front left", "front right").contains(cameras[i].getName())) {
-        estimators[i].setPrimaryStrategy(strategy);
-      }
-    }
   }
 
   /**
@@ -254,6 +128,8 @@ public class Vision {
         .map(Optional::get)
         .toArray(Pose3d[]::new);
   }
+
+  
 
   /**
    * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
@@ -299,7 +175,20 @@ public class Vision {
       FRONT_LEFT_CAMERA.robotToCam(), FRONT_RIGHT_CAMERA.robotToCam(),
     };
   }
-
+   
+  public Command directTagAlignment(Drive drive){
+    double tagYaw;
+    boolean targetSeen = false;
+    for (int i = 0; i < lastResults.length; i++) {
+      if (lastResults[i].hasTargets()){
+        for (var target : getSeenTags()){
+          tagYaw = target.getRotation().getMeasureX().in(Degrees);
+          targetSeen = true;
+        }
+      }
+    }
+    return run(drive.driveRobotRelative(() -> 0, () -> 0, ()))
+  }
   /**
    * Updates the vision field simulation. This method should not be called when code is running on
    * the robot.

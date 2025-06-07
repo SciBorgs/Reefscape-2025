@@ -452,6 +452,19 @@ public class Drive extends SubsystemBase implements AutoCloseable {
         });
   }
 
+  public Command driveRobotRelative(DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier vOmega, DoubleSupplier elevatorHeight){
+    return run(() -> {
+      setChassisSpeeds(
+              ChassisSpeeds.fromRobotRelativeSpeeds(
+                  vx.getAsDouble(),
+                  vy.getAsDouble(),
+                  vOmega.getAsDouble(),
+                  heading().plus(allianceRotation())),
+              ControlMode.OPEN_LOOP_VELOCITY,
+              elevatorHeight.getAsDouble());
+    });
+  }
+
   /**
    * Drives the robot based on a {@link InputStream} for field relative x y and omega velocities.
    *
