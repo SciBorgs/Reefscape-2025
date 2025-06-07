@@ -2,6 +2,7 @@ package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Milliseconds;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
@@ -16,4 +17,6 @@ public class ScoralConstants {
   public static final Current CURRENT_LIMIT = Amps.of(50);
 
   public static final Time RAMP_TIME = Milliseconds.of(50);
+
+  public static final Time DEBOUNCE_TIME = Seconds.of(0.18);
 }

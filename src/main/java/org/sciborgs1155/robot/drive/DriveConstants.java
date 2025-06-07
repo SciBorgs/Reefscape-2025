@@ -96,7 +96,7 @@ public final class DriveConstants {
 
   public static final class Translation {
     public static final double P = 4.0;
-    public static final double I = 0.0005;
+    public static final double I = 0.005;
     public static final double D = 0.05;
 
     public static final Distance TOLERANCE = Centimeters.of(1);
@@ -106,7 +106,7 @@ public final class DriveConstants {
 
   public static final class NewTranslation {
     public static final double P = 30.0;
-    public static final double I = 0.0;
+    public static final double I = 0.01;
     public static final double D = 0.05;
   }
 

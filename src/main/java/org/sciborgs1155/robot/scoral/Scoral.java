@@ -1,6 +1,7 @@
 package org.sciborgs1155.robot.scoral;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
 import static org.sciborgs1155.lib.Assertion.tAssert;
 import static org.sciborgs1155.robot.Ports.Scoral.ALGAE;
 import static org.sciborgs1155.robot.Ports.Scoral.BEAMBREAK;
@@ -59,8 +60,8 @@ public class Scoral extends SubsystemBase implements AutoCloseable {
     this.beambreak = beambreak;
     this.blocked =
         new Trigger(beambreak::get)
-            .debounce(0.5)
-            .negate(); // it spontaneously negated.... and it unnegated again...
+            .negate()
+            .debounce(DEBOUNCE_TIME.in(Seconds)); // it spontaneously negated.... and it unnegated again...
 
     setDefaultCommand(stop());
   }
