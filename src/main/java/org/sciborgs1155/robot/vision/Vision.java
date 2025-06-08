@@ -5,7 +5,6 @@ import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.HEIGHT;
-import static org.sciborgs1155.robot.vision.VisionConstants.HENRYS_CONSTANT;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_AMBIGUITY;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_HEIGHT;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +42,6 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
-import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -61,7 +58,8 @@ public class Vision {
   private final Map<String, Boolean> camerasEnabled;
   @Logged private final List<Pose3d> filteredEstimates;
 
-  public static DoubleEntry g = Tuning.entry("/Robot/tuning/vision/henry", HENRYS_CONSTANT);
+  // trusts vision a LOT. includes heading.
+  private boolean overTrustVision = false;
 
   private VisionSystemSim visionSim;
 
@@ -226,6 +224,15 @@ public class Vision {
     return estimates.toArray(PoseEstimate[]::new);
   }
 
+  /**
+   * Enables vision heading calculaton and also fully trusts it.
+   *
+   * @param enable Whether or not to enable this feature.
+   */
+  public void overTrust(boolean enable) {
+    overTrustVision = enable;
+  }
+
   public void disableCam(String name) {
     camerasEnabled.put(name, false);
   }
@@ -299,6 +306,7 @@ public class Vision {
 
     // disregard estimate heading after initial reposition
     if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
+    if (overTrustVision) estStdDevs.div(11552265);
 
     return estStdDevs.times(avgWeight);
   }

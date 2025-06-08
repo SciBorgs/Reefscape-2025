@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.lib.CommandRobot;
 import org.sciborgs1155.lib.FaultLogger;
@@ -149,6 +150,8 @@ public class Robot extends CommandRobot {
       Autos.configureAutos(drive, scoraling, elevator, align, scoral);
 
   @Logged private double speedMultiplier = Constants.FULL_SPEED_MULTIPLIER;
+
+  private BooleanSupplier enableVisionHeading;
 
   /** The robot contains subsystems, OI devices, and commands. */
   public Robot() {
@@ -323,8 +326,7 @@ public class Robot extends CommandRobot {
 
     // DRIVER
     driver
-        .leftBumper()
-        .or(driver.rightBumper())
+        .rightBumper()
         .onTrue(Commands.runOnce(() -> speedMultiplier = Constants.SLOW_SPEED_MULTIPLIER))
         .onFalse(Commands.runOnce(() -> speedMultiplier = Constants.FULL_SPEED_MULTIPLIER));
 
@@ -357,6 +359,8 @@ public class Robot extends CommandRobot {
 
     // driver.leftTrigger().whileTrue(leds.blink(Color.kWhite));
     driver.leftTrigger().whileTrue(drive.observantDrive(x, y, elevator::position));
+
+    addPeriodic(() -> vision.overTrust(driver.leftBumper().getAsBoolean()), PERIOD);
 
     // operator.povDown().whileTrue(leds.blink(Color.kWhite));
 

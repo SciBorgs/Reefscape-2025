@@ -67,7 +67,9 @@ public class Autos {
         .map(
             b ->
                 Commands.sequence(
-                    alignSource(alignment, scoraling, 0).ignoringDisable(true),
+                    Commands.parallel(
+                        alignSource(alignment, scoraling, 0).ignoringDisable(true),
+                        scoraling.homing()),
                     alignReef(b, alignment, scoraling).ignoringDisable(true)))
         .reduce(Commands.none(), (a, b) -> a.andThen(b))
         .ignoringDisable(false);

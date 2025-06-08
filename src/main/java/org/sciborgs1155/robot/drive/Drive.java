@@ -822,27 +822,32 @@ public class Drive extends SubsystemBase implements AutoCloseable {
   public Command observantDrive(
       DoubleSupplier vx, DoubleSupplier vy, DoubleSupplier elevatorHeight) {
     return drive(
-        vx,
-        vy,
-        () ->
-            Branch.nearest(
-                    pose()
-                        .transformBy(
-                            new Transform2d(
-                                VisionConstants.FRONT_LEFT_CAMERA
-                                    .robotToCam()
-                                    .getTranslation()
-                                    .toTranslation2d(),
-                                VisionConstants.FRONT_LEFT_CAMERA
-                                    .robotToCam()
-                                    .getRotation()
-                                    .toRotation2d())))
-                .pose()
-                .getTranslation()
-                .minus(pose().getTranslation())
-                .getAngle()
-                .minus(VisionConstants.FRONT_LEFT_CAMERA.robotToCam().getRotation().toRotation2d()),
-        elevatorHeight).withName("henry li left trigger");
+            vx,
+            vy,
+            () ->
+                Branch.nearest(
+                        pose()
+                            .transformBy(
+                                new Transform2d(
+                                    VisionConstants.FRONT_LEFT_CAMERA
+                                        .robotToCam()
+                                        .getTranslation()
+                                        .toTranslation2d(),
+                                    VisionConstants.FRONT_LEFT_CAMERA
+                                        .robotToCam()
+                                        .getRotation()
+                                        .toRotation2d())))
+                    .pose()
+                    .getTranslation()
+                    .minus(pose().getTranslation())
+                    .getAngle()
+                    .minus(
+                        VisionConstants.FRONT_LEFT_CAMERA
+                            .robotToCam()
+                            .getRotation()
+                            .toRotation2d()),
+            elevatorHeight)
+        .withName("henry li left trigger");
   }
 
   @Logged private double prevError = -1;

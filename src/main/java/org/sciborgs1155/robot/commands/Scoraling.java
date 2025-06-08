@@ -65,6 +65,10 @@ public class Scoraling {
     return elevator.retract().withName("retractElevator");
   }
 
+  public Command homing() {
+    return elevator.homingSequence().withName("homing");
+  }
+
   /**
    * A command which scores a coral at the given level, assuming you are already at the correct
    * branch.
