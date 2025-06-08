@@ -5,9 +5,11 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static org.sciborgs1155.robot.Constants.Robot.BUMPER_LENGTH;
+import static org.sciborgs1155.robot.Constants.advance;
 import static org.sciborgs1155.robot.Constants.alliance;
 import static org.sciborgs1155.robot.Constants.allianceReflect;
 import static org.sciborgs1155.robot.Constants.clamp;
+import static org.sciborgs1155.robot.Constants.strafe;
 import static org.sciborgs1155.robot.FieldConstants.Branch.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -94,11 +96,12 @@ public class FieldConstants {
           Rotation2d.kZero);
   public static final Pose2d REEF_BRANCH_B =
       new Pose2d(
-          CENTER_REEF
-              .getMeasureX()
-              .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
-          CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
-          Rotation2d.kZero);
+              CENTER_REEF
+                  .getMeasureX()
+                  .minus(REEF_MIN_RADIUS.plus(Constants.Robot.BUMPER_LENGTH.div(2))),
+              CENTER_REEF.getMeasureY().minus(Inches.of(13 / 2)),
+              Rotation2d.kZero)
+          .transformBy(strafe(Inches.of(1)).plus(advance(Inches.of(1.5))));
 
   // Reef faces
 
@@ -190,7 +193,7 @@ public class FieldConstants {
 
     /** specifically, Charlie Kerr (represents rotational offset in alignment) */
     public static Transform2d CHARLIES_CONSTANT =
-        new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(5));
+        new Transform2d(Meters.of(0.05), Meters.of(0), Rotation2d.fromDegrees(5));
 
     /**
      * Moves the pose in or out depending on the level.

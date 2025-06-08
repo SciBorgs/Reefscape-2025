@@ -53,6 +53,8 @@ public class VisionConstants {
   public static final double MAX_ANGLE = 1;
   public static final double MAX_AMBIGUITY = 0.18;
 
+  public static final double HENRYS_CONSTANT = 30;
+
   // Total of 22 AprilTags
   // Reference: https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf (page 35)
   // Tag Locations (1-22)
@@ -65,5 +67,5 @@ public class VisionConstants {
     0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
   };
 
-  public static final Set<Integer> REEF_TAGS = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 22);
+  public static final Set<Integer> REEF_TAGS = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
 }

@@ -176,7 +176,7 @@ public class Robot extends CommandRobot {
   /** Configures basic behavior for different periods during the game. */
   private void configureGameBehavior() {
     // Configure logging with DataLogManager, Monologue, and FaultLogger
-    DataLogManager.start("/u/logs");
+    DataLogManager.start();
     // SignalLogger.enableAutoLogging(true);
     // SignalLogger.setPath("/u/logs");
     addPeriodic(FaultLogger::update, 2);
@@ -497,6 +497,7 @@ public class Robot extends CommandRobot {
             elevator.goToTest(Level.L1.extension),
             elevator.goToTest(ElevatorConstants.MIN_EXTENSION),
             scoraling.runRollersTest(),
+            Test.fromCommand(Commands.waitSeconds(.5)),
             Test.fromCommand(
                 scoral.testScore().asProxy().until(scoral.blocked.negate()).withTimeout(1)),
             // arm.goToTest(CORAL_INTAKE_ANGLE),

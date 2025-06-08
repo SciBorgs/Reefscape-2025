@@ -1,9 +1,11 @@
 package org.sciborgs1155.robot.vision;
 
+import static java.lang.Math.pow;
 import static org.sciborgs1155.robot.vision.VisionConstants.FOV;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_LEFT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.FRONT_RIGHT_CAMERA;
 import static org.sciborgs1155.robot.vision.VisionConstants.HEIGHT;
+import static org.sciborgs1155.robot.vision.VisionConstants.HENRYS_CONSTANT;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_AMBIGUITY;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_HEIGHT;
@@ -23,6 +25,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +44,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.sciborgs1155.lib.FaultLogger;
+import org.sciborgs1155.lib.Tuning;
 import org.sciborgs1155.robot.FieldConstants;
 import org.sciborgs1155.robot.Robot;
 
@@ -56,6 +60,8 @@ public class Vision {
   private final PhotonPipelineResult[] lastResults;
   private final Map<String, Boolean> camerasEnabled;
   @Logged private final List<Pose3d> filteredEstimates;
+
+  public static DoubleEntry g = Tuning.entry("/Robot/tuning/vision/henry", HENRYS_CONSTANT);
 
   private VisionSystemSim visionSim;
 
@@ -274,6 +280,7 @@ public class Vision {
       avgDist +=
           tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
       avgWeight += TAG_WEIGHTS[tgt.getFiducialId() - 1];
+      if (tgt.bestCameraToTarget.getTranslation().getNorm() < 3) {}
     }
     if (targets.size() == 0) return estStdDevs;
 
@@ -285,7 +292,10 @@ public class Vision {
     // Increase std devs based on (average) distance
     if (targets.size() == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-    else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+    else
+      estStdDevs =
+          estStdDevs.times(
+              1 + (pow(avgDist - 2.5, 3) / 20)); // decreases estimated stdevs if its super close
 
     // disregard estimate heading after initial reposition
     if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
