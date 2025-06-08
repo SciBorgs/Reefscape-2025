@@ -842,7 +842,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
                 .minus(pose().getTranslation())
                 .getAngle()
                 .minus(VisionConstants.FRONT_LEFT_CAMERA.robotToCam().getRotation().toRotation2d()),
-        elevatorHeight);
+        elevatorHeight).withName("henry li left trigger");
   }
 
   @Logged private double prevError = -1;
