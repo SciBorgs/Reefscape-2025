@@ -10,6 +10,7 @@ import static org.sciborgs1155.robot.Constants.TUNING;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.BASE_FROM_CHASSIS;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.CARRIAGE_FROM_CHASSIS;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.HIGH_FIVE_DELAY;
+import static org.sciborgs1155.robot.elevator.ElevatorConstants.MANUAL_VOLTAGE_SCALAR;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_ACCEL;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_EXTENSION;
 import static org.sciborgs1155.robot.elevator.ElevatorConstants.MAX_VELOCITY;
@@ -196,11 +197,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return goTo(input
             .deadband(.15, 1)
             .scale(MAX_VELOCITY.in(MetersPerSecond))
-            .scale(2)
             .scale(Constants.PERIOD.in(Seconds))
             .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
             .add(() -> pid.getGoal().position))
         .withName("manual elevator");
+  }
+
+  public Command manualVoltageControl(InputStream input) {
+    return run(() -> hardware.setVoltage(kG + MANUAL_VOLTAGE_SCALAR.in(Volts) * Math.pow(input.getAsDouble(),2) * Math.signum(input.getAsDouble())));
   }
 
   /**
@@ -326,7 +330,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     double feedback = pid.calculate(hardware.position(), goal);
     double feedforward = ff.calculateWithVelocities(lastVelocity, pid.getSetpoint().velocity);
 
-    Epilogue.getConfig().backend.log("/Robot/elevator/elevator voltage", feedback + feedforward);
+    Epilogue.getConfig().backend.log("/Robot/elevator/voltage", feedback + feedforward);
     hardware.setVoltage(feedforward + feedback);
   }
 

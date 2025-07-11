@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Current;
@@ -17,6 +18,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 
 public class ElevatorConstants {
   public static final double kP = 3;
@@ -49,7 +51,10 @@ public class ElevatorConstants {
   /** conversion factor in METERS PER ROTATION */
   public static final double CONVERSION_FACTOR = GEARING / SPROCKET_CIRCUMFRENCE.in(Meters) / 2;
 
-  public static final Current CURRENT_LIMIT = Amps.of(65);
+  public static final Current CURRENT_LIMIT = Amps.of(30);
+
+  public static final Voltage MANUAL_VOLTAGE_SCALAR = Volts.of(4);
+
 
   // Don't worry about this :)
   public static final Time HIGH_FIVE_DELAY = Seconds.of(.3);

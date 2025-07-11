@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.ejml.simple.SimpleMatrix;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -306,7 +307,15 @@ public class Vision {
 
     // disregard estimate heading after initial reposition
     if (DriverStation.isEnabled()) estStdDevs.set(2, 0, Double.MAX_VALUE);
-    if (overTrustVision) estStdDevs.div(11552265);
+    if (overTrustVision)
+      estStdDevs.setColumn(
+          0,
+          new Matrix<N3, N1>(
+              new SimpleMatrix(
+                  3,
+                  1,
+                  true,
+                  new double[] {Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE})));
 
     return estStdDevs.times(avgWeight);
   }

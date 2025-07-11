@@ -34,6 +34,7 @@ public class Autos {
     chooser.addOption("P4", P4(alignment, scoraling));
     chooser.addOption("nyc practice field", nycPracticeField(alignment, scoraling));
     chooser.addOption("at home (bad middle reef)", badHome(alignment, scoraling));
+    chooser.addOption("Middle score", middle(alignment, scoraling));
     chooser.setDefaultOption(
         "line",
         drive.run(
@@ -170,6 +171,10 @@ public class Autos {
   public static Command badHome(Alignment alignment, Scoraling scoraling) {
     return fakeAlignAuto(alignment, scoraling, List.of(Branch.I, Branch.J));
     // return alignAuto(alignment, scoraling, List.of(Branch.A, Branch.B));
+  }
+
+  public static Command middle(Alignment alignment, Scoraling scoraling) {
+    return alignAuto(alignment, scoraling, List.of(Branch.H));
   }
 
   // * Warms up the pathfind command by telling drive to drive to itself. */

@@ -249,6 +249,7 @@ public class Robot extends CommandRobot {
   private void configureBindings() {
     InputStream raw_x = InputStream.of(driver::getLeftY).log("/Robot/raw x").negate();
     InputStream raw_y = InputStream.of(driver::getLeftX).log("/Robot/raw y").negate();
+
     // Apply speed multiplier, deadband, square inputs, and scale translation to max speed
     InputStream r =
         InputStream.hypot(raw_x, raw_y)
@@ -369,19 +370,14 @@ public class Robot extends CommandRobot {
     //
     // operator.rightTrigger()
     Trigger slow = operator.povRight().or(operator.povUp());
-    operator.leftBumper().and(slow).whileTrue(scoral.slowScore());
-    operator.leftBumper().and(slow.negate()).whileTrue(scoral.score());
-
+    // operator.leftBumper().and(slow).whileTrue(scoral.slowScore());
+    // operator.leftBumper().and(slow.negate()).whileTrue(scoral.score());
+    operator.leftBumper().whileTrue(scoral.stealgae());
     operator.rightBumper().whileTrue(scoral.expalgae());
 
     operator
         .a()
-        .whileTrue(
-            elevator
-                .scoreLevel(Level.L2_ALGAE)
-                .asProxy()
-                .alongWith(
-                    Commands.waitUntil(elevator::atGoal).andThen(scoral.stealgae().asProxy())));
+        .whileTrue(elevator.manualVoltageControl(InputStream.of(operator::getLeftY).negate().deadband(DEADBAND, 1)).asProxy());
 
     operator
         .x()
