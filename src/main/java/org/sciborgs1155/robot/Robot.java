@@ -334,10 +334,10 @@ public class Robot extends CommandRobot {
     driver.a().whileTrue(align.source().withDeadline(scoraling.hpsIntake().asProxy()));
 
     driver.x().and(driver.povDown()).whileTrue(align.nearReef(Side.LEFT, Level.L2));
-    driver.b().and(driver.povDown()).whileTrue(align.nearReef(Side.RIGHT, Level.L2));
+    driver.b().and(driver.povDown()).whileTrue(align.goToA());
 
     driver.x().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.LEFT, Level.L4));
-    driver.b().and(driver.povDown().negate()).whileTrue(align.nearReef(Side.RIGHT, Level.L4));
+    driver.b().and(driver.povDown().negate()).whileTrue(align.goToA());
 
     // driver.y().whileTrue(align.barge());
     driver

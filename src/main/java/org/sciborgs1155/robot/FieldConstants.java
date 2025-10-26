@@ -190,7 +190,7 @@ public class FieldConstants {
 
     /** specifically, Charlie Kerr (represents rotational offset in alignment) */
     public static Transform2d CHARLIES_CONSTANT =
-        new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(5));
+        new Transform2d(Meters.of(0), Meters.of(0), Rotation2d.fromDegrees(0));
 
     /**
      * Moves the pose in or out depending on the level.

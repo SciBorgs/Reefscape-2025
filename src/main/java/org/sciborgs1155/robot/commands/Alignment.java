@@ -242,6 +242,10 @@ public class Alignment {
         .ignoringDisable(false);
   }
 
+  public Command goToA() {
+    return alignTo(Branch.A::pose);
+  }
+
   /**
    * Finds the nearest reef face, then pathfinds right up to it.
    *
