@@ -199,7 +199,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
             .scale(MAX_VELOCITY.in(MetersPerSecond))
             .scale(Constants.PERIOD.in(Seconds))
             .rateLimit(MAX_ACCEL.in(MetersPerSecondPerSecond))
-            .add(() -> pid.getGoal().position))
+            .add(() -> pid.getGoal().position)
+            )
         .withName("manual elevator");
   }
 

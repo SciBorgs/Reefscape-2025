@@ -8,7 +8,7 @@ import static org.sciborgs1155.robot.vision.VisionConstants.HEIGHT;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_AMBIGUITY;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_ANGLE;
 import static org.sciborgs1155.robot.vision.VisionConstants.MAX_HEIGHT;
-import static org.sciborgs1155.robot.vision.VisionConstants.REEF_TAGS;
+import static org.sciborgs1155.robot.vision.VisionConstants.BAD_TAGS;
 import static org.sciborgs1155.robot.vision.VisionConstants.TAG_LAYOUT;
 import static org.sciborgs1155.robot.vision.VisionConstants.TAG_WEIGHTS;
 import static org.sciborgs1155.robot.vision.VisionConstants.WIDTH;
@@ -48,9 +48,9 @@ import org.sciborgs1155.robot.Robot;
 
 @Logged
 public class Vision {
-  public static record CameraConfig(String name, Transform3d robotToCam) {}
+  public record CameraConfig(String name, int FOV, Transform3d robotToCam, PoseStrategy strategy) {}
 
-  public static record PoseEstimate(EstimatedRobotPose estimatedPose, Matrix<N3, N1> standardDev) {}
+  public record PoseEstimate(EstimatedRobotPose estimatedPose, Matrix<N3, N1> standardDev) {}
 
   private final PhotonCamera[] cameras;
   private final PhotonPoseEstimator[] estimators;
@@ -154,12 +154,12 @@ public class Vision {
 
           // only reef tags
           change.targets =
-              change.targets.stream().filter(t -> REEF_TAGS.contains(t.fiducialId)).toList();
+              change.targets.stream().filter(t -> !BAD_TAGS.contains(t.fiducialId)).toList();
           change.multitagResult =
               change.multitagResult.filter(
                   r ->
                       r.fiducialIDsUsed.stream()
-                          .map(id -> REEF_TAGS.contains((int) id))
+                          .map(id -> !BAD_TAGS.contains((int) id))
                           .reduce(true, (a, b) -> a && b));
 
           // negate pitch
@@ -172,7 +172,7 @@ public class Vision {
               change.multitagResult.filter(
                   r ->
                       r.fiducialIDsUsed.stream()
-                          .map(id -> REEF_TAGS.contains((int) id))
+                          .map(id -> !BAD_TAGS.contains((int) id))
                           .reduce(true, (a, b) -> a && b));
 
           // remove ambiguity

@@ -15,36 +15,44 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Set;
+
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.sciborgs1155.robot.vision.Vision.CameraConfig;
 
 public class VisionConstants {
   public static final AprilTagFieldLayout TAG_LAYOUT =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+  public static Rotation3d yawPitchRoll(
+      double yawDegrees, double pitchDegrees, double rollDegrees) {
+    return new Rotation3d(Degrees.of(rollDegrees), Degrees.of(pitchDegrees), Degrees.of(yawDegrees));
+  }
   public static final CameraConfig FRONT_LEFT_CAMERA =
       new CameraConfig(
-          "front left",
+          "cam 0 RENAME",
+          78,
           new Transform3d(
-              Inches.of(12.931292).in(Meters),
-              Inches.of(10.883863).in(Meters),
-              Inches.of(8.739474).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(-35)))));
+              Inches.of(11.935943),
+              Inches.of(12.493204),
+              Inches.of(5.176840 + 4.6),
+              yawPitchRoll(65, -20, 180)),
+          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
+
 
   public static final CameraConfig FRONT_RIGHT_CAMERA =
       new CameraConfig(
-          "front right",
+          "cam 1 RENAME",
+          78,
           new Transform3d(
-              Inches.of(12.931292).in(Meters),
-              Inches.of(-10.883863).in(Meters),
-              Inches.of(8.739474).in(Meters),
-              new Rotation3d(Radians.zero(), Degrees.of(-17.5), Degrees.of(0))
-                  .rotateBy(new Rotation3d(Radians.zero(), Degrees.of(0), Degrees.of(35)))));
+              Inches.of(11.935943),
+              Inches.of(-12.493204),
+              Inches.of(5.176840 + 4.6),
+              yawPitchRoll(-65, -20, 180)),
+          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
 
   // ThriftyCam constants for our configuration
   public static final int WIDTH = 1280;
   public static final int HEIGHT = 720;
-  public static final Rotation2d FOV = Rotation2d.fromDegrees(80);
+  public static final Rotation2d FOV = Rotation2d.fromDegrees(78);
 
   public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(1.5, 1.5, 7);
   public static final Matrix<N3, N1> MULTIPLE_TAG_STD_DEVS = VecBuilder.fill(0.3, 0.3, 4);
@@ -64,8 +72,8 @@ public class VisionConstants {
   // Processor | Red Side: 3 | Blue Side: 16
 
   public static final double[] TAG_WEIGHTS = {
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
   };
 
-  public static final Set<Integer> REEF_TAGS = Set.of(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
+  public static final Set<Integer> BAD_TAGS = Set.of();
 }

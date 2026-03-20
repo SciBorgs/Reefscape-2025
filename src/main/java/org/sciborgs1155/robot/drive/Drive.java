@@ -201,7 +201,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
               ANGULAR_OFFSETS.get(0),
               FF_CONSTANTS.get(0),
               "FL",
-              false),
+              true),
           new TalonModule(
               FRONT_RIGHT_DRIVE,
               FRONT_RIGHT_TURNING,
@@ -217,7 +217,7 @@ public class Drive extends SubsystemBase implements AutoCloseable {
               ANGULAR_OFFSETS.get(2),
               FF_CONSTANTS.get(2),
               "RL",
-              false),
+              true),
           new TalonModule(
               REAR_RIGHT_DRIVE,
               REAR_RIGHT_TURNING,
